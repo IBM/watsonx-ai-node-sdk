@@ -31,14 +31,14 @@ const textGenRequestParametersModel = {
 
 // Define model list filter
 const listModelParams = {
-    filter: "lifecycle_available"
+    filters: "lifecycle_available"
 }
 
 async function listModelsAndGenerateText() {
     
     // Get available models
     const listModels = await watsonxAIService.listFoundationModelSpecs(listModelParams)
-    const modelList = res.result.resources.map(model => model.model_id);
+    const modelList = listModels.result.resources.map(model => model.model_id);
     console.log("\n\n***** LIST OF AVAILABLE MODELS *****");
     console.log(modelList);
 
@@ -53,7 +53,7 @@ async function listModelsAndGenerateText() {
     console.log("\n\n***** TEXT INPUT INTO MODEL *****");
     console.log(genParams.input)
     console.log("\n\n***** TEXT RESPONSE FROM MODEL *****");
-    console.log(res.result.results[0].generated_text);
+    console.log(textGeneration.result.results[0].generated_text);
 
 }
 
