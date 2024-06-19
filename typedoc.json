@@ -1,0 +1,12 @@
+{
+    "theme": "default",
+    "categorizeByGroup": true,
+    "categoryOrder": ["*", "Properties", "Other"],
+    "entryPointStrategy": "expand",
+    "excludeExternals": true,
+    "tsconfig": "tsconfig.json",
+    "out": "apidocs",
+    "includeVersion": true,
+    "entryPoints": ["index.ts"],
+    "excludeInternal": true
+}
