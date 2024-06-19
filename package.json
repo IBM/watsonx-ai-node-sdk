@@ -1,6 +1,6 @@
 {
   "name": "@ibm-cloud/watsonx-ai",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "IBM watsonx.ai Node.js SDK",
   "repository": {
     "type": "git",
@@ -78,6 +78,12 @@
     ],
     "testEnvironment": "node"
   },
-  "homepage": "https://github.com/IBM/watsonx-ai-node-sdk#readme"
-
+  "homepage": "https://github.com/IBM/watsonx-ai-node-sdk#readme",
+  "directories": {
+    "example": "examples",
+    "lib": "lib",
+    "test": "test"
+  },
+  "files": ["dist/**"],
+  "main": "dist/index.js"
 }
