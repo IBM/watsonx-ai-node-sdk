@@ -4,6 +4,7 @@
  * - tune model
  * - deploy model
  * - infer tuned model
+ * This example may have extended duration (~5 minutes) because of the training time and initialization of the deployment.
  */
 
 /**
@@ -147,6 +148,8 @@ async function tunePromptAndDeploy() {
 
     const trainingDetails = await watsonxAIService.trainingsCreate(trainingParams)
     const trainingId = trainingDetails.result.metadata.id;
+    // Wait until training has been finished, then save id of the model and use it for deployment
+    // This step should take ~3 minutes
     const modelId = await getModelId({trainingId, projectId});
 
     // Rel
@@ -166,6 +169,8 @@ async function tunePromptAndDeploy() {
 
     const deploymentDetails = await watsonxAIService.createDeployment(deploymentParams);
     const deploymentId = deploymentDetails.result.metadata.id;
+    // Wait for deployment to be ready inference
+    // This step should take ~2-3 minutes
     await waitForDeployment({ deploymentId, projectId });
 
     const genParams = {
