@@ -43,11 +43,12 @@ Changes might occur which impact applications that use this SDK.
 The IBM watsonx.ai Node.js SDK allows developers to programmatically interact with the [IBM watsonx.ai service](https://dataplatform.cloud.ibm.com/docs/content/wsj/getting-started/overview-wx.html?context=wx).
 
 ## Prerequisites
-* You need an [IBM Cloud][ibm-cloud-onboarding] or [IBM Cloud Pak® for Data][ibm-cpd-onboarding] account.
+* You need an [IBM Cloud][ibm-cloud-onboarding] (SaaS offering) or have access to [IBM Cloud Pak® for Data][ibm-cpd-onboarding] (on-prem offering).
+* You need to have an access to watsonx.ai service in either of above environments.
 * **Node.js >=14**: This SDK is tested with Node.js versions 14 and up. It may work on previous versions but this is not officially supported.
 
 [ibm-cloud-onboarding]: http://cloud.ibm.com/registration
-[ibm-cpd-onboarding]: https://dataplatform.cloud.ibm.com/registration/stepone?context=cpdaas&apps=all
+[ibm-cpd-onboarding]: https://www.ibm.com/products/cloud-pak-for-data
 
 ## Installation
 ```sh
