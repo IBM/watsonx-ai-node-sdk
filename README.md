@@ -3,7 +3,7 @@
 [![npm-version](https://img.shields.io/npm/v/IBM/platform-services-node-sdk.svg)](https://www.npmjs.com/package/ibm-platform-services)
 -->
 # IBM watsonx.ai Node.js SDK
-Node.js client library to interact with [IBM watsonx.ai service](https://cloud.ibm.com/apidocs/watsonx-ai).
+Node.js client library to interact with [IBM watsonx.ai service](https://dataplatform.cloud.ibm.com/docs/content/wsj/getting-started/overview-wx.html?context=wx).
 
 Disclaimer: this SDK is being released initially as a **pre-release** version.
 Changes might occur which impact applications that use this SDK.
