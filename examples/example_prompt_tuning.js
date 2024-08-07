@@ -13,7 +13,7 @@
  *
 **/
 
-const watsonxAI = require('@ibm-cloud/watsonx-ai');
+const { WatsonXAI } = require('@ibm-cloud/watsonx-ai');
 
 // Set projectId
 const projectId = '<PROJECT_ID>';
@@ -22,7 +22,7 @@ const projectId = '<PROJECT_ID>';
 let watsonxAIService;
 
 process.env.IBM_CREDENTIALS_FILE = './auth/watsonx_ai_ml_vml_v1.env';
-watsonxAIService = watsonxAI.newInstance({
+watsonxAIService = WatsonXAI.newInstance({
     version: '2024-05-31',
     serviceUrl: 'https://us-south.ml.cloud.ibm.com',
 });

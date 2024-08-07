@@ -80,7 +80,7 @@ async function generateTextFromSavedPrompt() {
         name: "Prompt deployment from WXAI SDK",
         baseModelId: promptContentParams.model_id,
         promptTemplate: {id: createdPromptId},
-        spaceId: 'd45219e5-c0dc-4a09-ba8b-f92e8382f536',
+        spaceId: '<SPACE_ID>',
         online: {}
     })
     console.log(JSON.stringify(createDeploy.result, null, 2));
