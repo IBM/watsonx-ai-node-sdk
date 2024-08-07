@@ -15,7 +15,7 @@
  */
 
 /* eslint-disable no-await-in-loop */
-
+const { Readable } = require('node:stream');
 const nock = require('nock');
 
 // need to import the whole package to mock getAuthenticatorFromEnvironment
@@ -23,14 +23,13 @@ const sdkCorePackage = require('ibm-cloud-sdk-core');
 const get_authenticator_from_environment = require('../../dist/auth/utils/get-authenticator-from-environment');
 
 const { NoAuthAuthenticator, unitTestUtils } = sdkCorePackage;
-const WatsonxAiMlVmlv1 = require('../../dist/watsonx-ai-ml/vml-v1');
+const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
 
 const {
   getOptions,
   checkUrlAndMethod,
   checkMediaHeaders,
   expectToBePromise,
-  checkUserHeader,
   checkForSuccessfulExecution,
 } = unitTestUtils;
 
@@ -40,7 +39,13 @@ const watsonxAiMlServiceOptions = {
   version: '2023-07-07',
 };
 
-const watsonxAiMlService = new WatsonxAiMlVmlv1(watsonxAiMlServiceOptions);
+const stream = new Readable({
+  read() {
+    this.push('test');
+  },
+});
+
+const watsonxAiMlService = new WatsonxAiMlVml_v1(watsonxAiMlServiceOptions);
 
 let createRequestMock = null;
 function mock_createRequest() {
@@ -66,7 +71,7 @@ getAuthenticatorMock.mockImplementation(() => new NoAuthAuthenticator());
 // used for the service construction tests
 let requiredGlobals;
 
-describe('WatsonxAiMlVmlv1', () => {
+describe('WatsonxAiMlVml_v1', () => {
   beforeEach(() => {
     mock_createRequest();
     // these are changed when passed into the factory/constructor, so re-init
@@ -84,13 +89,13 @@ describe('WatsonxAiMlVmlv1', () => {
 
   describe('the newInstance method', () => {
     test('should use defaults when options not provided', () => {
-      const testInstance = WatsonxAiMlVmlv1.newInstance(requiredGlobals);
+      const testInstance = WatsonxAiMlVml_v1.newInstance(requiredGlobals);
 
       expect(getAuthenticatorMock).toHaveBeenCalled();
       expect(testInstance.baseOptions.authenticator).toBeInstanceOf(NoAuthAuthenticator);
-      expect(testInstance.baseOptions.serviceName).toBe(WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME);
-      expect(testInstance.baseOptions.serviceUrl).toBe(WatsonxAiMlVmlv1.DEFAULT_SERVICE_URL);
-      expect(testInstance).toBeInstanceOf(WatsonxAiMlVmlv1);
+      expect(testInstance.baseOptions.serviceName).toBe(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME);
+      expect(testInstance.baseOptions.serviceUrl).toBe(WatsonxAiMlVml_v1.DEFAULT_SERVICE_URL);
+      expect(testInstance).toBeInstanceOf(WatsonxAiMlVml_v1);
     });
 
     test('should set serviceName, serviceUrl, and authenticator when provided', () => {
@@ -102,13 +107,13 @@ describe('WatsonxAiMlVmlv1', () => {
 
       options = Object.assign(options, requiredGlobals);
 
-      const testInstance = WatsonxAiMlVmlv1.newInstance(options);
+      const testInstance = WatsonxAiMlVml_v1.newInstance(options);
 
       expect(getAuthenticatorMock).not.toHaveBeenCalled();
       expect(testInstance.baseOptions.authenticator).toBeInstanceOf(NoAuthAuthenticator);
       expect(testInstance.baseOptions.serviceUrl).toBe('custom.com');
       expect(testInstance.baseOptions.serviceName).toBe('my-service');
-      expect(testInstance).toBeInstanceOf(WatsonxAiMlVmlv1);
+      expect(testInstance).toBeInstanceOf(WatsonxAiMlVml_v1);
     });
   });
 
@@ -121,7 +126,7 @@ describe('WatsonxAiMlVmlv1', () => {
 
       options = Object.assign(options, requiredGlobals);
 
-      const testInstance = new WatsonxAiMlVmlv1(options);
+      const testInstance = new WatsonxAiMlVml_v1(options);
 
       expect(testInstance.baseOptions.serviceUrl).toBe('custom.com');
     });
@@ -133,16 +138,16 @@ describe('WatsonxAiMlVmlv1', () => {
 
       options = Object.assign(options, requiredGlobals);
 
-      const testInstance = new WatsonxAiMlVmlv1(options);
+      const testInstance = new WatsonxAiMlVml_v1(options);
 
-      expect(testInstance.baseOptions.serviceUrl).toBe(WatsonxAiMlVmlv1.DEFAULT_SERVICE_URL);
+      expect(testInstance.baseOptions.serviceUrl).toBe(WatsonxAiMlVml_v1.DEFAULT_SERVICE_URL);
     });
   });
 
   describe('service-level tests', () => {
     describe('positive tests', () => {
       test('construct service with global params', () => {
-        const serviceObj = new WatsonxAiMlVmlv1(watsonxAiMlServiceOptions);
+        const serviceObj = new WatsonxAiMlVml_v1(watsonxAiMlServiceOptions);
         expect(serviceObj).not.toBeNull();
         expect(serviceObj.version).toEqual(watsonxAiMlServiceOptions.version);
       });
@@ -153,7 +158,7 @@ describe('WatsonxAiMlVmlv1', () => {
     describe('positive tests', () => {
       test('should use all default variable values if null is passed', () => {
         const defaultFormattedUrl = 'https://us-south.ml.cloud.ibm.com';
-        const formattedUrl = WatsonxAiMlVmlv1.constructServiceUrl(null);
+        const formattedUrl = WatsonxAiMlVml_v1.constructServiceUrl(null);
 
         expect(formattedUrl).toStrictEqual(defaultFormattedUrl);
       });
@@ -163,7 +168,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should fail if an invalid variable name is provided', () => {
         expect(() => {
           const providedUrlVariables = new Map([['invalid_variable_name', 'value']]);
-          WatsonxAiMlVmlv1.constructServiceUrl(providedUrlVariables);
+          WatsonxAiMlVml_v1.constructServiceUrl(providedUrlVariables);
         }).toThrow();
       });
     });
@@ -410,23 +415,23 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('deploymentsGet', () => {
+  describe('getDeployment', () => {
     describe('positive tests', () => {
-      function __deploymentsGetTest() {
-        // Construct the params object for operation deploymentsGet
+      function __getDeploymentTest() {
+        // Construct the params object for operation getDeployment
         const deploymentId = 'testString';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
-        const deploymentsGetParams = {
+        const getDeploymentParams = {
           deploymentId,
           spaceId,
           projectId,
         };
 
-        const deploymentsGetResult = watsonxAiMlService.deploymentsGet(deploymentsGetParams);
+        const getDeploymentResult = watsonxAiMlService.getDeployment(getDeploymentParams);
 
         // all methods should return a Promise
-        expectToBePromise(deploymentsGetResult);
+        expectToBePromise(getDeploymentResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -445,17 +450,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __deploymentsGetTest();
+        __getDeploymentTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __deploymentsGetTest();
+        __getDeploymentTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __deploymentsGetTest();
+        __getDeploymentTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -463,7 +468,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const deploymentId = 'testString';
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const deploymentsGetParams = {
+        const getDeploymentParams = {
           deploymentId,
           headers: {
             Accept: userAccept,
@@ -471,7 +476,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.deploymentsGet(deploymentsGetParams);
+        watsonxAiMlService.getDeployment(getDeploymentParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -480,7 +485,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsGet({});
+          await watsonxAiMlService.getDeployment({});
         } catch (e) {
           err = e;
         }
@@ -491,7 +496,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsGet();
+          await watsonxAiMlService.getDeployment();
         } catch (e) {
           err = e;
         }
@@ -501,7 +506,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('deploymentsUpdate', () => {
+  describe('updateDeployment', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -513,24 +518,23 @@ describe('WatsonxAiMlVmlv1', () => {
         value: 'testString',
       };
 
-      function __deploymentsUpdateTest() {
-        // Construct the params object for operation deploymentsUpdate
+      function __updateDeploymentTest() {
+        // Construct the params object for operation updateDeployment
         const deploymentId = 'testString';
         const jsonPatch = [jsonPatchOperationModel];
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
-        const deploymentsUpdateParams = {
+        const updateDeploymentParams = {
           deploymentId,
           jsonPatch,
           spaceId,
           projectId,
         };
 
-        const deploymentsUpdateResult =
-          watsonxAiMlService.deploymentsUpdate(deploymentsUpdateParams);
+        const updateDeploymentResult = watsonxAiMlService.updateDeployment(updateDeploymentParams);
 
         // all methods should return a Promise
-        expectToBePromise(deploymentsUpdateResult);
+        expectToBePromise(updateDeploymentResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -550,17 +554,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __deploymentsUpdateTest();
+        __updateDeploymentTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __deploymentsUpdateTest();
+        __updateDeploymentTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __deploymentsUpdateTest();
+        __updateDeploymentTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -569,7 +573,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const jsonPatch = [jsonPatchOperationModel];
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const deploymentsUpdateParams = {
+        const updateDeploymentParams = {
           deploymentId,
           jsonPatch,
           headers: {
@@ -578,7 +582,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.deploymentsUpdate(deploymentsUpdateParams);
+        watsonxAiMlService.updateDeployment(updateDeploymentParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -587,7 +591,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsUpdate({});
+          await watsonxAiMlService.updateDeployment({});
         } catch (e) {
           err = e;
         }
@@ -598,7 +602,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsUpdate();
+          await watsonxAiMlService.updateDeployment();
         } catch (e) {
           err = e;
         }
@@ -608,24 +612,23 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('deploymentsDelete', () => {
+  describe('deleteDeployment', () => {
     describe('positive tests', () => {
-      function __deploymentsDeleteTest() {
-        // Construct the params object for operation deploymentsDelete
+      function __deleteDeploymentTest() {
+        // Construct the params object for operation deleteDeployment
         const deploymentId = 'testString';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
-        const deploymentsDeleteParams = {
+        const deleteDeploymentParams = {
           deploymentId,
           spaceId,
           projectId,
         };
 
-        const deploymentsDeleteResult =
-          watsonxAiMlService.deploymentsDelete(deploymentsDeleteParams);
+        const deleteDeploymentResult = watsonxAiMlService.deleteDeployment(deleteDeploymentParams);
 
         // all methods should return a Promise
-        expectToBePromise(deploymentsDeleteResult);
+        expectToBePromise(deleteDeploymentResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -644,17 +647,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __deploymentsDeleteTest();
+        __deleteDeploymentTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __deploymentsDeleteTest();
+        __deleteDeploymentTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __deploymentsDeleteTest();
+        __deleteDeploymentTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -662,7 +665,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const deploymentId = 'testString';
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const deploymentsDeleteParams = {
+        const deleteDeploymentParams = {
           deploymentId,
           headers: {
             Accept: userAccept,
@@ -670,7 +673,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.deploymentsDelete(deploymentsDeleteParams);
+        watsonxAiMlService.deleteDeployment(deleteDeploymentParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -679,7 +682,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsDelete({});
+          await watsonxAiMlService.deleteDeployment({});
         } catch (e) {
           err = e;
         }
@@ -690,7 +693,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsDelete();
+          await watsonxAiMlService.deleteDeployment();
         } catch (e) {
           err = e;
         }
@@ -700,7 +703,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('deploymentsTextGeneration', () => {
+  describe('deploymentGenerateText', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -789,25 +792,25 @@ describe('WatsonxAiMlVmlv1', () => {
         foo: moderationPropertiesModel,
       };
 
-      function __deploymentsTextGenerationTest() {
-        // Construct the params object for operation deploymentsTextGeneration
+      function __deploymentGenerateTextTest() {
+        // Construct the params object for operation deploymentGenerateText
         const idOrName = 'classification';
         const input = 'how far is paris from bangalore:\n';
         const parameters = deploymentTextGenPropertiesModel;
         const moderations = moderationsModel;
-        const deploymentsTextGenerationParams = {
+        const deploymentGenerateTextParams = {
           idOrName,
           input,
           parameters,
           moderations,
         };
 
-        const deploymentsTextGenerationResult = watsonxAiMlService.deploymentsTextGeneration(
-          deploymentsTextGenerationParams
+        const deploymentGenerateTextResult = watsonxAiMlService.deploymentGenerateText(
+          deploymentGenerateTextParams
         );
 
         // all methods should return a Promise
-        expectToBePromise(deploymentsTextGenerationResult);
+        expectToBePromise(deploymentGenerateTextResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -831,17 +834,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __deploymentsTextGenerationTest();
+        __deploymentGenerateTextTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __deploymentsTextGenerationTest();
+        __deploymentGenerateTextTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __deploymentsTextGenerationTest();
+        __deploymentGenerateTextTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -849,7 +852,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const idOrName = 'classification';
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const deploymentsTextGenerationParams = {
+        const deploymentGenerateTextParams = {
           idOrName,
           headers: {
             Accept: userAccept,
@@ -857,7 +860,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.deploymentsTextGeneration(deploymentsTextGenerationParams);
+        watsonxAiMlService.deploymentGenerateText(deploymentGenerateTextParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -866,7 +869,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsTextGeneration({});
+          await watsonxAiMlService.deploymentGenerateText({});
         } catch (e) {
           err = e;
         }
@@ -877,7 +880,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsTextGeneration();
+          await watsonxAiMlService.deploymentGenerateText();
         } catch (e) {
           err = e;
         }
@@ -887,7 +890,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('deploymentsTextGenerationStream', () => {
+  describe('deploymentGenerateTextStream', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -976,26 +979,26 @@ describe('WatsonxAiMlVmlv1', () => {
         foo: moderationPropertiesModel,
       };
 
-      function __deploymentsTextGenerationStreamTest() {
-        // Construct the params object for operation deploymentsTextGenerationStream
+      function __deploymentGenerateTextStreamTest() {
+        // Construct the params object for operation deploymentGenerateTextStream
         const idOrName = 'classification';
         const input = 'testString';
         const parameters = deploymentTextGenPropertiesModel;
         const moderations = moderationsModel;
-        const accept = 'application/json';
-        const deploymentsTextGenerationStreamParams = {
+        const accept = 'text/event-stream';
+        const deploymentGenerateTextStreamParams = {
           idOrName,
           input,
           parameters,
           moderations,
-          accept,
         };
-
-        const deploymentsTextGenerationStreamResult =
-          watsonxAiMlService.deploymentsTextGenerationStream(deploymentsTextGenerationStreamParams);
+        createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
+        const deploymentGenerateTextStreamResult = watsonxAiMlService.deploymentGenerateTextStream(
+          deploymentGenerateTextStreamParams
+        );
 
         // all methods should return a Promise
-        expectToBePromise(deploymentsTextGenerationStreamResult);
+        expectToBePromise(deploymentGenerateTextStreamResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -1010,7 +1013,6 @@ describe('WatsonxAiMlVmlv1', () => {
         const expectedAccept = accept;
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
-        checkUserHeader(createRequestMock, 'Accept', accept);
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.moderations).toEqual(moderations);
@@ -1020,17 +1022,21 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __deploymentsTextGenerationStreamTest();
+        __deploymentGenerateTextStreamTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
+        createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
+
         watsonxAiMlService.enableRetries();
-        __deploymentsTextGenerationStreamTest();
+        __deploymentGenerateTextStreamTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
+        createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
+
         watsonxAiMlService.disableRetries();
-        __deploymentsTextGenerationStreamTest();
+        __deploymentGenerateTextStreamTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -1038,7 +1044,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const idOrName = 'classification';
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const deploymentsTextGenerationStreamParams = {
+        const deploymentGenerateTextStreamParams = {
           idOrName,
           headers: {
             Accept: userAccept,
@@ -1046,7 +1052,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.deploymentsTextGenerationStream(deploymentsTextGenerationStreamParams);
+        watsonxAiMlService.deploymentGenerateTextStream(deploymentGenerateTextStreamParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -1055,7 +1061,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsTextGenerationStream({});
+          await watsonxAiMlService.deploymentGenerateTextStream({});
         } catch (e) {
           err = e;
         }
@@ -1066,7 +1072,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsTextGenerationStream();
+          await watsonxAiMlService.deploymentGenerateTextStream();
         } catch (e) {
           err = e;
         }
@@ -1176,7 +1182,7 @@ describe('WatsonxAiMlVmlv1', () => {
           filters: 'modelid_ibm/granite-13b-instruct-v2',
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVmlv1.FoundationModelSpecsPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -1191,7 +1197,7 @@ describe('WatsonxAiMlVmlv1', () => {
           limit: 50,
           filters: 'modelid_ibm/granite-13b-instruct-v2',
         };
-        const pager = new WatsonxAiMlVmlv1.FoundationModelSpecsPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -1295,7 +1301,7 @@ describe('WatsonxAiMlVmlv1', () => {
           limit: 50,
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVmlv1.FoundationModelTasksPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAiMlService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -1309,7 +1315,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const params = {
           limit: 50,
         };
-        const pager = new WatsonxAiMlVmlv1.FoundationModelTasksPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAiMlService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -1317,843 +1323,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('notebooksCreate', () => {
-    describe('positive tests', () => {
-      // Request models needed by this operation.
-
-      // NotebookOrigin
-      const notebookOriginModel = {
-        type: 'blank',
-      };
-
-      // NotebookRuntime
-      const notebookRuntimeModel = {
-        environment: 'spark33py39-b275be5f-10ff-47ee-bfc9-63f1ce5addbf',
-        spark_monitoring_enabled: true,
-      };
-
-      // NotebookKernel
-      const notebookKernelModel = {
-        display_name: 'Python 3.9 with Spark',
-        name: 'python3',
-        language: 'python3',
-      };
-
-      // NotebooksCreateRequestNotebookCreateBodyInProject
-      const notebooksCreateRequestModel = {
-        name: 'my notebook',
-        description: 'this is my notebook',
-        file_reference: 'notebook/my_notebook.ipynb',
-        originates_from: notebookOriginModel,
-        runtime: notebookRuntimeModel,
-        kernel: notebookKernelModel,
-        project: 'b275be5f-10ff-47ee-bfc9-63f1ce5addbf',
-      };
-
-      function __notebooksCreateTest() {
-        // Construct the params object for operation notebooksCreate
-        const notebooksCreateRequest = notebooksCreateRequestModel;
-        const notebooksCreateParams = {
-          notebooksCreateRequest,
-        };
-
-        const notebooksCreateResult = watsonxAiMlService.notebooksCreate(notebooksCreateParams);
-
-        // all methods should return a Promise
-        expectToBePromise(notebooksCreateResult);
-
-        // assert that create request was called
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-
-        const mockRequestOptions = getOptions(createRequestMock);
-
-        checkUrlAndMethod(mockRequestOptions, '/v2/notebooks', 'POST');
-        const expectedAccept = 'application/json';
-        const expectedContentType = 'application/json';
-        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
-        expect(mockRequestOptions.body).toEqual(notebooksCreateRequest);
-      }
-
-      test('should pass the right params to createRequest with enable and disable retries', () => {
-        // baseline test
-        __notebooksCreateTest();
-
-        // enable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
-        __notebooksCreateTest();
-
-        // disable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
-        __notebooksCreateTest();
-      });
-
-      test('should prioritize user-given headers', () => {
-        // parameters
-        const notebooksCreateRequest = notebooksCreateRequestModel;
-        const userAccept = 'fake/accept';
-        const userContentType = 'fake/contentType';
-        const notebooksCreateParams = {
-          notebooksCreateRequest,
-          headers: {
-            Accept: userAccept,
-            'Content-Type': userContentType,
-          },
-        };
-
-        watsonxAiMlService.notebooksCreate(notebooksCreateParams);
-        checkMediaHeaders(createRequestMock, userAccept, userContentType);
-      });
-    });
-
-    describe('negative tests', () => {
-      test('should enforce required parameters', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.notebooksCreate({});
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-
-      test('should reject promise when required params are not given', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.notebooksCreate();
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-    });
-  });
-
-  describe('notebooksList', () => {
-    describe('positive tests', () => {
-      function __notebooksListTest() {
-        // Construct the params object for operation notebooksList
-        const projectId = 'testString';
-        const include = 'testString';
-        const notebooks = ['ca3c0e27-46ca-83d4-a646-d49b11c14de9'];
-        const notebooksListParams = {
-          projectId,
-          include,
-          notebooks,
-        };
-
-        const notebooksListResult = watsonxAiMlService.notebooksList(notebooksListParams);
-
-        // all methods should return a Promise
-        expectToBePromise(notebooksListResult);
-
-        // assert that create request was called
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-
-        const mockRequestOptions = getOptions(createRequestMock);
-
-        checkUrlAndMethod(mockRequestOptions, '/v2/notebooks/list', 'POST');
-        const expectedAccept = 'application/json';
-        const expectedContentType = 'application/json';
-        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
-        expect(mockRequestOptions.body.notebooks).toEqual(notebooks);
-        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
-        expect(mockRequestOptions.qs.include).toEqual(include);
-      }
-
-      test('should pass the right params to createRequest with enable and disable retries', () => {
-        // baseline test
-        __notebooksListTest();
-
-        // enable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
-        __notebooksListTest();
-
-        // disable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
-        __notebooksListTest();
-      });
-
-      test('should prioritize user-given headers', () => {
-        // parameters
-        const projectId = 'testString';
-        const include = 'testString';
-        const userAccept = 'fake/accept';
-        const userContentType = 'fake/contentType';
-        const notebooksListParams = {
-          projectId,
-          include,
-          headers: {
-            Accept: userAccept,
-            'Content-Type': userContentType,
-          },
-        };
-
-        watsonxAiMlService.notebooksList(notebooksListParams);
-        checkMediaHeaders(createRequestMock, userAccept, userContentType);
-      });
-    });
-
-    describe('negative tests', () => {
-      test('should enforce required parameters', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.notebooksList({});
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-
-      test('should reject promise when required params are not given', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.notebooksList();
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-    });
-  });
-
-  describe('notebooksDelete', () => {
-    describe('positive tests', () => {
-      function __notebooksDeleteTest() {
-        // Construct the params object for operation notebooksDelete
-        const notebookGuid = 'testString';
-        const notebooksDeleteParams = {
-          notebookGuid,
-        };
-
-        const notebooksDeleteResult = watsonxAiMlService.notebooksDelete(notebooksDeleteParams);
-
-        // all methods should return a Promise
-        expectToBePromise(notebooksDeleteResult);
-
-        // assert that create request was called
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-
-        const mockRequestOptions = getOptions(createRequestMock);
-
-        checkUrlAndMethod(mockRequestOptions, '/v2/notebooks/{notebook_guid}', 'DELETE');
-        const expectedAccept = undefined;
-        const expectedContentType = undefined;
-        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
-        expect(mockRequestOptions.path.notebook_guid).toEqual(notebookGuid);
-      }
-
-      test('should pass the right params to createRequest with enable and disable retries', () => {
-        // baseline test
-        __notebooksDeleteTest();
-
-        // enable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
-        __notebooksDeleteTest();
-
-        // disable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
-        __notebooksDeleteTest();
-      });
-
-      test('should prioritize user-given headers', () => {
-        // parameters
-        const notebookGuid = 'testString';
-        const userAccept = 'fake/accept';
-        const userContentType = 'fake/contentType';
-        const notebooksDeleteParams = {
-          notebookGuid,
-          headers: {
-            Accept: userAccept,
-            'Content-Type': userContentType,
-          },
-        };
-
-        watsonxAiMlService.notebooksDelete(notebooksDeleteParams);
-        checkMediaHeaders(createRequestMock, userAccept, userContentType);
-      });
-    });
-
-    describe('negative tests', () => {
-      test('should enforce required parameters', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.notebooksDelete({});
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-
-      test('should reject promise when required params are not given', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.notebooksDelete();
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-    });
-  });
-
-  describe('notebooksRevert', () => {
-    describe('positive tests', () => {
-      function __notebooksRevertTest() {
-        // Construct the params object for operation notebooksRevert
-        const notebookGuid = 'testString';
-        const source = 'ca3c0e27-46ca-83d4-a646-d49b11c14de9';
-        const notebooksRevertParams = {
-          notebookGuid,
-          source,
-        };
-
-        const notebooksRevertResult = watsonxAiMlService.notebooksRevert(notebooksRevertParams);
-
-        // all methods should return a Promise
-        expectToBePromise(notebooksRevertResult);
-
-        // assert that create request was called
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-
-        const mockRequestOptions = getOptions(createRequestMock);
-
-        checkUrlAndMethod(mockRequestOptions, '/v2/notebooks/{notebook_guid}', 'PUT');
-        const expectedAccept = 'application/json';
-        const expectedContentType = 'application/json';
-        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
-        expect(mockRequestOptions.body.source).toEqual(source);
-        expect(mockRequestOptions.path.notebook_guid).toEqual(notebookGuid);
-      }
-
-      test('should pass the right params to createRequest with enable and disable retries', () => {
-        // baseline test
-        __notebooksRevertTest();
-
-        // enable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
-        __notebooksRevertTest();
-
-        // disable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
-        __notebooksRevertTest();
-      });
-
-      test('should prioritize user-given headers', () => {
-        // parameters
-        const notebookGuid = 'testString';
-        const source = 'ca3c0e27-46ca-83d4-a646-d49b11c14de9';
-        const userAccept = 'fake/accept';
-        const userContentType = 'fake/contentType';
-        const notebooksRevertParams = {
-          notebookGuid,
-          source,
-          headers: {
-            Accept: userAccept,
-            'Content-Type': userContentType,
-          },
-        };
-
-        watsonxAiMlService.notebooksRevert(notebooksRevertParams);
-        checkMediaHeaders(createRequestMock, userAccept, userContentType);
-      });
-    });
-
-    describe('negative tests', () => {
-      test('should enforce required parameters', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.notebooksRevert({});
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-
-      test('should reject promise when required params are not given', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.notebooksRevert();
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-    });
-  });
-
-  describe('notebooksUpdate', () => {
-    describe('positive tests', () => {
-      // Request models needed by this operation.
-
-      // NotebookKernel
-      const notebookKernelModel = {
-        display_name: 'Python 3.9 with Spark',
-        name: 'python39',
-        language: 'python3',
-      };
-
-      function __notebooksUpdateTest() {
-        // Construct the params object for operation notebooksUpdate
-        const notebookGuid = 'testString';
-        const environment = 'd46ca0e27-a646-4de9-a646-9b113c183d4';
-        const sparkMonitoringEnabled = false;
-        const kernel = notebookKernelModel;
-        const notebooksUpdateParams = {
-          notebookGuid,
-          environment,
-          sparkMonitoringEnabled,
-          kernel,
-        };
-
-        const notebooksUpdateResult = watsonxAiMlService.notebooksUpdate(notebooksUpdateParams);
-
-        // all methods should return a Promise
-        expectToBePromise(notebooksUpdateResult);
-
-        // assert that create request was called
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-
-        const mockRequestOptions = getOptions(createRequestMock);
-
-        checkUrlAndMethod(mockRequestOptions, '/v2/notebooks/{notebook_guid}', 'PATCH');
-        const expectedAccept = 'application/json';
-        const expectedContentType = 'application/json';
-        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
-        expect(mockRequestOptions.body.environment).toEqual(environment);
-        expect(mockRequestOptions.body.spark_monitoring_enabled).toEqual(sparkMonitoringEnabled);
-        expect(mockRequestOptions.body.kernel).toEqual(kernel);
-        expect(mockRequestOptions.path.notebook_guid).toEqual(notebookGuid);
-      }
-
-      test('should pass the right params to createRequest with enable and disable retries', () => {
-        // baseline test
-        __notebooksUpdateTest();
-
-        // enable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
-        __notebooksUpdateTest();
-
-        // disable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
-        __notebooksUpdateTest();
-      });
-
-      test('should prioritize user-given headers', () => {
-        // parameters
-        const notebookGuid = 'testString';
-        const userAccept = 'fake/accept';
-        const userContentType = 'fake/contentType';
-        const notebooksUpdateParams = {
-          notebookGuid,
-          headers: {
-            Accept: userAccept,
-            'Content-Type': userContentType,
-          },
-        };
-
-        watsonxAiMlService.notebooksUpdate(notebooksUpdateParams);
-        checkMediaHeaders(createRequestMock, userAccept, userContentType);
-      });
-    });
-
-    describe('negative tests', () => {
-      test('should enforce required parameters', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.notebooksUpdate({});
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-
-      test('should reject promise when required params are not given', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.notebooksUpdate();
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-    });
-  });
-
-  describe('versionsCreate', () => {
-    describe('positive tests', () => {
-      function __versionsCreateTest() {
-        // Construct the params object for operation versionsCreate
-        const notebookGuid = 'testString';
-        const versionsCreateParams = {
-          notebookGuid,
-        };
-
-        const versionsCreateResult = watsonxAiMlService.versionsCreate(versionsCreateParams);
-
-        // all methods should return a Promise
-        expectToBePromise(versionsCreateResult);
-
-        // assert that create request was called
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-
-        const mockRequestOptions = getOptions(createRequestMock);
-
-        checkUrlAndMethod(mockRequestOptions, '/v2/notebooks/{notebook_guid}/versions', 'POST');
-        const expectedAccept = 'application/json';
-        const expectedContentType = undefined;
-        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
-        expect(mockRequestOptions.path.notebook_guid).toEqual(notebookGuid);
-      }
-
-      test('should pass the right params to createRequest with enable and disable retries', () => {
-        // baseline test
-        __versionsCreateTest();
-
-        // enable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
-        __versionsCreateTest();
-
-        // disable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
-        __versionsCreateTest();
-      });
-
-      test('should prioritize user-given headers', () => {
-        // parameters
-        const notebookGuid = 'testString';
-        const userAccept = 'fake/accept';
-        const userContentType = 'fake/contentType';
-        const versionsCreateParams = {
-          notebookGuid,
-          headers: {
-            Accept: userAccept,
-            'Content-Type': userContentType,
-          },
-        };
-
-        watsonxAiMlService.versionsCreate(versionsCreateParams);
-        checkMediaHeaders(createRequestMock, userAccept, userContentType);
-      });
-    });
-
-    describe('negative tests', () => {
-      test('should enforce required parameters', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.versionsCreate({});
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-
-      test('should reject promise when required params are not given', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.versionsCreate();
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-    });
-  });
-
-  describe('versionsList', () => {
-    describe('positive tests', () => {
-      function __versionsListTest() {
-        // Construct the params object for operation versionsList
-        const notebookGuid = 'testString';
-        const versionsListParams = {
-          notebookGuid,
-        };
-
-        const versionsListResult = watsonxAiMlService.versionsList(versionsListParams);
-
-        // all methods should return a Promise
-        expectToBePromise(versionsListResult);
-
-        // assert that create request was called
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-
-        const mockRequestOptions = getOptions(createRequestMock);
-
-        checkUrlAndMethod(mockRequestOptions, '/v2/notebooks/{notebook_guid}/versions', 'GET');
-        const expectedAccept = 'application/json';
-        const expectedContentType = undefined;
-        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
-        expect(mockRequestOptions.path.notebook_guid).toEqual(notebookGuid);
-      }
-
-      test('should pass the right params to createRequest with enable and disable retries', () => {
-        // baseline test
-        __versionsListTest();
-
-        // enable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
-        __versionsListTest();
-
-        // disable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
-        __versionsListTest();
-      });
-
-      test('should prioritize user-given headers', () => {
-        // parameters
-        const notebookGuid = 'testString';
-        const userAccept = 'fake/accept';
-        const userContentType = 'fake/contentType';
-        const versionsListParams = {
-          notebookGuid,
-          headers: {
-            Accept: userAccept,
-            'Content-Type': userContentType,
-          },
-        };
-
-        watsonxAiMlService.versionsList(versionsListParams);
-        checkMediaHeaders(createRequestMock, userAccept, userContentType);
-      });
-    });
-
-    describe('negative tests', () => {
-      test('should enforce required parameters', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.versionsList({});
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-
-      test('should reject promise when required params are not given', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.versionsList();
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-    });
-  });
-
-  describe('versionsGet', () => {
-    describe('positive tests', () => {
-      function __versionsGetTest() {
-        // Construct the params object for operation versionsGet
-        const notebookGuid = 'testString';
-        const versionGuid = 'testString';
-        const versionsGetParams = {
-          notebookGuid,
-          versionGuid,
-        };
-
-        const versionsGetResult = watsonxAiMlService.versionsGet(versionsGetParams);
-
-        // all methods should return a Promise
-        expectToBePromise(versionsGetResult);
-
-        // assert that create request was called
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-
-        const mockRequestOptions = getOptions(createRequestMock);
-
-        checkUrlAndMethod(
-          mockRequestOptions,
-          '/v2/notebooks/{notebook_guid}/versions/{version_guid}',
-          'GET'
-        );
-        const expectedAccept = 'application/json';
-        const expectedContentType = undefined;
-        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
-        expect(mockRequestOptions.path.notebook_guid).toEqual(notebookGuid);
-        expect(mockRequestOptions.path.version_guid).toEqual(versionGuid);
-      }
-
-      test('should pass the right params to createRequest with enable and disable retries', () => {
-        // baseline test
-        __versionsGetTest();
-
-        // enable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
-        __versionsGetTest();
-
-        // disable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
-        __versionsGetTest();
-      });
-
-      test('should prioritize user-given headers', () => {
-        // parameters
-        const notebookGuid = 'testString';
-        const versionGuid = 'testString';
-        const userAccept = 'fake/accept';
-        const userContentType = 'fake/contentType';
-        const versionsGetParams = {
-          notebookGuid,
-          versionGuid,
-          headers: {
-            Accept: userAccept,
-            'Content-Type': userContentType,
-          },
-        };
-
-        watsonxAiMlService.versionsGet(versionsGetParams);
-        checkMediaHeaders(createRequestMock, userAccept, userContentType);
-      });
-    });
-
-    describe('negative tests', () => {
-      test('should enforce required parameters', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.versionsGet({});
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-
-      test('should reject promise when required params are not given', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.versionsGet();
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-    });
-  });
-
-  describe('versionsDelete', () => {
-    describe('positive tests', () => {
-      function __versionsDeleteTest() {
-        // Construct the params object for operation versionsDelete
-        const notebookGuid = 'testString';
-        const versionGuid = 'testString';
-        const versionsDeleteParams = {
-          notebookGuid,
-          versionGuid,
-        };
-
-        const versionsDeleteResult = watsonxAiMlService.versionsDelete(versionsDeleteParams);
-
-        // all methods should return a Promise
-        expectToBePromise(versionsDeleteResult);
-
-        // assert that create request was called
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-
-        const mockRequestOptions = getOptions(createRequestMock);
-
-        checkUrlAndMethod(
-          mockRequestOptions,
-          '/v2/notebooks/{notebook_guid}/versions/{version_guid}',
-          'DELETE'
-        );
-        const expectedAccept = undefined;
-        const expectedContentType = undefined;
-        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
-        expect(mockRequestOptions.path.notebook_guid).toEqual(notebookGuid);
-        expect(mockRequestOptions.path.version_guid).toEqual(versionGuid);
-      }
-
-      test('should pass the right params to createRequest with enable and disable retries', () => {
-        // baseline test
-        __versionsDeleteTest();
-
-        // enable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
-        __versionsDeleteTest();
-
-        // disable retries and test again
-        createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
-        __versionsDeleteTest();
-      });
-
-      test('should prioritize user-given headers', () => {
-        // parameters
-        const notebookGuid = 'testString';
-        const versionGuid = 'testString';
-        const userAccept = 'fake/accept';
-        const userContentType = 'fake/contentType';
-        const versionsDeleteParams = {
-          notebookGuid,
-          versionGuid,
-          headers: {
-            Accept: userAccept,
-            'Content-Type': userContentType,
-          },
-        };
-
-        watsonxAiMlService.versionsDelete(versionsDeleteParams);
-        checkMediaHeaders(createRequestMock, userAccept, userContentType);
-      });
-    });
-
-    describe('negative tests', () => {
-      test('should enforce required parameters', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.versionsDelete({});
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-
-      test('should reject promise when required params are not given', async () => {
-        let err;
-        try {
-          await watsonxAiMlService.versionsDelete();
-        } catch (e) {
-          err = e;
-        }
-
-        expect(err.message).toMatch(/Missing required parameters/);
-      });
-    });
-  });
-
-  describe('postPrompt', () => {
+  describe('createPrompt', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -2237,8 +1407,8 @@ describe('WatsonxAiMlVmlv1', () => {
         description: 'Description of the model version.',
       };
 
-      function __postPromptTest() {
-        // Construct the params object for operation postPrompt
+      function __createPromptTest() {
+        // Construct the params object for operation createPrompt
         const name = 'My Prompt';
         const prompt = promptWithExternalModel;
         const description = 'My First Prompt';
@@ -2250,7 +1420,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const inputMode = 'structured';
         const projectId = 'testString';
         const spaceId = 'testString';
-        const postPromptParams = {
+        const createPromptParams = {
           name,
           prompt,
           description,
@@ -2264,10 +1434,10 @@ describe('WatsonxAiMlVmlv1', () => {
           spaceId,
         };
 
-        const postPromptResult = watsonxAiMlService.postPrompt(postPromptParams);
+        const createPromptResult = watsonxAiMlService.createPrompt(createPromptParams);
 
         // all methods should return a Promise
-        expectToBePromise(postPromptResult);
+        expectToBePromise(createPromptResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -2293,17 +1463,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __postPromptTest();
+        __createPromptTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __postPromptTest();
+        __createPromptTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __postPromptTest();
+        __createPromptTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -2312,7 +1482,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const prompt = promptWithExternalModel;
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const postPromptParams = {
+        const createPromptParams = {
           name,
           prompt,
           headers: {
@@ -2321,7 +1491,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.postPrompt(postPromptParams);
+        watsonxAiMlService.createPrompt(createPromptParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -2330,7 +1500,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.postPrompt({});
+          await watsonxAiMlService.createPrompt({});
         } catch (e) {
           err = e;
         }
@@ -2341,7 +1511,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.postPrompt();
+          await watsonxAiMlService.createPrompt();
         } catch (e) {
           err = e;
         }
@@ -2444,7 +1614,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('patchPrompt', () => {
+  describe('updatePrompt', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -2494,8 +1664,8 @@ describe('WatsonxAiMlVmlv1', () => {
         description: 'Description of the model version.',
       };
 
-      function __patchPromptTest() {
-        // Construct the params object for operation patchPrompt
+      function __updatePromptTest() {
+        // Construct the params object for operation updatePrompt
         const promptId = 'testString';
         const name = 'My Prompt';
         const prompt = promptModel;
@@ -2508,7 +1678,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const inputMode = 'structured';
         const projectId = 'testString';
         const spaceId = 'testString';
-        const patchPromptParams = {
+        const updatePromptParams = {
           promptId,
           name,
           prompt,
@@ -2523,10 +1693,10 @@ describe('WatsonxAiMlVmlv1', () => {
           spaceId,
         };
 
-        const patchPromptResult = watsonxAiMlService.patchPrompt(patchPromptParams);
+        const updatePromptResult = watsonxAiMlService.updatePrompt(updatePromptParams);
 
         // all methods should return a Promise
-        expectToBePromise(patchPromptResult);
+        expectToBePromise(updatePromptResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -2553,17 +1723,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __patchPromptTest();
+        __updatePromptTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __patchPromptTest();
+        __updatePromptTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __patchPromptTest();
+        __updatePromptTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -2573,7 +1743,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const prompt = promptModel;
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const patchPromptParams = {
+        const updatePromptParams = {
           promptId,
           name,
           prompt,
@@ -2583,7 +1753,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.patchPrompt(patchPromptParams);
+        watsonxAiMlService.updatePrompt(updatePromptParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -2592,7 +1762,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.patchPrompt({});
+          await watsonxAiMlService.updatePrompt({});
         } catch (e) {
           err = e;
         }
@@ -2603,7 +1773,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.patchPrompt();
+          await watsonxAiMlService.updatePrompt();
         } catch (e) {
           err = e;
         }
@@ -2703,10 +1873,10 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('putPromptLock', () => {
+  describe('updatePromptLock', () => {
     describe('positive tests', () => {
-      function __putPromptLockTest() {
-        // Construct the params object for operation putPromptLock
+      function __updatePromptLockTest() {
+        // Construct the params object for operation updatePromptLock
         const promptId = 'testString';
         const locked = true;
         const lockType = 'edit';
@@ -2714,7 +1884,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const projectId = 'testString';
         const spaceId = 'testString';
         const force = true;
-        const putPromptLockParams = {
+        const updatePromptLockParams = {
           promptId,
           locked,
           lockType,
@@ -2724,10 +1894,10 @@ describe('WatsonxAiMlVmlv1', () => {
           force,
         };
 
-        const putPromptLockResult = watsonxAiMlService.putPromptLock(putPromptLockParams);
+        const updatePromptLockResult = watsonxAiMlService.updatePromptLock(updatePromptLockParams);
 
         // all methods should return a Promise
-        expectToBePromise(putPromptLockResult);
+        expectToBePromise(updatePromptLockResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -2749,17 +1919,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __putPromptLockTest();
+        __updatePromptLockTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __putPromptLockTest();
+        __updatePromptLockTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __putPromptLockTest();
+        __updatePromptLockTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -2768,7 +1938,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const locked = true;
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const putPromptLockParams = {
+        const updatePromptLockParams = {
           promptId,
           locked,
           headers: {
@@ -2777,7 +1947,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.putPromptLock(putPromptLockParams);
+        watsonxAiMlService.updatePromptLock(updatePromptLockParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -2786,7 +1956,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.putPromptLock({});
+          await watsonxAiMlService.updatePromptLock({});
         } catch (e) {
           err = e;
         }
@@ -2797,7 +1967,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.putPromptLock();
+          await watsonxAiMlService.updatePromptLock();
         } catch (e) {
           err = e;
         }
@@ -2993,7 +2163,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('postPromptChatItem', () => {
+  describe('createPromptChatItem', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -3005,24 +2175,25 @@ describe('WatsonxAiMlVmlv1', () => {
         timestamp: 1711504485261,
       };
 
-      function __postPromptChatItemTest() {
-        // Construct the params object for operation postPromptChatItem
+      function __createPromptChatItemTest() {
+        // Construct the params object for operation createPromptChatItem
         const promptId = 'testString';
         const chatItem = [chatItemModel];
         const spaceId = 'testString';
         const projectId = 'testString';
-        const postPromptChatItemParams = {
+        const createPromptChatItemParams = {
           promptId,
           chatItem,
           spaceId,
           projectId,
         };
 
-        const postPromptChatItemResult =
-          watsonxAiMlService.postPromptChatItem(postPromptChatItemParams);
+        const createPromptChatItemResult = watsonxAiMlService.createPromptChatItem(
+          createPromptChatItemParams
+        );
 
         // all methods should return a Promise
-        expectToBePromise(postPromptChatItemResult);
+        expectToBePromise(createPromptChatItemResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -3041,17 +2212,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __postPromptChatItemTest();
+        __createPromptChatItemTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __postPromptChatItemTest();
+        __createPromptChatItemTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __postPromptChatItemTest();
+        __createPromptChatItemTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -3060,7 +2231,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const chatItem = [chatItemModel];
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const postPromptChatItemParams = {
+        const createPromptChatItemParams = {
           promptId,
           chatItem,
           headers: {
@@ -3069,7 +2240,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.postPromptChatItem(postPromptChatItemParams);
+        watsonxAiMlService.createPromptChatItem(createPromptChatItemParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3078,7 +2249,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.postPromptChatItem({});
+          await watsonxAiMlService.createPromptChatItem({});
         } catch (e) {
           err = e;
         }
@@ -3089,7 +2260,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.postPromptChatItem();
+          await watsonxAiMlService.createPromptChatItem();
         } catch (e) {
           err = e;
         }
@@ -3099,7 +2270,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('postPromptSession', () => {
+  describe('createPromptSession', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -3161,8 +2332,8 @@ describe('WatsonxAiMlVmlv1', () => {
         prompt: promptModel,
       };
 
-      function __postPromptSessionTest() {
-        // Construct the params object for operation postPromptSession
+      function __createPromptSessionTest() {
+        // Construct the params object for operation createPromptSession
         const name = 'Session 1';
         const id = '1c29d9a1-9ba6-422d-aa39-517b26adc147';
         const description = 'My First Prompt Session';
@@ -3173,7 +2344,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const lock = promptLockModel;
         const prompts = [wxPromptSessionEntryModel];
         const projectId = 'testString';
-        const postPromptSessionParams = {
+        const createPromptSessionParams = {
           name,
           id,
           description,
@@ -3186,11 +2357,11 @@ describe('WatsonxAiMlVmlv1', () => {
           projectId,
         };
 
-        const postPromptSessionResult =
-          watsonxAiMlService.postPromptSession(postPromptSessionParams);
+        const createPromptSessionResult =
+          watsonxAiMlService.createPromptSession(createPromptSessionParams);
 
         // all methods should return a Promise
-        expectToBePromise(postPromptSessionResult);
+        expectToBePromise(createPromptSessionResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -3215,17 +2386,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __postPromptSessionTest();
+        __createPromptSessionTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __postPromptSessionTest();
+        __createPromptSessionTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __postPromptSessionTest();
+        __createPromptSessionTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -3233,7 +2404,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const name = 'Session 1';
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const postPromptSessionParams = {
+        const createPromptSessionParams = {
           name,
           headers: {
             Accept: userAccept,
@@ -3241,7 +2412,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.postPromptSession(postPromptSessionParams);
+        watsonxAiMlService.createPromptSession(createPromptSessionParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3250,7 +2421,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.postPromptSession({});
+          await watsonxAiMlService.createPromptSession({});
         } catch (e) {
           err = e;
         }
@@ -3261,7 +2432,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.postPromptSession();
+          await watsonxAiMlService.createPromptSession();
         } catch (e) {
           err = e;
         }
@@ -3361,26 +2532,26 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('patchPromptSession', () => {
+  describe('updatePromptSession', () => {
     describe('positive tests', () => {
-      function __patchPromptSessionTest() {
-        // Construct the params object for operation patchPromptSession
+      function __updatePromptSessionTest() {
+        // Construct the params object for operation updatePromptSession
         const sessionId = 'testString';
         const name = 'Session 1';
         const description = 'My First Prompt Session';
         const projectId = 'testString';
-        const patchPromptSessionParams = {
+        const updatePromptSessionParams = {
           sessionId,
           name,
           description,
           projectId,
         };
 
-        const patchPromptSessionResult =
-          watsonxAiMlService.patchPromptSession(patchPromptSessionParams);
+        const updatePromptSessionResult =
+          watsonxAiMlService.updatePromptSession(updatePromptSessionParams);
 
         // all methods should return a Promise
-        expectToBePromise(patchPromptSessionResult);
+        expectToBePromise(updatePromptSessionResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -3399,17 +2570,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __patchPromptSessionTest();
+        __updatePromptSessionTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __patchPromptSessionTest();
+        __updatePromptSessionTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __patchPromptSessionTest();
+        __updatePromptSessionTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -3417,7 +2588,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const sessionId = 'testString';
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const patchPromptSessionParams = {
+        const updatePromptSessionParams = {
           sessionId,
           headers: {
             Accept: userAccept,
@@ -3425,7 +2596,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.patchPromptSession(patchPromptSessionParams);
+        watsonxAiMlService.updatePromptSession(updatePromptSessionParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3434,7 +2605,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.patchPromptSession({});
+          await watsonxAiMlService.updatePromptSession({});
         } catch (e) {
           err = e;
         }
@@ -3445,7 +2616,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.patchPromptSession();
+          await watsonxAiMlService.updatePromptSession();
         } catch (e) {
           err = e;
         }
@@ -3543,7 +2714,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('postPromptSessionEntry', () => {
+  describe('createPromptSessionEntry', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -3586,8 +2757,8 @@ describe('WatsonxAiMlVmlv1', () => {
         chat_items: [chatItemModel],
       };
 
-      function __postPromptSessionEntryTest() {
-        // Construct the params object for operation postPromptSessionEntry
+      function __createPromptSessionEntryTest() {
+        // Construct the params object for operation createPromptSessionEntry
         const sessionId = 'testString';
         const name = 'My Prompt';
         const createdAt = 1711504485261;
@@ -3598,7 +2769,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const isTemplate = true;
         const inputMode = 'structured';
         const projectId = 'testString';
-        const postPromptSessionEntryParams = {
+        const createPromptSessionEntryParams = {
           sessionId,
           name,
           createdAt,
@@ -3611,12 +2782,12 @@ describe('WatsonxAiMlVmlv1', () => {
           projectId,
         };
 
-        const postPromptSessionEntryResult = watsonxAiMlService.postPromptSessionEntry(
-          postPromptSessionEntryParams
+        const createPromptSessionEntryResult = watsonxAiMlService.createPromptSessionEntry(
+          createPromptSessionEntryParams
         );
 
         // all methods should return a Promise
-        expectToBePromise(postPromptSessionEntryResult);
+        expectToBePromise(createPromptSessionEntryResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -3641,17 +2812,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __postPromptSessionEntryTest();
+        __createPromptSessionEntryTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __postPromptSessionEntryTest();
+        __createPromptSessionEntryTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __postPromptSessionEntryTest();
+        __createPromptSessionEntryTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -3662,7 +2833,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const prompt = promptModel;
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const postPromptSessionEntryParams = {
+        const createPromptSessionEntryParams = {
           sessionId,
           name,
           createdAt,
@@ -3673,7 +2844,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.postPromptSessionEntry(postPromptSessionEntryParams);
+        watsonxAiMlService.createPromptSessionEntry(createPromptSessionEntryParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3682,7 +2853,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.postPromptSessionEntry({});
+          await watsonxAiMlService.createPromptSessionEntry({});
         } catch (e) {
           err = e;
         }
@@ -3693,7 +2864,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.postPromptSessionEntry();
+          await watsonxAiMlService.createPromptSessionEntry();
         } catch (e) {
           err = e;
         }
@@ -3703,27 +2874,27 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('getPromptSessionEntries', () => {
+  describe('listPromptSessionEntries', () => {
     describe('positive tests', () => {
-      function __getPromptSessionEntriesTest() {
-        // Construct the params object for operation getPromptSessionEntries
+      function __listPromptSessionEntriesTest() {
+        // Construct the params object for operation listPromptSessionEntries
         const sessionId = 'testString';
         const projectId = 'testString';
         const bookmark = 'testString';
         const limit = 'testString';
-        const getPromptSessionEntriesParams = {
+        const listPromptSessionEntriesParams = {
           sessionId,
           projectId,
           bookmark,
           limit,
         };
 
-        const getPromptSessionEntriesResult = watsonxAiMlService.getPromptSessionEntries(
-          getPromptSessionEntriesParams
+        const listPromptSessionEntriesResult = watsonxAiMlService.listPromptSessionEntries(
+          listPromptSessionEntriesParams
         );
 
         // all methods should return a Promise
-        expectToBePromise(getPromptSessionEntriesResult);
+        expectToBePromise(listPromptSessionEntriesResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -3742,17 +2913,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __getPromptSessionEntriesTest();
+        __listPromptSessionEntriesTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __getPromptSessionEntriesTest();
+        __listPromptSessionEntriesTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __getPromptSessionEntriesTest();
+        __listPromptSessionEntriesTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -3760,7 +2931,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const sessionId = 'testString';
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const getPromptSessionEntriesParams = {
+        const listPromptSessionEntriesParams = {
           sessionId,
           headers: {
             Accept: userAccept,
@@ -3768,7 +2939,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.getPromptSessionEntries(getPromptSessionEntriesParams);
+        watsonxAiMlService.listPromptSessionEntries(listPromptSessionEntriesParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3777,7 +2948,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptSessionEntries({});
+          await watsonxAiMlService.listPromptSessionEntries({});
         } catch (e) {
           err = e;
         }
@@ -3788,7 +2959,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptSessionEntries();
+          await watsonxAiMlService.listPromptSessionEntries();
         } catch (e) {
           err = e;
         }
@@ -3798,7 +2969,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('postPromptSessionEntryChatItem', () => {
+  describe('createPromptSessionEntryChatItem', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -3810,24 +2981,26 @@ describe('WatsonxAiMlVmlv1', () => {
         timestamp: 1711504485261,
       };
 
-      function __postPromptSessionEntryChatItemTest() {
-        // Construct the params object for operation postPromptSessionEntryChatItem
+      function __createPromptSessionEntryChatItemTest() {
+        // Construct the params object for operation createPromptSessionEntryChatItem
         const sessionId = 'testString';
         const entryId = 'testString';
         const chatItem = [chatItemModel];
         const projectId = 'testString';
-        const postPromptSessionEntryChatItemParams = {
+        const createPromptSessionEntryChatItemParams = {
           sessionId,
           entryId,
           chatItem,
           projectId,
         };
 
-        const postPromptSessionEntryChatItemResult =
-          watsonxAiMlService.postPromptSessionEntryChatItem(postPromptSessionEntryChatItemParams);
+        const createPromptSessionEntryChatItemResult =
+          watsonxAiMlService.createPromptSessionEntryChatItem(
+            createPromptSessionEntryChatItemParams
+          );
 
         // all methods should return a Promise
-        expectToBePromise(postPromptSessionEntryChatItemResult);
+        expectToBePromise(createPromptSessionEntryChatItemResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -3850,17 +3023,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __postPromptSessionEntryChatItemTest();
+        __createPromptSessionEntryChatItemTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __postPromptSessionEntryChatItemTest();
+        __createPromptSessionEntryChatItemTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __postPromptSessionEntryChatItemTest();
+        __createPromptSessionEntryChatItemTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -3870,7 +3043,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const chatItem = [chatItemModel];
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const postPromptSessionEntryChatItemParams = {
+        const createPromptSessionEntryChatItemParams = {
           sessionId,
           entryId,
           chatItem,
@@ -3880,7 +3053,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.postPromptSessionEntryChatItem(postPromptSessionEntryChatItemParams);
+        watsonxAiMlService.createPromptSessionEntryChatItem(createPromptSessionEntryChatItemParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3889,7 +3062,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.postPromptSessionEntryChatItem({});
+          await watsonxAiMlService.createPromptSessionEntryChatItem({});
         } catch (e) {
           err = e;
         }
@@ -3900,7 +3073,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.postPromptSessionEntryChatItem();
+          await watsonxAiMlService.createPromptSessionEntryChatItem();
         } catch (e) {
           err = e;
         }
@@ -3910,17 +3083,17 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('putPromptSessionLock', () => {
+  describe('updatePromptSessionLock', () => {
     describe('positive tests', () => {
-      function __putPromptSessionLockTest() {
-        // Construct the params object for operation putPromptSessionLock
+      function __updatePromptSessionLockTest() {
+        // Construct the params object for operation updatePromptSessionLock
         const sessionId = 'testString';
         const locked = true;
         const lockType = 'edit';
         const lockedBy = 'IBMid-000000YYY0';
         const projectId = 'testString';
         const force = true;
-        const putPromptSessionLockParams = {
+        const updatePromptSessionLockParams = {
           sessionId,
           locked,
           lockType,
@@ -3929,12 +3102,12 @@ describe('WatsonxAiMlVmlv1', () => {
           force,
         };
 
-        const putPromptSessionLockResult = watsonxAiMlService.putPromptSessionLock(
-          putPromptSessionLockParams
+        const updatePromptSessionLockResult = watsonxAiMlService.updatePromptSessionLock(
+          updatePromptSessionLockParams
         );
 
         // all methods should return a Promise
-        expectToBePromise(putPromptSessionLockResult);
+        expectToBePromise(updatePromptSessionLockResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -3955,17 +3128,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __putPromptSessionLockTest();
+        __updatePromptSessionLockTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __putPromptSessionLockTest();
+        __updatePromptSessionLockTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __putPromptSessionLockTest();
+        __updatePromptSessionLockTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -3974,7 +3147,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const locked = true;
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const putPromptSessionLockParams = {
+        const updatePromptSessionLockParams = {
           sessionId,
           locked,
           headers: {
@@ -3983,7 +3156,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.putPromptSessionLock(putPromptSessionLockParams);
+        watsonxAiMlService.updatePromptSessionLock(updatePromptSessionLockParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3992,7 +3165,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.putPromptSessionLock({});
+          await watsonxAiMlService.updatePromptSessionLock({});
         } catch (e) {
           err = e;
         }
@@ -4003,7 +3176,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.putPromptSessionLock();
+          await watsonxAiMlService.updatePromptSessionLock();
         } catch (e) {
           err = e;
         }
@@ -4298,7 +3471,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('textEmbeddings', () => {
+  describe('embedText', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -4313,14 +3486,14 @@ describe('WatsonxAiMlVmlv1', () => {
         return_options: embeddingReturnOptionsModel,
       };
 
-      function __textEmbeddingsTest() {
-        // Construct the params object for operation textEmbeddings
+      function __embedTextTest() {
+        // Construct the params object for operation embedText
         const modelId = 'slate';
         const inputs = ['Youth craves thrills while adulthood cherishes wisdom.'];
         const spaceId = 'testString';
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const parameters = embeddingParametersModel;
-        const textEmbeddingsParams = {
+        const embedTextParams = {
           modelId,
           inputs,
           spaceId,
@@ -4328,10 +3501,10 @@ describe('WatsonxAiMlVmlv1', () => {
           parameters,
         };
 
-        const textEmbeddingsResult = watsonxAiMlService.textEmbeddings(textEmbeddingsParams);
+        const embedTextResult = watsonxAiMlService.embedText(embedTextParams);
 
         // all methods should return a Promise
-        expectToBePromise(textEmbeddingsResult);
+        expectToBePromise(embedTextResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -4352,17 +3525,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __textEmbeddingsTest();
+        __embedTextTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __textEmbeddingsTest();
+        __embedTextTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __textEmbeddingsTest();
+        __embedTextTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -4371,7 +3544,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const inputs = ['Youth craves thrills while adulthood cherishes wisdom.'];
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const textEmbeddingsParams = {
+        const embedTextParams = {
           modelId,
           inputs,
           headers: {
@@ -4380,7 +3553,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.textEmbeddings(textEmbeddingsParams);
+        watsonxAiMlService.embedText(embedTextParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4389,7 +3562,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.textEmbeddings({});
+          await watsonxAiMlService.embedText({});
         } catch (e) {
           err = e;
         }
@@ -4400,7 +3573,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.textEmbeddings();
+          await watsonxAiMlService.embedText();
         } catch (e) {
           err = e;
         }
@@ -4410,7 +3583,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('textGeneration', () => {
+  describe('generateText', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -4510,8 +3683,8 @@ describe('WatsonxAiMlVmlv1', () => {
         foo: moderationPropertiesModel,
       };
 
-      function __textGenerationTest() {
-        // Construct the params object for operation textGeneration
+      function __generateTextTest() {
+        // Construct the params object for operation generateText
         const input =
           'Generate a marketing email advertising a new sale with the following characteristics:\n\nCompany: Swimwear Unlimited\n\nOffer Keywords: {Select customers only, mid-summer fun, swimwear sale}\n\nOffer End Date: July 15\n\nAdvertisement Tone: Exciting!\n\nInclude no URLs.\n\nInclude no telephone numbers.\n';
         const modelId = 'google/flan-ul2';
@@ -4519,7 +3692,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const parameters = textGenRequestParametersModel;
         const moderations = moderationsModel;
-        const textGenerationParams = {
+        const generateTextParams = {
           input,
           modelId,
           spaceId,
@@ -4528,10 +3701,10 @@ describe('WatsonxAiMlVmlv1', () => {
           moderations,
         };
 
-        const textGenerationResult = watsonxAiMlService.textGeneration(textGenerationParams);
+        const generateTextResult = watsonxAiMlService.generateText(generateTextParams);
 
         // all methods should return a Promise
-        expectToBePromise(textGenerationResult);
+        expectToBePromise(generateTextResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -4553,17 +3726,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __textGenerationTest();
+        __generateTextTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __textGenerationTest();
+        __generateTextTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __textGenerationTest();
+        __generateTextTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -4573,7 +3746,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const modelId = 'google/flan-ul2';
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const textGenerationParams = {
+        const generateTextParams = {
           input,
           modelId,
           headers: {
@@ -4582,7 +3755,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.textGeneration(textGenerationParams);
+        watsonxAiMlService.generateText(generateTextParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4591,7 +3764,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.textGeneration({});
+          await watsonxAiMlService.generateText({});
         } catch (e) {
           err = e;
         }
@@ -4602,7 +3775,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.textGeneration();
+          await watsonxAiMlService.generateText();
         } catch (e) {
           err = e;
         }
@@ -4612,7 +3785,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('textGenerationStream', () => {
+  describe('generateTextStream', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -4712,8 +3885,8 @@ describe('WatsonxAiMlVmlv1', () => {
         foo: moderationPropertiesModel,
       };
 
-      function __textGenerationStreamTest() {
-        // Construct the params object for operation textGenerationStream
+      function __generateTextStreamTest() {
+        // Construct the params object for operation generateTextStream
         const input =
           'Generate a marketing email advertising a new sale with the following characteristics:\n\nCompany: Swimwear Unlimited\n\nOffer Keywords: {Select customers only, mid-summer fun, swimwear sale}\n\nOffer End Date: July 15\n\nAdvertisement Tone: Exciting!\n\nInclude no URLs.\n\nInclude no telephone numbers.\n';
         const modelId = 'google/flan-ul2';
@@ -4721,23 +3894,21 @@ describe('WatsonxAiMlVmlv1', () => {
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const parameters = textGenRequestParametersModel;
         const moderations = moderationsModel;
-        const accept = 'application/json';
-        const textGenerationStreamParams = {
+        const accept = 'text/event-stream';
+        const generateTextStreamParams = {
           input,
           modelId,
           spaceId,
           projectId,
           parameters,
           moderations,
-          accept,
         };
-
-        const textGenerationStreamResult = watsonxAiMlService.textGenerationStream(
-          textGenerationStreamParams
-        );
+        createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
+        const generateTextStreamResult =
+          watsonxAiMlService.generateTextStream(generateTextStreamParams);
 
         // all methods should return a Promise
-        expectToBePromise(textGenerationStreamResult);
+        expectToBePromise(generateTextStreamResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -4748,7 +3919,6 @@ describe('WatsonxAiMlVmlv1', () => {
         const expectedAccept = accept;
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
-        checkUserHeader(createRequestMock, 'Accept', accept);
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -4760,17 +3930,19 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __textGenerationStreamTest();
+        __generateTextStreamTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __textGenerationStreamTest();
+        createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
+        __generateTextStreamTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __textGenerationStreamTest();
+        createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
+        __generateTextStreamTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -4778,18 +3950,17 @@ describe('WatsonxAiMlVmlv1', () => {
         const input =
           'Generate a marketing email advertising a new sale with the following characteristics:\n\nCompany: Swimwear Unlimited\n\nOffer Keywords: {Select customers only, mid-summer fun, swimwear sale}\n\nOffer End Date: July 15\n\nAdvertisement Tone: Exciting!\n\nInclude no URLs.\n\nInclude no telephone numbers.\n';
         const modelId = 'google/flan-ul2';
-        const userAccept = 'fake/accept';
+        const userAccept = 'text/event-stream';
         const userContentType = 'fake/contentType';
-        const textGenerationStreamParams = {
+        const generateTextStreamParams = {
           input,
           modelId,
           headers: {
-            Accept: userAccept,
             'Content-Type': userContentType,
           },
         };
-
-        watsonxAiMlService.textGenerationStream(textGenerationStreamParams);
+        createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
+        watsonxAiMlService.generateTextStream(generateTextStreamParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4798,7 +3969,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.textGenerationStream({});
+          await watsonxAiMlService.generateTextStream({});
         } catch (e) {
           err = e;
         }
@@ -4809,7 +3980,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.textGenerationStream();
+          await watsonxAiMlService.generateTextStream();
         } catch (e) {
           err = e;
         }
@@ -4819,7 +3990,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('textTokenization', () => {
+  describe('tokenizeText', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -4828,14 +3999,14 @@ describe('WatsonxAiMlVmlv1', () => {
         return_tokens: true,
       };
 
-      function __textTokenizationTest() {
-        // Construct the params object for operation textTokenization
+      function __tokenizeTextTest() {
+        // Construct the params object for operation tokenizeText
         const modelId = 'google/flan-ul2';
         const input = 'Write a tagline for an alumni association: Together we';
         const spaceId = 'testString';
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const parameters = textTokenizeParametersModel;
-        const textTokenizationParams = {
+        const tokenizeTextParams = {
           modelId,
           input,
           spaceId,
@@ -4843,10 +4014,10 @@ describe('WatsonxAiMlVmlv1', () => {
           parameters,
         };
 
-        const textTokenizationResult = watsonxAiMlService.textTokenization(textTokenizationParams);
+        const tokenizeTextResult = watsonxAiMlService.tokenizeText(tokenizeTextParams);
 
         // all methods should return a Promise
-        expectToBePromise(textTokenizationResult);
+        expectToBePromise(tokenizeTextResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -4867,17 +4038,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __textTokenizationTest();
+        __tokenizeTextTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __textTokenizationTest();
+        __tokenizeTextTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __textTokenizationTest();
+        __tokenizeTextTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -4886,7 +4057,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const input = 'Write a tagline for an alumni association: Together we';
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const textTokenizationParams = {
+        const tokenizeTextParams = {
           modelId,
           input,
           headers: {
@@ -4895,7 +4066,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.textTokenization(textTokenizationParams);
+        watsonxAiMlService.tokenizeText(tokenizeTextParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4904,7 +4075,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.textTokenization({});
+          await watsonxAiMlService.tokenizeText({});
         } catch (e) {
           err = e;
         }
@@ -4915,7 +4086,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.textTokenization();
+          await watsonxAiMlService.tokenizeText();
         } catch (e) {
           err = e;
         }
@@ -4925,7 +4096,7 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('trainingsCreate', () => {
+  describe('createTraining', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
 
@@ -4980,8 +4151,8 @@ describe('WatsonxAiMlVmlv1', () => {
         schema: dataSchemaModel,
       };
 
-      function __trainingsCreateTest() {
-        // Construct the params object for operation trainingsCreate
+      function __createTrainingTest() {
+        // Construct the params object for operation createTraining
         const name = 'my-prompt-tune-training';
         const resultsReference = objectLocationModel;
         const spaceId = 'testString';
@@ -4992,7 +4163,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const trainingDataReferences = [dataConnectionReferenceModel];
         const custom = { anyKey: 'anyValue' };
         const autoUpdateModel = true;
-        const trainingsCreateParams = {
+        const createTrainingParams = {
           name,
           resultsReference,
           spaceId,
@@ -5005,10 +4176,10 @@ describe('WatsonxAiMlVmlv1', () => {
           autoUpdateModel,
         };
 
-        const trainingsCreateResult = watsonxAiMlService.trainingsCreate(trainingsCreateParams);
+        const createTrainingResult = watsonxAiMlService.createTraining(createTrainingParams);
 
         // all methods should return a Promise
-        expectToBePromise(trainingsCreateResult);
+        expectToBePromise(createTrainingResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -5034,17 +4205,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __trainingsCreateTest();
+        __createTrainingTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __trainingsCreateTest();
+        __createTrainingTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __trainingsCreateTest();
+        __createTrainingTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -5053,7 +4224,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const resultsReference = objectLocationModel;
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const trainingsCreateParams = {
+        const createTrainingParams = {
           name,
           resultsReference,
           headers: {
@@ -5062,7 +4233,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.trainingsCreate(trainingsCreateParams);
+        watsonxAiMlService.createTraining(createTrainingParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -5071,7 +4242,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.trainingsCreate({});
+          await watsonxAiMlService.createTraining({});
         } catch (e) {
           err = e;
         }
@@ -5082,7 +4253,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.trainingsCreate();
+          await watsonxAiMlService.createTraining();
         } catch (e) {
           err = e;
         }
@@ -5092,10 +4263,10 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('trainingsList', () => {
+  describe('listTrainings', () => {
     describe('positive tests', () => {
-      function __trainingsListTest() {
-        // Construct the params object for operation trainingsList
+      function __listTrainingsTest() {
+        // Construct the params object for operation listTrainings
         const start = 'testString';
         const limit = 50;
         const totalCount = true;
@@ -5103,7 +4274,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const state = 'queued';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
-        const trainingsListParams = {
+        const listTrainingsParams = {
           start,
           limit,
           totalCount,
@@ -5113,10 +4284,10 @@ describe('WatsonxAiMlVmlv1', () => {
           projectId,
         };
 
-        const trainingsListResult = watsonxAiMlService.trainingsList(trainingsListParams);
+        const listTrainingsResult = watsonxAiMlService.listTrainings(listTrainingsParams);
 
         // all methods should return a Promise
-        expectToBePromise(trainingsListResult);
+        expectToBePromise(listTrainingsResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -5139,37 +4310,36 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __trainingsListTest();
+        __listTrainingsTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __trainingsListTest();
+        __listTrainingsTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __trainingsListTest();
+        __listTrainingsTest();
       });
 
       test('should prioritize user-given headers', () => {
         // parameters
-        const userAccept = 'fake/accept';
+        const userAccept = 'application/json';
         const userContentType = 'fake/contentType';
-        const trainingsListParams = {
+        const listTrainingsParams = {
           headers: {
-            Accept: userAccept,
             'Content-Type': userContentType,
           },
         };
 
-        watsonxAiMlService.trainingsList(trainingsListParams);
+        watsonxAiMlService.listTrainings(listTrainingsParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.trainingsList({});
+        watsonxAiMlService.listTrainings({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
@@ -5206,7 +4376,7 @@ describe('WatsonxAiMlVmlv1', () => {
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVmlv1.TrainingsListPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAiMlService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -5225,7 +4395,7 @@ describe('WatsonxAiMlVmlv1', () => {
           spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
         };
-        const pager = new WatsonxAiMlVmlv1.TrainingsListPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAiMlService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -5233,23 +4403,23 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('trainingsGet', () => {
+  describe('getTraining', () => {
     describe('positive tests', () => {
-      function __trainingsGetTest() {
-        // Construct the params object for operation trainingsGet
+      function __getTrainingTest() {
+        // Construct the params object for operation getTraining
         const trainingId = 'testString';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
-        const trainingsGetParams = {
+        const getTrainingParams = {
           trainingId,
           spaceId,
           projectId,
         };
 
-        const trainingsGetResult = watsonxAiMlService.trainingsGet(trainingsGetParams);
+        const getTrainingResult = watsonxAiMlService.getTraining(getTrainingParams);
 
         // all methods should return a Promise
-        expectToBePromise(trainingsGetResult);
+        expectToBePromise(getTrainingResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -5268,17 +4438,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __trainingsGetTest();
+        __getTrainingTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __trainingsGetTest();
+        __getTrainingTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __trainingsGetTest();
+        __getTrainingTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -5286,7 +4456,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const trainingId = 'testString';
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const trainingsGetParams = {
+        const getTrainingParams = {
           trainingId,
           headers: {
             Accept: userAccept,
@@ -5294,7 +4464,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.trainingsGet(trainingsGetParams);
+        watsonxAiMlService.getTraining(getTrainingParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -5303,7 +4473,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.trainingsGet({});
+          await watsonxAiMlService.getTraining({});
         } catch (e) {
           err = e;
         }
@@ -5314,7 +4484,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.trainingsGet();
+          await watsonxAiMlService.getTraining();
         } catch (e) {
           err = e;
         }
@@ -5324,25 +4494,25 @@ describe('WatsonxAiMlVmlv1', () => {
     });
   });
 
-  describe('trainingsDelete', () => {
+  describe('deleteTraining', () => {
     describe('positive tests', () => {
-      function __trainingsDeleteTest() {
-        // Construct the params object for operation trainingsDelete
+      function __deleteTrainingTest() {
+        // Construct the params object for operation deleteTraining
         const trainingId = 'testString';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const hardDelete = true;
-        const trainingsDeleteParams = {
+        const deleteTrainingParams = {
           trainingId,
           spaceId,
           projectId,
           hardDelete,
         };
 
-        const trainingsDeleteResult = watsonxAiMlService.trainingsDelete(trainingsDeleteParams);
+        const deleteTrainingResult = watsonxAiMlService.deleteTraining(deleteTrainingParams);
 
         // all methods should return a Promise
-        expectToBePromise(trainingsDeleteResult);
+        expectToBePromise(deleteTrainingResult);
 
         // assert that create request was called
         expect(createRequestMock).toHaveBeenCalledTimes(1);
@@ -5362,17 +4532,17 @@ describe('WatsonxAiMlVmlv1', () => {
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
-        __trainingsDeleteTest();
+        __deleteTrainingTest();
 
         // enable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.enableRetries();
-        __trainingsDeleteTest();
+        __deleteTrainingTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         watsonxAiMlService.disableRetries();
-        __trainingsDeleteTest();
+        __deleteTrainingTest();
       });
 
       test('should prioritize user-given headers', () => {
@@ -5380,7 +4550,7 @@ describe('WatsonxAiMlVmlv1', () => {
         const trainingId = 'testString';
         const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
-        const trainingsDeleteParams = {
+        const deleteTrainingParams = {
           trainingId,
           headers: {
             Accept: userAccept,
@@ -5388,7 +4558,7 @@ describe('WatsonxAiMlVmlv1', () => {
           },
         };
 
-        watsonxAiMlService.trainingsDelete(trainingsDeleteParams);
+        watsonxAiMlService.deleteTraining(deleteTrainingParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -5397,7 +4567,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.trainingsDelete({});
+          await watsonxAiMlService.deleteTraining({});
         } catch (e) {
           err = e;
         }
@@ -5408,7 +4578,7 @@ describe('WatsonxAiMlVmlv1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.trainingsDelete();
+          await watsonxAiMlService.deleteTraining();
         } catch (e) {
           err = e;
         }

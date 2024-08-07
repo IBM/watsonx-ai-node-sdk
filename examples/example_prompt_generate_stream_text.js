@@ -1,10 +1,10 @@
 /**
  * The following example flow:
  * - initialize SDK
- * - store prompt in space
+ * - store prompt in project
  * - get stored prompt
  * - deploy stored prompt
- * - generate text based on deployed prompt
+ * - generate text stream based on deployed prompt
  */
 
 /**
@@ -50,7 +50,7 @@ const promptContentParams = {
 const promptParameters = {
     name: "WXAI SDK Example Prompt",
     description: "Example prompt created from watsonx-ai-node-sdk library",
-    spaceId: '<SPACE_ID>',
+    projectId: '<PROJECT_ID>',
     prompt: promptContentParams,
     promptVariables: {
         "input": {
@@ -70,7 +70,7 @@ async function generateTextFromSavedPrompt() {
     // Get stored prompt
     const getPrompt = await watsonxAIService.getPrompt({
         promptId: createdPromptId,
-        spaceId: '<SPACE_ID>'
+        projectId: '<PROJECT_ID>',
     })
     console.log("\n\n***** PROMPT CONTENT *****");
     console.log(JSON.stringify(getPrompt.result, null, 2));
@@ -80,7 +80,7 @@ async function generateTextFromSavedPrompt() {
         name: "Prompt deployment from WXAI SDK",
         baseModelId: promptContentParams.model_id,
         promptTemplate: {id: createdPromptId},
-        spaceId: 'd45219e5-c0dc-4a09-ba8b-f92e8382f536',
+        projectId: '<PROJECT_ID>',
         online: {}
     })
     console.log(JSON.stringify(createDeploy.result, null, 2));
@@ -90,7 +90,7 @@ async function generateTextFromSavedPrompt() {
 
     // Infer deployed prompt
     let modelInput = "It's sunny outside."
-    const inferDeployedPrompt = await watsonxAIService.deploymentGenerateText({
+    const streamInferDeployedPrompt = await watsonxAIService.deploymentGenerateTextStream({
         idOrName: createdDeployId,
         parameters: {
             prompt_variables: {
@@ -101,7 +101,9 @@ async function generateTextFromSavedPrompt() {
     console.log("\n\n***** TEXT INPUT INTO MODEL *****");
     console.log(modelInput)
     console.log("\n\n***** TEXT RESPONSE FROM MODEL *****");
-    console.log(inferDeployedPrompt.result.results[0].generated_text);
+    for await (const line of streamInferDeployedPrompt) {
+      console.log(line);
+    }
 
 }
 

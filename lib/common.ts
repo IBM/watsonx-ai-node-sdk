@@ -16,7 +16,9 @@
 
 import os = require('os');
 
-// tslint:disable-next-line:no-var-requires
+const { TransformStream } = require('node:stream/web');
+const { Readable } = require('node:stream');
+
 const pkg = require('../package.json');
 
 export type SdkHeaders = {
@@ -56,4 +58,35 @@ export function getSdkHeaders(
   };
 
   return headers;
+}
+
+export class LineTransformStream extends TransformStream {
+  private buffer: string;
+
+  constructor() {
+    super({
+      transform: (chunk, controller) => this.transform(chunk, controller),
+      flush: (controller) => this.flush(controller),
+    });
+    this.buffer = '';
+  }
+
+  transform(chunk, controller) {
+    this.buffer += chunk;
+    const lines = this.buffer.split('\n');
+    this.buffer = lines.pop();
+
+    lines.forEach((line) => controller.enqueue(line));
+  }
+
+  flush(controller) {
+    if (this.buffer) {
+      controller.enqueue(this.buffer);
+    }
+  }
+}
+
+export function transformStream(apiResponse: any): ReadableStream {
+  const readableStream = Readable.toWeb(apiResponse.result);
+  return readableStream.pipeThrough(new TextDecoderStream()).pipeThrough(new LineTransformStream());
 }

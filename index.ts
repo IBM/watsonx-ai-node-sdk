@@ -18,4 +18,4 @@
  * @module watsonx-ai
  */
 
-export import WatsonXAI = require('./watsonx-ai-ml/vml-v1');
+export import WatsonXAI = require('./watsonx-ai-ml/vml_v1');

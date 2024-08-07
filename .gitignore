@@ -88,3 +88,8 @@ secrets.tar
 
 # SDK generator
 .openapi-generator*
+openapi-sdkgen/
+
+# API spec files
+watsonx-ai.json
+watsonx-ai-cp.json

@@ -33,7 +33,9 @@ import {
   validateParams,
 } from 'ibm-cloud-sdk-core';
 import { getAuthenticatorFromEnvironment } from '../auth/utils/get-authenticator-from-environment';
-import { getSdkHeaders } from '../lib/common';
+import { getSdkHeaders, LineTransformStream, transformStream } from '../lib/common';
+
+const { Readable } = require('node:stream');
 
 /**
  * SDK entrypoint for IBM watsonx.ai product
@@ -52,7 +54,7 @@ const PLATFORM_URLS_MAP = {
   'https://private.us-south.ml.cloud.ibm.com': 'https://api.dataplatform.cloud.ibm.com/wx',
 };
 
-class WatsonxAiMlVmlv1 extends BaseService {
+class WatsonxAiMlVml_v1 extends BaseService {
   /** @hidden */
   static DEFAULT_SERVICE_URL: string = 'https://us-south.ml.cloud.ibm.com';
 
@@ -83,8 +85,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
    */
   static constructServiceUrl(providedUrlVariables: Map<string, string> | null): string {
     return constructServiceUrl(
-      WatsonxAiMlVmlv1.PARAMETERIZED_SERVICE_URL,
-      WatsonxAiMlVmlv1.defaultUrlVariables,
+      WatsonxAiMlVml_v1.PARAMETERIZED_SERVICE_URL,
+      WatsonxAiMlVml_v1.defaultUrlVariables,
       providedUrlVariables
     );
   }
@@ -94,20 +96,19 @@ class WatsonxAiMlVmlv1 extends BaseService {
    ************************/
 
   /**
-   * Constructs an instance of WatsonxAiMlVmlv1 with passed in options and external configuration.
+   * Constructs an instance of WatsonxAiMlVml_v1 with passed in options and external configuration.
    *
    * @param {UserOptions} [options] - The parameters to send to the service.
    * @param {string} [options.serviceName] - The name of the service to configure
    * @param {Authenticator} [options.authenticator] - The Authenticator object used to authenticate requests to the service
    * @param {string} [options.serviceUrl] - The base URL for the service
-   * @returns {WatsonxAiMlVmlv1}
-   *
+   * @returns {WatsonxAiMlVml_v1}
    *
    * @category constructor
    *
    */
 
-  public static newInstance(options: UserOptions): WatsonxAiMlVmlv1 {
+  public static newInstance(options: UserOptions): WatsonxAiMlVml_v1 {
     options = options || {};
 
     if (!options.serviceName) {
@@ -120,13 +121,12 @@ class WatsonxAiMlVmlv1 extends BaseService {
       options.platformUrl = readExternalSources(options.serviceName).platformUrl;
     }
 
-    const service = new WatsonxAiMlVmlv1(options);
+    const service = new WatsonxAiMlVml_v1(options);
 
     service.configureService(options.serviceName);
     if (options.serviceUrl) {
       service.setServiceUrl(options.serviceUrl);
     }
-
     return service;
   }
 
@@ -136,7 +136,7 @@ class WatsonxAiMlVmlv1 extends BaseService {
   wxServiceUrl: string;
 
   /**
-   * Construct a WatsonxAiMlVmlv1 object.
+   * Construct a WatsonxAiMlVml_v1 object.
    *
    * @param {Object} options - Options for the service.
    * @param {string} options.version - The version date for the API of the form `YYYY-MM-DD`.
@@ -144,7 +144,7 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {OutgoingHttpHeaders} [options.headers] - Default headers that shall be included with every request to the service.
    * @param {Authenticator} options.authenticator - The Authenticator object used to authenticate requests to the service
    * @constructor
-   * @returns {WatsonxAiMlVmlv1}
+   * @returns {WatsonxAiMlVml_v1}
    */
   constructor(options: UserOptions) {
     options = options || {};
@@ -154,12 +154,11 @@ class WatsonxAiMlVmlv1 extends BaseService {
     if (_validationErrors) {
       throw _validationErrors;
     }
-
     super(options);
     if (options.serviceUrl) {
       this.setServiceUrl(options.serviceUrl);
     } else {
-      this.setServiceUrl(WatsonxAiMlVmlv1.DEFAULT_SERVICE_URL);
+      this.setServiceUrl(WatsonxAiMlVml_v1.DEFAULT_SERVICE_URL);
     }
     if (options.platformUrl) {
       this.wxServiceUrl = options.platformUrl.concat('/wx');
@@ -196,19 +195,19 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.description] - A description of the resource.
    * @param {string[]} [params.tags] - A list of tags for this resource.
    * @param {JsonObject} [params.custom] - User defined properties specified as key-value pairs.
-   * @param {Rel} [params.asset] - A reference to a resource.
    * @param {SimpleRel} [params.promptTemplate] - A reference to a resource.
    * @param {HardwareSpec} [params.hardwareSpec] - A hardware specification.
+   * @param {Rel} [params.asset] - A reference to a resource.
    * @param {string} [params.baseModelId] - The base model that is required for this deployment if this is for a prompt
    * template or a prompt tune for an IBM foundation model.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.DeploymentResource>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResource>>}
    *
    * @category Deployments
    */
   public createDeployment(
-    params: WatsonxAiMlVmlv1.CreateDeploymentParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.DeploymentResource>> {
+    params: WatsonxAiMlVml_v1.CreateDeploymentParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResource>> {
     const _params = { ...params };
     const _requiredParams = ['name', 'online'];
     const _validParams = [
@@ -238,9 +237,9 @@ class WatsonxAiMlVmlv1 extends BaseService {
       'description': _params.description,
       'tags': _params.tags,
       'custom': _params.custom,
-      'asset': _params.asset,
       'prompt_template': _params.promptTemplate,
       'hardware_spec': _params.hardwareSpec,
+      'asset': _params.asset,
       'base_model_id': _params.baseModelId,
     };
 
@@ -249,8 +248,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'createDeployment'
     );
 
@@ -314,13 +313,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {boolean} [params.conflict] - Returns whether `serving_name` is available for use or not. This query
    * parameter cannot be combined with any other parameter except for `serving_name`.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.DeploymentResourceCollection>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResourceCollection>>}
    *
    * @category Deployments
    */
   public listDeployments(
-    params?: WatsonxAiMlVmlv1.ListDeploymentsParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.DeploymentResourceCollection>> {
+    params?: WatsonxAiMlVml_v1.ListDeploymentsParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResourceCollection>> {
     const _params = { ...params };
     const _requiredParams = [];
     const _validParams = [
@@ -356,8 +355,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'listDeployments'
     );
 
@@ -394,13 +393,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
    * query parameter has to be given.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.DeploymentResource>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResource>>}
    *
    * @category Deployments
    */
-  public deploymentsGet(
-    params: WatsonxAiMlVmlv1.DeploymentsGetParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.DeploymentResource>> {
+  public getDeployment(
+    params: WatsonxAiMlVml_v1.DeploymentsGetParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResource>> {
     const _params = { ...params };
     const _requiredParams = ['deploymentId'];
     const _validParams = ['deploymentId', 'spaceId', 'projectId', 'headers'];
@@ -408,7 +407,6 @@ class WatsonxAiMlVmlv1 extends BaseService {
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
-
     const query = {
       'version': this.version,
       'space_id': _params.spaceId,
@@ -420,8 +418,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'deploymentsGet'
     );
 
@@ -474,13 +472,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
    * query parameter has to be given.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.DeploymentResource>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResource>>}
    *
    * @category Deployments
    */
-  public deploymentsUpdate(
-    params: WatsonxAiMlVmlv1.DeploymentsUpdateParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.DeploymentResource>> {
+  public updateDeployment(
+    params: WatsonxAiMlVml_v1.DeploymentsUpdateParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResource>> {
     const _params = { ...params };
     const _requiredParams = ['deploymentId', 'jsonPatch'];
     const _validParams = ['deploymentId', 'jsonPatch', 'spaceId', 'projectId', 'headers'];
@@ -501,8 +499,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'deploymentsUpdate'
     );
 
@@ -542,13 +540,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
    * query parameter has to be given.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
    *
    * @category Deployments
    */
-  public deploymentsDelete(
-    params: WatsonxAiMlVmlv1.DeploymentsDeleteParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>> {
+  public deleteDeployment(
+    params: WatsonxAiMlVml_v1.DeploymentsDeleteParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['deploymentId'];
     const _validParams = ['deploymentId', 'spaceId', 'projectId', 'headers'];
@@ -568,8 +566,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'deploymentsDelete'
     );
 
@@ -617,13 +615,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TextGenResponse>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>>}
    *
    * @category Deployments
    */
-  public deploymentsTextGeneration(
-    params: WatsonxAiMlVmlv1.DeploymentsTextGenerationParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TextGenResponse>> {
+  public deploymentGenerateText(
+    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>> {
     const _params = { ...params };
     const _requiredParams = ['idOrName'];
     const _validParams = ['idOrName', 'input', 'parameters', 'moderations', 'headers'];
@@ -647,8 +645,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'deploymentsTextGeneration'
     );
 
@@ -699,6 +697,20 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.input] - The prompt to generate completions. Note: The method tokenizes the input
    * internally. It is recommended not to leave any trailing spaces.
    *
+   * ### Response
+   * ReadableStream represents a source of streaming data. If request performed successfully ReadableStream returns
+   * stream line by line. Output will stream as follow:
+   * - id: 1
+   * - event: message
+   * - data: {data}
+   * - empty line which separates the next Event Message
+   *
+   * Here is one of the possibilities to read streaming output:
+   *
+   * const stream = await watsonxAiMlService.generateTextStream(parameters);
+   * for await (const line of stream) {
+   *   console.log(line);
+   * }
    *
    * This field is ignored if there is a prompt template.
    * @param {DeploymentTextGenProperties} [params.parameters] - The template properties if this request refers to a
@@ -706,19 +718,17 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {Moderations} [params.moderations] - Properties that control the moderations, for usages such as `Hate and
    * profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types
    * of moderations.
-   * @param {string} [params.accept] - The type of the response: application/json or text/event-stream. A character
-   * encoding can be specified by including a `charset` parameter. For example, 'text/event-stream;charset=utf-8'.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TextGenResponse[]>>}
+   * @returns {Promise<ReadableStream<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse[]>>>}
    *
    * @category Deployments
    */
-  public deploymentsTextGenerationStream(
-    params: WatsonxAiMlVmlv1.DeploymentsTextGenerationStreamParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TextGenResponse[]>> {
+  public async deploymentGenerateTextStream(
+    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams
+  ): Promise<ReadableStream<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse[]>>> {
     const _params = { ...params };
     const _requiredParams = ['idOrName'];
-    const _validParams = ['idOrName', 'input', 'parameters', 'moderations', 'accept', 'headers'];
+    const _validParams = ['idOrName', 'input', 'parameters', 'moderations', 'headers'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -739,8 +749,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'deploymentsTextGenerationStream'
     );
 
@@ -751,22 +761,26 @@ class WatsonxAiMlVmlv1 extends BaseService {
         body,
         qs: query,
         path,
+        responseType: 'stream',
+        adapter: 'fetch',
       },
       defaultOptions: extend(true, {}, this.baseOptions, {
         headers: extend(
           true,
           sdkHeaders,
           {
+            'Accept': 'text/event-stream',
+            'Connection': 'keep-alive',
             'Content-Type': 'application/json',
-            'Accept': _params.accept,
           },
           _params.headers
         ),
       }),
     };
-
-    return this.createRequest(parameters);
+    const apiResponse = await this.createRequest(parameters);
+    return transformStream(apiResponse);
   }
+
   /*************************
    * foundationModelSpecs
    ************************/
@@ -789,32 +803,37 @@ class WatsonxAiMlVmlv1 extends BaseService {
    *    filter: Requires existence of the filter.
    *    !filter: Requires absence of the filter.
    *  filter: one of
-   *    modelid_*:   Filters by model id.
-   *                 Namely, select a model with a specific model id.
-   *    provider_*:  Filters by provider.
-   *                 Namely, select all models with a specific provider.
-   *    source_*:    Filters by source.
-   *                 Namely, select all models with a specific source.
-   *    tier_*:      Filters by tier.
-   *                 Namely, select all models with a specific tier.
-   *    task_*:      Filters by task id.
-   *                 Namely, select all models that support a specific task id.
-   *    lifecycle_*: Filters by lifecycle state.
-   *                 Namely, select all models that are currently in the specified lifecycle state.
-   *    function_*:  Filters by function.
-   *                 Namely, select all models that support a specific function.
+   *    modelid_*:     Filters by model id.
+   *                   Namely, select a model with a specific model id.
+   *    provider_*:    Filters by provider.
+   *                   Namely, select all models with a specific provider.
+   *    source_*:      Filters by source.
+   *                   Namely, select all models with a specific source.
+   *    input_tier_*:  Filters by input tier.
+   *                   Namely, select all models with a specific input tier.
+   *    output_tier_*: Filters by output tier.
+   *                   Namely, select all models with a specific output tier.
+   *    tier_*:        Filters by tier.
+   *                   Namely, select all models with a specific input or output tier.
+   *    task_*:        Filters by task id.
+   *                   Namely, select all models that support a specific task id.
+   *    lifecycle_*:   Filters by lifecycle state.
+   *                   Namely, select all models that are currently in the specified lifecycle state.
+   *    function_*:    Filters by function.
+   *                   Namely, select all models that support a specific function.
    * ```.
+   * @param {boolean} [params.techPreview] - See all the `Tech Preview` models if entitled.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.FoundationModels>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FoundationModels>>}
    *
    * @category Foundation Model Specs
    */
   public listFoundationModelSpecs(
-    params?: WatsonxAiMlVmlv1.ListFoundationModelSpecsParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.FoundationModels>> {
+    params?: WatsonxAiMlVml_v1.ListFoundationModelSpecsParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FoundationModels>> {
     const _params = { ...params };
     const _requiredParams = [];
-    const _validParams = ['start', 'limit', 'filters', 'headers'];
+    const _validParams = ['start', 'limit', 'filters', 'techPreview', 'headers'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -825,11 +844,12 @@ class WatsonxAiMlVmlv1 extends BaseService {
       'start': _params.start,
       'limit': _params.limit,
       'filters': _params.filters,
+      'tech_preview': _params.techPreview,
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'listFoundationModelSpecs'
     );
 
@@ -865,13 +885,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {number} [params.limit] - How many resources should be returned. By default limit is 100. Max limit allowed
    * is 200.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.FoundationModelTasks>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FoundationModelTasks>>}
    *
    * @category Foundation Model Specs
    */
   public listFoundationModelTasks(
-    params?: WatsonxAiMlVmlv1.ListFoundationModelTasksParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.FoundationModelTasks>> {
+    params?: WatsonxAiMlVml_v1.ListFoundationModelTasksParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FoundationModelTasks>> {
     const _params = { ...params };
     const _requiredParams = [];
     const _validParams = ['start', 'limit', 'headers'];
@@ -887,8 +907,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'listFoundationModelTasks'
     );
 
@@ -907,531 +927,6 @@ class WatsonxAiMlVmlv1 extends BaseService {
           },
           _params.headers
         ),
-      }),
-    };
-
-    return this.createRequest(parameters);
-  }
-  /*************************
-   * notebooks
-   ************************/
-
-  /**
-   * Create a new notebook.
-   *
-   * Create a new notebook
-   * - either from scratch
-   * - or by copying another notebook.
-   *
-   * To create a notebook from scratch, you need to first upload the notebook content(`ipynb` format) to the project
-   * Cloud Object Storage (COS) and then reference it with the attribute `file_reference`. The other required attributes
-   * are `name`, `project` and `runtime`.  The attribute `runtime` is used to specify the environment on which the
-   * notebook runs.
-   *
-   * To copy a notebook, you only need to provide `name` and `source_guid` in the request body.
-   *
-   * @param {Object} params - The parameters to send to the service.
-   * @param {NotebooksCreateRequest} params.notebooksCreateRequest - Specification of the notebook to be created.
-   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.NotebooksCreateResponse>>}
-   *
-   * @category Notebooks
-   */
-  public notebooksCreate(
-    params: WatsonxAiMlVmlv1.NotebooksCreateParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.NotebooksCreateResponse>> {
-    const _params = { ...params };
-    const _requiredParams = ['notebooksCreateRequest'];
-    const _validParams = ['notebooksCreateRequest', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
-    if (_validationErrors) {
-      return Promise.reject(_validationErrors);
-    }
-    const body = _params.notebooksCreateRequest;
-    const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
-      'notebooksCreate'
-    );
-
-    const parameters = {
-      options: {
-        url: '/v2/notebooks',
-        method: 'POST',
-        body,
-      },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
-    };
-    return this.createRequest(parameters);
-  }
-
-  /**
-   * Retrieve the details of a large number of notebooks inside a project.
-   *
-   * Retrieve the details of a large number of notebooks inside a project.
-   *
-   * @param {Object} params - The parameters to send to the service.
-   * @param {string} params.projectId - The guid of the project.
-   * @param {string} params.include - Additional info that will be included into the notebook details. Possible values
-   * are:
-   * - runtime.
-   * @param {string[]} [params.notebooks] - The list of notebooks whose details will be retrieved.
-   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.NotebooksResourceList>>}
-   *
-   * @category Notebooks
-   */
-  public notebooksList(
-    params: WatsonxAiMlVmlv1.NotebooksListParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.NotebooksResourceList>> {
-    const _params = { ...params };
-    const _requiredParams = ['projectId', 'include'];
-    const _validParams = ['projectId', 'include', 'notebooks', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
-    if (_validationErrors) {
-      return Promise.reject(_validationErrors);
-    }
-
-    const body = {
-      'notebooks': _params.notebooks,
-    };
-
-    const query = {
-      'project_id': _params.projectId,
-      'include': _params.include,
-    };
-
-    const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
-      'notebooksList'
-    );
-
-    const parameters = {
-      options: {
-        url: '/v2/notebooks/list',
-        method: 'POST',
-        body,
-        qs: query,
-      },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
-    };
-
-    return this.createRequest(parameters);
-  }
-
-  /**
-   * Delete a particular notebook, including the notebook asset.
-   *
-   * Delete a particular notebook, including the notebook asset.
-   *
-   * @param {Object} params - The parameters to send to the service.
-   * @param {string} params.notebookGuid - The guid of the notebook.
-   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>>}
-   *
-   * @category Notebooks
-   */
-  public notebooksDelete(
-    params: WatsonxAiMlVmlv1.NotebooksDeleteParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>> {
-    const _params = { ...params };
-    const _requiredParams = ['notebookGuid'];
-    const _validParams = ['notebookGuid', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
-    if (_validationErrors) {
-      return Promise.reject(_validationErrors);
-    }
-    const path = {
-      'notebook_guid': _params.notebookGuid,
-    };
-
-    const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
-      'notebooksDelete'
-    );
-
-    const parameters = {
-      options: {
-        url: '/v2/notebooks/{notebook_guid}',
-        method: 'DELETE',
-        path,
-      },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        serviceUrl: this.wxServiceUrl,
-        headers: extend(true, sdkHeaders, {}, _params.headers),
-      }),
-    };
-
-    return this.createRequest(parameters);
-  }
-
-  /**
-   * Revert the main notebook to a version.
-   *
-   * Revert the main notebook to a version.
-   *
-   * @param {Object} params - The parameters to send to the service.
-   * @param {string} params.notebookGuid - The guid of the main notebook.
-   * @param {string} params.source - The guid of the notebook version.
-   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.NotebooksRevertResponse>>}
-   *
-   * @category Notebooks
-   */
-  public notebooksRevert(
-    params: WatsonxAiMlVmlv1.NotebooksRevertParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.NotebooksRevertResponse>> {
-    const _params = { ...params };
-    const _requiredParams = ['notebookGuid', 'source'];
-    const _validParams = ['notebookGuid', 'source', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
-    if (_validationErrors) {
-      return Promise.reject(_validationErrors);
-    }
-    const body = {
-      'source': _params.source,
-    };
-
-    const path = {
-      'notebook_guid': _params.notebookGuid,
-    };
-
-    const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
-      'notebooksRevert'
-    );
-
-    const parameters = {
-      options: {
-        url: '/v2/notebooks/{notebook_guid}',
-        method: 'PUT',
-        body,
-        path,
-      },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
-    };
-
-    return this.createRequest(parameters);
-  }
-
-  /**
-   * Update a particular notebook.
-   *
-   * Update a particular notebook.
-   *
-   * @param {Object} params - The parameters to send to the service.
-   * @param {string} params.notebookGuid - The guid of the notebook.
-   * @param {string} [params.environment] - The guid of the environment on which the notebook runs.
-   * @param {boolean} [params.sparkMonitoringEnabled] - Spark monitoring enabled or not.
-   * @param {NotebookKernel} [params.kernel] - A notebook kernel.
-   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.Notebook>>}
-   *
-   * @category Notebooks
-   */
-  public notebooksUpdate(
-    params: WatsonxAiMlVmlv1.NotebooksUpdateParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.Notebook>> {
-    const _params = { ...params };
-    const _requiredParams = ['notebookGuid'];
-    const _validParams = [
-      'notebookGuid',
-      'environment',
-      'sparkMonitoringEnabled',
-      'kernel',
-      'headers',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
-    if (_validationErrors) {
-      return Promise.reject(_validationErrors);
-    }
-
-    const body = {
-      'environment': _params.environment,
-      'spark_monitoring_enabled': _params.sparkMonitoringEnabled,
-      'kernel': _params.kernel,
-    };
-
-    const path = {
-      'notebook_guid': _params.notebookGuid,
-    };
-
-    const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
-      'notebooksUpdate'
-    );
-
-    const parameters = {
-      options: {
-        url: '/v2/notebooks/{notebook_guid}',
-        method: 'PATCH',
-        body,
-        path,
-      },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
-    };
-
-    return this.createRequest(parameters);
-  }
-  /*************************
-   * notebookVersions
-   ************************/
-
-  /**
-   * Create a new version.
-   *
-   * Create a version of a given notebook.
-   *
-   * @param {Object} params - The parameters to send to the service.
-   * @param {string} params.notebookGuid - The guid of the notebook.
-   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.VersionsCreateResponse>>}
-   *
-   * @category Notebooks
-   */
-  public versionsCreate(
-    params: WatsonxAiMlVmlv1.VersionsCreateParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.VersionsCreateResponse>> {
-    const _params = { ...params };
-    const _requiredParams = ['notebookGuid'];
-    const _validParams = ['notebookGuid', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
-    if (_validationErrors) {
-      return Promise.reject(_validationErrors);
-    }
-    const path = {
-      'notebook_guid': _params.notebookGuid,
-    };
-
-    const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
-      'versionsCreate'
-    );
-
-    const parameters = {
-      options: {
-        url: '/v2/notebooks/{notebook_guid}/versions',
-        method: 'POST',
-        path,
-      },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
-    };
-
-    return this.createRequest(parameters);
-  }
-
-  /**
-   * List the versions of a notebook.
-   *
-   * List all versions of a particular notebook.
-   *
-   * @param {Object} params - The parameters to send to the service.
-   * @param {string} params.notebookGuid - The guid of the notebook.
-   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.VersionsListResponse>>}
-   *
-   * @category Notebooks
-   */
-  public versionsList(
-    params: WatsonxAiMlVmlv1.VersionsListParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.VersionsListResponse>> {
-    const _params = { ...params };
-    const _requiredParams = ['notebookGuid'];
-    const _validParams = ['notebookGuid', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
-    if (_validationErrors) {
-      return Promise.reject(_validationErrors);
-    }
-    const path = {
-      'notebook_guid': _params.notebookGuid,
-    };
-
-    const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
-      'versionsList'
-    );
-
-    const parameters = {
-      options: {
-        url: '/v2/notebooks/{notebook_guid}/versions',
-        method: 'GET',
-        path,
-      },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
-    };
-
-    return this.createRequest(parameters);
-  }
-
-  /**
-   * Retrieve a notebook version.
-   *
-   * Retrieve a particular version of a notebook.
-   *
-   * @param {Object} params - The parameters to send to the service.
-   * @param {string} params.notebookGuid - The guid of the notebook.
-   * @param {string} params.versionGuid - The guid of the version.
-   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.VersionsGetResponse>>}
-   *
-   * @category Notebooks
-   */
-  public versionsGet(
-    params: WatsonxAiMlVmlv1.VersionsGetParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.VersionsGetResponse>> {
-    const _params = { ...params };
-    const _requiredParams = ['notebookGuid', 'versionGuid'];
-    const _validParams = ['notebookGuid', 'versionGuid', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
-    if (_validationErrors) {
-      return Promise.reject(_validationErrors);
-    }
-
-    const path = {
-      'notebook_guid': _params.notebookGuid,
-      'version_guid': _params.versionGuid,
-    };
-
-    const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
-      'versionsGet'
-    );
-
-    const parameters = {
-      options: {
-        url: '/v2/notebooks/{notebook_guid}/versions/{version_guid}',
-        method: 'GET',
-        path,
-      },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
-    };
-
-    return this.createRequest(parameters);
-  }
-
-  /**
-   * Delete a notebook version.
-   *
-   * Delete a particular version of a given notebook.
-   *
-   * @param {Object} params - The parameters to send to the service.
-   * @param {string} params.notebookGuid - The guid of the notebook.
-   * @param {string} params.versionGuid - The guid of the version.
-   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>>}
-   *
-   * @category Notebooks
-   */
-  public versionsDelete(
-    params: WatsonxAiMlVmlv1.VersionsDeleteParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>> {
-    const _params = { ...params };
-    const _requiredParams = ['notebookGuid', 'versionGuid'];
-    const _validParams = ['notebookGuid', 'versionGuid', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
-    if (_validationErrors) {
-      return Promise.reject(_validationErrors);
-    }
-    const path = {
-      'notebook_guid': _params.notebookGuid,
-      'version_guid': _params.versionGuid,
-    };
-
-    const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
-      'versionsDelete'
-    );
-
-    const parameters = {
-      options: {
-        url: '/v2/notebooks/{notebook_guid}/versions/{version_guid}',
-        method: 'DELETE',
-        path,
-      },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        serviceUrl: this.wxServiceUrl,
-        headers: extend(true, sdkHeaders, {}, _params.headers),
       }),
     };
 
@@ -1461,13 +956,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.spaceId] - [REQUIRED] Specifies the space ID as the target. One target must be supplied per
    * request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptResponse>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>>}
    *
    * @category Prompts / Prompt Templates
    */
-  public postPrompt(
-    params: WatsonxAiMlVmlv1.PostPromptParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptResponse>> {
+  public createPrompt(
+    params: WatsonxAiMlVml_v1.PostPromptParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>> {
     const _params = { ...params };
     const _requiredParams = ['name', 'prompt'];
     const _validParams = [
@@ -1488,6 +983,7 @@ class WatsonxAiMlVmlv1 extends BaseService {
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
+
     const body = {
       'name': _params.name,
       'prompt': _params.prompt,
@@ -1505,7 +1001,11 @@ class WatsonxAiMlVmlv1 extends BaseService {
       'space_id': _params.spaceId,
     };
 
-    const sdkHeaders = getSdkHeaders(WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME, 'vml-v1', 'postPrompt');
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'postPrompt'
+    );
 
     const parameters = {
       options: {
@@ -1545,13 +1045,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.restrictModelParameters] - Only return a set of model parameters compatiable with
    * inferencing.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptResponse>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>>}
    *
    * @category Prompts / Prompt Templates
    */
   public getPrompt(
-    params: WatsonxAiMlVmlv1.GetPromptParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptResponse>> {
+    params: WatsonxAiMlVml_v1.GetPromptParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
     const _validParams = ['promptId', 'projectId', 'spaceId', 'restrictModelParameters', 'headers'];
@@ -1570,7 +1070,7 @@ class WatsonxAiMlVmlv1 extends BaseService {
       'prompt_id': _params.promptId,
     };
 
-    const sdkHeaders = getSdkHeaders(WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME, 'vml-v1', 'getPrompt');
+    const sdkHeaders = getSdkHeaders(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME, 'vml_v1', 'getPrompt');
 
     const parameters = {
       options: {
@@ -1616,13 +1116,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.spaceId] - [REQUIRED] Specifies the space ID as the target. One target must be supplied per
    * request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptResponse>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>>}
    *
    * @category Prompts / Prompt Templates
    */
-  public patchPrompt(
-    params: WatsonxAiMlVmlv1.PatchPromptParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptResponse>> {
+  public updatePrompt(
+    params: WatsonxAiMlVml_v1.PatchPromptParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>> {
     const _params = { ...params };
     const _requiredParams = ['promptId', 'name', 'prompt'];
     const _validParams = [
@@ -1667,8 +1167,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'patchPrompt'
     );
 
@@ -1709,13 +1209,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.spaceId] - [REQUIRED] Specifies the space ID as the target. One target must be supplied per
    * request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
    *
    * @category Prompts / Prompt Templates
    */
   public deletePrompt(
-    params: WatsonxAiMlVmlv1.DeletePromptParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>> {
+    params: WatsonxAiMlVml_v1.DeletePromptParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
     const _validParams = ['promptId', 'projectId', 'spaceId', 'headers'];
@@ -1734,8 +1234,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'deletePrompt'
     );
 
@@ -1772,13 +1272,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * request.
    * @param {boolean} [params.force] - Override a lock if it is currently taken.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.PromptLock>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>>}
    *
    * @category Prompts / Prompt Templates
    */
-  public putPromptLock(
-    params: WatsonxAiMlVmlv1.PutPromptLockParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.PromptLock>> {
+  public updatePromptLock(
+    params: WatsonxAiMlVml_v1.PutPromptLockParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>> {
     const _params = { ...params };
     const _requiredParams = ['promptId', 'locked'];
     const _validParams = [
@@ -1813,8 +1313,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'putPromptLock'
     );
 
@@ -1855,13 +1355,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.PromptLock>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>>}
    *
    * @category Prompts / Prompt Templates
    */
   public getPromptLock(
-    params: WatsonxAiMlVmlv1.GetPromptLockParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.PromptLock>> {
+    params: WatsonxAiMlVml_v1.GetPromptLockParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
     const _validParams = ['promptId', 'spaceId', 'projectId', 'headers'];
@@ -1880,8 +1380,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'getPromptLock'
     );
 
@@ -1924,13 +1424,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.GetPromptInputResponse>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.GetPromptInputResponse>>}
    *
    * @category Prompts / Prompt Templates
    */
   public getPromptInput(
-    params: WatsonxAiMlVmlv1.GetPromptInputParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.GetPromptInputResponse>> {
+    params: WatsonxAiMlVml_v1.GetPromptInputParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.GetPromptInputResponse>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
     const _validParams = ['promptId', 'input', 'promptVariable', 'spaceId', 'projectId', 'headers'];
@@ -1954,8 +1454,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'getPromptInput'
     );
 
@@ -1997,13 +1497,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
    *
    * @category Prompts / Prompt Templates
    */
-  public postPromptChatItem(
-    params: WatsonxAiMlVmlv1.PostPromptChatItemParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>> {
+  public createPromptChatItem(
+    params: WatsonxAiMlVml_v1.PostPromptChatItemParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['promptId', 'chatItem'];
     const _validParams = ['promptId', 'chatItem', 'spaceId', 'projectId', 'headers'];
@@ -2023,8 +1523,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'postPromptChatItem'
     );
 
@@ -2073,13 +1573,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptResponse>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>>}
    *
    * @category Prompt Sessions
    */
-  public postPromptSession(
-    params: WatsonxAiMlVmlv1.PostPromptSessionParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptResponse>> {
+  public createPromptSession(
+    params: WatsonxAiMlVml_v1.PostPromptSessionParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>> {
     const _params = { ...params };
     const _requiredParams = ['name'];
     const _validParams = [
@@ -2117,8 +1617,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'postPromptSession'
     );
 
@@ -2157,13 +1657,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * per request.
    * @param {boolean} [params.prefetch] - Include the most recent entry.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptSession>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSession>>}
    *
    * @category Prompt Sessions
    */
   public getPromptSession(
-    params: WatsonxAiMlVmlv1.GetPromptSessionParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptSession>> {
+    params: WatsonxAiMlVml_v1.GetPromptSessionParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSession>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
     const _validParams = ['sessionId', 'projectId', 'prefetch', 'headers'];
@@ -2182,8 +1682,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'getPromptSession'
     );
 
@@ -2222,13 +1722,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptSession>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSession>>}
    *
    * @category Prompt Sessions
    */
-  public patchPromptSession(
-    params: WatsonxAiMlVmlv1.PatchPromptSessionParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptSession>> {
+  public updatePromptSession(
+    params: WatsonxAiMlVml_v1.PatchPromptSessionParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSession>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
     const _validParams = ['sessionId', 'name', 'description', 'projectId', 'headers'];
@@ -2251,8 +1751,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'patchPromptSession'
     );
 
@@ -2291,13 +1791,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
    *
    * @category Prompt Sessions
    */
   public deletePromptSession(
-    params: WatsonxAiMlVmlv1.DeletePromptSessionParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>> {
+    params: WatsonxAiMlVml_v1.DeletePromptSessionParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
     const _validParams = ['sessionId', 'projectId', 'headers'];
@@ -2315,8 +1815,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'deletePromptSession'
     );
 
@@ -2354,13 +1854,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptSessionEntry>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSessionEntry>>}
    *
    * @category Prompt Sessions
    */
-  public postPromptSessionEntry(
-    params: WatsonxAiMlVmlv1.PostPromptSessionEntryParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptSessionEntry>> {
+  public createPromptSessionEntry(
+    params: WatsonxAiMlVml_v1.PostPromptSessionEntryParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSessionEntry>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'name', 'createdAt', 'prompt'];
     const _validParams = [
@@ -2401,8 +1901,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'postPromptSessionEntry'
     );
 
@@ -2443,13 +1943,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.bookmark] - Bookmark from a previously limited get request.
    * @param {string} [params.limit] - Limit for results to retrieve, default 20.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptSessionEntryList>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSessionEntryList>>}
    *
    * @category Prompt Sessions
    */
-  public getPromptSessionEntries(
-    params: WatsonxAiMlVmlv1.GetPromptSessionEntriesParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptSessionEntryList>> {
+  public listPromptSessionEntries(
+    params: WatsonxAiMlVml_v1.GetPromptSessionEntriesParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSessionEntryList>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
     const _validParams = ['sessionId', 'projectId', 'bookmark', 'limit', 'headers'];
@@ -2469,8 +1969,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'getPromptSessionEntries'
     );
 
@@ -2509,13 +2009,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
    *
    * @category Prompt Sessions
    */
-  public postPromptSessionEntryChatItem(
-    params: WatsonxAiMlVmlv1.PostPromptSessionEntryChatItemParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>> {
+  public createPromptSessionEntryChatItem(
+    params: WatsonxAiMlVml_v1.PostPromptSessionEntryChatItemParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'entryId', 'chatItem'];
     const _validParams = ['sessionId', 'entryId', 'chatItem', 'projectId', 'headers'];
@@ -2535,8 +2035,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'postPromptSessionEntryChatItem'
     );
 
@@ -2579,13 +2079,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * per request.
    * @param {boolean} [params.force] - Override a lock if it is currently taken.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.PromptLock>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>>}
    *
    * @category Prompt Sessions
    */
-  public putPromptSessionLock(
-    params: WatsonxAiMlVmlv1.PutPromptSessionLockParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.PromptLock>> {
+  public updatePromptSessionLock(
+    params: WatsonxAiMlVml_v1.PutPromptSessionLockParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'locked'];
     const _validParams = [
@@ -2618,8 +2118,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'putPromptSessionLock'
     );
 
@@ -2658,13 +2158,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.PromptLock>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>>}
    *
    * @category Prompt Sessions
    */
   public getPromptSessionLock(
-    params: WatsonxAiMlVmlv1.GetPromptSessionLockParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.PromptLock>> {
+    params: WatsonxAiMlVml_v1.GetPromptSessionLockParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
     const _validParams = ['sessionId', 'projectId', 'headers'];
@@ -2682,8 +2182,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'getPromptSessionLock'
     );
 
@@ -2721,13 +2221,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptResponse>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>>}
    *
    * @category Prompt Sessions
    */
   public getPromptSessionEntry(
-    params: WatsonxAiMlVmlv1.GetPromptSessionEntryParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.WxPromptResponse>> {
+    params: WatsonxAiMlVml_v1.GetPromptSessionEntryParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'entryId'];
     const _validParams = ['sessionId', 'entryId', 'projectId', 'headers'];
@@ -2746,8 +2246,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'getPromptSessionEntry'
     );
 
@@ -2785,13 +2285,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
    *
    * @category Prompt Sessions
    */
   public deletePromptSessionEntry(
-    params: WatsonxAiMlVmlv1.DeletePromptSessionEntryParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>> {
+    params: WatsonxAiMlVml_v1.DeletePromptSessionEntryParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'entryId'];
     const _validParams = ['sessionId', 'entryId', 'projectId', 'headers'];
@@ -2810,8 +2310,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'deletePromptSessionEntry'
     );
 
@@ -2853,13 +2353,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * to be given.
    * @param {EmbeddingParameters} [params.parameters] - Parameters for text embedding requests.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmbeddingsResponse>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmbeddingsResponse>>}
    *
    * @category Embeddings
    */
-  public textEmbeddings(
-    params: WatsonxAiMlVmlv1.TextEmbeddingsParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmbeddingsResponse>> {
+  public embedText(
+    params: WatsonxAiMlVml_v1.TextEmbeddingsParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmbeddingsResponse>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'inputs'];
     const _validParams = ['modelId', 'inputs', 'spaceId', 'projectId', 'parameters', 'headers'];
@@ -2881,8 +2381,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'textEmbeddings'
     );
 
@@ -2926,18 +2426,18 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * be given.
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
    * to be given.
-   * @param {TextGenRequestParameters} [params.parameters] - The chat related parameters.
+   * @param {TextGenParameters} [params.parameters] - Properties that control the model and response.
    * @param {Moderations} [params.moderations] - Properties that control the moderations, for usages such as `Hate and
    * profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TextGenResponse>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>>}
    *
    * @category Text Generation
    */
-  public textGeneration(
-    params: WatsonxAiMlVmlv1.TextGenerationParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TextGenResponse>> {
+  public generateText(
+    params: WatsonxAiMlVml_v1.TextGenerationParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>> {
     const _params = { ...params };
     const _requiredParams = ['input', 'modelId'];
     const _validParams = [
@@ -2968,8 +2468,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'textGeneration'
     );
 
@@ -3002,6 +2502,22 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * Infer the next tokens for a given deployed model with a set of parameters. This operation will return the output
    * tokens as a stream of events.
    *
+   * ### Response
+   * ReadableStream represents a source of streaming data. If request performed successfully ReadableStream returns
+   * stream line by line. Output will stream as follow:
+   * - id: 1
+   * - event: message
+   * - data: {data}
+   * - empty line which separates the next Event Message
+   *
+   * Here is one of the possibilities to read streaming output:
+   *
+   * const stream = await watsonxAiMlService.generateTextStream(parameters);
+   * for await (const line of stream) {
+   *   console.log(line);
+   * }
+   *
+   *
    * @param {Object} params - The parameters to send to the service.
    * @param {string} params.input - The prompt to generate completions. Note: The method tokenizes the input internally.
    * It is recommended not to leave any trailing spaces.
@@ -3011,20 +2527,18 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * be given.
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
    * to be given.
-   * @param {TextGenRequestParameters} [params.parameters] - The chat related parameters.
+   * @param {TextGenParameters} [params.parameters] - Properties that control the model and response.
    * @param {Moderations} [params.moderations] - Properties that control the moderations, for usages such as `Hate and
    * profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types
    * of moderations.
-   * @param {string} [params.accept] - The type of the response: application/json or text/event-stream. A character
-   * encoding can be specified by including a `charset` parameter. For example, 'text/event-stream;charset=utf-8'.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TextGenResponse[]>>}
+   * @returns {Promise<ReadableStream<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse[]>>>}
    *
    * @category Text Generation
    */
-  public textGenerationStream(
-    params: WatsonxAiMlVmlv1.TextGenerationStreamParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TextGenResponse[]>> {
+  public async generateTextStream(
+    params: WatsonxAiMlVml_v1.TextGenerationStreamParams
+  ): Promise<ReadableStream<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse[]>>> {
     const _params = { ...params };
     const _requiredParams = ['input', 'modelId'];
     const _validParams = [
@@ -3034,7 +2548,6 @@ class WatsonxAiMlVmlv1 extends BaseService {
       'projectId',
       'parameters',
       'moderations',
-      'accept',
       'headers',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
@@ -3056,8 +2569,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'textGenerationStream'
     );
 
@@ -3067,22 +2580,27 @@ class WatsonxAiMlVmlv1 extends BaseService {
         method: 'POST',
         body,
         qs: query,
+        responseType: 'stream',
+        adapter: 'fetch',
       },
+
       defaultOptions: extend(true, {}, this.baseOptions, {
         headers: extend(
           true,
           sdkHeaders,
           {
+            'Accept': 'text/event-stream',
+            'Connection': 'keep-alive',
             'Content-Type': 'application/json',
-            'Accept': _params.accept,
           },
           _params.headers
         ),
       }),
     };
-
-    return this.createRequest(parameters);
+    const apiResponse = await this.createRequest(parameters);
+    return transformStream(apiResponse);
   }
+
   /*************************
    * tokenization
    ************************/
@@ -3104,13 +2622,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * to be given.
    * @param {TextTokenizeParameters} [params.parameters] - The parameters for text tokenization.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TextTokenizeResponse>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextTokenizeResponse>>}
    *
    * @category Tokenization
    */
-  public textTokenization(
-    params: WatsonxAiMlVmlv1.TextTokenizationParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TextTokenizeResponse>> {
+  public tokenizeText(
+    params: WatsonxAiMlVml_v1.TextTokenizationParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextTokenizeResponse>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'input'];
     const _validParams = ['modelId', 'input', 'spaceId', 'projectId', 'parameters', 'headers'];
@@ -3132,8 +2650,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'textTokenization'
     );
 
@@ -3230,7 +2748,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {Object} params - The parameters to send to the service.
    * @param {string} params.name - The name of the training.
    * @param {ObjectLocation} params.resultsReference - The training results. Normally this is specified as
-   * `type=container` which means that it is stored in the space or project.
+   * `type=container` which
+   * means that it is stored in the space or project.
    * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
    * be given.
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
@@ -3243,13 +2762,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {boolean} [params.autoUpdateModel] - If set to `true` then the result of the training, if successful, will
    * be uploaded to the repository as a model.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TrainingResource>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TrainingResource>>}
    *
    * @category Trainings
    */
-  public trainingsCreate(
-    params: WatsonxAiMlVmlv1.TrainingsCreateParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TrainingResource>> {
+  public createTraining(
+    params: WatsonxAiMlVml_v1.TrainingsCreateParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TrainingResource>> {
     const _params = { ...params };
     const _requiredParams = ['name', 'resultsReference'];
     const _validParams = [
@@ -3288,8 +2807,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'trainingsCreate'
     );
 
@@ -3334,13 +2853,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
    * query parameter has to be given.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TrainingResourceCollection>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TrainingResourceCollection>>}
    *
    * @category Trainings
    */
-  public trainingsList(
-    params?: WatsonxAiMlVmlv1.TrainingsListParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TrainingResourceCollection>> {
+  public listTrainings(
+    params?: WatsonxAiMlVml_v1.TrainingsListParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TrainingResourceCollection>> {
     const _params = { ...params };
     const _requiredParams = [];
     const _validParams = [
@@ -3370,8 +2889,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'trainingsList'
     );
 
@@ -3408,13 +2927,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
    * query parameter has to be given.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TrainingResource>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TrainingResource>>}
    *
    * @category Trainings
    */
-  public trainingsGet(
-    params: WatsonxAiMlVmlv1.TrainingsGetParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.TrainingResource>> {
+  public getTraining(
+    params: WatsonxAiMlVml_v1.TrainingsGetParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TrainingResource>> {
     const _params = { ...params };
     const _requiredParams = ['trainingId'];
     const _validParams = ['trainingId', 'spaceId', 'projectId', 'headers'];
@@ -3434,8 +2953,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'trainingsGet'
     );
 
@@ -3474,13 +2993,13 @@ class WatsonxAiMlVmlv1 extends BaseService {
    * query parameter has to be given.
    * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job metadata information.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>>}
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
    *
    * @category Trainings
    */
-  public trainingsDelete(
-    params: WatsonxAiMlVmlv1.TrainingsDeleteParams
-  ): Promise<WatsonxAiMlVmlv1.Response<WatsonxAiMlVmlv1.EmptyObject>> {
+  public deleteTraining(
+    params: WatsonxAiMlVml_v1.TrainingsDeleteParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['trainingId'];
     const _validParams = ['trainingId', 'spaceId', 'projectId', 'hardDelete', 'headers'];
@@ -3501,8 +3020,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
     };
 
     const sdkHeaders = getSdkHeaders(
-      WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME,
-      'vml-v1',
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
       'trainingsDelete'
     );
 
@@ -3526,8 +3045,8 @@ class WatsonxAiMlVmlv1 extends BaseService {
  * interfaces
  ************************/
 
-namespace WatsonxAiMlVmlv1 {
-  /** Options for the `WatsonxAiMlVmlv1` constructor. */
+namespace WatsonxAiMlVml_v1 {
+  /** Options for the `WatsonxAiMlVml_v1` constructor. */
   export interface Options extends UserOptions {
     /** The version date for the API of the form `YYYY-MM-DD`. */
     version: string;
@@ -3575,11 +3094,11 @@ namespace WatsonxAiMlVmlv1 {
     /** User defined properties specified as key-value pairs. */
     custom?: JsonObject;
     /** A reference to a resource. */
-    asset?: Rel;
-    /** A reference to a resource. */
     promptTemplate?: SimpleRel;
     /** A hardware specification. */
     hardwareSpec?: HardwareSpec;
+    /** A reference to a resource. */
+    asset?: Rel;
     /** The base model that is required for this deployment if this is for a prompt template or a prompt tune for an
      *  IBM foundation model.
      */
@@ -3714,20 +3233,7 @@ namespace WatsonxAiMlVmlv1 {
      *  identifiable information` (PII) filtering. This list can be extended with new types of moderations.
      */
     moderations?: Moderations;
-    /** The type of the response: application/json or text/event-stream. A character encoding can be specified by
-     *  including a `charset` parameter. For example, 'text/event-stream;charset=utf-8'.
-     */
-    accept?: DeploymentsTextGenerationStreamConstants.Accept | string;
     headers?: OutgoingHttpHeaders;
-  }
-
-  /** Constants for the `deploymentsTextGenerationStream` operation. */
-  export namespace DeploymentsTextGenerationStreamConstants {
-    /** The type of the response: application/json or text/event-stream. A character encoding can be specified by including a `charset` parameter. For example, 'text/event-stream;charset=utf-8'. */
-    export enum Accept {
-      APPLICATION_JSON = 'application/json',
-      TEXT_EVENT_STREAM = 'text/event-stream',
-    }
   }
 
   /** Parameters for the `listFoundationModelSpecs` operation. */
@@ -3745,23 +3251,29 @@ namespace WatsonxAiMlVmlv1 {
      *     filter: Requires existence of the filter.
      *     !filter: Requires absence of the filter.
      *   filter: one of
-     *     modelid_*:   Filters by model id.
-     *                  Namely, select a model with a specific model id.
-     *     provider_*:  Filters by provider.
-     *                  Namely, select all models with a specific provider.
-     *     source_*:    Filters by source.
-     *                  Namely, select all models with a specific source.
-     *     tier_*:      Filters by tier.
-     *                  Namely, select all models with a specific tier.
-     *     task_*:      Filters by task id.
-     *                  Namely, select all models that support a specific task id.
-     *     lifecycle_*: Filters by lifecycle state.
-     *                  Namely, select all models that are currently in the specified lifecycle state.
-     *     function_*:  Filters by function.
-     *                  Namely, select all models that support a specific function.
+     *     modelid_*:     Filters by model id.
+     *                    Namely, select a model with a specific model id.
+     *     provider_*:    Filters by provider.
+     *                    Namely, select all models with a specific provider.
+     *     source_*:      Filters by source.
+     *                    Namely, select all models with a specific source.
+     *     input_tier_*:  Filters by input tier.
+     *                    Namely, select all models with a specific input tier.
+     *     output_tier_*: Filters by output tier.
+     *                    Namely, select all models with a specific output tier.
+     *     tier_*:        Filters by tier.
+     *                    Namely, select all models with a specific input or output tier.
+     *     task_*:        Filters by task id.
+     *                    Namely, select all models that support a specific task id.
+     *     lifecycle_*:   Filters by lifecycle state.
+     *                    Namely, select all models that are currently in the specified lifecycle state.
+     *     function_*:    Filters by function.
+     *                    Namely, select all models that support a specific function.
      *  ```.
      */
     filters?: string;
+    /** See all the `Tech Preview` models if entitled. */
+    techPreview?: boolean;
     headers?: OutgoingHttpHeaders;
   }
 
@@ -4219,8 +3731,8 @@ namespace WatsonxAiMlVmlv1 {
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
     projectId?: string;
-    /** The chat related parameters. */
-    parameters?: TextGenRequestParameters;
+    /** Properties that control the model and response. */
+    parameters?: TextGenParameters;
     /** Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and `Personal
      *  identifiable information` (PII) filtering. This list can be extended with new types of moderations.
      */
@@ -4242,26 +3754,13 @@ namespace WatsonxAiMlVmlv1 {
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
     projectId?: string;
-    /** The chat related parameters. */
-    parameters?: TextGenRequestParameters;
+    /** Properties that control the model and response. */
+    parameters?: TextGenParameters;
     /** Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and `Personal
      *  identifiable information` (PII) filtering. This list can be extended with new types of moderations.
      */
     moderations?: Moderations;
-    /** The type of the response: application/json or text/event-stream. A character encoding can be specified by
-     *  including a `charset` parameter. For example, 'text/event-stream;charset=utf-8'.
-     */
-    accept?: TextGenerationStreamConstants.Accept | string;
     headers?: OutgoingHttpHeaders;
-  }
-
-  /** Constants for the `textGenerationStream` operation. */
-  export namespace TextGenerationStreamConstants {
-    /** The type of the response: application/json or text/event-stream. A character encoding can be specified by including a `charset` parameter. For example, 'text/event-stream;charset=utf-8'. */
-    export enum Accept {
-      APPLICATION_JSON = 'application/json',
-      TEXT_EVENT_STREAM = 'text/event-stream',
-    }
   }
 
   /** Parameters for the `textTokenization` operation. */
@@ -4285,8 +3784,8 @@ namespace WatsonxAiMlVmlv1 {
   export interface TrainingsCreateParams {
     /** The name of the training. */
     name: string;
-    /** The training results. Normally this is specified as `type=container` which means that it is stored in the
-     *  space or project.
+    /** The training results. Normally this is specified as `type=container` which
+     *  means that it is stored in the space or project.
      */
     resultsReference: ObjectLocation;
     /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
@@ -4417,22 +3916,6 @@ namespace WatsonxAiMlVmlv1 {
     model_id?: string;
   }
 
-  /** Properties that describe the chat context. */
-  export interface ChatHistoryTextGenProperties {
-    /** Identifies this chat context as a question if `true`. */
-    is_question?: boolean;
-    /** The content for the chat context. */
-    content?: string;
-  }
-
-  /** Properties that describe the chat context. */
-  export interface ChatTextGenProperties {
-    /** The history for this chat session. */
-    history?: ChatHistoryTextGenProperties[];
-    /** The RAG context for grounded chat input. */
-    context?: string;
-  }
-
   /** The limits that may be set per request. */
   export interface ConsumptionsLimit {
     /** The hard limit on the call time for a request, if set. */
@@ -4502,8 +3985,6 @@ namespace WatsonxAiMlVmlv1 {
     /** User defined properties specified as key-value pairs. */
     custom?: JsonObject;
     /** A reference to a resource. */
-    asset?: Rel;
-    /** A reference to a resource. */
     prompt_template?: SimpleRel;
     /** Indicates that this is an online deployment. An object has to be specified but can be empty.
      *  The `serving_name` can be provided in the `online.parameters`.
@@ -4511,6 +3992,8 @@ namespace WatsonxAiMlVmlv1 {
     online: OnlineDeployment;
     /** A hardware specification. */
     hardware_spec?: HardwareSpec;
+    /** A reference to a resource. */
+    asset?: ModelRel;
     /** The base model that is required for this deployment if this is for a prompt template or a prompt tune for an
      *  IBM foundation model.
      */
@@ -4656,8 +4139,8 @@ namespace WatsonxAiMlVmlv1 {
      */
     stop_sequences?: string[];
     /** A value used to modify the next-token probabilities in sampling mode. Values less than 1.0 sharpen the
-     *  probability distribution, resulting in 'less random' output. Values greater than 1.0 flatten the probability
-     *  distribution, resulting in 'more random' output. A value of 1.0 has no effect.
+     *  probability distribution, resulting in "less random" output. Values greater than 1.0 flatten the probability
+     *  distribution, resulting in "more random" output. A value of 1.0 has no effect.
      */
     temperature?: number;
     /** Time limit in milliseconds - if not completed within this time, generation will stop. The text generated so
@@ -4723,8 +4206,8 @@ namespace WatsonxAiMlVmlv1 {
   /** Parameters for text embedding requests. */
   export interface EmbeddingParameters {
     /** Represents the maximum number of input tokens accepted. This can be used to avoid requests failing due to
-     *  input being longer than configured limits. If the text is truncated, then it truncates the start of the input
-     *  (on the left), so the end of the input will remain the same. If this value exceeds the `maximum sequence length`
+     *  input being longer than configured limits. If the text is truncated, then it truncates the end of the input (on
+     *  the right), so the start of the input will remain the same. If this value exceeds the `maximum sequence length`
      *  (refer to the documentation to find this value for the model) then the call will fail if the total number of
      *  tokens exceeds the `maximum sequence length`. Zero means don't truncate.
      */
@@ -4752,7 +4235,7 @@ namespace WatsonxAiMlVmlv1 {
     /** The number of input tokens that were consumed. */
     input_token_count: number;
     /** Optional details coming from the service and related to the API call or the associated resource. */
-    system?: SystemTgDetails;
+    system?: SystemDetails;
   }
 
   /** ExternalInformationExternalModel. */
@@ -4793,9 +4276,13 @@ namespace WatsonxAiMlVmlv1 {
     /** The tasks that are supported by this model. */
     tasks?: TaskDescription[];
     /** The tier of the model, depending on the `tier` the billing will be different, refer to the plan for the
-     *  details.
+     *  details. Note that input tokens and output tokens may be charged differently.
      */
-    tier: FoundationModel.Constants.Tier | string;
+    input_tier: FoundationModel.Constants.InputTier | string;
+    /** The tier of the model, depending on the `tier` the billing will be different, refer to the plan for the
+     *  details. Note that input tokens and output tokens may be charged differently.
+     */
+    output_tier: FoundationModel.Constants.OutputTier | string;
     /** Specifies the provider of this model. */
     source: string;
     /** The minimum number of examples required for the model. */
@@ -4812,14 +4299,24 @@ namespace WatsonxAiMlVmlv1 {
     training_parameters?: TrainingParameters;
     /** The information related to the minor versions of this model. */
     versions?: FoundationModelVersion[];
+    /** If `true` then this model is only available in the `Tech Preview`. */
+    tech_preview?: boolean;
   }
   export namespace FoundationModel {
     export namespace Constants {
-      /** The tier of the model, depending on the `tier` the billing will be different, refer to the plan for the details. */
-      export enum Tier {
+      /** The tier of the model, depending on the `tier` the billing will be different, refer to the plan for the details. Note that input tokens and output tokens may be charged differently. */
+      export enum InputTier {
         CLASS_1 = 'class_1',
         CLASS_2 = 'class_2',
         CLASS_3 = 'class_3',
+        CLASS_C1 = 'class_c1',
+      }
+      /** The tier of the model, depending on the `tier` the billing will be different, refer to the plan for the details. Note that input tokens and output tokens may be charged differently. */
+      export enum OutputTier {
+        CLASS_1 = 'class_1',
+        CLASS_2 = 'class_2',
+        CLASS_3 = 'class_3',
+        CLASS_C1 = 'class_c1',
       }
     }
   }
@@ -4855,7 +4352,7 @@ namespace WatsonxAiMlVmlv1 {
     /** The supported foundation model tasks. */
     resources?: FoundationModelTask[];
     /** Optional details coming from the service and related to the API call or the associated resource. */
-    system?: SystemTgDetails;
+    system?: SystemDetails;
   }
 
   /** A minor or patch version for the model. */
@@ -4879,7 +4376,7 @@ namespace WatsonxAiMlVmlv1 {
     /** The supported foundation models. */
     resources?: FoundationModel[];
     /** Optional details coming from the service and related to the API call or the associated resource. */
-    system?: SystemTgDetails;
+    system?: SystemDetails;
   }
 
   /** GetPromptInputResponse. */
@@ -4890,11 +4387,11 @@ namespace WatsonxAiMlVmlv1 {
 
   /** A hardware specification. */
   export interface HardwareSpec {
-    /** The id of the hardware specification. One, and only one, of `id` or `name` must be set. */
+    /** The id of the hardware specification. */
     id?: string;
-    /** The revision of the hardware specification if `id` is used. */
+    /** The revision of the hardware specification. */
     rev?: string;
-    /** The name of the hardware specification. One, and only one, of `id` or `name` must be set. */
+    /** The name of the hardware specification. */
     name?: string;
     /** The number of nodes applied to a computation. */
     num_nodes?: number;
@@ -5001,6 +4498,16 @@ namespace WatsonxAiMlVmlv1 {
     max_sequence_length?: number;
     /** This is the maximum number of records that can be accepted when training this model. */
     training_data_max_records?: number;
+  }
+
+  /** A reference to a resource. */
+  export interface ModelRel {
+    /** The id of the referenced resource. */
+    id: string;
+    /** The revision of the referenced resource. */
+    rev?: string;
+    /** The resource key for this asset if it exists. */
+    resource_key?: string;
   }
 
   /** The properties specific to HAP. */
@@ -5531,9 +5038,9 @@ namespace WatsonxAiMlVmlv1 {
   }
 
   /** Optional details coming from the service and related to the API call or the associated resource. */
-  export interface SystemTgDetails {
+  export interface SystemDetails {
     /** Any warnings coming from the system. */
-    warnings?: WarningTg[];
+    warnings?: Warning[];
   }
 
   /** The attributes of the task for this model. */
@@ -5567,8 +5074,8 @@ namespace WatsonxAiMlVmlv1 {
     start_index?: number;
   }
 
-  /** The chat related parameters. */
-  export interface TextGenRequestParameters {
+  /** Properties that control the model and response. */
+  export interface TextGenParameters {
     /** Represents the strategy used for picking the tokens during generation of the output text.
      *
      *  During text generation when parameter value is set to greedy, each successive token corresponds to the highest
@@ -5578,7 +5085,7 @@ namespace WatsonxAiMlVmlv1 {
      *  already-generated text and the top_k and top_p parameters described below. See this
      *  [url](https://huggingface.co/blog/how-to-generate) for an informative article about text generation.
      */
-    decoding_method?: TextGenRequestParameters.Constants.DecodingMethod | string;
+    decoding_method?: TextGenParameters.Constants.DecodingMethod | string;
     /** It can be used to exponentially increase the likelihood of the text generation terminating once a specified
      *  number of tokens have been generated.
      */
@@ -5586,7 +5093,7 @@ namespace WatsonxAiMlVmlv1 {
     /** The maximum number of new tokens to be generated. The maximum supported value for this field depends on the
      *  model being used.
      *
-     *  How the 'token' is defined depends on the tokenizer and vocabulary size, which in turn depends on the model.
+     *  How the "token" is defined depends on the tokenizer and vocabulary size, which in turn depends on the model.
      *  Often the tokens are a mix of full words and sub-words. To learn more about tokenization, [see
      *  here](https://huggingface.co/course/chapter2/4).
      *
@@ -5603,8 +5110,8 @@ namespace WatsonxAiMlVmlv1 {
      */
     stop_sequences?: string[];
     /** A value used to modify the next-token probabilities in sampling mode. Values less than 1.0 sharpen the
-     *  probability distribution, resulting in 'less random' output. Values greater than 1.0 flatten the probability
-     *  distribution, resulting in 'more random' output. A value of 1.0 has no effect.
+     *  probability distribution, resulting in "less random" output. Values greater than 1.0 flatten the probability
+     *  distribution, resulting in "more random" output. A value of 1.0 has no effect.
      */
     temperature?: number;
     /** Time limit in milliseconds - if not completed within this time, generation will stop. The text generated so
@@ -5640,10 +5147,8 @@ namespace WatsonxAiMlVmlv1 {
      *  that the output will end with the stop sequence text when matched.
      */
     include_stop_sequence?: boolean;
-    /** Properties that describe the chat context. */
-    chat?: ChatTextGenProperties;
   }
-  export namespace TextGenRequestParameters {
+  export namespace TextGenParameters {
     export namespace Constants {
       /** Represents the strategy used for picking the tokens during generation of the output text. During text generation when parameter value is set to greedy, each successive token corresponds to the highest probability token given the text that has already been generated. This strategy can lead to repetitive results especially for longer output sequences. The alternative sample strategy generates text by picking subsequent tokens based on the probability distribution of possible next tokens defined by (i.e., conditioned on) the already-generated text and the top_k and top_p parameters described below. See this [url](https://huggingface.co/blog/how-to-generate) for an informative article about text generation. */
       export enum DecodingMethod {
@@ -5662,19 +5167,15 @@ namespace WatsonxAiMlVmlv1 {
     /** The time when the response was created. */
     created_at: string;
     /** The generated tokens. */
-    results: TextGenResult[];
+    results: TextGenResponseFieldsResultsItem[];
     /** Optional details coming from the service and related to the API call or the associated resource. */
-    system?: SystemTgDetails;
+    system?: SystemDetails;
   }
 
-  /** TextGenResult. */
-  export interface TextGenResult {
+  /** TextGenResponseFieldsResultsItem. */
+  export interface TextGenResponseFieldsResultsItem {
     /** The text that was generated by the model. */
     generated_text: string;
-    /** The number of generated tokens. */
-    generated_token_count?: number;
-    /** The number of input tokens consumed. */
-    input_token_count?: number;
     /** The reason why the call stopped, can be one of:
      *  - not_finished - Possibly more tokens to be streamed.
      *  - max_tokens - Maximum requested tokens reached.
@@ -5687,7 +5188,11 @@ namespace WatsonxAiMlVmlv1 {
      *
      *  Note that these values will be lower-cased so test for values case insensitive.
      */
-    stop_reason: TextGenResult.Constants.StopReason | string;
+    stop_reason: TextGenResponseFieldsResultsItem.Constants.StopReason | string;
+    /** The number of generated tokens. */
+    generated_token_count?: number;
+    /** The number of input tokens consumed. */
+    input_token_count?: number;
     /** The seed used, if it exists. */
     seed?: number;
     /** The list of individual generated tokens. Extra token information is included based on the other flags in the
@@ -5701,7 +5206,7 @@ namespace WatsonxAiMlVmlv1 {
     /** The result of any detected moderations. */
     moderations?: ModerationResults;
   }
-  export namespace TextGenResult {
+  export namespace TextGenResponseFieldsResultsItem {
     export namespace Constants {
       /** The reason why the call stopped, can be one of: - not_finished - Possibly more tokens to be streamed. - max_tokens - Maximum requested tokens reached. - eos_token - End of sequence token encountered. - cancelled - Request canceled by the client. - time_limit - Time limit reached. - stop_sequence - Stop sequence encountered. - token_limit - Token limit reached. - error - Error encountered. Note that these values will be lower-cased so test for values case insensitive. */
       export enum StopReason {
@@ -5776,7 +5281,7 @@ namespace WatsonxAiMlVmlv1 {
     tokens?: string[];
   }
 
-  /** Number of steps to be used for gradient accumulation. Gradient accumulation refers to a method of collecting gradient for configured number of steps instead of updating the model variables at every step and then applying the update to model variables. This can be used as a tool to overcome smaller batch size limitation. Often also referred in conjunction with 'effective batch size'. */
+  /** Number of steps to be used for gradient accumulation. Gradient accumulation refers to a method of collecting gradient for configured number of steps instead of updating the model variables at every step and then applying the update to model variables. This can be used as a tool to overcome smaller batch size limitation. Often also referred in conjunction with "effective batch size". */
   export interface TrainingAccumulatedSteps {
     /** The default value. */
     default?: number;
@@ -5907,7 +5412,7 @@ namespace WatsonxAiMlVmlv1 {
      *  Gradient accumulation refers to a method of collecting gradient for configured number of steps
      *  instead of updating the model variables at every step and then applying the update to model variables.
      *  This can be used as a tool to overcome smaller batch size limitation.
-     *  Often also referred in conjunction with 'effective batch size'.
+     *  Often also referred in conjunction with "effective batch size".
      */
     accumulate_steps?: TrainingAccumulatedSteps;
     /** Learning rate to be used for training. */
@@ -6027,18 +5532,10 @@ namespace WatsonxAiMlVmlv1 {
     message: string;
     /** An `id` associated with the message. */
     id?: string;
-    /** Additional key-value pairs that depend on the specific warning. */
-    additional_properties?: JsonObject;
-  }
-
-  /** A warning message. */
-  export interface WarningTg {
-    /** The message. */
-    message: string;
-    /** An `id` associated with the message. */
-    id?: string;
     /** A reference to a more detailed explanation when available. */
     more_info?: string;
+    /** Additional key-value pairs that depend on the specific warning. */
+    additional_properties?: JsonObject;
   }
 
   /** WxPromptPatchModelVersion. */
@@ -6343,21 +5840,21 @@ namespace WatsonxAiMlVmlv1 {
 
     protected pageContext: any;
 
-    protected client: WatsonxAiMlVmlv1;
+    protected client: WatsonxAiMlVml_v1;
 
-    protected params: WatsonxAiMlVmlv1.ListFoundationModelSpecsParams;
+    protected params: WatsonxAiMlVml_v1.ListFoundationModelSpecsParams;
 
     /**
      * Construct a FoundationModelSpecsPager object.
      *
-     * @param {WatsonxAiMlVmlv1}  client - The service client instance used to invoke listFoundationModelSpecs()
+     * @param {WatsonxAiMlVml_v1}  client - The service client instance used to invoke listFoundationModelSpecs()
      * @param {Object} [params] - The parameters to be passed to listFoundationModelSpecs()
      * @constructor
      * @returns {FoundationModelSpecsPager}
      */
     constructor(
-      client: WatsonxAiMlVmlv1,
-      params?: WatsonxAiMlVmlv1.ListFoundationModelSpecsParams
+      client: WatsonxAiMlVml_v1,
+      params?: WatsonxAiMlVml_v1.ListFoundationModelSpecsParams
     ) {
       if (params && params.start) {
         throw new Error(`the params.start field should not be set`);
@@ -6379,9 +5876,9 @@ namespace WatsonxAiMlVmlv1 {
 
     /**
      * Returns the next page of results by invoking listFoundationModelSpecs().
-     * @returns {Promise<WatsonxAiMlVmlv1.FoundationModel[]>}
+     * @returns {Promise<WatsonxAiMlVml_v1.FoundationModel[]>}
      */
-    public async getNext(): Promise<WatsonxAiMlVmlv1.FoundationModel[]> {
+    public async getNext(): Promise<WatsonxAiMlVml_v1.FoundationModel[]> {
       if (!this.hasNext()) {
         throw new Error('No more results available');
       }
@@ -6407,9 +5904,9 @@ namespace WatsonxAiMlVmlv1 {
 
     /**
      * Returns all results by invoking listFoundationModelSpecs() repeatedly until all pages of results have been retrieved.
-     * @returns {Promise<WatsonxAiMlVmlv1.FoundationModel[]>}
+     * @returns {Promise<WatsonxAiMlVml_v1.FoundationModel[]>}
      */
-    public async getAll(): Promise<WatsonxAiMlVmlv1.FoundationModel[]> {
+    public async getAll(): Promise<WatsonxAiMlVml_v1.FoundationModel[]> {
       const results: FoundationModel[] = [];
       while (this.hasNext()) {
         const nextPage = await this.getNext();
@@ -6427,21 +5924,21 @@ namespace WatsonxAiMlVmlv1 {
 
     protected pageContext: any;
 
-    protected client: WatsonxAiMlVmlv1;
+    protected client: WatsonxAiMlVml_v1;
 
-    protected params: WatsonxAiMlVmlv1.ListFoundationModelTasksParams;
+    protected params: WatsonxAiMlVml_v1.ListFoundationModelTasksParams;
 
     /**
      * Construct a FoundationModelTasksPager object.
      *
-     * @param {WatsonxAiMlVmlv1}  client - The service client instance used to invoke listFoundationModelTasks()
+     * @param {WatsonxAiMlVml_v1}  client - The service client instance used to invoke listFoundationModelTasks()
      * @param {Object} [params] - The parameters to be passed to listFoundationModelTasks()
      * @constructor
      * @returns {FoundationModelTasksPager}
      */
     constructor(
-      client: WatsonxAiMlVmlv1,
-      params?: WatsonxAiMlVmlv1.ListFoundationModelTasksParams
+      client: WatsonxAiMlVml_v1,
+      params?: WatsonxAiMlVml_v1.ListFoundationModelTasksParams
     ) {
       if (params && params.start) {
         throw new Error(`the params.start field should not be set`);
@@ -6463,9 +5960,9 @@ namespace WatsonxAiMlVmlv1 {
 
     /**
      * Returns the next page of results by invoking listFoundationModelTasks().
-     * @returns {Promise<WatsonxAiMlVmlv1.FoundationModelTask[]>}
+     * @returns {Promise<WatsonxAiMlVml_v1.FoundationModelTask[]>}
      */
-    public async getNext(): Promise<WatsonxAiMlVmlv1.FoundationModelTask[]> {
+    public async getNext(): Promise<WatsonxAiMlVml_v1.FoundationModelTask[]> {
       if (!this.hasNext()) {
         throw new Error('No more results available');
       }
@@ -6491,9 +5988,9 @@ namespace WatsonxAiMlVmlv1 {
 
     /**
      * Returns all results by invoking listFoundationModelTasks() repeatedly until all pages of results have been retrieved.
-     * @returns {Promise<WatsonxAiMlVmlv1.FoundationModelTask[]>}
+     * @returns {Promise<WatsonxAiMlVml_v1.FoundationModelTask[]>}
      */
-    public async getAll(): Promise<WatsonxAiMlVmlv1.FoundationModelTask[]> {
+    public async getAll(): Promise<WatsonxAiMlVml_v1.FoundationModelTask[]> {
       const results: FoundationModelTask[] = [];
       while (this.hasNext()) {
         const nextPage = await this.getNext();
@@ -6504,26 +6001,26 @@ namespace WatsonxAiMlVmlv1 {
   }
 
   /**
-   * TrainingsListPager can be used to simplify the use of trainingsList().
+   * TrainingsListPager can be used to simplify the use of listTrainings().
    */
   export class TrainingsListPager {
     protected _hasNext: boolean;
 
     protected pageContext: any;
 
-    protected client: WatsonxAiMlVmlv1;
+    protected client: WatsonxAiMlVml_v1;
 
-    protected params: WatsonxAiMlVmlv1.TrainingsListParams;
+    protected params: WatsonxAiMlVml_v1.TrainingsListParams;
 
     /**
      * Construct a TrainingsListPager object.
      *
-     * @param {WatsonxAiMlVmlv1}  client - The service client instance used to invoke trainingsList()
-     * @param {Object} [params] - The parameters to be passed to trainingsList()
+     * @param {WatsonxAiMlVml_v1}  client - The service client instance used to invoke listTrainings()
+     * @param {Object} [params] - The parameters to be passed to listTrainings()
      * @constructor
      * @returns {TrainingsListPager}
      */
-    constructor(client: WatsonxAiMlVmlv1, params?: WatsonxAiMlVmlv1.TrainingsListParams) {
+    constructor(client: WatsonxAiMlVml_v1, params?: WatsonxAiMlVml_v1.TrainingsListParams) {
       if (params && params.start) {
         throw new Error(`the params.start field should not be set`);
       }
@@ -6543,10 +6040,10 @@ namespace WatsonxAiMlVmlv1 {
     }
 
     /**
-     * Returns the next page of results by invoking trainingsList().
-     * @returns {Promise<WatsonxAiMlVmlv1.TrainingResource[]>}
+     * Returns the next page of results by invoking listTrainings().
+     * @returns {Promise<WatsonxAiMlVml_v1.TrainingResource[]>}
      */
-    public async getNext(): Promise<WatsonxAiMlVmlv1.TrainingResource[]> {
+    public async getNext(): Promise<WatsonxAiMlVml_v1.TrainingResource[]> {
       if (!this.hasNext()) {
         throw new Error('No more results available');
       }
@@ -6554,7 +6051,7 @@ namespace WatsonxAiMlVmlv1 {
       if (this.pageContext.next) {
         this.params.start = this.pageContext.next;
       }
-      const response = await this.client.trainingsList(this.params);
+      const response = await this.client.listTrainings(this.params);
       const { result } = response;
 
       let next;
@@ -6571,10 +6068,10 @@ namespace WatsonxAiMlVmlv1 {
     }
 
     /**
-     * Returns all results by invoking trainingsList() repeatedly until all pages of results have been retrieved.
-     * @returns {Promise<WatsonxAiMlVmlv1.TrainingResource[]>}
+     * Returns all results by invoking listTrainings() repeatedly until all pages of results have been retrieved.
+     * @returns {Promise<WatsonxAiMlVml_v1.TrainingResource[]>}
      */
-    public async getAll(): Promise<WatsonxAiMlVmlv1.TrainingResource[]> {
+    public async getAll(): Promise<WatsonxAiMlVml_v1.TrainingResource[]> {
       const results: TrainingResource[] = [];
       while (this.hasNext()) {
         const nextPage = await this.getNext();
@@ -6585,4 +6082,4 @@ namespace WatsonxAiMlVmlv1 {
   }
 }
 
-export = WatsonxAiMlVmlv1;
+export = WatsonxAiMlVml_v1;

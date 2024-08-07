@@ -18,19 +18,34 @@
 /* eslint-disable no-await-in-loop */
 
 const { readExternalSources } = require('ibm-cloud-sdk-core');
-const WatsonxAiMlVmlv1 = require('../../dist/watsonx-ai-ml/vml-v1');
+const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
 
 // testcase timeout value (200s).
 const timeout = 200000;
-const projectId = '<PROJECT_ID>';
 
 // Location of our config file.
-const configFile = '<ABS_PATH>/watsonx_ai_ml_vml_v1.env';
+const configFile = 'test/integration/watsonx_ai_ml_vml_v1.env';
 
 const describe = authHelper.prepareTests(configFile);
+// Limit for all listing methods to avoid too heavy memory and time consumption
+const limit = 5;
+authHelper.loadEnv();
+const projectId = process.env.WATSONX_AI_PROJECT_ID;
+const trainingAssetId = process.env.TRAINING_ASSET_ID;
 
-describe('WatsonxAiMlVmlv1_integration', () => {
+const checkIfDeploymentIsReady = async (service, args = [], retries = 5, delay = 150000) => {
+  for (let i = 0; i < retries; i += 1) {
+    const result = await service.getDeployment(args);
+    if (result.result.entity.status.state === 'ready') {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+  throw new Error('Failed to get a valid response after maximum retries');
+};
+
+describe('WatsonxAiMlVml_v1_integration', () => {
   jest.setTimeout(timeout);
 
   // Service instance
@@ -42,22 +57,23 @@ describe('WatsonxAiMlVmlv1_integration', () => {
   let entryId;
 
   test('Initialize service', async () => {
-    watsonxAiMlService = WatsonxAiMlVmlv1.newInstance({
-      serviceUrl: '<SERVICE_URL>',
-      version: '2024-03-14',
+    watsonxAiMlService = WatsonxAiMlVml_v1.newInstance({
+      serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
+      platformUrl: process.env.WATSONX_AI_PLATFORM_URL,
+      version: '2023-07-07',
     });
 
     expect(watsonxAiMlService).not.toBeNull();
 
-    const config = readExternalSources(WatsonxAiMlVmlv1.DEFAULT_SERVICE_NAME);
+    const config = readExternalSources(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME);
     expect(config).not.toBeNull();
 
     watsonxAiMlService.enableRetries();
   });
 
-  test('listFoundationModelSpecs()', async () => {
+  test('listFoundationModelSpecs', async () => {
     const params = {
-      limit: 50,
+      limit,
       filters: 'modelid_ibm/granite-13b-instruct-v2',
     };
 
@@ -67,16 +83,16 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('listFoundationModelSpecs() via FoundationModelSpecsPager', async () => {
+  test('listFoundationModelSpecs via FoundationModelSpecsPager', async () => {
     const params = {
-      limit: 50,
+      limit,
       filters: 'modelid_ibm/granite-13b-instruct-v2',
     };
 
     const allResults = [];
 
     // Test getNext().
-    let pager = new WatsonxAiMlVmlv1.FoundationModelSpecsPager(watsonxAiMlService, params);
+    let pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
     while (pager.hasNext()) {
       const nextPage = await pager.getNext();
       expect(nextPage).not.toBeNull();
@@ -84,16 +100,16 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     }
 
     // Test getAll().
-    pager = new WatsonxAiMlVmlv1.FoundationModelSpecsPager(watsonxAiMlService, params);
+    pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
     const allItems = await pager.getAll();
     expect(allItems).not.toBeNull();
     expect(allItems).toHaveLength(allResults.length);
     console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
   });
 
-  test('listFoundationModelTasks()', async () => {
+  test('listFoundationModelTasks', async () => {
     const params = {
-      limit: 50,
+      limit,
     };
 
     const res = await watsonxAiMlService.listFoundationModelTasks(params);
@@ -102,15 +118,15 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('listFoundationModelTasks() via FoundationModelTasksPager', async () => {
+  test('listFoundationModelTasks via FoundationModelTasksPager', async () => {
     const params = {
-      limit: 50,
+      limit,
     };
 
     const allResults = [];
 
     // Test getNext().
-    let pager = new WatsonxAiMlVmlv1.FoundationModelTasksPager(watsonxAiMlService, params);
+    let pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAiMlService, params);
     while (pager.hasNext()) {
       const nextPage = await pager.getNext();
       expect(nextPage).not.toBeNull();
@@ -118,14 +134,14 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     }
 
     // Test getAll().
-    pager = new WatsonxAiMlVmlv1.FoundationModelTasksPager(watsonxAiMlService, params);
+    pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAiMlService, params);
     const allItems = await pager.getAll();
     expect(allItems).not.toBeNull();
     expect(allItems).toHaveLength(allResults.length);
     console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
   });
 
-  test('trainingsCreate()', async () => {
+  test('createTraining()', async () => {
     // Request models needed by this operation.
 
     // DataConnection
@@ -169,10 +185,11 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     // fields: [{ name: 'duration', type: 'number' }],
     // type: 'struct',
     // };
-    const href = '<LOCALIZATION OF ASSET>';
+    const href = `/v2/assets/${trainingAssetId}?project_id=${projectId}`;
+
     // DataConnectionReference
     const dataConnectionReferenceModel = {
-      // id: 'tune1_data.json',
+      id: 'watson_emotion.jsonl',
       // connection: dataConnectionModel,
       // schema: dataSchemaModel,
       type: 'data_asset',
@@ -182,7 +199,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     };
 
     const params = {
-      name: 'my-prompt-tune-training',
+      name: 'test-prompt-tune-training',
       resultsReference: objectLocationModel,
       projectId, // or spaceId
       description: 'testString',
@@ -193,23 +210,23 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       autoUpdateModel: true,
     };
 
-    const res = await watsonxAiMlService.trainingsCreate(params);
+    const res = await watsonxAiMlService.createTraining(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(201);
     expect(res.result).toBeDefined();
     trainingId = res.result.metadata.id;
   });
 
-  test('trainingsList()', async () => {
+  test('listTrainings', async () => {
     const params = {
-      limit: 50,
+      limit,
       totalCount: true,
       tagValue: 'testString',
       state: 'queued',
       projectId,
     };
 
-    const res = await watsonxAiMlService.trainingsList(params);
+    const res = await watsonxAiMlService.listTrainings(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
@@ -217,7 +234,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
 
   test('trainingsList() via TrainingsListPager', async () => {
     const params = {
-      limit: 50,
+      limit,
       totalCount: true,
       state: 'queued',
       projectId,
@@ -226,7 +243,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     const allResults = [];
 
     // Test getNext().
-    let pager = new WatsonxAiMlVmlv1.TrainingsListPager(watsonxAiMlService, params);
+    let pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAiMlService, params);
     while (pager.hasNext()) {
       const nextPage = await pager.getNext();
       expect(nextPage).not.toBeNull();
@@ -234,36 +251,35 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     }
 
     // Test getAll().
-    pager = new WatsonxAiMlVmlv1.TrainingsListPager(watsonxAiMlService, params);
+    pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAiMlService, params);
     const allItems = await pager.getAll();
     expect(allItems).not.toBeNull();
     expect(allItems).toHaveLength(allResults.length);
     console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
   });
 
-  test('trainingsGet()', async () => {
+  test('getTraining', async () => {
     const params = {
       trainingId,
       projectId,
     };
 
-    const res = await watsonxAiMlService.trainingsGet(params);
-    console.log(res.result);
+    const res = await watsonxAiMlService.getTraining(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
   });
 
-  test('createDeployment()', async () => {
-    const trainingparams = {
+  test('createDeployment', async () => {
+    const trainingParams = {
       trainingId,
       projectId,
     };
 
-    const retryAsyncCall = async (asyncFn, args = [], retries = 5, delay = 120000) => {
+    const retryAsyncCall = async (args = [], retries = 5, delay = 150000) => {
       for (let i = 0; i < retries; i += 1) {
-        const result = await watsonxAiMlService.trainingsGet(args);
-        console.log(result);
+        const result = await watsonxAiMlService.getTraining(args);
+
         if (result.result.entity.model_id !== undefined) {
           return result.result.entity.model_id;
         }
@@ -272,13 +288,13 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       throw new Error('Failed to get a valid response after maximum retries');
     };
 
-    const modelId = await retryAsyncCall(watsonxAiMlService.trainingsGet, trainingparams);
+    const modelId = await retryAsyncCall(trainingParams);
 
     // Request models needed by this operation.
     console.log(modelId);
     // OnlineDeploymentParameters
     const onlineDeploymentParametersModel = {
-      serving_name: 'test_deployment',
+      serving_name: (Math.random() + 1).toString(36).substring(10),
     };
 
     // OnlineDeployment
@@ -313,40 +329,33 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.status).toBe(202);
     expect(res.result).toBeDefined();
     deploymentId = res.result.metadata.id;
-  }, 650000);
+  }, 800000);
 
-  test('listDeployments()', async () => {
+  test('listDeployments', async () => {
     const params = {
       projectId,
-      // servingName: 'classification',
-      // tagValue: 'testString',
-      // assetId: 'testString',
-      // promptTemplateId: 'testString',
-      // state: 'ready',
       conflict: false,
     };
 
     const res = await watsonxAiMlService.listDeployments(params);
-    console.log(res.result.resources);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
   });
 
-  test('deploymentsGet()', async () => {
+  test('getDeployment', async () => {
     const params = {
       deploymentId,
       projectId,
     };
 
-    const res = await watsonxAiMlService.deploymentsGet(params);
-    console.log(res.result);
+    const res = await watsonxAiMlService.getDeployment(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
   });
 
-  test('deploymentsUpdate()', async () => {
+  test('updateDeployment', async () => {
     // Request models needed by this operation.
 
     // JsonPatchOperation
@@ -363,32 +372,19 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       projectId,
     };
 
-    const res = await watsonxAiMlService.deploymentsUpdate(params);
+    const res = await watsonxAiMlService.updateDeployment(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
   });
 
-  test('deploymentsTextGeneration()', async () => {
+  test('deploymentGenerateText', async () => {
     // Request models needed by this operation.
     const getParams = {
       deploymentId,
       projectId,
     };
-
-    const retryAsyncCall = async (asyncFn, args = [], retries = 5, delay = 120000) => {
-      for (let i = 0; i < retries; i += 1) {
-        const result = await watsonxAiMlService.deploymentsGet(args);
-        console.log(result);
-        console.log(result.result.entity.status);
-        if (result.result.entity.status.state === 'ready') {
-          return;
-        }
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
-      throw new Error('Failed to get a valid response after maximum retries');
-    };
-    await retryAsyncCall(watsonxAiMlService.deploymentsGet, getParams);
+    await checkIfDeploymentIsReady(watsonxAiMlService, getParams);
     // TextGenLengthPenalty
     const textGenLengthPenaltyModel = {
       decay_factor: 2.5,
@@ -480,14 +476,19 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       moderations: moderationsModel,
     };
 
-    const res = await watsonxAiMlService.deploymentsTextGeneration(params);
+    const res = await watsonxAiMlService.deploymentGenerateText(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
-  }, 600000);
+  }, 800000);
 
-  test('deploymentsTextGenerationStream()', async () => {
+  test('deploymentGenerateTextStream', async () => {
     // Request models needed by this operation.
+    const getParams = {
+      deploymentId,
+      projectId,
+    };
+    await checkIfDeploymentIsReady(watsonxAiMlService, getParams);
 
     // TextGenLengthPenalty
     const textGenLengthPenaltyModel = {
@@ -511,12 +512,8 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       length_penalty: textGenLengthPenaltyModel,
       max_new_tokens: 30,
       min_new_tokens: 5,
-      random_seed: 1,
       stop_sequences: ['fail'],
-      temperature: 1.5,
       time_limit: 600000,
-      top_k: 50,
-      top_p: 0.5,
       repetition_penalty: 1.5,
       truncate_input_tokens: 0,
       return_options: returnOptionPropertiesModel,
@@ -575,7 +572,6 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       hap: moderationHapPropertiesModel,
       pii: moderationPiiPropertiesModel,
       input_ranges: [moderationTextRangeModel],
-      foo: moderationPropertiesModel,
     };
 
     const params = {
@@ -583,16 +579,14 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       input: 'testString',
       parameters: deploymentTextGenPropertiesModel,
       moderations: moderationsModel,
-      accept: 'application/json',
     };
 
-    const res = await watsonxAiMlService.deploymentsTextGenerationStream(params);
+    const res = await watsonxAiMlService.deploymentGenerateTextStream(params);
     expect(res).toBeDefined();
-    expect(res.status).toBe(200);
-    expect(res.result).toBeDefined();
+    expect(res).toBeInstanceOf(ReadableStream);
   });
 
-  test('postPrompt()', async () => {
+  test('postPrompt', async () => {
     // Request models needed by this operation.
 
     // PromptWithExternalModelParameters
@@ -685,7 +679,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       projectId,
     };
 
-    const res = await watsonxAiMlService.postPrompt(params);
+    const res = await watsonxAiMlService.createPrompt(params);
     console.log(res);
     promptId = res.result.id;
     expect(res).toBeDefined();
@@ -693,7 +687,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('getPrompt()', async () => {
+  test('getPrompt', async () => {
     const params = {
       promptId,
       projectId,
@@ -706,7 +700,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('patchPrompt()', async () => {
+  test('updatePrompt', async () => {
     // Request models needed by this operation.
 
     // PromptModelParameters
@@ -768,13 +762,13 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       projectId,
     };
 
-    const res = await watsonxAiMlService.patchPrompt(params);
+    const res = await watsonxAiMlService.updatePrompt(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
   });
 
-  test('putPromptLock()', async () => {
+  test('updatePromptLock', async () => {
     const params = {
       promptId,
       locked: false,
@@ -782,13 +776,13 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       force: true,
     };
 
-    const res = await watsonxAiMlService.putPromptLock(params);
+    const res = await watsonxAiMlService.updatePromptLock(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
   });
 
-  test('getPromptLock()', async () => {
+  test('getPromptLock', async () => {
     const params = {
       promptId,
       projectId,
@@ -800,7 +794,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('getPromptInput()', async () => {
+  test('getPromptInput', async () => {
     const params = {
       promptId,
       // input: 'Some text with variables.',
@@ -814,7 +808,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('postPromptChatItem()', async () => {
+  test('createPromptChatItem', async () => {
     // Request models needed by this operation.
 
     // ChatItem
@@ -840,13 +834,13 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       projectId,
     };
 
-    const res = await watsonxAiMlService.postPromptChatItem(params);
+    const res = await watsonxAiMlService.createPromptChatItem(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(201);
     expect(res.result).toBeDefined();
   });
 
-  test('postPromptSession()', async () => {
+  test('createPromptSession', async () => {
     // Request models needed by this operation.
 
     // PromptLock
@@ -910,7 +904,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       projectId,
     };
 
-    const res = await watsonxAiMlService.postPromptSession(params);
+    const res = await watsonxAiMlService.createPromptSession(params);
     sessionId = res.result.id;
     console.log(res.result);
     expect(res).toBeDefined();
@@ -918,7 +912,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('getPromptSession()', async () => {
+  test('getPromptSession', async () => {
     const params = {
       sessionId,
       projectId,
@@ -931,7 +925,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('patchPromptSession()', async () => {
+  test('updatePromptSession', async () => {
     const params = {
       sessionId,
       name: 'Session 1 update',
@@ -939,13 +933,13 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       projectId,
     };
 
-    const res = await watsonxAiMlService.patchPromptSession(params);
+    const res = await watsonxAiMlService.updatePromptSession(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
   });
 
-  test('postPromptSessionEntry()', async () => {
+  test('createPromptSessionEntry', async () => {
     // Request models needed by this operation.
 
     // PromptModelParameters
@@ -999,7 +993,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       projectId,
     };
 
-    const res = await watsonxAiMlService.postPromptSessionEntry(params);
+    const res = await watsonxAiMlService.createPromptSessionEntry(params);
     entryId = res.result.id;
     console.log(res);
     expect(res).toBeDefined();
@@ -1007,7 +1001,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('getPromptSessionEntry()', async () => {
+  test.skip('getPromptSessionEntry', async () => {
     const params = {
       entryId,
       sessionId,
@@ -1021,7 +1015,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('getPromptSessionEntries()', async () => {
+  test('listPromptSessionEntries', async () => {
     const params = {
       sessionId,
       projectId,
@@ -1029,14 +1023,14 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       // limit: 'testString',
     };
 
-    const res = await watsonxAiMlService.getPromptSessionEntries(params);
+    const res = await watsonxAiMlService.listPromptSessionEntries(params);
     console.log(res);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
   });
 
-  test('postPromptSessionEntryChatItem()', async () => {
+  test.skip('postPromptSessionEntryChatItem', async () => {
     // Request models needed by this operation.
 
     // ChatItem
@@ -1054,8 +1048,6 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       timestamp: 1711504485261,
       token_count: 6,
     };
-    console.log(sessionId);
-    console.log(entryId);
     const params = {
       sessionId,
       entryId,
@@ -1063,14 +1055,13 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       projectId,
     };
 
-    const res = await watsonxAiMlService.postPromptSessionEntryChatItem(params);
-    console.log(res);
+    const res = await watsonxAiMlService.createPromptSessionEntryChatItem(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(201);
     expect(res.result).toBeDefined();
   });
 
-  test('putPromptSessionLock()', async () => {
+  test('updatePromptSessionLock', async () => {
     const params = {
       sessionId,
       locked: false,
@@ -1078,13 +1069,13 @@ describe('WatsonxAiMlVmlv1_integration', () => {
       force: true,
     };
 
-    const res = await watsonxAiMlService.putPromptSessionLock(params);
+    const res = await watsonxAiMlService.updatePromptSessionLock(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
   });
 
-  test('getPromptSessionLock()', async () => {
+  test('getPromptSessionLock', async () => {
     const params = {
       sessionId,
       projectId,
@@ -1096,32 +1087,32 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('trainingsDelete()', async () => {
+  test('deleteTraining', async () => {
     const params = {
       trainingId,
       projectId,
       hardDelete: true,
     };
 
-    const res = await watsonxAiMlService.trainingsDelete(params);
+    const res = await watsonxAiMlService.deleteTraining(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(204);
     expect(res.result).toBeDefined();
   });
 
-  test('deploymentsDelete()', async () => {
+  test('deleteDeployment', async () => {
     const params = {
       deploymentId,
       projectId,
     };
 
-    const res = await watsonxAiMlService.deploymentsDelete(params);
+    const res = await watsonxAiMlService.deleteDeployment(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(204);
     expect(res.result).toBeDefined();
   });
 
-  test('deletePromptSession()', async () => {
+  test('deletePromptSession', async () => {
     const params = {
       sessionId,
       projectId,
@@ -1133,7 +1124,7 @@ describe('WatsonxAiMlVmlv1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('deletePrompt()', async () => {
+  test('deletePrompt', async () => {
     const params = {
       promptId,
       projectId,

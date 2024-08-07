@@ -16,6 +16,7 @@
 
 const fs = require('fs');
 const dotenv = require('dotenv');
+const path = require('path');
 
 // this variable will either hold the normal `describe` method from `jest`
 // or will be an alias for `describe.skip` from `jest` (skipping all tests)
@@ -54,7 +55,7 @@ module.exports.getDescribe = () => describeToUse;
 // set the properties as environment variables.
 module.exports.loadEnv = () => {
   if (configFileExists) {
-    dotenv.config({ path: configFilename });
+    dotenv.config({ path: path.resolve(process.cwd(), configFilename) });
   }
 };
 

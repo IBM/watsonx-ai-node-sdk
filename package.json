@@ -1,6 +1,6 @@
 {
   "name": "@ibm-cloud/watsonx-ai",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "IBM watsonx.ai Node.js SDK",
   "repository": {
     "type": "git",
@@ -27,11 +27,12 @@
     "test-integration": "npm run build && jest test/integration/",
     "test-examples": "npm run build && jest examples/",
     "test-travis": "jest --runInBand --testNamePattern='^((?!@slow).)*$' test/",
-    "test-unit-travis": "jest --runInBand test/unit/",
-    "test-integration-travis": "jest --runInBand --no-colors --testNamePattern='^((?!@slow).)*$' --json test/integration > test-output.log",
+    "test-unit-travis": "jest --runInBand --verbose test/unit/",
+    "test-integration-travis": "jest --runInBand --verbose --no-colors --testNamePattern='^((?!@slow).)*$' --json test/integration > test-output.log",
     "check-packages": "installed-check -e -d -v",
     "all": "npm run test-unit && npm run lint",
-    "typedoc": "typedoc"
+    "typedoc": "typedoc",
+    "typedoc-merge": "typedoc --entryPointStrategy merge"
   },
   "license": "Apache-2.0",
   "publishConfig": {

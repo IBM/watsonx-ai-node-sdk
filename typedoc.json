@@ -6,7 +6,7 @@
     "excludeExternals": true,
     "tsconfig": "tsconfig.json",
     "out": "apidocs",
-    "includeVersion": true,
+    "includeVersion": false,
     "entryPoints": ["index.ts"],
     "excludeInternal": true
 }

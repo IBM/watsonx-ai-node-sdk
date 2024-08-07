@@ -146,7 +146,7 @@ const onlineDeploymentModel = {
 
 async function tunePromptAndDeploy() {
 
-    const trainingDetails = await watsonxAIService.trainingsCreate(trainingParams)
+    const trainingDetails = await watsonxAIService.createTraining(trainingParams)
     const trainingId = trainingDetails.result.metadata.id;
     // Wait until training has been finished, then save id of the model and use it for deployment
     // This step should take ~3 minutes
@@ -180,7 +180,7 @@ async function tunePromptAndDeploy() {
     };
 
     const textGeneration = await watsonxAIService
-    .deploymentsTextGeneration(genParams)
+    .deploymentGenerateText(genParams)
     .then((res) => {
         console.log("\n\n***** TEXT RESPONSE FROM MODEL *****");
         console.log(res.result.results[0].generated_text);

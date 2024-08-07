@@ -49,7 +49,7 @@ async function generateEmbeddingsAndCompare() {
         modelId: model1,
         spaceId: '<SPACE_ID>'
     }
-    const embedding1 = await watsonxAIService.textEmbeddings(textEmbeddingParameters1)
+    const embedding1 = await watsonxAIService.embedText(textEmbeddingParameters1)
     embedding_vector1 = embedding1.result.results
     console.log("\n\n***** EMBEDDING VECTOR FROM 1ST MODEL *****");
     console.log(embedding_vector1);
@@ -60,7 +60,7 @@ async function generateEmbeddingsAndCompare() {
         modelId: model2,
         spaceId: '<SPACE_ID>'
     }
-    const embedding2 = await watsonxAIService.textEmbeddings(textEmbeddingParameters2)
+    const embedding2 = await watsonxAIService.embedText(textEmbeddingParameters2)
     embedding_vector2 = embedding2.result.results
     console.log("\n\n***** EMBEDDING VECTOR FROM 2ND MODEL *****");
     console.log(embedding_vector2);

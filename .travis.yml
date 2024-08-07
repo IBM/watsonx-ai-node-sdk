@@ -4,19 +4,27 @@ dist: focal
 
 group: focal
 
-node_js:
-  - 14
-  - 16
-  - 18
-  - 20
+jobs:
+  include:
+  - node_js: 18
+    env: TEST_SUITE=unit
+  - node_js: 20
+    env: TEST_SUITE=unit
+  - node_js: 22
+    env: TEST_SUITE=unit
+  - node_js: 20
+    env: TEST_SUITE=integration
 
 before_install:
   - wget -qO - https://package.perforce.com/perforce.pubkey | sudo apt-key add -
   - npm i -g npm@8
   - npm --version
+  - ./scripts/cicd/prepare-integration-test-config.sh
 
 script:
   - npm run build
-  - npm run test-travis || travis_terminate 1
-  - npm run lint
+  - npm run test-"${TEST_SUITE}"-travis || travis_terminate 1
+  - if [[ "${TEST_SUITE}" == "unit" ]] ; then 
+      npm run lint ;
+    fi
   - npm run check-packages

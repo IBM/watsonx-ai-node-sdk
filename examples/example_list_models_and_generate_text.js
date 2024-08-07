@@ -49,7 +49,7 @@ async function listModelsAndGenerateText() {
         spaceId: '<SPACE_ID>',
         parameters: textGenRequestParametersModel,
     };
-    const textGeneration = await watsonxAIService.textGeneration(genParams)
+    const textGeneration = await watsonxAIService.generateText(genParams)
     console.log("\n\n***** TEXT INPUT INTO MODEL *****");
     console.log(genParams.input)
     console.log("\n\n***** TEXT RESPONSE FROM MODEL *****");

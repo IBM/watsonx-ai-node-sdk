@@ -41,7 +41,7 @@ async function tokenizeInputAndCompare() {
             return_tokens: true
         }
     }
-    const tokenize1 = await watsonxAIService.textTokenization(textTokenzationParameters1)
+    const tokenize1 = await watsonxAIService.tokenizeText(textTokenzationParameters1)
     tokens1 = tokenize1.result.result.tokens
     console.log("\n\n***** TOKENS FROM 1ST MODEL *****");
     console.log(tokens1);
@@ -55,7 +55,7 @@ async function tokenizeInputAndCompare() {
             return_tokens: true
         }
     }
-    const tokenize2 = await watsonxAIService.textTokenization(textTokenzationParameters2)
+    const tokenize2 = await watsonxAIService.tokenizeText(textTokenzationParameters2)
     tokens2 = tokenize2.result.result.tokens
     console.log("\n\n***** TOKENS FROM 2ND MODEL *****");
     console.log(tokens2);
