@@ -14,11 +14,10 @@
 
 const { WatsonXAI } = require('@ibm-cloud/watsonx-ai');
 
-// Service instance
-let watsonxAIService;
-
 process.env.IBM_CREDENTIALS_FILE = './auth/watsonx_ai_ml_vml_v1.env';
-watsonxAIService = WatsonXAI.newInstance({
+
+// Service instance
+const watsonxAIService = WatsonXAI.newInstance({
     version: '2024-05-31',
     serviceUrl: 'https://us-south.ml.cloud.ibm.com',
 
@@ -37,8 +36,8 @@ async function generateEmbeddingsAndCompare() {
     console.log(modelList);
 
     // Get two first available embedding models
-    model1 = modelList[0];
-    model2 = modelList[1];
+    const model1 = modelList[0];
+    const model2 = modelList[1];
 
     // Specify input data
     const input = "You should be able to notice a difference between how the models are generating embedding vector for the same input."

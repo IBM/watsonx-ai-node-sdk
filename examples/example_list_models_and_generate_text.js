@@ -13,11 +13,10 @@
 
 const { WatsonXAI } = require('@ibm-cloud/watsonx-ai');
 
-// Service instance
-let watsonxAIService;
-
 process.env.IBM_CREDENTIALS_FILE = './auth/watsonx_ai_ml_vml_v1.env';
-watsonxAIService = WatsonXAI.newInstance({
+
+// Service instance
+const watsonxAIService = WatsonXAI.newInstance({
     version: '2024-05-31',
     serviceUrl: 'https://us-south.ml.cloud.ibm.com',
 

@@ -34,9 +34,6 @@ import {
 } from 'ibm-cloud-sdk-core';
 import { getAuthenticatorFromEnvironment } from '../auth/utils/get-authenticator-from-environment';
 import { getSdkHeaders, LineTransformStream, transformStream } from '../lib/common';
-
-const { Readable } = require('node:stream');
-
 /**
  * SDK entrypoint for IBM watsonx.ai product
  *
@@ -698,7 +695,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * internally. It is recommended not to leave any trailing spaces.
    *
    * ### Response
-   * ReadableStream represents a source of streaming data. If request performed successfully ReadableStream returns
+   * AsyncIterable<string> represents a source of streaming data. If request performed successfully AsyncIterable<string> returns
    * stream line by line. Output will stream as follow:
    * - id: 1
    * - event: message
@@ -719,13 +716,13 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<ReadableStream<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse[]>>>}
+   * @returns {Promise<AsyncIterable<string>>}
    *
    * @category Deployments
    */
   public async deploymentGenerateTextStream(
     params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams
-  ): Promise<ReadableStream<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse[]>>> {
+  ): Promise<AsyncIterable<string>> {
     const _params = { ...params };
     const _requiredParams = ['idOrName'];
     const _validParams = ['idOrName', 'input', 'parameters', 'moderations', 'headers'];
@@ -2503,7 +2500,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * tokens as a stream of events.
    *
    * ### Response
-   * ReadableStream represents a source of streaming data. If request performed successfully ReadableStream returns
+   * AsyncIterable<string> represents a source of streaming data. If request performed successfully AsyncIterable<string> returns
    * stream line by line. Output will stream as follow:
    * - id: 1
    * - event: message
@@ -2532,13 +2529,13 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<ReadableStream<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse[]>>>}
+   * @returns {Promise<AsyncIterable<string>>}
    *
    * @category Text Generation
    */
   public async generateTextStream(
     params: WatsonxAiMlVml_v1.TextGenerationStreamParams
-  ): Promise<ReadableStream<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse[]>>> {
+  ): Promise<AsyncIterable<string>> {
     const _params = { ...params };
     const _requiredParams = ['input', 'modelId'];
     const _validParams = [

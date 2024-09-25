@@ -330,7 +330,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     });
 
     expect(res).toBeDefined();
-    expect(res).toBeInstanceOf(ReadableStream);
+    expect(res).toBeInstanceOf(Readable);
   });
 
   test('tokenizeText', async () => {

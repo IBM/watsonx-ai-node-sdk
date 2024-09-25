@@ -108,9 +108,7 @@ Please set environment variables before proceeding with examples:
 const { WatsonXAI } = require('@ibm-cloud/watsonx-ai');
 
 // Service instance
-let watsonxAIService;
-
-watsonxAIService = WatsonXAI.newInstance({
+const watsonxAIService = WatsonXAI.newInstance({
     version: '2024-05-31',
     serviceUrl: 'https://us-south.ml.cloud.ibm.com',
 });
@@ -128,7 +126,7 @@ const params = {
 
 try {
     const textGeneration = watsonxAIService
-    .textGeneration(params)
+    .generateText(params)
     .then((res) => {
         console.log("\n\n***** TEXT RESPONSE FROM MODEL *****");
         console.log(res.result.results[0].generated_text);

@@ -16,8 +16,7 @@
 
 import os = require('os');
 
-const { TransformStream } = require('node:stream/web');
-const { Readable } = require('node:stream');
+import { Readable } from 'stream';
 
 const pkg = require('../package.json');
 
@@ -86,7 +85,9 @@ export class LineTransformStream extends TransformStream {
   }
 }
 
-export function transformStream(apiResponse: any): ReadableStream {
-  const readableStream = Readable.toWeb(apiResponse.result);
-  return readableStream.pipeThrough(new TextDecoderStream()).pipeThrough(new LineTransformStream());
+export function transformStream(apiResponse: any) {
+  const readableStream: AsyncIterable<string> = Readable.from(apiResponse.result, {
+    encoding: 'utf8',
+  });
+  return readableStream;
 }

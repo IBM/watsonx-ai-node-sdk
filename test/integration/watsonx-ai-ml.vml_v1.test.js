@@ -17,6 +17,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
 
+const { Readable } = require('stream');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
@@ -583,7 +584,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
     const res = await watsonxAiMlService.deploymentGenerateTextStream(params);
     expect(res).toBeDefined();
-    expect(res).toBeInstanceOf(ReadableStream);
+    expect(res).toBeInstanceOf(Readable);
   });
 
   test('postPrompt', async () => {
