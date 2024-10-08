@@ -21,7 +21,6 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-await-in-loop */
 
-import * as extend from 'extend';
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
 import {
   Authenticator,
@@ -33,7 +32,11 @@ import {
   validateParams,
 } from 'ibm-cloud-sdk-core';
 import { getAuthenticatorFromEnvironment } from '../auth/utils/get-authenticator-from-environment';
-import { getSdkHeaders, LineTransformStream, transformStream } from '../lib/common';
+import {
+  getSdkHeaders,
+  transformStreamToObjectStream,
+  transformStreamToStringStream,
+} from '../lib/common';
 /**
  * SDK entrypoint for IBM watsonx.ai product
  *
@@ -175,10 +178,13 @@ class WatsonxAiMlVml_v1 extends BaseService {
   /**
    * Create a new watsonx.ai deployment.
    *
-   * Create a new deployment, currently the only supported type is `online`. If this is a deployment for a prompt tune
-   * then the `asset` object must exist and the `id` must be the `id` of the `model` that was created after the prompt
-   * training. If this is a deployment for a prompt template then the `prompt_template` object should exist and the `id`
-   * must be the `id` of the prompt template to be deployed.
+   * Create a new deployment, currently the only supported type is `online`.
+   *
+   * If this is a deployment for a prompt tune then the `asset` object must exist and the `id` must be the `id` of the
+   * `model` that was created after the prompt training.
+   *
+   * If this is a deployment for a prompt template then the `prompt_template` object should exist and the `id` must be
+   * the `id` of the prompt template to be deployed.
    *
    * @param {Object} params - The parameters to send to the service.
    * @param {string} params.name - The name of the resource.
@@ -194,6 +200,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * @param {JsonObject} [params.custom] - User defined properties specified as key-value pairs.
    * @param {SimpleRel} [params.promptTemplate] - A reference to a resource.
    * @param {HardwareSpec} [params.hardwareSpec] - A hardware specification.
+   * @param {HardwareRequest} [params.hardwareRequest] - The requested hardware for deployment.
    * @param {Rel} [params.asset] - A reference to a resource.
    * @param {string} [params.baseModelId] - The base model that is required for this deployment if this is for a prompt
    * template or a prompt tune for an IBM foundation model.
@@ -215,9 +222,10 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'description',
       'tags',
       'custom',
-      'asset',
       'promptTemplate',
       'hardwareSpec',
+      'hardwareRequest',
+      'asset',
       'baseModelId',
       'headers',
     ];
@@ -236,6 +244,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'custom': _params.custom,
       'prompt_template': _params.promptTemplate,
       'hardware_spec': _params.hardwareSpec,
+      'hardware_request': _params.hardwareRequest,
       'asset': _params.asset,
       'base_model_id': _params.baseModelId,
     };
@@ -257,17 +266,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         body,
         qs: query,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -296,7 +303,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * The supported deployment types are (see the description for `deployed_asset_type` in the deployment entity):
    *
    * 1. `prompt_tune` - when a prompt tuned model is deployed. 2. `foundation_model` - when a prompt template is used on
-   * a pre-deployed IBM provided model.
+   * a pre-deployed IBM provided model. 3. `custom_foundation_model` - when a custom foundation model is deployed.
    *
    * These can be combined with the flag `prompt_template` like this:
    *
@@ -363,16 +370,14 @@ class WatsonxAiMlVml_v1 extends BaseService {
         method: 'GET',
         qs: query,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -404,6 +409,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
+
     const query = {
       'version': this.version,
       'space_id': _params.spaceId,
@@ -427,16 +433,14 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -453,13 +457,14 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * - `/tags`
    * - `/custom`
    * - `/online/parameters`
-   * - `/asset`
-   * - `/prompt_template`
+   * - `/asset` - `replace` only
+   * - `/prompt_template` - `replace` only
    * - `/hardware_spec`
+   * - `/hardware_request`
+   * - `/base_model_id` - `replace` only (applicable only to prompt template deployments referring to IBM base
+   * foundation models)
    *
    * The PATCH operation with path specified as `/online/parameters` can be used to update the `serving_name`.
-   *
-   * Patching `/asset` or `/prompt_template` should normally be used in the case when these fields already exist.
    *
    * @param {Object} params - The parameters to send to the service.
    * @param {string} params.deploymentId - The deployment id.
@@ -509,17 +514,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json-patch+json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json-patch+json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -575,9 +578,10 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(true, sdkHeaders, {}, _params.headers),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: { ...sdkHeaders, ..._params.headers },
+      },
     };
 
     return this.createRequest(parameters);
@@ -587,7 +591,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * Infer text.
    *
    * Infer the next tokens for a given deployed model with a set of parameters. If a `serving_name` is used then it must
-   * match the `serving_name` that is returned in the `inference` when the deployment was created.
+   * match the `serving_name` that is returned in the `inference` section when the deployment was created.
    *
    * ### Return options
    *
@@ -655,17 +659,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -695,13 +697,19 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * internally. It is recommended not to leave any trailing spaces.
    *
    * ### Response
-   * AsyncIterable<string> represents a source of streaming data. If request performed successfully AsyncIterable<string> returns
-   * stream line by line. Output will stream as follow:
+   * AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
+   * either stream line by line. Output will stream as follow:
    * - id: 1
    * - event: message
    * - data: {data}
    * - empty line which separates the next Event Message
    *
+   * or stream of objects. Output will stream as follow:
+   * {
+   *  id: 2,
+   *  event: 'message',
+   *  data: {data}
+   * }
    * Here is one of the possibilities to read streaming output:
    *
    * const stream = await watsonxAiMlService.generateTextStream(parameters);
@@ -716,16 +724,35 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<AsyncIterable<string>>}
+   * @param {boolean} [params.returnObject] - Flag that indicates return type. Set 'true' to return objects.
+   * @returns {Promise<AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>}
    *
    * @category Deployments
    */
+
+  public async deploymentGenerateTextStream(
+    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams & { returnObject?: false }
+  ): Promise<AsyncIterable<string>>;
+
+  public async deploymentGenerateTextStream(
+    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams & { returnObject: true }
+  ): Promise<AsyncIterable<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
+
   public async deploymentGenerateTextStream(
     params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams
-  ): Promise<AsyncIterable<string>> {
+  ): Promise<
+    AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>
+  > {
     const _params = { ...params };
     const _requiredParams = ['idOrName'];
-    const _validParams = ['idOrName', 'input', 'parameters', 'moderations', 'headers'];
+    const _validParams = [
+      'idOrName',
+      'input',
+      'parameters',
+      'moderations',
+      'headers',
+      'returnObject',
+    ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -761,23 +788,26 @@ class WatsonxAiMlVml_v1 extends BaseService {
         responseType: 'stream',
         adapter: 'fetch',
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'text/event-stream',
-            'Connection': 'keep-alive',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'text/event-stream',
+          'Connection': 'keep-alive',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
-    const apiResponse = await this.createRequest(parameters);
-    return transformStream(apiResponse);
-  }
 
+    const apiResponse = await this.createRequest(parameters);
+    const stream = _params.returnObject
+      ? transformStreamToObjectStream<
+          WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>
+        >(apiResponse)
+      : transformStreamToStringStream<string>(apiResponse);
+    return stream;
+  }
   /*************************
    * foundationModelSpecs
    ************************/
@@ -856,16 +886,14 @@ class WatsonxAiMlVml_v1 extends BaseService {
         method: 'GET',
         qs: query,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -915,16 +943,14 @@ class WatsonxAiMlVml_v1 extends BaseService {
         method: 'GET',
         qs: query,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1011,18 +1037,16 @@ class WatsonxAiMlVml_v1 extends BaseService {
         body,
         qs: query,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1076,17 +1100,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1106,7 +1128,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * @param {string[]} [params.taskIds] -
    * @param {boolean} [params.governanceTracked] -
    * @param {WxPromptPatchModelVersion} [params.modelVersion] -
-   * @param {JsonObject} [params.promptVariable] -
+   * @param {JsonObject} [params.promptVariables] -
    * @param {string} [params.inputMode] - Input mode in use for the prompt.
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
    * per request.
@@ -1131,7 +1153,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'taskIds',
       'governanceTracked',
       'modelVersion',
-      'promptVariable',
+      'promptVariables',
       'inputMode',
       'projectId',
       'spaceId',
@@ -1150,7 +1172,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'task_ids': _params.taskIds,
       'governance_tracked': _params.governanceTracked,
       'model_version': _params.modelVersion,
-      'prompt_variable': _params.promptVariable,
+      'prompt_variables': _params.promptVariables,
       'input_mode': _params.inputMode,
     };
 
@@ -1177,18 +1199,16 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1243,10 +1263,11 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(true, sdkHeaders, {}, _params.headers),
-      }),
+        headers: { ...sdkHeaders, ..._params.headers },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1323,18 +1344,16 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1389,17 +1408,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1414,8 +1431,8 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * @param {string} params.promptId - Prompt ID.
    * @param {string} [params.input] - Override input string that will be used to generate the response. The string can
    * contain template parameters.
-   * @param {JsonObject} [params.promptVariable] - Supply only to replace placeholders. Object content must be key:value
-   * pairs where the 'key' is the parameter to replace and 'value' is the value to use.
+   * @param {JsonObject} [params.promptVariables] - Supply only to replace placeholders. Object content must be
+   * key:value pairs where the 'key' is the parameter to replace and 'value' is the value to use.
    * @param {string} [params.spaceId] - [REQUIRED] Specifies the space ID as the target. One target must be supplied per
    * request.
    * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
@@ -1430,7 +1447,14 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.GetPromptInputResponse>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
-    const _validParams = ['promptId', 'input', 'promptVariable', 'spaceId', 'projectId', 'headers'];
+    const _validParams = [
+      'promptId',
+      'input',
+      'promptVariables',
+      'spaceId',
+      'projectId',
+      'headers',
+    ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -1438,7 +1462,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
     const body = {
       'input': _params.input,
-      'prompt_variable': _params.promptVariable,
+      'prompt_variables': _params.promptVariables,
     };
 
     const query = {
@@ -1464,18 +1488,16 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1533,17 +1555,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1626,18 +1646,16 @@ class WatsonxAiMlVml_v1 extends BaseService {
         body,
         qs: query,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1691,17 +1709,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1761,18 +1777,16 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1824,10 +1838,11 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(true, sdkHeaders, {}, _params.headers),
-      }),
+        headers: { ...sdkHeaders, ..._params.headers },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1911,18 +1926,16 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -1978,17 +1991,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -2045,17 +2056,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -2128,18 +2137,16 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -2191,17 +2198,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -2255,17 +2260,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -2319,13 +2322,337 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
+      defaultOptions: {
+        ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
-        headers: extend(true, sdkHeaders, {}, _params.headers),
-      }),
+        headers: { ...sdkHeaders, ..._params.headers },
+      },
     };
 
     return this.createRequest(parameters);
+  }
+
+  /*************************
+   * textChat
+   ************************/
+
+  /**
+   * Infer text.
+   *
+   * Infer the next tokens for a given deployed model with a set of parameters.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.modelId - The model to use for the chat completion.
+   *
+   * Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
+   * @param {TextChatMessages[]} params.messages - The messages for this chat session.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
+   * be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
+   * to be given.
+   * @param {TextChatParameterTools[]} [params.tools] - Tool functions that can be called with the response.
+   * @param {string} [params.toolChoiceOption] - Using `none` means the model will not call any tool and instead
+   * generates a message.
+   *
+   * **The following options (`auto` and `required`) are not yet supported.**
+   *
+   * Using `auto` means the model can pick between generating a message or calling one or more tools. Using `required`
+   * means the model must call one or more tools.
+   *
+   * Only one of `tool_choice_option` or `tool_choice` must be present.
+   * @param {TextChatToolChoiceTool} [params.toolChoice] - Specifying a particular tool via `{"type": "function",
+   * "function": {"name": "my_function"}}` forces the model to call that tool.
+   *
+   * Only one of `tool_choice_option` or `tool_choice` must be present.
+   * @param {number} [params.frequencyPenalty] - Positive values penalize new tokens based on their existing frequency
+   * in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
+   * @param {boolean} [params.logprobs] - Whether to return log probabilities of the output tokens or not. If true,
+   * returns the log probabilities of each output token returned in the content of message.
+   * @param {number} [params.topLogprobs] - An integer specifying the number of most likely tokens to return at each
+   * token position, each with an associated log probability. The option `logprobs` must be set to `true` if this
+   * parameter is used.
+   * @param {number} [params.maxTokens] - The maximum number of tokens that can be generated in the chat completion. The
+   * total length of input tokens and generated tokens is limited by the model's context length.
+   * @param {number} [params.n] - How many chat completion choices to generate for each input message. Note that you
+   * will be charged based on the number of generated tokens across all of the choices. Keep n as 1 to minimize costs.
+   * @param {number} [params.presencePenalty] - Positive values penalize new tokens based on whether they appear in the
+   * text so far, increasing the model's likelihood to talk about new topics.
+   * @param {TextChatResponseFormat} [params.responseFormat] - The chat response format parameters.
+   * @param {number} [params.temperature] - What sampling temperature to use,. Higher values like 0.8 will make the
+   * output more random, while lower values like 0.2 will make it more focused and deterministic.
+   *
+   * We generally recommend altering this or `top_p` but not both.
+   * @param {number} [params.topP] - An alternative to sampling with temperature, called nucleus sampling, where the
+   * model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the
+   * top 10% probability mass are considered.
+   *
+   * We generally recommend altering this or `temperature` but not both.
+   * @param {number} [params.timeLimit] - Time limit in milliseconds - if not completed within this time, generation
+   * will stop. The text generated so far will be returned along with the `TIME_LIMIT`` stop reason. Depending on the
+   * users plan, and on the model being used, there may be an enforced maximum time limit.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>}
+   *
+   * @category Text Chat
+   */
+  public textChat(
+    params: WatsonxAiMlVml_v1.TextChatParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>> {
+    const _params = { ...params };
+    const _requiredParams = ['modelId', 'messages'];
+    const _validParams = [
+      'modelId',
+      'messages',
+      'spaceId',
+      'projectId',
+      'tools',
+      'toolChoiceOption',
+      'toolChoice',
+      'frequencyPenalty',
+      'logprobs',
+      'topLogprobs',
+      'maxTokens',
+      'n',
+      'presencePenalty',
+      'responseFormat',
+      'temperature',
+      'topP',
+      'timeLimit',
+      'headers',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'model_id': _params.modelId,
+      'messages': _params.messages,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+      'tools': _params.tools,
+      'tool_choice_option': _params.toolChoiceOption,
+      'tool_choice': _params.toolChoice,
+      'frequency_penalty': _params.frequencyPenalty,
+      'logprobs': _params.logprobs,
+      'top_logprobs': _params.topLogprobs,
+      'max_tokens': _params.maxTokens,
+      'n': _params.n,
+      'presence_penalty': _params.presencePenalty,
+      'response_format': _params.responseFormat,
+      'temperature': _params.temperature,
+      'top_p': _params.topP,
+      'time_limit': _params.timeLimit,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME, 'vml_v1', 'textChat');
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/text/chat',
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Infer text event stream.
+   *
+   * Infer the next tokens for a given deployed model with a set of parameters. This operation will return the output
+   * tokens as a stream of events
+   *
+   * ### Response
+   * AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
+   * either stream line by line. Output will stream as follow:
+   * - id: 1
+   * - event: message
+   * - data: {data}
+   * - empty line which separates the next Event Message
+   *
+   * or stream of objects. Output will stream as follow:
+   * {
+   *  id: 2,
+   *  event: 'message',
+   *  data: {data}
+   * }
+   * Here is one of the possibilities to read streaming output:
+   *
+   * const stream = await watsonxAiMlService.generateTextStream(parameters);
+   * for await (const line of stream) {
+   *   console.log(line);
+   * }.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.modelId - The model to use for the chat completion.
+   *
+   * Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
+   * @param {TextChatMessages[]} params.messages - The messages for this chat session.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
+   * be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
+   * to be given.
+   * @param {TextChatParameterTools[]} [params.tools] - Tool functions that can be called with the response.
+   * @param {string} [params.toolChoiceOption] - Using `none` means the model will not call any tool and instead
+   * generates a message.
+   *
+   * **The following options (`auto` and `required`) are not yet supported.**
+   *
+   * Using `auto` means the model can pick between generating a message or calling one or more tools. Using `required`
+   * means the model must call one or more tools.
+   *
+   * Only one of `tool_choice_option` or `tool_choice` must be present.
+   * @param {TextChatToolChoiceTool} [params.toolChoice] - Specifying a particular tool via `{"type": "function",
+   * "function": {"name": "my_function"}}` forces the model to call that tool.
+   *
+   * Only one of `tool_choice_option` or `tool_choice` must be present.
+   * @param {number} [params.frequencyPenalty] - Positive values penalize new tokens based on their existing frequency
+   * in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
+   * @param {boolean} [params.logprobs] - Whether to return log probabilities of the output tokens or not. If true,
+   * returns the log probabilities of each output token returned in the content of message.
+   * @param {number} [params.topLogprobs] - An integer specifying the number of most likely tokens to return at each
+   * token position, each with an associated log probability. The option `logprobs` must be set to `true` if this
+   * parameter is used.
+   * @param {number} [params.maxTokens] - The maximum number of tokens that can be generated in the chat completion. The
+   * total length of input tokens and generated tokens is limited by the model's context length.
+   * @param {number} [params.n] - How many chat completion choices to generate for each input message. Note that you
+   * will be charged based on the number of generated tokens across all of the choices. Keep n as 1 to minimize costs.
+   * @param {number} [params.presencePenalty] - Positive values penalize new tokens based on whether they appear in the
+   * text so far, increasing the model's likelihood to talk about new topics.
+   * @param {TextChatResponseFormat} [params.responseFormat] - The chat response format parameters.
+   * @param {number} [params.temperature] - What sampling temperature to use,. Higher values like 0.8 will make the
+   * output more random, while lower values like 0.2 will make it more focused and deterministic.
+   *
+   * We generally recommend altering this or `top_p` but not both.
+   * @param {number} [params.topP] - An alternative to sampling with temperature, called nucleus sampling, where the
+   * model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the
+   * top 10% probability mass are considered.
+   *
+   * We generally recommend altering this or `temperature` but not both.
+   * @param {number} [params.timeLimit] - Time limit in milliseconds - if not completed within this time, generation
+   * will stop. The text generated so far will be returned along with the `TIME_LIMIT`` stop reason. Depending on the
+   * users plan, and on the model being used, there may be an enforced maximum time limit.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @param {boolean} [params.returnObject] - Flag that indicates return type. Set 'true' to return objects.
+   * @returns {Promise<AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>>}
+   *
+   * @category Text Chat
+   */
+
+  public async textChatStream(
+    params: WatsonxAiMlVml_v1.TextChatStreamParams & { returnObject?: false }
+  ): Promise<AsyncIterable<string>>;
+
+  public async textChatStream(
+    params: WatsonxAiMlVml_v1.TextChatStreamParams & { returnObject: true }
+  ): Promise<AsyncIterable<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>>;
+
+  public async textChatStream(
+    params: WatsonxAiMlVml_v1.TextChatStreamParams
+  ): Promise<
+    AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>
+  > {
+    const _params = { ...params };
+    const _requiredParams = ['modelId', 'messages'];
+    const _validParams = [
+      'modelId',
+      'messages',
+      'spaceId',
+      'projectId',
+      'tools',
+      'toolChoiceOption',
+      'toolChoice',
+      'frequencyPenalty',
+      'logprobs',
+      'topLogprobs',
+      'maxTokens',
+      'n',
+      'presencePenalty',
+      'responseFormat',
+      'temperature',
+      'topP',
+      'timeLimit',
+      'headers',
+      'returnObject',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'model_id': _params.modelId,
+      'messages': _params.messages,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+      'tools': _params.tools,
+      'tool_choice_option': _params.toolChoiceOption,
+      'tool_choice': _params.toolChoice,
+      'frequency_penalty': _params.frequencyPenalty,
+      'logprobs': _params.logprobs,
+      'top_logprobs': _params.topLogprobs,
+      'max_tokens': _params.maxTokens,
+      'n': _params.n,
+      'presence_penalty': _params.presencePenalty,
+      'response_format': _params.responseFormat,
+      'temperature': _params.temperature,
+      'top_p': _params.topP,
+      'time_limit': _params.timeLimit,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'textChatStream'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/text/chat_stream',
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'text/event-stream',
+          'Connection': 'keep-alive',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+    const apiResponse = await this.createRequest(parameters);
+    const stream = _params.returnObject
+      ? transformStreamToObjectStream<
+          WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>
+        >(apiResponse)
+      : transformStreamToStringStream<string>(apiResponse);
+    return stream;
   }
   /*************************
    * textEmbeddings
@@ -2390,17 +2717,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         body,
         qs: query,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -2477,17 +2802,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         body,
         qs: query,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -2500,12 +2823,19 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * tokens as a stream of events.
    *
    * ### Response
-   * AsyncIterable<string> represents a source of streaming data. If request performed successfully AsyncIterable<string> returns
-   * stream line by line. Output will stream as follow:
+   * AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
+   * either stream line by line. Output will stream as follow:
    * - id: 1
    * - event: message
    * - data: {data}
    * - empty line which separates the next Event Message
+   *
+   * or stream of objects. Output will stream as follow:
+   * {
+   *  id: ,
+   *  event: 'message',
+   *  data: {data}
+   * }
    *
    * Here is one of the possibilities to read streaming output:
    *
@@ -2529,13 +2859,25 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<AsyncIterable<string>>}
+   * @param {boolean} [params.returnObject] - Flag that indicates return type. Set 'true' to return objects.
+   * @returns {Promise<AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>}
    *
    * @category Text Generation
    */
+
+  public async generateTextStream(
+    params: WatsonxAiMlVml_v1.TextGenerationStreamParams & { returnObject?: false }
+  ): Promise<AsyncIterable<string>>;
+
+  public async generateTextStream(
+    params: WatsonxAiMlVml_v1.TextGenerationStreamParams & { returnObject: true }
+  ): Promise<AsyncIterable<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
+
   public async generateTextStream(
     params: WatsonxAiMlVml_v1.TextGenerationStreamParams
-  ): Promise<AsyncIterable<string>> {
+  ): Promise<
+    AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>
+  > {
     const _params = { ...params };
     const _requiredParams = ['input', 'modelId'];
     const _validParams = [
@@ -2546,6 +2888,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'parameters',
       'moderations',
       'headers',
+      'returnObject',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -2581,21 +2924,24 @@ class WatsonxAiMlVml_v1 extends BaseService {
         adapter: 'fetch',
       },
 
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'text/event-stream',
-            'Connection': 'keep-alive',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'text/event-stream',
+          'Connection': 'keep-alive',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
     const apiResponse = await this.createRequest(parameters);
-    return transformStream(apiResponse);
+    const stream = _params.returnObject
+      ? transformStreamToObjectStream<
+          WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>
+        >(apiResponse)
+      : transformStreamToStringStream<string>(apiResponse);
+    return stream;
   }
 
   /*************************
@@ -2659,17 +3005,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         body,
         qs: query,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -2691,36 +3035,36 @@ class WatsonxAiMlVml_v1 extends BaseService {
    *   1. Create a WML model asset, in a space or a project,
    *      by providing the `request.json` as shown below:
    *        ```
-   *        curl -X POST 'https://{cpd_cluster}/ml/v4/models?version=2024-01-29' \
-   *          -H 'Authorization: Bearer <replace with your token>' \
-   *          -H 'content-type: application/json' \
+   *        curl -X POST "https://{cpd_cluster}/ml/v4/models?version=2024-01-29" \
+   *          -H "Authorization: Bearer <replace with your token>" \
+   *          -H "content-type: application/json" \
    *          --data '{
-   *             'name': 'replace_with_a_meaningful_name',
-   *             'space_id': 'replace_with_your_space_id',
-   *             'type': 'prompt_tune_1.0',
-   *             'software_spec': {
-   *               'name': 'watsonx-textgen-fm-1.0'
+   *             "name": "replace_with_a_meaningful_name",
+   *             "space_id": "replace_with_your_space_id",
+   *             "type": "prompt_tune_1.0",
+   *             "software_spec": {
+   *               "name": "watsonx-textgen-fm-1.0"
    *             },
-   *             'metrics': [ from the training job ],
-   *             'training': {
-   *               'id': '05859469-b25b-420e-aefe-4a5cb6b595eb',
-   *               'base_model': {
-   *                 'model_id': 'google/flan-t5-xl'
+   *             "metrics": [ from the training job ],
+   *             "training": {
+   *               "id": "05859469-b25b-420e-aefe-4a5cb6b595eb",
+   *               "base_model": {
+   *                 "model_id": "google/flan-t5-xl"
    *               },
-   *               'task_id': 'generation',
-   *               'verbalizer': 'Input: {{input}} Output:'
+   *               "task_id": "generation",
+   *               "verbalizer": "Input: {{input}} Output:"
    *             },
-   *             'training_data_references': [
+   *             "training_data_references": [
    *               {
-   *                 'connection': {
-   *                   'id': '20933468-7e8a-4706-bc90-f0a09332b263'
+   *                 "connection": {
+   *                   "id": "20933468-7e8a-4706-bc90-f0a09332b263"
    *                 },
-   *                 'id': 'file_to_tune1.json',
-   *                 'location': {
-   *                   'bucket': 'wxproject-donotdelete-pr-xeyivy0rx3vrbl',
-   *                   'path': 'file_to_tune1.json'
+   *                 "id": "file_to_tune1.json",
+   *                 "location": {
+   *                   "bucket": "wxproject-donotdelete-pr-xeyivy0rx3vrbl",
+   *                   "path": "file_to_tune1.json"
    *                 },
-   *                 'type': 'connection_asset'
+   *                 "type": "connection_asset"
    *               }
    *             ]
    *           }'
@@ -2816,17 +3160,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         body,
         qs: query,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -2897,16 +3239,14 @@ class WatsonxAiMlVml_v1 extends BaseService {
         method: 'GET',
         qs: query,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -2962,23 +3302,21 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(
-          true,
-          sdkHeaders,
-          {
-            'Accept': 'application/json',
-          },
-          _params.headers
-        ),
-      }),
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
   }
 
   /**
-   * Cancel the training.
+   * Cancel or delete the training.
    *
    * Cancel the specified training and remove it.
    *
@@ -2988,7 +3326,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * parameter has to be given.
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
    * query parameter has to be given.
-   * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job metadata information.
+   * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job or request metadata.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
    *
@@ -3029,9 +3367,89 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: extend(true, {}, this.baseOptions, {
-        headers: extend(true, sdkHeaders, {}, _params.headers),
-      }),
+      defaultOptions: { ...this.baseOptions, headers: { ...sdkHeaders, ..._params.headers } },
+    };
+
+    return this.createRequest(parameters);
+  }
+  /*************************
+   * textRerank
+   ************************/
+
+  /**
+   * Generate rerank.
+   *
+   * Rerank texts based on some queries.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.modelId - The `id` of the model to be used for this request. Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
+   * @param {RerankInput[]} params.inputs - The rank input strings.
+   * @param {string} params.query - The rank query.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
+   * be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
+   * to be given.
+   * @param {RerankParameters} [params.parameters] - The properties used for reranking.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.RerankResponse>>}
+   *
+   * @category Text Rerank
+   */
+  public textRerank(
+    params: WatsonxAiMlVml_v1.TextRerankParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.RerankResponse>> {
+    const _params = { ...params };
+    const _requiredParams = ['modelId', 'inputs', 'query'];
+    const _validParams = [
+      'modelId',
+      'inputs',
+      'query',
+      'spaceId',
+      'projectId',
+      'parameters',
+      'headers',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'model_id': _params.modelId,
+      'inputs': _params.inputs,
+      'query': _params.query,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+      'parameters': _params.parameters,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'textRerank'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/text/rerank',
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -3094,6 +3512,8 @@ namespace WatsonxAiMlVml_v1 {
     promptTemplate?: SimpleRel;
     /** A hardware specification. */
     hardwareSpec?: HardwareSpec;
+    /** The requested hardware for deployment. */
+    hardwareRequest?: HardwareRequest;
     /** A reference to a resource. */
     asset?: Rel;
     /** The base model that is required for this deployment if this is for a prompt template or a prompt tune for an
@@ -3126,7 +3546,7 @@ namespace WatsonxAiMlVml_v1 {
      *  The supported deployment types are (see the description for `deployed_asset_type` in the deployment entity):
      *
      *  1. `prompt_tune` - when a prompt tuned model is deployed. 2. `foundation_model` - when a prompt template is used
-     *  on a pre-deployed IBM provided model.
+     *  on a pre-deployed IBM provided model. 3. `custom_foundation_model` - when a custom foundation model is deployed.
      *
      *  These can be combined with the flag `prompt_template` like this:
      *
@@ -3231,6 +3651,8 @@ namespace WatsonxAiMlVml_v1 {
      */
     moderations?: Moderations;
     headers?: OutgoingHttpHeaders;
+    /* whether to return stream of objects if true or stream of strings if false or undefined */
+    returnObject?: boolean;
   }
 
   /** Parameters for the `listFoundationModelSpecs` operation. */
@@ -3282,85 +3704,6 @@ namespace WatsonxAiMlVml_v1 {
     start?: string;
     /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
     limit?: number;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `notebooksCreate` operation. */
-  export interface NotebooksCreateParams {
-    /** Specification of the notebook to be created. */
-    notebooksCreateRequest: NotebooksCreateRequest;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `notebooksList` operation. */
-  export interface NotebooksListParams {
-    /** The guid of the project. */
-    projectId: string;
-    /** Additional info that will be included into the notebook details. Possible values are: - runtime. */
-    include: string;
-    /** The list of notebooks whose details will be retrieved. */
-    notebooks?: string[];
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `notebooksDelete` operation. */
-  export interface NotebooksDeleteParams {
-    /** The guid of the notebook. */
-    notebookGuid: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `notebooksRevert` operation. */
-  export interface NotebooksRevertParams {
-    /** The guid of the main notebook. */
-    notebookGuid: string;
-    /** The guid of the notebook version. */
-    source: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `notebooksUpdate` operation. */
-  export interface NotebooksUpdateParams {
-    /** The guid of the notebook. */
-    notebookGuid: string;
-    /** The guid of the environment on which the notebook runs. */
-    environment?: string;
-    /** Spark monitoring enabled or not. */
-    sparkMonitoringEnabled?: boolean;
-    /** A notebook kernel. */
-    kernel?: NotebookKernel;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `versionsCreate` operation. */
-  export interface VersionsCreateParams {
-    /** The guid of the notebook. */
-    notebookGuid: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `versionsList` operation. */
-  export interface VersionsListParams {
-    /** The guid of the notebook. */
-    notebookGuid: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `versionsGet` operation. */
-  export interface VersionsGetParams {
-    /** The guid of the notebook. */
-    notebookGuid: string;
-    /** The guid of the version. */
-    versionGuid: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `versionsDelete` operation. */
-  export interface VersionsDeleteParams {
-    /** The guid of the notebook. */
-    notebookGuid: string;
-    /** The guid of the version. */
-    versionGuid: string;
     headers?: OutgoingHttpHeaders;
   }
 
@@ -3424,7 +3767,7 @@ namespace WatsonxAiMlVml_v1 {
     taskIds?: string[];
     governanceTracked?: boolean;
     modelVersion?: WxPromptPatchModelVersion;
-    promptVariable?: JsonObject;
+    promptVariables?: JsonObject;
     /** Input mode in use for the prompt. */
     inputMode?: PatchPromptConstants.InputMode | string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
@@ -3506,7 +3849,7 @@ namespace WatsonxAiMlVml_v1 {
     /** Supply only to replace placeholders. Object content must be key:value pairs where the 'key' is the parameter
      *  to replace and 'value' is the value to use.
      */
-    promptVariable?: JsonObject;
+    promptVariables?: JsonObject;
     /** [REQUIRED] Specifies the space ID as the target. One target must be supplied per request. */
     spaceId?: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
@@ -3697,6 +4040,193 @@ namespace WatsonxAiMlVml_v1 {
     headers?: OutgoingHttpHeaders;
   }
 
+  /** Parameters for the `textChat` operation. */
+  export interface TextChatParams {
+    /** The model to use for the chat completion.
+     *
+     *  Please refer to the [list of
+     *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
+     */
+    modelId: string;
+    /** The messages for this chat session. */
+    messages: TextChatMessages[];
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** Tool functions that can be called with the response. */
+    tools?: TextChatParameterTools[];
+    /** Using `none` means the model will not call any tool and instead generates a message.
+     *
+     *  **The following options (`auto` and `required`) are not yet supported.**
+     *
+     *  Using `auto` means the model can pick between generating a message or calling one or more tools. Using
+     *  `required` means the model must call one or more tools.
+     *
+     *  Only one of `tool_choice_option` or `tool_choice` must be present.
+     */
+    toolChoiceOption?: TextChatConstants.ToolChoiceOption | string;
+    /** Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}` forces the
+     *  model to call that tool.
+     *
+     *  Only one of `tool_choice_option` or `tool_choice` must be present.
+     */
+    toolChoice?: TextChatToolChoiceTool;
+    /** Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the
+     *  model's likelihood to repeat the same line verbatim.
+     */
+    frequencyPenalty?: number;
+    /** Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of
+     *  each output token returned in the content of message.
+     */
+    logprobs?: boolean;
+    /** An integer specifying the number of most likely tokens to return at each token position, each with an
+     *  associated log probability. The option `logprobs` must be set to `true` if this parameter is used.
+     */
+    topLogprobs?: number;
+    /** The maximum number of tokens that can be generated in the chat completion. The total length of input tokens
+     *  and generated tokens is limited by the model's context length.
+     */
+    maxTokens?: number;
+    /** How many chat completion choices to generate for each input message. Note that you will be charged based on
+     *  the number of generated tokens across all of the choices. Keep n as 1 to minimize costs.
+     */
+    n?: number;
+    /** Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's
+     *  likelihood to talk about new topics.
+     */
+    presencePenalty?: number;
+    /** The chat response format parameters. */
+    responseFormat?: TextChatResponseFormat;
+    /** What sampling temperature to use,. Higher values like 0.8 will make the output more random, while lower
+     *  values like 0.2 will make it more focused and deterministic.
+     *
+     *  We generally recommend altering this or `top_p` but not both.
+     */
+    temperature?: number;
+    /** An alternative to sampling with temperature, called nucleus sampling, where the model considers the results
+     *  of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass
+     *  are considered.
+     *
+     *  We generally recommend altering this or `temperature` but not both.
+     */
+    topP?: number;
+    /** Time limit in milliseconds - if not completed within this time, generation will stop. The text generated so
+     *  far will be returned along with the `TIME_LIMIT`` stop reason. Depending on the users plan, and on the model
+     *  being used, there may be an enforced maximum time limit.
+     */
+    timeLimit?: number;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Constants for the `textChat` operation. */
+  export namespace TextChatConstants {
+    /** Using `none` means the model will not call any tool and instead generates a message. **The following options (`auto` and `required`) are not yet supported.** Using `auto` means the model can pick between generating a message or calling one or more tools. Using `required` means the model must call one or more tools. Only one of `tool_choice_option` or `tool_choice` must be present. */
+    export enum ToolChoiceOption {
+      NONE = 'none',
+      AUTO = 'auto',
+      REQUIRED = 'required',
+    }
+  }
+
+  /** Parameters for the `textChatStream` operation. */
+  export interface TextChatStreamParams {
+    /** The model to use for the chat completion.
+     *
+     *  Please refer to the [list of
+     *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
+     */
+    modelId: string;
+    /** The messages for this chat session. */
+    messages: TextChatMessages[];
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** Tool functions that can be called with the response. */
+    tools?: TextChatParameterTools[];
+    /** Using `none` means the model will not call any tool and instead generates a message.
+     *
+     *  **The following options (`auto` and `required`) are not yet supported.**
+     *
+     *  Using `auto` means the model can pick between generating a message or calling one or more tools. Using
+     *  `required` means the model must call one or more tools.
+     *
+     *  Only one of `tool_choice_option` or `tool_choice` must be present.
+     */
+    toolChoiceOption?: TextChatStreamConstants.ToolChoiceOption | string;
+    /** Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}` forces the
+     *  model to call that tool.
+     *
+     *  Only one of `tool_choice_option` or `tool_choice` must be present.
+     */
+    toolChoice?: TextChatToolChoiceTool;
+    /** Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the
+     *  model's likelihood to repeat the same line verbatim.
+     */
+    frequencyPenalty?: number;
+    /** Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of
+     *  each output token returned in the content of message.
+     */
+    logprobs?: boolean;
+    /** An integer specifying the number of most likely tokens to return at each token position, each with an
+     *  associated log probability. The option `logprobs` must be set to `true` if this parameter is used.
+     */
+    topLogprobs?: number;
+    /** The maximum number of tokens that can be generated in the chat completion. The total length of input tokens
+     *  and generated tokens is limited by the model's context length.
+     */
+    maxTokens?: number;
+    /** How many chat completion choices to generate for each input message. Note that you will be charged based on
+     *  the number of generated tokens across all of the choices. Keep n as 1 to minimize costs.
+     */
+    n?: number;
+    /** Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's
+     *  likelihood to talk about new topics.
+     */
+    presencePenalty?: number;
+    /** The chat response format parameters. */
+    responseFormat?: TextChatResponseFormat;
+    /** What sampling temperature to use,. Higher values like 0.8 will make the output more random, while lower
+     *  values like 0.2 will make it more focused and deterministic.
+     *
+     *  We generally recommend altering this or `top_p` but not both.
+     */
+    temperature?: number;
+    /** An alternative to sampling with temperature, called nucleus sampling, where the model considers the results
+     *  of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass
+     *  are considered.
+     *
+     *  We generally recommend altering this or `temperature` but not both.
+     */
+    topP?: number;
+    /** Time limit in milliseconds - if not completed within this time, generation will stop. The text generated so
+     *  far will be returned along with the `TIME_LIMIT`` stop reason. Depending on the users plan, and on the model
+     *  being used, there may be an enforced maximum time limit.
+     */
+    timeLimit?: number;
+    headers?: OutgoingHttpHeaders;
+    /* whether to return stream of objects if true or stream of strings if false or undefined */
+    returnObject?: boolean;
+  }
+
+  /** Streamed object interface in returnObject mode*/
+  export interface ObjectStreamed<T> {
+    id: number;
+    event: string;
+    data: T;
+  }
+
+  /** Constants for the `textChatStream` operation. */
+  export namespace TextChatStreamConstants {
+    /** Using `none` means the model will not call any tool and instead generates a message. **The following options (`auto` and `required`) are not yet supported.** Using `auto` means the model can pick between generating a message or calling one or more tools. Using `required` means the model must call one or more tools. Only one of `tool_choice_option` or `tool_choice` must be present. */
+    export enum ToolChoiceOption {
+      NONE = 'none',
+      AUTO = 'auto',
+      REQUIRED = 'required',
+    }
+  }
+
   /** Parameters for the `textEmbeddings` operation. */
   export interface TextEmbeddingsParams {
     /** The `id` of the model to be used for this request. Please refer to the [list of
@@ -3758,6 +4288,8 @@ namespace WatsonxAiMlVml_v1 {
      */
     moderations?: Moderations;
     headers?: OutgoingHttpHeaders;
+    /* whether to return stream of objects if true or stream of strings if false or undefined */
+    returnObject?: boolean;
   }
 
   /** Parameters for the `textTokenization` operation. */
@@ -3860,8 +4392,27 @@ namespace WatsonxAiMlVml_v1 {
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     projectId?: string;
-    /** Set to true in order to also delete the job metadata information. */
+    /** Set to true in order to also delete the job or request metadata. */
     hardDelete?: boolean;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `textRerank` operation. */
+  export interface TextRerankParams {
+    /** The `id` of the model to be used for this request. Please refer to the [list of
+     *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
+     */
+    modelId: string;
+    /** The rank input strings. */
+    inputs: RerankInput[];
+    /** The rank query. */
+    query: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** The properties used for reranking. */
+    parameters?: RerankParameters;
     headers?: OutgoingHttpHeaders;
   }
 
@@ -3901,13 +4452,13 @@ namespace WatsonxAiMlVml_v1 {
       /** The type of the problematic field. */
       export enum Type {
         FIELD = 'field',
-        QUERY = 'query',
+        PARAMETER = 'parameter',
         HEADER = 'header',
       }
     }
   }
 
-  /** The model id of the base model for this prompt tuning. */
+  /** The model id of the base model for prompt tuning. */
   export interface BaseModel {
     /** The model id of the base model. */
     model_id?: string;
@@ -3989,15 +4540,21 @@ namespace WatsonxAiMlVml_v1 {
     online: OnlineDeployment;
     /** A hardware specification. */
     hardware_spec?: HardwareSpec;
+    /** The requested hardware for deployment. */
+    hardware_request?: HardwareRequest;
     /** A reference to a resource. */
     asset?: ModelRel;
     /** The base model that is required for this deployment if this is for a prompt template or a prompt tune for an
      *  IBM foundation model.
      */
     base_model_id?: string;
-    /** The type of the deployed model. The possible values are the following: 1. `prompt_tune` - when a prompt
-     *  tuned model is deployed. 2. `foundation_model` - when a prompt template is used on a pre-deployed IBM provided
-     *  model.
+    /** The type of the deployed model. The possible values are the following:
+     *
+     *  1. `prompt_tune` - when a prompt tuned model is deployed.
+     *
+     *  2. `foundation_model` - when a prompt template is used on a pre-deployed IBM provided model.
+     *
+     *  3. `custom_foundation_model` - when a custom foundation model is deployed.
      */
     deployed_asset_type?: DeploymentEntity.Constants.DeployedAssetType | string;
     /** The verbalizer that was used to train this model if the deployment has `deployed_asset_type` of
@@ -4011,10 +4568,11 @@ namespace WatsonxAiMlVml_v1 {
   }
   export namespace DeploymentEntity {
     export namespace Constants {
-      /** The type of the deployed model. The possible values are the following: 1. `prompt_tune` - when a prompt tuned model is deployed. 2. `foundation_model` - when a prompt template is used on a pre-deployed IBM provided model. */
+      /** The type of the deployed model. The possible values are the following: 1. `prompt_tune` - when a prompt tuned model is deployed. 2. `foundation_model` - when a prompt template is used on a pre-deployed IBM provided model. 3. `custom_foundation_model` - when a custom foundation model is deployed. */
       export enum DeployedAssetType {
         PROMPT_TUNE = 'prompt_tune',
         FOUNDATION_MODEL = 'foundation_model',
+        CUSTOM_FOUNDATION_MODEL = 'custom_foundation_model',
       }
     }
   }
@@ -4119,7 +4677,7 @@ namespace WatsonxAiMlVml_v1 {
     /** The maximum number of new tokens to be generated. The maximum supported value for this field depends on the
      *  model being used.
      *
-     *  How the 'token' is defined depends on the tokenizer and vocabulary size, which in turn depends on the model.
+     *  How the "token" is defined depends on the tokenizer and vocabulary size, which in turn depends on the model.
      *  Often the tokens are a mix of full words and sub-words. To learn more about tokenization, [see
      *  here](https://huggingface.co/course/chapter2/4).
      *
@@ -4164,7 +4722,7 @@ namespace WatsonxAiMlVml_v1 {
      *  input being longer than configured limits. If the text is truncated, then it truncates the start of the input
      *  (on the left), so the end of the input will remain the same. If this value exceeds the `maximum sequence length`
      *  (refer to the documentation to find this value for the model) then the call will fail if the total number of
-     *  tokens exceeds the `maximum sequence length`. Zero means don't truncate.
+     *  tokens exceeds the `maximum sequence length`.
      */
     truncate_input_tokens?: number;
     /** Properties that control what is returned. */
@@ -4206,7 +4764,7 @@ namespace WatsonxAiMlVml_v1 {
      *  input being longer than configured limits. If the text is truncated, then it truncates the end of the input (on
      *  the right), so the start of the input will remain the same. If this value exceeds the `maximum sequence length`
      *  (refer to the documentation to find this value for the model) then the call will fail if the total number of
-     *  tokens exceeds the `maximum sequence length`. Zero means don't truncate.
+     *  tokens exceeds the `maximum sequence length`.
      */
     truncate_input_tokens?: number;
     /** The return options for text embeddings. */
@@ -4382,6 +4940,24 @@ namespace WatsonxAiMlVml_v1 {
     input?: string;
   }
 
+  /** The requested hardware for deployment. */
+  export interface HardwareRequest {
+    /** The size of GPU requested for the deployment. */
+    size?: HardwareRequest.Constants.Size | string;
+    /** The number of nodes for the GPU requested for deployment. */
+    num_nodes?: number;
+  }
+  export namespace HardwareRequest {
+    export namespace Constants {
+      /** The size of GPU requested for the deployment. */
+      export enum Size {
+        GPU_S = 'gpu_s',
+        GPU_M = 'gpu_m',
+        GPU_L = 'gpu_l',
+      }
+    }
+  }
+
   /** A hardware specification. */
   export interface HardwareSpec {
     /** The id of the hardware specification. */
@@ -4471,7 +5047,7 @@ namespace WatsonxAiMlVml_v1 {
     remove_entity_value?: boolean;
   }
 
-  /** Optional messages related to the deployment. */
+  /** Optional messages related to the resource. */
   export interface Message {
     /** The level of the message, normally one of `debug`, `info` or `warning`. */
     level?: string;
@@ -4524,9 +5100,9 @@ namespace WatsonxAiMlVml_v1 {
   /** The properties specific to PII. */
   export interface ModerationPiiProperties {
     /** Properties that control the moderation on the text. */
-    input?: TextModeration;
+    input?: TextModerationWithoutThreshold;
     /** Properties that control the moderation on the text. */
-    output?: TextModeration;
+    output?: TextModerationWithoutThreshold;
     /** The properties specific to masking. If this object exists,
      *  even if it is empty, then masking will be applied.
      */
@@ -4596,225 +5172,6 @@ namespace WatsonxAiMlVml_v1 {
     [propName: string]: any;
   }
 
-  /** Notebook information as returned by a GET request. */
-  export interface Notebook {
-    /** Metadata of a notebook. */
-    metadata?: NotebookMetadata;
-    /** Entity of a notebook. */
-    entity?: NotebookEntity;
-  }
-
-  /** Entity of a notebook. */
-  export interface NotebookEntity {
-    /** Definition part of a notebook entity. */
-    notebook?: NotebookEntityDefinition;
-    /** A notebook runtime. */
-    runtime?: NotebookRuntime;
-    /** Full URI of the notebook. */
-    href?: string;
-  }
-
-  /** Definition part of a notebook entity. */
-  export interface NotebookEntityDefinition {
-    /** A notebook kernel. */
-    kernel?: NotebookKernel;
-    /** The notebook origin. */
-    originates_from?: NotebookOrigin;
-  }
-
-  /** Definition part of a notebook entity copied from a source. */
-  export interface NotebookEntityDefinitionForCopy {
-    /** A notebook kernel. */
-    kernel?: NotebookKernel;
-    /** The origin of a notebook from a source. */
-    originates_from?: NotebookOriginFromSource;
-  }
-
-  /** Entity of a notebook copied from a source. */
-  export interface NotebookEntityForCopy {
-    /** Definition part of a notebook entity copied from a source. */
-    notebook?: NotebookEntityDefinitionForCopy;
-    /** A notebook runtime. */
-    runtime?: NotebookRuntime;
-    /** Full URI of the notebook. */
-    href?: string;
-  }
-
-  /** A notebook kernel. */
-  export interface NotebookKernel {
-    /** The display name of the environment kernel. */
-    display_name?: string;
-    /** The name of the environment kernel. */
-    name?: string;
-    /** The language of the environment kernel. */
-    language?: string;
-  }
-
-  /** Metadata of a notebook. */
-  export interface NotebookMetadata {
-    /** The name of the notebook. */
-    name?: string;
-    /** A more verbose description. */
-    description?: string;
-    /** Asset type, always 'notebook'. */
-    asset_type?: string;
-    /** Creation date, ms since epoch. */
-    created?: number;
-    /** Creation date, ISO format. */
-    created_at?: string;
-    /** IAM ID of the asset's owner. */
-    owner_id?: string;
-    /** UUID of the asset's catalog. */
-    catalog_id?: string;
-    /** UUID of the asset. */
-    asset_id?: string;
-  }
-
-  /** Metadata of a notebook in a project. */
-  export interface NotebookMetadataInProject {
-    /** The name of the notebook. */
-    name?: string;
-    /** A more verbose description. */
-    description?: string;
-    /** Asset type, always "notebook". */
-    asset_type?: string;
-    /** Creation date, ms since epoch. */
-    created?: number;
-    /** Creation date, ISO format. */
-    created_at?: string;
-    /** IAM ID of the asset's owner. */
-    owner_id?: string;
-    /** UUID of the asset's catalog. */
-    catalog_id?: string;
-    /** UUID of the asset. */
-    asset_id?: string;
-    /** UUID of the asset's project. */
-    project_id: string;
-  }
-
-  /** The notebook origin. */
-  export interface NotebookOrigin {
-    /** The orgin type of the notebook, either blank, file or url. */
-    type?: string;
-  }
-
-  /** The origin of a notebook from a source. */
-  export interface NotebookOriginFromSource {
-    /** The orgin type of the notebook, either blank, file or url. */
-    type?: string;
-    /** The guid of the source file. */
-    guid?: string;
-  }
-
-  /** Notebook info returned in a listing. */
-  export interface NotebookResource {
-    /** Metadata of notebook info returned in a listing. */
-    metadata?: NotebookResourceMetadata;
-    /** Entity of notebook info returned in a listing. */
-    entity?: NotebookResourceEntity;
-  }
-
-  /** Entity of notebook info returned in a listing. */
-  export interface NotebookResourceEntity {
-    /** Asset API asset description returned with a notebook listing. */
-    asset?: NotebookResourceEntityAsset;
-    /** Runtime info returned with a notebook listing. */
-    runtime?: NotebookResourceEntityRuntime;
-  }
-
-  /** Asset API asset description returned with a notebook listing. */
-  export interface NotebookResourceEntityAsset {
-    /** The UUID of the asset. */
-    asset_id?: string;
-    /** The asset type. Always 'notebook'. */
-    asset_type?: string;
-    /** Timestamp of the creation date, ms since epoch. */
-    created?: number;
-    /** Date the asset was created, ISO format. */
-    created_at?: string;
-    /** The asset catalog ID. */
-    catalog_id?: string;
-    /** The project the notebook belongs to. */
-    project_id?: string;
-    /** Version of the asset. */
-    version?: number;
-    /** The asset URL. */
-    href?: string;
-  }
-
-  /** Runtime info returned with a notebook listing. */
-  export interface NotebookResourceEntityRuntime {
-    /** If Spark monitoring is enabled. */
-    spark_monitoring_enabled?: boolean;
-    /** UUID of the environment of the notebook. */
-    environment?: string;
-  }
-
-  /** Metadata of notebook info returned in a listing. */
-  export interface NotebookResourceMetadata {
-    /** UUID of the notebook. */
-    guid?: string;
-    /** URL of the notebook. */
-    url?: string;
-  }
-
-  /** A notebook runtime. */
-  export interface NotebookRuntime {
-    /** The guid of the environment on which the notebook runs. */
-    environment: string;
-    /** Spark monitoring enabled or not. */
-    spark_monitoring_enabled?: boolean;
-  }
-
-  /** A notebook version entity in a project. */
-  export interface NotebookVersionEntityInProject {
-    /** The guid of the versioned notebook. */
-    master_notebook_guid?: string;
-    /** The IUI of the user that has created the version. */
-    created_by_iui?: string;
-    /** The file reference in the corresponding COS. */
-    file_reference?: string;
-    /** The revision id of the notebook. */
-    rev_id?: number;
-    /** The guid of the project. */
-    project_id: string;
-  }
-
-  /** A notebook version in a project. */
-  export interface NotebookVersionInProject {
-    /** Notebook version metadata. */
-    metadata?: NotebookVersionMetadata;
-    /** A notebook version entity in a project. */
-    entity?: NotebookVersionEntityInProject;
-  }
-
-  /** Notebook version metadata. */
-  export interface NotebookVersionMetadata {
-    /** The guid of the version. */
-    guid?: string;
-    /** The URL of the version. */
-    url?: string;
-    /** The creation timestamp in UTC millisecond since UNIX Epoch time. */
-    created_at?: number;
-  }
-
-  /** NotebooksCreateRequest. */
-  export interface NotebooksCreateRequest {}
-
-  /** NotebooksCreateResponse. */
-  export interface NotebooksCreateResponse {}
-
-  /** A list of notebook info as returned by a list query. */
-  export interface NotebooksResourceList {
-    /** The number of items in the resources list. */
-    total_results: number;
-    /** An array of notebooks. */
-    resources: NotebookResource[];
-  }
-
-  /** NotebooksRevertResponse. */
-  export interface NotebooksRevertResponse {}
-
   /** A reference to data. */
   export interface ObjectLocation {
     /** Item identification inside a collection. */
@@ -4881,7 +5238,7 @@ namespace WatsonxAiMlVml_v1 {
 
   /** Properties to control the prompt tuning. */
   export interface PromptTuning {
-    /** The model id of the base model for this prompt tuning. */
+    /** The model id of the base model for this job. */
     base_model?: BaseModel;
     /** The task that is targeted for this model. */
     task_id: string;
@@ -4894,7 +5251,7 @@ namespace WatsonxAiMlVml_v1 {
     /** Number of steps to be used for gradient accumulation. Gradient accumulation refers to a method of collecting
      *  gradient for configured number of steps instead of updating the model variables at every step and then applying
      *  the update to model variables. This can be used as a tool to overcome smaller batch size limitation. Often also
-     *  referred in conjunction with 'effective batch size'.
+     *  referred in conjunction with "effective batch size".
      */
     accumulate_steps?: number;
     /** Verbalizer template to be used for formatting data at train and inference time. This template may use
@@ -4951,6 +5308,65 @@ namespace WatsonxAiMlVml_v1 {
     id: string;
     /** The revision of the referenced resource. */
     rev?: string;
+  }
+
+  /** A text to rank. */
+  export interface RerankInput {
+    /** The text to rank. */
+    text: string;
+  }
+
+  /** The properties used for reranking. */
+  export interface RerankParameters {
+    /** Represents the maximum number of input tokens accepted. This can be used to avoid requests failing due to
+     *  input being longer than configured limits. If the text is truncated, then it truncates the end of the input (on
+     *  the right), so the start of the input will remain the same. If this value exceeds the `maximum sequence length`
+     *  (refer to the documentation to find this value for the model) then the call will fail if the total number of
+     *  tokens exceeds the `maximum sequence length`.
+     */
+    truncate_input_tokens?: number;
+    /** The return options for text reranking. */
+    return_options?: RerankReturnOptions;
+  }
+
+  /** System details. */
+  export interface RerankResponse {
+    /** The `id` of the model to be used for this request. Please refer to the [list of
+     *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
+     */
+    model_id: string;
+    /** The model version (using semantic versioning) if set. */
+    model_version?: string;
+    /** The ranked results. */
+    results: RerankedResults[];
+    /** The time when the response was created. */
+    created_at: string;
+    /** The number of input tokens that were consumed. */
+    input_token_count: number;
+    /** The rank query, if requested. */
+    query?: string;
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
+  /** The return options for text reranking. */
+  export interface RerankReturnOptions {
+    /** Just show the top `n` results if set. */
+    top_n?: number;
+    /** If `true` then the inputs will be returned in the response. */
+    inputs?: boolean;
+    /** If `true` then the queries will be returned in the response. */
+    query?: boolean;
+  }
+
+  /** The ranking score for the input. */
+  export interface RerankedResults {
+    /** The index of the text from the input in the original request `inputs` array. */
+    index: number;
+    /** The score of the input. */
+    score: number;
+    /** The text that was ranked, if requested. */
+    input?: string;
   }
 
   /** Information related to the revision. */
@@ -5040,12 +5456,49 @@ namespace WatsonxAiMlVml_v1 {
     warnings?: Warning[];
   }
 
+  /** The benchmarking result for this task for this model. */
+  export interface TaskBenchmark {
+    /** Type of benchmarks used. */
+    type?: string;
+    /** Description of benchmark used. */
+    description?: string;
+    /** Benchmarked language (multilingual benchmarks). */
+    language?: string;
+    /** Benchmarking dataset properties. */
+    dataset?: TaskBenchmarkDataset;
+    /** The benchmarking prompt properties. */
+    prompt?: TaskBenchmarkPrompt;
+    /** The scores for a given benchmark. */
+    metrics?: TaskBenchmarkMetric[];
+  }
+
+  /** Benchmarking dataset properties. */
+  export interface TaskBenchmarkDataset {
+    /** The benchmarking dataset name. */
+    name?: string;
+  }
+
+  /** The metric for a given property. */
+  export interface TaskBenchmarkMetric {
+    /** The name of the metric. */
+    name?: string;
+    /** The mean value calculated over all records in the dataset. */
+    value?: number;
+  }
+
+  /** The benchmarking prompt properties. */
+  export interface TaskBenchmarkPrompt {
+    number_of_shots?: number;
+  }
+
   /** The attributes of the task for this model. */
   export interface TaskDescription {
     /** The `id` of the task. */
     id: string;
     /** The ratings for this task for this model. */
     ratings?: TaskRating;
+    /** The benchmarks for a given task. */
+    benchmarks?: TaskBenchmark[];
     /** The tags for a given task. */
     tags?: string[];
   }
@@ -5061,6 +5514,208 @@ namespace WatsonxAiMlVml_v1 {
      *  5 is the best support and 1 is poor support. A missing value means that the quality is not known.
      */
     quality?: number;
+  }
+
+  /** The function call. */
+  export interface TextChatFunctionCall {
+    /** The name of the function. */
+    name: string;
+    /** The arguments to call the function with, as generated by the model in JSON format.
+     *
+     *  Note that the model does not always generate valid JSON, and may hallucinate parameters not defined by your
+     *  function schema. Validate the arguments in your code before calling your function.
+     */
+    arguments: string;
+  }
+
+  /** TextChatMessages. */
+  export interface TextChatMessages {}
+
+  /** The parameters specific to chat. */
+  export interface TextChatParameterFunction {
+    /** The name of the function. */
+    name: string;
+    /** A description of what the function does, used by the model to choose when and how to call the function. */
+    description?: string;
+    /** The parameters the functions accepts, described as a JSON Schema object. See the [JSON Schema
+     *  reference](https://json-schema.org/learn/getting-started-step-by-step) for documentation about the format.
+     *
+     *  Omitting parameters defines a function with an empty parameter list.
+     */
+    parameters?: JsonObject;
+  }
+
+  /** The chat tool parameters. */
+  export interface TextChatParameterTools {
+    /** The tool type. */
+    type: TextChatParameterTools.Constants.Type | string;
+    /** The parameters specific to chat. */
+    function?: TextChatParameterFunction;
+  }
+  export namespace TextChatParameterTools {
+    export namespace Constants {
+      /** The tool type. */
+      export enum Type {
+        FUNCTION = 'function',
+      }
+    }
+  }
+
+  /** System details. */
+  export interface TextChatResponse {
+    /** A unique identifier for the chat completion. */
+    id: string;
+    /** The model used for the chat completion. */
+    model_id: string;
+    /** The model version (using semantic versioning) if set. */
+    model_version?: string;
+    /** A list of chat completion choices. Can be more than one if `n` is greater than 1. */
+    choices: TextChatResultChoice[];
+    /** The Unix timestamp (in seconds) of when the chat completion was created. */
+    created: number;
+    /** The time when the response was created. */
+    created_at?: string;
+    /** Usage statistics for the completion request. */
+    usage?: TextChatUsage;
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
+  /** The chat response format parameters. */
+  export interface TextChatResponseFormat {
+    /** Used to enable JSON mode, which guarantees the message the model generates is valid JSON.
+     *
+     *  **Important:** when using JSON mode, you must also instruct the model to produce JSON yourself via a system or
+     *  user message. Without this, the model may generate an unending stream of whitespace until the generation reaches
+     *  the token limit, resulting in a long-running and seemingly "stuck" request. Also note that the message content
+     *  may be partially cut off if `finish_reason="length"`, which indicates the generation exceeded `max_tokens` or
+     *  the conversation exceeded the max context length.
+     */
+    type: TextChatResponseFormat.Constants.Type | string;
+  }
+  export namespace TextChatResponseFormat {
+    export namespace Constants {
+      /** Used to enable JSON mode, which guarantees the message the model generates is valid JSON. **Important:** when using JSON mode, you must also instruct the model to produce JSON yourself via a system or user message. Without this, the model may generate an unending stream of whitespace until the generation reaches the token limit, resulting in a long-running and seemingly "stuck" request. Also note that the message content may be partially cut off if `finish_reason="length"`, which indicates the generation exceeded `max_tokens` or the conversation exceeded the max context length. */
+      export enum Type {
+        JSON_OBJECT = 'json_object',
+      }
+    }
+  }
+
+  /** A tool related result. */
+  export interface TextChatResultChoice {
+    /** The index of this result. */
+    index?: number;
+    /** A message result. */
+    message?: TextChatResultMessage;
+    /** The reason why the call stopped, can be one of:
+     *  - `stop` - The model hit a natural stop point or a provided stop sequence.
+     *  - `length` - The maximum number of tokens specified in the request was reached.
+     *  - `tool_calls` - The model called a tool.
+     *  - `time_limit`` - Time limit reached.
+     *  - `cancelled`` - Request canceled by the client.
+     *  - `error`` - Error encountered.
+     *  - `null` - API response still in progress or incomplete.
+     */
+    finish_reason?: TextChatResultChoice.Constants.FinishReason | string;
+  }
+  export namespace TextChatResultChoice {
+    export namespace Constants {
+      /** The reason why the call stopped, can be one of: - `stop` - The model hit a natural stop point or a provided stop sequence. - `length` - The maximum number of tokens specified in the request was reached. - `tool_calls` - The model called a tool. - `time_limit`` - Time limit reached. - `cancelled`` - Request canceled by the client. - `error`` - Error encountered. - `null` - API response still in progress or incomplete. */
+      export enum FinishReason {
+        STOP = 'stop',
+        LENGTH = 'length',
+        TOOL_CALLS = 'tool_calls',
+        TIME_LIMIT = 'time_limit',
+        CANCELLED = 'cancelled',
+        ERROR = 'error',
+      }
+    }
+  }
+
+  /** A message result. */
+  export interface TextChatResultMessage {
+    /** The role of the author of this message. */
+    role: string;
+    /** The contents of the message. */
+    content?: string;
+    /** The refusal message generated by the model. */
+    refusal?: string;
+    /** The tool calls generated by the model, such as function calls. */
+    tool_calls?: TextChatToolCall[];
+  }
+
+  /** The tool call. */
+  export interface TextChatToolCall {
+    /** The ID of the tool call. */
+    id: string;
+    /** The type of the tool. Currently, only `function` is supported. */
+    type: TextChatToolCall.Constants.Type | string;
+    /** The function call. */
+    function: TextChatFunctionCall;
+  }
+  export namespace TextChatToolCall {
+    export namespace Constants {
+      /** The type of the tool. Currently, only `function` is supported. */
+      export enum Type {
+        FUNCTION = 'function',
+      }
+    }
+  }
+
+  /** Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}` forces the model to call that tool. Only one of `tool_choice_option` or `tool_choice` must be present. */
+  export interface TextChatToolChoiceTool {
+    /** The tool type. */
+    type: TextChatToolChoiceTool.Constants.Type | string;
+    /** The named function. */
+    function: TextChatToolFunction;
+  }
+  export namespace TextChatToolChoiceTool {
+    export namespace Constants {
+      /** The tool type. */
+      export enum Type {
+        FUNCTION = 'function',
+      }
+    }
+  }
+
+  /** The named function. */
+  export interface TextChatToolFunction {
+    /** The name of the function. */
+    name: string;
+  }
+
+  /** Usage statistics for the completion request. */
+  export interface TextChatUsage {
+    /** Number of tokens in the generated completion. */
+    completion_tokens?: number;
+    /** Number of tokens in the prompt. */
+    prompt_tokens?: number;
+    /** Total number of tokens used in the request (prompt + completion). */
+    total_tokens?: number;
+  }
+
+  /** TextChatUserContents. */
+  export interface TextChatUserContents {}
+
+  /** The definition of a user image content. */
+  export interface TextChatUserImageURL {
+    /** The url of the image. This can be the url to the image or a base64 encoded image. */
+    url: string;
+    /** This parameter controls how the model processes the image and generates its textual understanding. The
+     *  `auto` setting which will look at the image input size and decide if it should use the `low` or `high` setting.
+     */
+    detail?: TextChatUserImageURL.Constants.Detail | string;
+  }
+  export namespace TextChatUserImageURL {
+    export namespace Constants {
+      /** This parameter controls how the model processes the image and generates its textual understanding. The `auto` setting which will look at the image input size and decide if it should use the `low` or `high` setting. */
+      export enum Detail {
+        LOW = 'low',
+        HIGH = 'high',
+        AUTO = 'auto',
+      }
+    }
   }
 
   /** It can be used to exponentially increase the likelihood of the text generation terminating once a specified number of tokens have been generated. */
@@ -5135,7 +5790,7 @@ namespace WatsonxAiMlVml_v1 {
      *  input being longer than configured limits. If the text is truncated, then it truncates the start of the input
      *  (on the left), so the end of the input will remain the same. If this value exceeds the `maximum sequence length`
      *  (refer to the documentation to find this value for the model) then the call will fail if the total number of
-     *  tokens exceeds the `maximum sequence length`. Zero means don't truncate.
+     *  tokens exceeds the `maximum sequence length`.
      */
     truncate_input_tokens?: number;
     /** Properties that control what is returned. */
@@ -5251,6 +5906,19 @@ namespace WatsonxAiMlVml_v1 {
     /** The threshold probability that this is a real match. */
     threshold?: number;
     /** TextModeration accepts additional properties. */
+    [propName: string]: any;
+  }
+
+  /** Properties that control the moderation on the text. */
+  export interface TextModerationWithoutThreshold {
+    /** Should this moderation be enabled on the text.
+     *
+     *
+     *  The default value is `true` which means that if the parent object exists but the `enabled` field does not exist
+     *  then this is considered to be enabled.
+     */
+    enabled?: boolean;
+    /** TextModerationWithoutThreshold accepts additional properties. */
     [propName: string]: any;
   }
 
@@ -5514,15 +6182,6 @@ namespace WatsonxAiMlVml_v1 {
     default?: string;
   }
 
-  /** VersionsCreateResponse. */
-  export interface VersionsCreateResponse {}
-
-  /** VersionsGetResponse. */
-  export interface VersionsGetResponse {}
-
-  /** VersionsListResponse. */
-  export interface VersionsListResponse {}
-
   /** A warning message. */
   export interface Warning {
     /** The message. */
@@ -5537,7 +6196,7 @@ namespace WatsonxAiMlVml_v1 {
 
   /** WxPromptPatchModelVersion. */
   export interface WxPromptPatchModelVersion {
-    /** User provided semvar version for tracking in IBM AI Factsheets. */
+    /** User provided semantic version for tracking in IBM AI Factsheets. */
     number?: string;
     /** User provived tag. */
     tag?: string;
@@ -5547,7 +6206,7 @@ namespace WatsonxAiMlVml_v1 {
 
   /** WxPromptPostModelVersion. */
   export interface WxPromptPostModelVersion {
-    /** User provided semvar version for tracking in IBM AI Factsheets. */
+    /** User provided semantic version for tracking in IBM AI Factsheets. */
     number?: string;
     /** User provived tag. */
     tag?: string;
@@ -5557,7 +6216,7 @@ namespace WatsonxAiMlVml_v1 {
 
   /** WxPromptResponseModelVersion. */
   export interface WxPromptResponseModelVersion {
-    /** User provided semvar version for tracking in IBM AI Factsheets. */
+    /** User provided semantic version for tracking in IBM AI Factsheets. */
     number?: string;
     /** User provived tag. */
     tag?: string;
@@ -5750,79 +6409,131 @@ namespace WatsonxAiMlVml_v1 {
     bookmark?: string;
   }
 
-  /** Payload for copying a notebook. */
-  export interface NotebooksCreateRequestNotebookCopyBody extends NotebooksCreateRequest {
-    /** The name of the new notebook. */
-    name: string;
-    /** The guid of the notebook to be copied. */
-    source_guid: string;
+  /** The definition of an assistant message. */
+  export interface TextChatMessagesTextChatMessageAssistant extends TextChatMessages {
+    /** The role of the messages author. */
+    role: TextChatMessagesTextChatMessageAssistant.Constants.Role | string;
+    /** The contents of the assistant message. Required unless `tool_calls` is specified. */
+    content?: string;
+    /** An optional name for the participant. Provides the model information to differentiate between participants
+     *  of the same role.
+     */
+    name?: string;
+    /** The refusal message by the assistant. */
+    refusal?: string;
+    /** The tool calls generated by the model, such as function calls. */
+    tool_calls?: TextChatToolCall[];
+  }
+  export namespace TextChatMessagesTextChatMessageAssistant {
+    export namespace Constants {
+      /** The role of the messages author. */
+      export enum Role {
+        ASSISTANT = 'assistant',
+        SYSTEM = 'system',
+        TOOL = 'tool',
+        USER = 'system',
+      }
+    }
   }
 
-  /** Payload for creating a notebook in a project. */
-  export interface NotebooksCreateRequestNotebookCreateBodyInProject
-    extends NotebooksCreateRequest {
-    /** The name of the new notebook. */
-    name: string;
-    /** A more verbose description of the notebook. */
-    description?: string;
-    /** The reference to the file in the object storage. */
-    file_reference: string;
-    /** The notebook origin. */
-    originates_from?: NotebookOrigin;
-    /** A notebook runtime. */
-    runtime: NotebookRuntime;
-    /** A notebook kernel. */
-    kernel?: NotebookKernel;
-    /** The guid of the project in which to create the notebook. */
-    project: string;
+  /** The definition of a system message. */
+  export interface TextChatMessagesTextChatMessageSystem extends TextChatMessages {
+    /** The role of the messages author. */
+    role: TextChatMessagesTextChatMessageSystem.Constants.Role | string;
+    /** The contents of the system message. */
+    content: string;
+    /** An optional name for the participant. Provides the model information to differentiate between participants
+     *  of the same role.
+     */
+    name?: string;
+  }
+  export namespace TextChatMessagesTextChatMessageSystem {
+    export namespace Constants {
+      /** The role of the messages author. */
+      export enum Role {
+        ASSISTANT = 'assistant',
+        SYSTEM = 'system',
+        TOOL = 'tool',
+        USER = 'user',
+      }
+    }
   }
 
-  /** Information of a copied notebook as returned by a GET request. */
-  export interface NotebooksCreateResponseNotebookForCopy extends NotebooksCreateResponse {
-    /** Metadata of a notebook in a project. */
-    metadata?: NotebookMetadataInProject;
-    /** Entity of a notebook copied from a source. */
-    entity?: NotebookEntityForCopy;
+  /** The definition of a tool message. */
+  export interface TextChatMessagesTextChatMessageTool extends TextChatMessages {
+    /** The role of the messages author. */
+    role: TextChatMessagesTextChatMessageTool.Constants.Role | string;
+    /** The contents of the tool message. */
+    content: string;
+    /** Tool call that this message is responding to. */
+    tool_call_id: string;
+  }
+  export namespace TextChatMessagesTextChatMessageTool {
+    export namespace Constants {
+      /** The role of the messages author. */
+      export enum Role {
+        ASSISTANT = 'assistant',
+        SYSTEM = 'system',
+        TOOL = 'tool',
+        USER = 'user',
+      }
+    }
   }
 
-  /** Notebook information in a project as returned by a GET request. */
-  export interface NotebooksCreateResponseNotebookInProject extends NotebooksCreateResponse {
-    /** Metadata of a notebook in a project. */
-    metadata?: NotebookMetadataInProject;
-    /** Entity of a notebook. */
-    entity?: NotebookEntity;
+  /** The definition of a user message. */
+  export interface TextChatMessagesTextChatMessageUser extends TextChatMessages {
+    /** The role of the messages author. */
+    role: TextChatMessagesTextChatMessageUser.Constants.Role | string;
+    content: TextChatUserContents[];
+    /** An optional name for the participant. Provides the model information to differentiate between participants
+     *  of the same role.
+     */
+    name?: string;
+  }
+  export namespace TextChatMessagesTextChatMessageUser {
+    export namespace Constants {
+      /** The role of the messages author. */
+      export enum Role {
+        ASSISTANT = 'assistant',
+        SYSTEM = 'system',
+        TOOL = 'tool',
+        USER = 'user',
+      }
+    }
   }
 
-  /** Notebook information in a project as returned by a GET request. */
-  export interface NotebooksRevertResponseNotebookInProject extends NotebooksRevertResponse {
-    /** Metadata of a notebook in a project. */
-    metadata?: NotebookMetadataInProject;
-    /** Entity of a notebook. */
-    entity?: NotebookEntity;
+  /** The definition of a user image content. */
+  export interface TextChatUserContentsTextChatUserImageURLContent extends TextChatUserContents {
+    /** The type of the user content. */
+    type: TextChatUserContentsTextChatUserImageURLContent.Constants.Type | string;
+    /** The definition of a user image content. */
+    image_url: TextChatUserImageURL;
+  }
+  export namespace TextChatUserContentsTextChatUserImageURLContent {
+    export namespace Constants {
+      /** The type of the user content. */
+      export enum Type {
+        TEXT = 'text',
+        IMAGE_URL = 'image_url',
+      }
+    }
   }
 
-  /** A notebook version in a project. */
-  export interface VersionsCreateResponseNotebookVersionInProject extends VersionsCreateResponse {
-    /** Notebook version metadata. */
-    metadata?: NotebookVersionMetadata;
-    /** A notebook version entity in a project. */
-    entity?: NotebookVersionEntityInProject;
+  /** The definition of a user text content. */
+  export interface TextChatUserContentsTextChatUserTextContent extends TextChatUserContents {
+    /** The type of the user content. */
+    type: TextChatUserContentsTextChatUserTextContent.Constants.Type | string;
+    /** The text content. */
+    text: string;
   }
-
-  /** A notebook version in a project. */
-  export interface VersionsGetResponseNotebookVersionInProject extends VersionsGetResponse {
-    /** Notebook version metadata. */
-    metadata?: NotebookVersionMetadata;
-    /** A notebook version entity in a project. */
-    entity?: NotebookVersionEntityInProject;
-  }
-
-  /** A list of notebook versions in a project. */
-  export interface VersionsListResponseNotebookVersionsListInProject extends VersionsListResponse {
-    /** The number of items in the resources array. */
-    total_results: number;
-    /** An array of notebook versions. */
-    resources: NotebookVersionInProject[];
+  export namespace TextChatUserContentsTextChatUserTextContent {
+    export namespace Constants {
+      /** The type of the user content. */
+      export enum Type {
+        TEXT = 'text',
+        IMAGE_URL = 'image_url',
+      }
+    }
   }
 
   /*************************

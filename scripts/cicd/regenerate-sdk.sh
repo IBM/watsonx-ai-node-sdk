@@ -11,11 +11,13 @@ source "${SCRIPTS_DIR}/prepare-env.sh"
 # Download API specification file
 API_SPEC_FILE="watsonx-ai.json"
 
-curl -Ls \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer ${GH_TOKEN}" \
-  "https://raw.github.ibm.com/cloud-api-docs/machine-learning/master/watsonx-ai.json" \
-  -o "${API_SPEC_FILE}"
+if [[ ! "${API_SPEC_FROM_PARAMETER}" =~ (1|y|yes|t|true|on|run) ]] ; then
+    curl -Ls \
+      -H "Accept: application/vnd.github+json" \
+      -H "Authorization: Bearer ${GH_TOKEN}" \
+      "https://raw.github.ibm.com/cloud-api-docs/machine-learning/master/watsonx-ai.json" \
+      -o "${API_SPEC_FILE}"
+fi
 
 # Validate API specification if needed
 if [[ "${VALIDATE_API_SPEC}" =~ (1|y|yes|t|true|on|run) ]] ; then
@@ -29,6 +31,8 @@ fi
 
 # Switch branches
 GITHUB_URL=$(git config --get remote.origin.url | sed 's|https://||g' | sed 's|.git||g')
+git config --local user.name "${GH_USER}"
+git config --local user.email "${GH_EMAIL}"
 git remote set-url origin "https://${GH_USER}:${GH_TOKEN}@${GITHUB_URL}.git"
 git stash
 git fetch
@@ -42,9 +46,7 @@ GENERATOR_DIR="./openapi-sdkgen"
 "${GENERATOR_DIR}/openapi-sdkgen.sh" generate -g ibm-node -i "${API_SPEC_FILE}" -o . --genITs
 
 # Test new code
-"${SCRIPTS_DIR}/prepare-integration-test-config.sh"
-npm run test-unit || echo "Integration tests have failed..."
-npm run test-integration || echo "Integration tests have failed..."
+npm run test-unit || echo "Unit tests have failed..."
 
 # Apply eslint
 npm run lint-fix
@@ -62,7 +64,7 @@ git push
 
 # Create a draft Pull Request to the base branch
 GITHUB_REPO="${GITHUB_URL#*/}"
-PR_TITLE="[Pipeline] Code update - build ${BUILD_DISPLAY_NAME}"
+PR_TITLE="[Pipeline] Code update - build_${BUILD_NUMBER}"
 PR_BODY="**This Pull Request is created by automation pipeline.**\n\nRegenerated SDK code with openapi-sdkgen:${GENERATOR_VERSION}.\nSource API specification can be downloaded from [build URL](${BUILD_URL})\n"
 curl -Ls \
   -H "Accept: application/vnd.github+json" \

@@ -15,11 +15,17 @@
  */
 
 /* eslint-disable no-await-in-loop */
-const { Readable } = require('node:stream');
-const nock = require('nock');
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable jest/no-focused-tests */
 
-// need to import the whole package to mock getAuthenticatorFromEnvironment
+const nock = require('nock');
 const sdkCorePackage = require('ibm-cloud-sdk-core');
+const {
+  StreamTransform,
+  ObjectTransformStream,
+  LineTransformStream,
+} = require('../../dist/lib/common');
+// need to import the whole package to mock getAuthenticatorFromEnvironment
 const get_authenticator_from_environment = require('../../dist/auth/utils/get-authenticator-from-environment');
 
 const { NoAuthAuthenticator, unitTestUtils } = sdkCorePackage;
@@ -39,7 +45,7 @@ const watsonxAiMlServiceOptions = {
   version: '2023-07-07',
 };
 
-const stream = new Readable({
+const stream = new StreamTransform({
   read() {
     this.push('test');
   },
@@ -189,12 +195,6 @@ describe('WatsonxAiMlVml_v1', () => {
         parameters: onlineDeploymentParametersModel,
       };
 
-      // Rel
-      const relModel = {
-        id: '4cedab6d-e8e4-4214-b81a-2ddb122db2ab',
-        rev: '2',
-      };
-
       // SimpleRel
       const simpleRelModel = {
         id: '4cedab6d-e8e4-4214-b81a-2ddb122db2ab',
@@ -208,6 +208,18 @@ describe('WatsonxAiMlVml_v1', () => {
         num_nodes: 2,
       };
 
+      // HardwareRequest
+      const hardwareRequestModel = {
+        size: 'gpu_s',
+        num_nodes: 72.5,
+      };
+
+      // Rel
+      const relModel = {
+        id: '4cedab6d-e8e4-4214-b81a-2ddb122db2ab',
+        rev: '2',
+      };
+
       function __createDeploymentTest() {
         // Construct the params object for operation createDeployment
         const name = 'text_classification';
@@ -217,9 +229,10 @@ describe('WatsonxAiMlVml_v1', () => {
         const description = 'testString';
         const tags = ['testString'];
         const custom = { anyKey: 'anyValue' };
-        const asset = relModel;
         const promptTemplate = simpleRelModel;
         const hardwareSpec = hardwareSpecModel;
+        const hardwareRequest = hardwareRequestModel;
+        const asset = relModel;
         const baseModelId = 'testString';
         const createDeploymentParams = {
           name,
@@ -229,9 +242,10 @@ describe('WatsonxAiMlVml_v1', () => {
           description,
           tags,
           custom,
-          asset,
           promptTemplate,
           hardwareSpec,
+          hardwareRequest,
+          asset,
           baseModelId,
         };
 
@@ -256,9 +270,10 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.description).toEqual(description);
         expect(mockRequestOptions.body.tags).toEqual(tags);
         expect(mockRequestOptions.body.custom).toEqual(custom);
-        expect(mockRequestOptions.body.asset).toEqual(asset);
         expect(mockRequestOptions.body.prompt_template).toEqual(promptTemplate);
         expect(mockRequestOptions.body.hardware_spec).toEqual(hardwareSpec);
+        expect(mockRequestOptions.body.hardware_request).toEqual(hardwareRequest);
+        expect(mockRequestOptions.body.asset).toEqual(asset);
         expect(mockRequestOptions.body.base_model_id).toEqual(baseModelId);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
       }
@@ -736,7 +751,7 @@ describe('WatsonxAiMlVml_v1', () => {
         top_k: 50,
         top_p: 0.5,
         repetition_penalty: 1.5,
-        truncate_input_tokens: 0,
+        truncate_input_tokens: 1,
         return_options: returnOptionPropertiesModel,
         include_stop_sequence: true,
         typical_p: 0.5,
@@ -763,10 +778,16 @@ describe('WatsonxAiMlVml_v1', () => {
         foo: 'testString',
       };
 
+      // TextModerationWithoutThreshold
+      const textModerationWithoutThresholdModel = {
+        enabled: true,
+        foo: 'testString',
+      };
+
       // ModerationPiiProperties
       const moderationPiiPropertiesModel = {
-        input: textModerationModel,
-        output: textModerationModel,
+        input: textModerationWithoutThresholdModel,
+        output: textModerationWithoutThresholdModel,
         mask: maskPropertiesModel,
         foo: 'testString',
       };
@@ -923,7 +944,7 @@ describe('WatsonxAiMlVml_v1', () => {
         top_k: 50,
         top_p: 0.5,
         repetition_penalty: 1.5,
-        truncate_input_tokens: 0,
+        truncate_input_tokens: 1,
         return_options: returnOptionPropertiesModel,
         include_stop_sequence: true,
         typical_p: 0.5,
@@ -950,10 +971,16 @@ describe('WatsonxAiMlVml_v1', () => {
         foo: 'testString',
       };
 
+      // TextModerationWithoutThreshold
+      const textModerationWithoutThresholdModel = {
+        enabled: true,
+        foo: 'testString',
+      };
+
       // ModerationPiiProperties
       const moderationPiiPropertiesModel = {
-        input: textModerationModel,
-        output: textModerationModel,
+        input: textModerationWithoutThresholdModel,
+        output: textModerationWithoutThresholdModel,
         mask: maskPropertiesModel,
         foo: 'testString',
       };
@@ -1089,10 +1116,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const start = 'testString';
         const limit = 50;
         const filters = 'modelid_ibm/granite-13b-instruct-v2';
+        const techPreview = false;
         const listFoundationModelSpecsParams = {
           start,
           limit,
           filters,
+          techPreview,
         };
 
         const listFoundationModelSpecsResult = watsonxAiMlService.listFoundationModelSpecs(
@@ -1115,6 +1144,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
         expect(mockRequestOptions.qs.filters).toEqual(filters);
+        expect(mockRequestOptions.qs.tech_preview).toEqual(techPreview);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -1158,9 +1188,9 @@ describe('WatsonxAiMlVml_v1', () => {
       const serviceUrl = watsonxAiMlServiceOptions.url;
       const path = '/ml/v1/foundation_model_specs';
       const mockPagerResponse1 =
-        '{"next":{"href":"https://myhost.com/somePath?start=1"},"total_count":2,"limit":1,"resources":[{"model_id":"google/flan-ul2","label":"flan-ul2 (20B)","provider":"Hugging Face","tuned_by":"tuned_by","short_description":"An encoder decoder model based on the T5 architecture and instruction-tuned using the Fine-tuned LAnguage Net.","long_description":"flan-ul2 (20B) is an encoder decoder model based on the T5 architecture and instruction-tuned using the Fine-tuned LAnguage Net (FLAN).","limits":{"lite":{"call_time":"3S","max_input_tokens":200,"max_output_tokens":1000}},"task_ids":["task_ids"],"tasks":[{"id":"summarization","ratings":{"cost":2,"quality":3},"tags":["tags"]}],"tier":"class_1","source":"Hugging Face","min_shot_size":10,"number_params":"20b","model_limits":{"max_sequence_length":4096,"training_data_max_records":1024},"lifecycle":[{"id":"available","label":"label","start_date":"2023-07-23","alternative_model_ids":["alternative_model_ids"],"url":"url"}],"training_parameters":{"init_method":{"supported":["supported"],"default":"random"},"init_text":{"default":"text"},"num_virtual_tokens":{"supported":[9],"default":100},"num_epochs":{"default":20,"min":1,"max":50},"verbalizer":{"default":"Input: {{input}} Output:"},"batch_size":{"default":16,"min":1,"max":16},"max_input_tokens":{"default":256,"min":1,"max":1024},"max_output_tokens":{"default":128,"min":1,"max":256},"torch_dtype":{"default":"bfloat16"},"accumulate_steps":{"default":128,"min":1,"max":128},"learning_rate":{"default":0.3,"min":0.01,"max":0.5}},"versions":[{"version":"1.1.0","available_date":"2023-08-23"}]}]}';
+        '{"next":{"href":"https://myhost.com/somePath?start=1"},"total_count":2,"limit":1,"resources":[{"model_id":"google/flan-ul2","label":"flan-ul2 (20B)","provider":"Hugging Face","tuned_by":"tuned_by","short_description":"An encoder decoder model based on the T5 architecture and instruction-tuned using the Fine-tuned LAnguage Net.","long_description":"flan-ul2 (20B) is an encoder decoder model based on the T5 architecture and instruction-tuned using the Fine-tuned LAnguage Net (FLAN).","limits":{"lite":{"call_time":"3S","max_input_tokens":200,"max_output_tokens":1000}},"task_ids":["task_ids"],"tasks":[{"id":"summarization","ratings":{"cost":2,"quality":3},"benchmarks":[{"type":"academic","description":"MultiLingual Summarization dataset with 1.5M+ article/summary pairs across five languages. Evaluated using rougeL with 5 shots.","language":"German","dataset":{"name":"mlsum.de"},"prompt":{"number_of_shots":5},"metrics":[{"name":"rougeL","value":0.5197}]}],"tags":["tags"]}],"input_tier":"class_1","output_tier":"class_1","source":"Hugging Face","min_shot_size":10,"number_params":"20b","model_limits":{"max_sequence_length":4096,"training_data_max_records":1024},"lifecycle":[{"id":"available","label":"label","start_date":"2023-07-23","alternative_model_ids":["alternative_model_ids"],"url":"url"}],"training_parameters":{"init_method":{"supported":["supported"],"default":"random"},"init_text":{"default":"text"},"num_virtual_tokens":{"supported":[9],"default":100},"num_epochs":{"default":20,"min":1,"max":50},"verbalizer":{"default":"Input: {{input}} Output:"},"batch_size":{"default":16,"min":1,"max":16},"max_input_tokens":{"default":256,"min":1,"max":1024},"max_output_tokens":{"default":128,"min":1,"max":256},"torch_dtype":{"default":"bfloat16"},"accumulate_steps":{"default":128,"min":1,"max":128},"learning_rate":{"default":0.3,"min":0.01,"max":0.5}},"versions":[{"version":"1.1.0","available_date":"2023-08-23"}],"tech_preview":false}]}';
       const mockPagerResponse2 =
-        '{"total_count":2,"limit":1,"resources":[{"model_id":"google/flan-ul2","label":"flan-ul2 (20B)","provider":"Hugging Face","tuned_by":"tuned_by","short_description":"An encoder decoder model based on the T5 architecture and instruction-tuned using the Fine-tuned LAnguage Net.","long_description":"flan-ul2 (20B) is an encoder decoder model based on the T5 architecture and instruction-tuned using the Fine-tuned LAnguage Net (FLAN).","limits":{"lite":{"call_time":"3S","max_input_tokens":200,"max_output_tokens":1000}},"task_ids":["task_ids"],"tasks":[{"id":"summarization","ratings":{"cost":2,"quality":3},"tags":["tags"]}],"tier":"class_1","source":"Hugging Face","min_shot_size":10,"number_params":"20b","model_limits":{"max_sequence_length":4096,"training_data_max_records":1024},"lifecycle":[{"id":"available","label":"label","start_date":"2023-07-23","alternative_model_ids":["alternative_model_ids"],"url":"url"}],"training_parameters":{"init_method":{"supported":["supported"],"default":"random"},"init_text":{"default":"text"},"num_virtual_tokens":{"supported":[9],"default":100},"num_epochs":{"default":20,"min":1,"max":50},"verbalizer":{"default":"Input: {{input}} Output:"},"batch_size":{"default":16,"min":1,"max":16},"max_input_tokens":{"default":256,"min":1,"max":1024},"max_output_tokens":{"default":128,"min":1,"max":256},"torch_dtype":{"default":"bfloat16"},"accumulate_steps":{"default":128,"min":1,"max":128},"learning_rate":{"default":0.3,"min":0.01,"max":0.5}},"versions":[{"version":"1.1.0","available_date":"2023-08-23"}]}]}';
+        '{"total_count":2,"limit":1,"resources":[{"model_id":"google/flan-ul2","label":"flan-ul2 (20B)","provider":"Hugging Face","tuned_by":"tuned_by","short_description":"An encoder decoder model based on the T5 architecture and instruction-tuned using the Fine-tuned LAnguage Net.","long_description":"flan-ul2 (20B) is an encoder decoder model based on the T5 architecture and instruction-tuned using the Fine-tuned LAnguage Net (FLAN).","limits":{"lite":{"call_time":"3S","max_input_tokens":200,"max_output_tokens":1000}},"task_ids":["task_ids"],"tasks":[{"id":"summarization","ratings":{"cost":2,"quality":3},"benchmarks":[{"type":"academic","description":"MultiLingual Summarization dataset with 1.5M+ article/summary pairs across five languages. Evaluated using rougeL with 5 shots.","language":"German","dataset":{"name":"mlsum.de"},"prompt":{"number_of_shots":5},"metrics":[{"name":"rougeL","value":0.5197}]}],"tags":["tags"]}],"input_tier":"class_1","output_tier":"class_1","source":"Hugging Face","min_shot_size":10,"number_params":"20b","model_limits":{"max_sequence_length":4096,"training_data_max_records":1024},"lifecycle":[{"id":"available","label":"label","start_date":"2023-07-23","alternative_model_ids":["alternative_model_ids"],"url":"url"}],"training_parameters":{"init_method":{"supported":["supported"],"default":"random"},"init_text":{"default":"text"},"num_virtual_tokens":{"supported":[9],"default":100},"num_epochs":{"default":20,"min":1,"max":50},"verbalizer":{"default":"Input: {{input}} Output:"},"batch_size":{"default":16,"min":1,"max":16},"max_input_tokens":{"default":256,"min":1,"max":1024},"max_output_tokens":{"default":128,"min":1,"max":256},"torch_dtype":{"default":"bfloat16"},"accumulate_steps":{"default":128,"min":1,"max":128},"learning_rate":{"default":0.3,"min":0.01,"max":0.5}},"versions":[{"version":"1.1.0","available_date":"2023-08-23"}],"tech_preview":false}]}';
 
       beforeEach(() => {
         unmock_createRequest();
@@ -1180,6 +1210,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const params = {
           limit: 50,
           filters: 'modelid_ibm/granite-13b-instruct-v2',
+          techPreview: false,
         };
         const allResults = [];
         const pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
@@ -1196,6 +1227,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const params = {
           limit: 50,
           filters: 'modelid_ibm/granite-13b-instruct-v2',
+          techPreview: false,
         };
         const pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
         const allResults = await pager.getAll();
@@ -1674,7 +1706,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const taskIds = ['generation'];
         const governanceTracked = true;
         const modelVersion = wxPromptPatchModelVersionModel;
-        const promptVariable = { 'key1': { anyKey: 'anyValue' } };
+        const promptVariables = { 'key1': { anyKey: 'anyValue' } };
         const inputMode = 'structured';
         const projectId = 'testString';
         const spaceId = 'testString';
@@ -1687,7 +1719,7 @@ describe('WatsonxAiMlVml_v1', () => {
           taskIds,
           governanceTracked,
           modelVersion,
-          promptVariable,
+          promptVariables,
           inputMode,
           projectId,
           spaceId,
@@ -1714,7 +1746,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.task_ids).toEqual(taskIds);
         expect(mockRequestOptions.body.governance_tracked).toEqual(governanceTracked);
         expect(mockRequestOptions.body.model_version).toEqual(modelVersion);
-        expect(mockRequestOptions.body.prompt_variable).toEqual(promptVariable);
+        expect(mockRequestOptions.body.prompt_variables).toEqual(promptVariables);
         expect(mockRequestOptions.body.input_mode).toEqual(inputMode);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -2073,13 +2105,13 @@ describe('WatsonxAiMlVml_v1', () => {
         // Construct the params object for operation getPromptInput
         const promptId = 'testString';
         const input = 'Some text with variables.';
-        const promptVariable = { 'key1': 'var1' };
+        const promptVariables = { 'key1': 'var1' };
         const spaceId = 'testString';
         const projectId = 'testString';
         const getPromptInputParams = {
           promptId,
           input,
-          promptVariable,
+          promptVariables,
           spaceId,
           projectId,
         };
@@ -2099,7 +2131,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         expect(mockRequestOptions.body.input).toEqual(input);
-        expect(mockRequestOptions.body.prompt_variable).toEqual(promptVariable);
+        expect(mockRequestOptions.body.prompt_variables).toEqual(promptVariables);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.prompt_id).toEqual(promptId);
@@ -3471,6 +3503,382 @@ describe('WatsonxAiMlVml_v1', () => {
     });
   });
 
+  describe('textChat', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // TextChatFunctionCall
+      const textChatFunctionCallModel = {
+        name: 'testString',
+        arguments: 'testString',
+      };
+
+      // TextChatToolCall
+      const textChatToolCallModel = {
+        id: 'testString',
+        type: 'function',
+        function: textChatFunctionCallModel,
+      };
+
+      // TextChatMessagesTextChatMessageAssistant
+      const textChatMessagesModel = {
+        role: 'TextChatMessageAssistant',
+        content: 'You are a helpful assistant.',
+        name: 'testString',
+        refusal: 'testString',
+        tool_calls: [textChatToolCallModel],
+      };
+
+      // TextChatParameterFunction
+      const textChatParameterFunctionModel = {
+        name: 'testString',
+        description: 'testString',
+        parameters: { anyKey: 'anyValue' },
+      };
+
+      // TextChatParameterTools
+      const textChatParameterToolsModel = {
+        type: 'function',
+        function: textChatParameterFunctionModel,
+      };
+
+      // TextChatToolFunction
+      const textChatToolFunctionModel = {
+        name: 'testString',
+      };
+
+      // TextChatToolChoiceTool
+      const textChatToolChoiceToolModel = {
+        type: 'function',
+        function: textChatToolFunctionModel,
+      };
+
+      // TextChatResponseFormat
+      const textChatResponseFormatModel = {
+        type: 'json_object',
+      };
+
+      function __textChatTest() {
+        // Construct the params object for operation textChat
+        const modelId = 'meta-llama/llama-3-8b-instruct';
+        const messages = [textChatMessagesModel];
+        const spaceId = 'testString';
+        const projectId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const tools = [textChatParameterToolsModel];
+        const toolChoiceOption = 'none';
+        const toolChoice = textChatToolChoiceToolModel;
+        const frequencyPenalty = 0;
+        const logprobs = false;
+        const topLogprobs = 0;
+        const maxTokens = 100;
+        const n = 1;
+        const presencePenalty = 0;
+        const responseFormat = textChatResponseFormatModel;
+        const temperature = 0;
+        const topP = 1;
+        const timeLimit = 1000;
+        const textChatParams = {
+          modelId,
+          messages,
+          spaceId,
+          projectId,
+          tools,
+          toolChoiceOption,
+          toolChoice,
+          frequencyPenalty,
+          logprobs,
+          topLogprobs,
+          maxTokens,
+          n,
+          presencePenalty,
+          responseFormat,
+          temperature,
+          topP,
+          timeLimit,
+        };
+
+        const textChatResult = watsonxAiMlService.textChat(textChatParams);
+
+        // all methods should return a Promise
+        expectToBePromise(textChatResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/text/chat', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.model_id).toEqual(modelId);
+        expect(mockRequestOptions.body.messages).toEqual(messages);
+        expect(mockRequestOptions.body.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.body.project_id).toEqual(projectId);
+        expect(mockRequestOptions.body.tools).toEqual(tools);
+        expect(mockRequestOptions.body.tool_choice_option).toEqual(toolChoiceOption);
+        expect(mockRequestOptions.body.tool_choice).toEqual(toolChoice);
+        expect(mockRequestOptions.body.frequency_penalty).toEqual(frequencyPenalty);
+        expect(mockRequestOptions.body.logprobs).toEqual(logprobs);
+        expect(mockRequestOptions.body.top_logprobs).toEqual(topLogprobs);
+        expect(mockRequestOptions.body.max_tokens).toEqual(maxTokens);
+        expect(mockRequestOptions.body.n).toEqual(n);
+        expect(mockRequestOptions.body.presence_penalty).toEqual(presencePenalty);
+        expect(mockRequestOptions.body.response_format).toEqual(responseFormat);
+        expect(mockRequestOptions.body.temperature).toEqual(temperature);
+        expect(mockRequestOptions.body.top_p).toEqual(topP);
+        expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __textChatTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __textChatTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __textChatTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const modelId = 'meta-llama/llama-3-8b-instruct';
+        const messages = [textChatMessagesModel];
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const textChatParams = {
+          modelId,
+          messages,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.textChat(textChatParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.textChat({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.textChat();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('textChatStream', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // TextChatFunctionCall
+      const textChatFunctionCallModel = {
+        name: 'testString',
+        arguments: 'testString',
+      };
+
+      // TextChatToolCall
+      const textChatToolCallModel = {
+        id: 'testString',
+        type: 'function',
+        function: textChatFunctionCallModel,
+      };
+
+      // TextChatMessagesTextChatMessageAssistant
+      const textChatMessagesModel = {
+        role: 'TextChatMessageAssistant',
+        content: 'testString',
+        name: 'testString',
+        refusal: 'testString',
+        tool_calls: [textChatToolCallModel],
+      };
+
+      // TextChatParameterFunction
+      const textChatParameterFunctionModel = {
+        name: 'testString',
+        description: 'testString',
+        parameters: { anyKey: 'anyValue' },
+      };
+
+      // TextChatParameterTools
+      const textChatParameterToolsModel = {
+        type: 'function',
+        function: textChatParameterFunctionModel,
+      };
+
+      // TextChatToolFunction
+      const textChatToolFunctionModel = {
+        name: 'testString',
+      };
+
+      // TextChatToolChoiceTool
+      const textChatToolChoiceToolModel = {
+        type: 'function',
+        function: textChatToolFunctionModel,
+      };
+
+      // TextChatResponseFormat
+      const textChatResponseFormatModel = {
+        type: 'json_object',
+      };
+
+      function __textChatStreamTest() {
+        // Construct the params object for operation textChatStream
+        const modelId = 'testString';
+        const messages = [textChatMessagesModel];
+        const spaceId = '3fc54cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
+        const tools = [textChatParameterToolsModel];
+        const toolChoiceOption = 'none';
+        const toolChoice = textChatToolChoiceToolModel;
+        const frequencyPenalty = 0;
+        const logprobs = false;
+        const topLogprobs = 0;
+        const maxTokens = 1024;
+        const n = 1;
+        const presencePenalty = 0;
+        const responseFormat = textChatResponseFormatModel;
+        const temperature = 1;
+        const topP = 1;
+        const timeLimit = 600000;
+        const textChatStreamParams = {
+          modelId,
+          messages,
+          spaceId,
+          projectId,
+          tools,
+          toolChoiceOption,
+          toolChoice,
+          frequencyPenalty,
+          logprobs,
+          topLogprobs,
+          maxTokens,
+          n,
+          presencePenalty,
+          responseFormat,
+          temperature,
+          topP,
+          timeLimit,
+        };
+        createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
+        const textChatStreamResult = watsonxAiMlService.textChatStream(textChatStreamParams);
+
+        // all methods should return a Promise
+        expectToBePromise(textChatStreamResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/text/chat_stream', 'POST');
+        const expectedAccept = 'text/event-stream';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.model_id).toEqual(modelId);
+        expect(mockRequestOptions.body.messages).toEqual(messages);
+        expect(mockRequestOptions.body.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.body.project_id).toEqual(projectId);
+        expect(mockRequestOptions.body.tools).toEqual(tools);
+        expect(mockRequestOptions.body.tool_choice_option).toEqual(toolChoiceOption);
+        expect(mockRequestOptions.body.tool_choice).toEqual(toolChoice);
+        expect(mockRequestOptions.body.frequency_penalty).toEqual(frequencyPenalty);
+        expect(mockRequestOptions.body.logprobs).toEqual(logprobs);
+        expect(mockRequestOptions.body.top_logprobs).toEqual(topLogprobs);
+        expect(mockRequestOptions.body.max_tokens).toEqual(maxTokens);
+        expect(mockRequestOptions.body.n).toEqual(n);
+        expect(mockRequestOptions.body.presence_penalty).toEqual(presencePenalty);
+        expect(mockRequestOptions.body.response_format).toEqual(responseFormat);
+        expect(mockRequestOptions.body.temperature).toEqual(temperature);
+        expect(mockRequestOptions.body.top_p).toEqual(topP);
+        expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __textChatStreamTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __textChatStreamTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __textChatStreamTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const modelId = 'testString';
+        const messages = [textChatMessagesModel];
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const textChatStreamParams = {
+          modelId,
+          messages,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.textChatStream(textChatStreamParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.textChatStream({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.textChatStream();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
   describe('embedText', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
@@ -3482,7 +3890,7 @@ describe('WatsonxAiMlVml_v1', () => {
 
       // EmbeddingParameters
       const embeddingParametersModel = {
-        truncate_input_tokens: 0,
+        truncate_input_tokens: 1,
         return_options: embeddingReturnOptionsModel,
       };
 
@@ -3603,20 +4011,8 @@ describe('WatsonxAiMlVml_v1', () => {
         top_n_tokens: 2,
       };
 
-      // ChatHistoryTextGenProperties
-      const chatHistoryTextGenPropertiesModel = {
-        is_question: true,
-        content: 'testString',
-      };
-
-      // ChatTextGenProperties
-      const chatTextGenPropertiesModel = {
-        history: [chatHistoryTextGenPropertiesModel],
-        context: 'testString',
-      };
-
-      // TextGenRequestParameters
-      const textGenRequestParametersModel = {
+      // TextGenParameters
+      const textGenParametersModel = {
         decoding_method: 'greedy',
         length_penalty: textGenLengthPenaltyModel,
         max_new_tokens: 30,
@@ -3628,10 +4024,9 @@ describe('WatsonxAiMlVml_v1', () => {
         top_k: 50,
         top_p: 0.5,
         repetition_penalty: 1.5,
-        truncate_input_tokens: 0,
+        truncate_input_tokens: 1,
         return_options: returnOptionPropertiesModel,
         include_stop_sequence: true,
-        chat: chatTextGenPropertiesModel,
       };
 
       // TextModeration
@@ -3654,10 +4049,16 @@ describe('WatsonxAiMlVml_v1', () => {
         foo: 'testString',
       };
 
+      // TextModerationWithoutThreshold
+      const textModerationWithoutThresholdModel = {
+        enabled: true,
+        foo: 'testString',
+      };
+
       // ModerationPiiProperties
       const moderationPiiPropertiesModel = {
-        input: textModerationModel,
-        output: textModerationModel,
+        input: textModerationWithoutThresholdModel,
+        output: textModerationWithoutThresholdModel,
         mask: maskPropertiesModel,
         foo: 'testString',
       };
@@ -3690,7 +4091,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const modelId = 'google/flan-ul2';
         const spaceId = 'testString';
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
-        const parameters = textGenRequestParametersModel;
+        const parameters = textGenParametersModel;
         const moderations = moderationsModel;
         const generateTextParams = {
           input,
@@ -3805,20 +4206,8 @@ describe('WatsonxAiMlVml_v1', () => {
         top_n_tokens: 2,
       };
 
-      // ChatHistoryTextGenProperties
-      const chatHistoryTextGenPropertiesModel = {
-        is_question: true,
-        content: 'testString',
-      };
-
-      // ChatTextGenProperties
-      const chatTextGenPropertiesModel = {
-        history: [chatHistoryTextGenPropertiesModel],
-        context: 'testString',
-      };
-
-      // TextGenRequestParameters
-      const textGenRequestParametersModel = {
+      // TextGenParameters
+      const textGenParametersModel = {
         decoding_method: 'greedy',
         length_penalty: textGenLengthPenaltyModel,
         max_new_tokens: 30,
@@ -3830,10 +4219,9 @@ describe('WatsonxAiMlVml_v1', () => {
         top_k: 50,
         top_p: 0.5,
         repetition_penalty: 1.5,
-        truncate_input_tokens: 0,
+        truncate_input_tokens: 1,
         return_options: returnOptionPropertiesModel,
         include_stop_sequence: true,
-        chat: chatTextGenPropertiesModel,
       };
 
       // TextModeration
@@ -3856,10 +4244,16 @@ describe('WatsonxAiMlVml_v1', () => {
         foo: 'testString',
       };
 
+      // TextModerationWithoutThreshold
+      const textModerationWithoutThresholdModel = {
+        enabled: true,
+        foo: 'testString',
+      };
+
       // ModerationPiiProperties
       const moderationPiiPropertiesModel = {
-        input: textModerationModel,
-        output: textModerationModel,
+        input: textModerationWithoutThresholdModel,
+        output: textModerationWithoutThresholdModel,
         mask: maskPropertiesModel,
         foo: 'testString',
       };
@@ -3892,9 +4286,8 @@ describe('WatsonxAiMlVml_v1', () => {
         const modelId = 'google/flan-ul2';
         const spaceId = 'testString';
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
-        const parameters = textGenRequestParametersModel;
+        const parameters = textGenParametersModel;
         const moderations = moderationsModel;
-        const accept = 'text/event-stream';
         const generateTextStreamParams = {
           input,
           modelId,
@@ -3916,7 +4309,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const mockRequestOptions = getOptions(createRequestMock);
 
         checkUrlAndMethod(mockRequestOptions, '/ml/v1/text/generation_stream', 'POST');
-        const expectedAccept = accept;
+        const expectedAccept = 'text/event-stream';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         expect(mockRequestOptions.body.input).toEqual(input);
@@ -3926,6 +4319,27 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.moderations).toEqual(moderations);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+      }
+
+      function __generateTextStreamFlagTest(returnObject) {
+        const input =
+          'Generate a marketing email advertising a new sale with the following characteristics:\n\nCompany: Swimwear Unlimited\n\nOffer Keywords: {Select customers only, mid-summer fun, swimwear sale}\n\nOffer End Date: July 15\n\nAdvertisement Tone: Exciting!\n\nInclude no URLs.\n\nInclude no telephone numbers.\n';
+        const modelId = 'google/flan-ul2';
+        const spaceId = 'testString';
+        const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
+        const parameters = textGenParametersModel;
+        const moderations = moderationsModel;
+        const generateTextStreamParams = {
+          input,
+          modelId,
+          spaceId,
+          projectId,
+          parameters,
+          moderations,
+          returnObject,
+        };
+        createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
+        return watsonxAiMlService.generateTextStream(generateTextStreamParams);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -3956,12 +4370,21 @@ describe('WatsonxAiMlVml_v1', () => {
           input,
           modelId,
           headers: {
+            Accept: userAccept,
             'Content-Type': userContentType,
           },
         };
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
         watsonxAiMlService.generateTextStream(generateTextStreamParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+
+      test('should return correct values depending on flag', async () => {
+        const textStreamString = await __generateTextStreamFlagTest(false);
+        expect(textStreamString instanceof LineTransformStream).toBe(true);
+
+        const textStreamObject = await __generateTextStreamFlagTest(true);
+        expect(textStreamObject instanceof ObjectTransformStream).toBe(true);
       });
     });
 
@@ -4325,10 +4748,11 @@ describe('WatsonxAiMlVml_v1', () => {
 
       test('should prioritize user-given headers', () => {
         // parameters
-        const userAccept = 'application/json';
+        const userAccept = 'fake/accept';
         const userContentType = 'fake/contentType';
         const listTrainingsParams = {
           headers: {
+            Accept: userAccept,
             'Content-Type': userContentType,
           },
         };

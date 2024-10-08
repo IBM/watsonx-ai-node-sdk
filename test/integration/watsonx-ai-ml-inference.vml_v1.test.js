@@ -52,9 +52,11 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     watsonxAiMlService.enableRetries();
   });
 
-  test('listFoundationModelSpecs', async () => {
+  test('listFoundationModelSpecs()', async () => {
     const params = {
-      limit: 5,
+      limit: 50,
+      filters: 'modelid_ibm/granite-13b-instruct-v2',
+      techPreview: false,
     };
 
     const res = await watsonxAiMlService.listFoundationModelSpecs(params);
@@ -63,10 +65,11 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('listFoundationModelSpecs via FoundationModelSpecsPager', async () => {
+  test('listFoundationModelSpecs() via FoundationModelSpecsPager', async () => {
     const params = {
       limit: 50,
       filters: 'modelid_ibm/granite-13b-instruct-v2',
+      techPreview: false,
     };
 
     const allResults = [];
@@ -87,9 +90,9 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
   });
 
-  test('listFoundationModelTasks', async () => {
+  test('listFoundationModelTasks()', async () => {
     const params = {
-      limit: 5,
+      limit: 50,
     };
 
     const res = await watsonxAiMlService.listFoundationModelTasks(params);
@@ -98,9 +101,9 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('listFoundationModelTasks via FoundationModelTasksPager', async () => {
+  test('listFoundationModelTasks() via FoundationModelTasksPager', async () => {
     const params = {
-      limit: 5,
+      limit: 50,
     };
 
     const allResults = [];
@@ -378,5 +381,38 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
+  });
+
+  test('textChat', async () => {
+    const res = await watsonxAiMlService.textChat({
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful assistant.',
+        },
+      ],
+      modelId: 'mistralai/mistral-large',
+      projectId,
+    });
+
+    expect(res).toBeDefined();
+    expect(res.status).toBe(200);
+    expect(res.result).toBeDefined();
+  });
+
+  test('textChatStream', async () => {
+    const res = await watsonxAiMlService.textChatStream({
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful assistant.',
+        },
+      ],
+      modelId: 'mistralai/mistral-large',
+      projectId,
+    });
+
+    expect(res).toBeDefined();
+    expect(res).toBeInstanceOf(Readable);
   });
 });

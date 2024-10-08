@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+/* eslint-disable max-classes-per-file */
 import os = require('os');
-
-import { Readable } from 'stream';
+import { Readable as Rdb, Transform, TransformCallback } from 'stream';
 
 const pkg = require('../package.json');
 
@@ -59,35 +59,88 @@ export function getSdkHeaders(
   return headers;
 }
 
-export class LineTransformStream extends TransformStream {
-  private buffer: string;
+const stringToObj = (chunk: string[]) => {
+  const obj = {};
+  chunk.forEach((line) => {
+    const index = line.indexOf(': ');
+    const key = line.substring(0, index);
+    const value = line.substring(index + 2);
+    if (key === 'id') {
+      obj[key] = Number(value);
+    } else if (key === 'event') {
+      obj[key] = String(value);
+    } else if (key === 'data') {
+      obj[key] = JSON.parse(`${value}`);
+    }
+  });
+
+  return Object.keys(obj).length > 0 ? obj : null;
+};
+
+export class StreamTransform extends Transform {
+  buffer: string;
 
   constructor() {
-    super({
-      transform: (chunk, controller) => this.transform(chunk, controller),
-      flush: (controller) => this.flush(controller),
-    });
+    super({ readableObjectMode: true, writableObjectMode: false });
     this.buffer = '';
   }
-
-  transform(chunk, controller) {
-    this.buffer += chunk;
-    const lines = this.buffer.split('\n');
-    this.buffer = lines.pop();
-
-    lines.forEach((line) => controller.enqueue(line));
+}
+export class ObjectTransformStream extends StreamTransform {
+  _transform(chunk: any, _encoding: string, callback: TransformCallback): void {
+    this.buffer += chunk.toString();
+    const parts = this.buffer.split('\n');
+    if (parts.indexOf('') !== parts.length - 2 && parts.indexOf('') !== -1) {
+      while (parts.length > 0) {
+        const newObj = parts.splice(0, parts.indexOf('') + 1);
+        const obj = stringToObj(newObj);
+        if (obj) this.push(obj);
+      }
+      this.buffer = '';
+    } else if (parts[parts.length - 1] !== '') {
+      this.buffer = parts.join('\n');
+    } else {
+      const obj = stringToObj(parts);
+      this.buffer = '';
+      if (obj) this.push(obj);
+    }
+    callback();
   }
 
-  flush(controller) {
+  _flush(callback: TransformCallback): void {
     if (this.buffer) {
-      controller.enqueue(this.buffer);
+      const parts = this.buffer.split('\n');
+      const obj = stringToObj(parts);
+      this.push(obj);
     }
+    callback();
   }
 }
 
-export function transformStream(apiResponse: any) {
-  const readableStream: AsyncIterable<string> = Readable.from(apiResponse.result, {
-    encoding: 'utf8',
-  });
+export async function transformStreamToObjectStream<T>(apiResponse: any) {
+  const readableStream: AsyncIterable<T> = Rdb.from(apiResponse.result).pipe(
+    new ObjectTransformStream()
+  );
+  return readableStream;
+}
+
+export class LineTransformStream extends StreamTransform {
+  _transform(chunk: any, _encoding: string, callback: TransformCallback) {
+    this.buffer += chunk.toString();
+    const lines = this.buffer.split('\n');
+    this.buffer = lines.pop();
+    lines.forEach((line) => this.push(line));
+    callback();
+  }
+
+  _flush(callback: TransformCallback) {
+    if (this.buffer) {
+      this.push(this.buffer);
+    }
+    callback();
+  }
+}
+
+export async function transformStreamToStringStream<T>(apiResponse: any) {
+  const readableStream = Rdb.from(apiResponse.result).pipe(new LineTransformStream());
   return readableStream;
 }

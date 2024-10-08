@@ -1,14 +1,14 @@
 /**
  * (C) Copyright IBM Corp. 2024.
  *
- * Licensed under the Apache License, Version 2.0 (the 'License');
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -19,7 +19,7 @@
 
 const { Readable } = require('stream');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
-const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1.js');
+const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
 
 // testcase timeout value (200s).
@@ -72,83 +72,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     watsonxAiMlService.enableRetries();
   });
 
-  test('listFoundationModelSpecs', async () => {
-    const params = {
-      limit,
-      filters: 'modelid_ibm/granite-13b-instruct-v2',
-    };
-
-    const res = await watsonxAiMlService.listFoundationModelSpecs(params);
-    expect(res).toBeDefined();
-    expect(res.status).toBe(200);
-    expect(res.result).toBeDefined();
-  });
-
-  test('listFoundationModelSpecs via FoundationModelSpecsPager', async () => {
-    const params = {
-      limit,
-      filters: 'modelid_ibm/granite-13b-instruct-v2',
-    };
-
-    const allResults = [];
-
-    // Test getNext().
-    let pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
-    while (pager.hasNext()) {
-      const nextPage = await pager.getNext();
-      expect(nextPage).not.toBeNull();
-      allResults.push(...nextPage);
-    }
-
-    // Test getAll().
-    pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
-    const allItems = await pager.getAll();
-    expect(allItems).not.toBeNull();
-    expect(allItems).toHaveLength(allResults.length);
-    console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
-  });
-
-  test('listFoundationModelTasks', async () => {
-    const params = {
-      limit,
-    };
-
-    const res = await watsonxAiMlService.listFoundationModelTasks(params);
-    expect(res).toBeDefined();
-    expect(res.status).toBe(200);
-    expect(res.result).toBeDefined();
-  });
-
-  test('listFoundationModelTasks via FoundationModelTasksPager', async () => {
-    const params = {
-      limit,
-    };
-
-    const allResults = [];
-
-    // Test getNext().
-    let pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAiMlService, params);
-    while (pager.hasNext()) {
-      const nextPage = await pager.getNext();
-      expect(nextPage).not.toBeNull();
-      allResults.push(...nextPage);
-    }
-
-    // Test getAll().
-    pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAiMlService, params);
-    const allItems = await pager.getAll();
-    expect(allItems).not.toBeNull();
-    expect(allItems).toHaveLength(allResults.length);
-    console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
-  });
-
   test('createTraining()', async () => {
     // Request models needed by this operation.
-
-    // DataConnection
-    // const dataConnectionModel = {
-    //  foo: 'testString',
-    // };
 
     // ObjectLocation
     const objectLocationModel = {
@@ -179,20 +104,11 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       init_text: 'testString',
     };
 
-    // DataSchema
-    // const dataSchemaModel = {
-    // id: 't1',
-    // name: 'Tasks',
-    // fields: [{ name: 'duration', type: 'number' }],
-    // type: 'struct',
-    // };
     const href = `/v2/assets/${trainingAssetId}?project_id=${projectId}`;
 
     // DataConnectionReference
     const dataConnectionReferenceModel = {
       id: 'watson_emotion.jsonl',
-      // connection: dataConnectionModel,
-      // schema: dataSchemaModel,
       type: 'data_asset',
       location: {
         href,
@@ -303,15 +219,29 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       parameters: onlineDeploymentParametersModel,
     };
 
+    // SimpleRel
+    const simpleRelModel = {
+      id: '4cedab6d-e8e4-4214-b81a-2ddb122db2ab',
+    };
+
+    // HardwareSpec
+    const hardwareSpecModel = {
+      id: '4cedab6d-e8e4-4214-b81a-2ddb122db2ab',
+      rev: '2',
+      name: 'testString',
+      num_nodes: 2,
+    };
+
+    // HardwareRequest
+    const hardwareRequestModel = {
+      size: 'gpu_s',
+      num_nodes: 5,
+    };
+
     // Rel
     const relModel = {
       id: modelId,
     };
-
-    // SimpleRel
-    // const simpleRelModel = {
-    //  id: '4cedab6d-e8e4-4214-b81a-2ddb122db2ab',
-    // };
 
     const params = {
       name: 'text_classification',
@@ -320,9 +250,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       description: 'testString',
       tags: ['testString'],
       custom: { anyKey: 'anyValue' },
+      hardwareRequest: hardwareRequestModel,
       asset: relModel,
-      // promptTemplate: simpleRelModel,
-      // baseModelId: 'testString',
     };
 
     const res = await watsonxAiMlService.createDeployment(params);
@@ -411,7 +340,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       stop_sequences: ['fail'],
       time_limit: 600000,
       repetition_penalty: 1.5,
-      truncate_input_tokens: 0,
+      truncate_input_tokens: 1,
       return_options: returnOptionPropertiesModel,
       include_stop_sequence: true,
       prompt_variables: {
@@ -441,10 +370,16 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       foo: 'testString',
     };
 
+    // TextModerationWithoutThreshold
+    const textModerationWithoutThresholdModel = {
+      enabled: true,
+      foo: 'testString',
+    };
+
     // ModerationPiiProperties
     const moderationPiiPropertiesModel = {
-      input: textModerationModel,
-      output: textModerationModel,
+      input: textModerationWithoutThresholdModel,
+      output: textModerationWithoutThresholdModel,
       mask: maskPropertiesModel,
       foo: 'testString',
     };
@@ -516,7 +451,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       stop_sequences: ['fail'],
       time_limit: 600000,
       repetition_penalty: 1.5,
-      truncate_input_tokens: 0,
+      truncate_input_tokens: 1,
       return_options: returnOptionPropertiesModel,
       include_stop_sequence: true,
       typical_p: 0.5,
@@ -547,10 +482,16 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       foo: 'testString',
     };
 
+    // TextModerationWithoutThreshold
+    const textModerationWithoutThresholdModel = {
+      enabled: true,
+      foo: 'testString',
+    };
+
     // ModerationPiiProperties
     const moderationPiiPropertiesModel = {
-      input: textModerationModel,
-      output: textModerationModel,
+      input: textModerationWithoutThresholdModel,
+      output: textModerationWithoutThresholdModel,
       mask: maskPropertiesModel,
       foo: 'testString',
     };
@@ -648,11 +589,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     const promptWithExternalModel = {
       input: [['testString', '']],
       model_id: 'ibm/granite-13b-chat-v2',
-      // model_parameters: promptWithExternalModelParametersModel,
       data: promptDataModel,
-      // system_prompt: 'testString',
-      // chat_items: [chatItemModel],
-      // external_information: externalInformationModel,
     };
 
     // PromptLock
@@ -660,18 +597,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       locked: true,
     };
 
-    // WxPromptPostModelVersion
-    // const wxPromptPostModelVersionModel = {
-    //  number: '2.0.0-rc.7',
-    //  tag: 'tag',
-    //  description: 'Description of the model version.',
-    // };
-
     const params = {
       name: 'My Prompt',
       prompt: promptWithExternalModel,
       description: 'My First Prompt',
-      // createdAt: 1711504485261,
       taskIds: ['testString'],
       lock: promptLockModel,
       // modelVersion: wxPromptPostModelVersionModel,
@@ -722,7 +651,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       instruction: 'testString',
       input_prefix: 'testString',
       output_prefix: 'testString',
-      // examples: [],
     };
 
     // ChatItem
@@ -755,11 +683,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       name: 'My Prompt',
       prompt: promptModel,
       description: 'My Updated First Prompt',
-      // taskIds: ['generation'],
-      // governanceTracked: true,
       // modelVersion: wxPromptPatchModelVersionModel,
       // promptVariable: { 'key1': { anyKey: 'anyValue' } },
-      // inputMode: 'structured',
       projectId,
     };
 
@@ -798,8 +723,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   test('getPromptInput', async () => {
     const params = {
       promptId,
-      // input: 'Some text with variables.',
-      // promptVariable: { 'key1': 'var1' },
       projectId,
     };
 
@@ -869,21 +792,12 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       output_prefix: 'testString',
     };
 
-    // ChatItem
-    // const chatItemModel = {
-    //  type: 'question',
-    //  content: 'Some text',
-    //  status: 'ready',
-    //  timestamp: 1711504485261,
-    // };
-
     // Prompt
     const promptModel = {
       model_id: 'ibm/granite-13b-chat-v2',
       // model_parameters: promptModelParametersModel,
       data: promptDataModel,
       // system_prompt: 'testString',
-      // chat_items: [chatItemModel],
     };
 
     // WxPromptSessionEntry
@@ -893,7 +807,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       // prompt_variables: { 'key1': { anyKey: 'anyValue' } },
       // is_template: true,
       created_at: 1711504485261,
-      // input_mode: 'structured',
       prompt: promptModel,
     };
 
@@ -974,7 +887,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
     // Prompt
     const promptModel = {
-      // input: [],
       model_id: 'ibm/granite-13b-chat-v2',
       // model_parameters: promptModelParametersModel,
       data: promptDataModel,
@@ -1020,8 +932,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     const params = {
       sessionId,
       projectId,
-      // bookmark: 'testString',
-      // limit: 'testString',
     };
 
     const res = await watsonxAiMlService.listPromptSessionEntries(params);

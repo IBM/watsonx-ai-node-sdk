@@ -6,18 +6,37 @@ group: focal
 
 jobs:
   include:
-  - node_js: 18
+  - stage: "Unit tests"
+    node_js: 18
     env: TEST_SUITE=unit
   - node_js: 20
     env: TEST_SUITE=unit
   - node_js: 22
     env: TEST_SUITE=unit
-  - node_js: 20
+  - stage: "Integration tests"
+    node_js: 20
     env: TEST_SUITE=integration
+  - stage: "Security scans"
+    name: "Secrets scanning"
+    language: python
+    python: 3.10
+    before_install:
+      - pip install --upgrade "git+https://github.com/ibm/detect-secrets.git@master#egg=detect-secrets"
+      - detect-secrets --version
+    script:
+      - detect-secrets audit .secrets.baseline
+    after_failure:
+      - echo "For more details refer to https://w3.ibm.com/w3publisher/detect-secrets"
+  - name: "Vulnerability scanning"
+    node_js: 20
+    before_install:
+      - node --version
+      - npm --version
+    script: npm audit --audit-level moderate
+  
 
 before_install:
-  - wget -qO - https://package.perforce.com/perforce.pubkey | sudo apt-key add -
-  - npm i -g npm@8
+  - node --version
   - npm --version
   - ./scripts/cicd/prepare-integration-test-config.sh
 

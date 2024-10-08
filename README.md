@@ -1,7 +1,7 @@
+[![Build Status](https://app.travis-ci.com/IBM/watsonx-ai-node-sdk.svg?branch=main)](https://app.travis-ci.com/IBM/watsonx-ai-node-sdk)
+[![npm-version](https://img.shields.io/npm/v/@ibm-cloud/watsonx-ai.svg)](https://www.npmjs.com/package/@ibm-cloud/watsonx-ai)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-<!--
-[![npm-version](https://img.shields.io/npm/v/IBM/platform-services-node-sdk.svg)](https://www.npmjs.com/package/ibm-platform-services)
--->
+
 # IBM watsonx.ai Node.js SDK
 Node.js client library to interact with [IBM watsonx.ai service](https://dataplatform.cloud.ibm.com/docs/content/wsj/getting-started/overview-wx.html?context=wx).
 
@@ -20,13 +20,21 @@ Node.js client library to interact with [IBM watsonx.ai service](https://datapla
 
 <!-- toc -->
 
-- [IBM watsonx.ai Node.js SDK](#ibm-watsonx-ai-sdk)
+- [IBM watsonx.ai Node.js SDK](#ibm-watsonxai-nodejs-sdk)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Using the SDK](#using-the-sdk)
+    - [With environment variables](#with-environment-variables)
+      - [IAM authentication](#iam-authentication)
+      - [Bearer token authentication](#bearer-token-authentication)
+      - [CP4D authentication](#cp4d-authentication)
+    - [With an external credentials file](#with-an-external-credentials-file)
+    - [With programmatic approach](#with-programmatic-approach)
   - [Code examples](#code-examples)
+    - [Basic example - text generation/inference](#basic-example---text-generationinference)
+    - [More examples](#more-examples)
   - [Questions](#questions)
   - [Issues](#issues)
   - [Open source @ IBM](#open-source--ibm)
@@ -89,6 +97,11 @@ WATSONX_AI_USERNAME=<YOUR_USERNAME>
 WATSONX_AI_PASSWORD=<YOUR_PASSWORD>
 WATSONX_AI_URL=url
 ```
+If any troubles regarding SSL verification appear, such as "Error: self-signed certificate in certificate chain", please try setting up enviromental virables as below:
+```sh
+WATSONX_AI_DISABLE_SSL=true
+WATSONX_AI_AUTH_DISABLE_SSL=true
+```
 
 ### With an external credentials file
 To use an external configuration file, please see the [general SDK usage information](https://github.com/IBM/ibm-cloud-sdk-common#using-external-configuration) for guidance. Additionally, please see the following template files for:
@@ -119,7 +132,7 @@ const textGenRequestParametersModel = {
 
 const params = {
     input: 'Generate a short greeting for project kick-off meeting.',
-    modelId: 'google/flan-ul2',
+    modelId: 'ibm/granite-13b-chat-v2',
     projectId: '<YOUR_PROJECT_ID>',
     parameters: textGenRequestParametersModel,
 };
