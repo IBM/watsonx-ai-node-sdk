@@ -34,6 +34,7 @@ import {
 import { getAuthenticatorFromEnvironment } from '../auth/utils/get-authenticator-from-environment';
 import {
   getSdkHeaders,
+  ObjectStreamed,
   transformStreamToObjectStream,
   transformStreamToStringStream,
 } from '../lib/common';
@@ -697,7 +698,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * internally. It is recommended not to leave any trailing spaces.
    *
    * ### Response
-   * AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
+   * AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
    * either stream line by line. Output will stream as follow:
    * - id: 1
    * - event: message
@@ -725,7 +726,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @param {boolean} [params.returnObject] - Flag that indicates return type. Set 'true' to return objects.
-   * @returns {Promise<AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>}
+   * @returns {Promise<AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>}
    *
    * @category Deployments
    */
@@ -736,13 +737,11 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
   public async deploymentGenerateTextStream(
     params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams & { returnObject: true }
-  ): Promise<AsyncIterable<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
+  ): Promise<AsyncIterable<ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
 
   public async deploymentGenerateTextStream(
     params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams
-  ): Promise<
-    AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>
-  > {
+  ): Promise<AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>> {
     const _params = { ...params };
     const _requiredParams = ['idOrName'];
     const _validParams = [
@@ -802,9 +801,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
     const apiResponse = await this.createRequest(parameters);
     const stream = _params.returnObject
-      ? transformStreamToObjectStream<
-          WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>
-        >(apiResponse)
+      ? transformStreamToObjectStream<WatsonxAiMlVml_v1.TextGenResponse>(apiResponse)
       : transformStreamToStringStream<string>(apiResponse);
     return stream;
   }
@@ -2480,7 +2477,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * tokens as a stream of events
    *
    * ### Response
-   * AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
+   * AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
    * either stream line by line. Output will stream as follow:
    * - id: 1
    * - event: message
@@ -2552,7 +2549,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * users plan, and on the model being used, there may be an enforced maximum time limit.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @param {boolean} [params.returnObject] - Flag that indicates return type. Set 'true' to return objects.
-   * @returns {Promise<AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>>}
+   * @returns {Promise<AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>>}
    *
    * @category Text Chat
    */
@@ -2563,13 +2560,11 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
   public async textChatStream(
     params: WatsonxAiMlVml_v1.TextChatStreamParams & { returnObject: true }
-  ): Promise<AsyncIterable<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>>;
+  ): Promise<AsyncIterable<ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>>;
 
   public async textChatStream(
     params: WatsonxAiMlVml_v1.TextChatStreamParams
-  ): Promise<
-    AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>
-  > {
+  ): Promise<AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'messages'];
     const _validParams = [
@@ -2634,6 +2629,8 @@ class WatsonxAiMlVml_v1 extends BaseService {
         method: 'POST',
         body,
         qs: query,
+        responseType: 'stream',
+        adapter: 'fetch',
       },
       defaultOptions: {
         ...this.baseOptions,
@@ -2648,9 +2645,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     };
     const apiResponse = await this.createRequest(parameters);
     const stream = _params.returnObject
-      ? transformStreamToObjectStream<
-          WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>
-        >(apiResponse)
+      ? transformStreamToObjectStream<WatsonxAiMlVml_v1.TextChatResponse[]>(apiResponse)
       : transformStreamToStringStream<string>(apiResponse);
     return stream;
   }
@@ -2823,7 +2818,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * tokens as a stream of events.
    *
    * ### Response
-   * AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
+   * AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
    * either stream line by line. Output will stream as follow:
    * - id: 1
    * - event: message
@@ -2860,7 +2855,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @param {boolean} [params.returnObject] - Flag that indicates return type. Set 'true' to return objects.
-   * @returns {Promise<AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>}
+   * @returns {Promise<AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>}
    *
    * @category Text Generation
    */
@@ -2871,13 +2866,11 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
   public async generateTextStream(
     params: WatsonxAiMlVml_v1.TextGenerationStreamParams & { returnObject: true }
-  ): Promise<AsyncIterable<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
+  ): Promise<AsyncIterable<ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
 
   public async generateTextStream(
     params: WatsonxAiMlVml_v1.TextGenerationStreamParams
-  ): Promise<
-    AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>
-  > {
+  ): Promise<AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>> {
     const _params = { ...params };
     const _requiredParams = ['input', 'modelId'];
     const _validParams = [
@@ -2937,9 +2930,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     };
     const apiResponse = await this.createRequest(parameters);
     const stream = _params.returnObject
-      ? transformStreamToObjectStream<
-          WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>
-        >(apiResponse)
+      ? transformStreamToObjectStream<WatsonxAiMlVml_v1.TextGenResponse>(apiResponse)
       : transformStreamToStringStream<string>(apiResponse);
     return stream;
   }
@@ -4208,13 +4199,6 @@ namespace WatsonxAiMlVml_v1 {
     headers?: OutgoingHttpHeaders;
     /* whether to return stream of objects if true or stream of strings if false or undefined */
     returnObject?: boolean;
-  }
-
-  /** Streamed object interface in returnObject mode*/
-  export interface ObjectStreamed<T> {
-    id: number;
-    event: string;
-    data: T;
   }
 
   /** Constants for the `textChatStream` operation. */

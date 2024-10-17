@@ -7,49 +7,40 @@
  * This example may have extended duration (~5 minutes) because of the training time and initialization of the deployment.
  */
 
-/**
- * Use 'import ...' statement if you want to use the sample in the module
- * and comment 'const watsonxAI...' statement
- *
-**/
-
-const { WatsonXAI } = require('@ibm-cloud/watsonx-ai');
-
-// Set projectId
-const projectId = '<PROJECT_ID>';
+import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
+import 'dotenv/config';
 
 process.env.IBM_CREDENTIALS_FILE = './auth/watsonx_ai_ml_vml_v1.env';
+const projectId = process.env.WATSONX_AI_PROJECT_ID;
+const spaceId = process.env.WATSONX_AI_SPACE_ID;
+const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 
 // Service instance
 const watsonxAIService = WatsonXAI.newInstance({
-    version: '2024-05-31',
-    serviceUrl: 'https://us-south.ml.cloud.ibm.com',
+  version: '2024-05-31',
+  serviceUrl,
 });
 
 const getModelId = async (args, retries = 5, delay = 120000) => {
-    for (let i = 0; i < retries; i++) {
-        const result = await watsonxAIService.trainingsGet(args);
-        if (result.result.entity.model_id !== undefined) {
-            return result.result.entity.model_id;
-        }
-        await new Promise(resolve => setTimeout(resolve, delay));
+  for (let i = 0; i < retries; i++) {
+    const result = await watsonxAIService.getTraining(args);
+    if (result.result.entity.model_id !== undefined) {
+      return result.result.entity.model_id;
     }
-    throw new Error('Failed to get a valid response after maximum retries');
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+  throw new Error('Failed to get a valid response after maximum retries');
 };
 
 const waitForDeployment = async (args, retries = 5, delay = 120000) => {
   for (let i = 0; i < retries; i++) {
-   const result = await watsonxAIService.deploymentsGet(args);
-   if (result.result.entity.status.state == 'ready') {
+    const result = await watsonxAIService.getDeployment(args);
+    if (result.result.entity.status.state == 'ready') {
       return;
-   }
-   await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
- throw new Error('Failed to get a valid response after maximum retries');
-};
-
-const textGenRequestParametersModel = {
-    max_new_tokens: 100,
+  throw new Error('Failed to get a valid response after maximum retries');
 };
 
 // ObjectLocation
@@ -62,13 +53,12 @@ const objectLocationModel = {
 const baseModelModel = {
   model_id: 'google/flan-t5-xl',
 };
-
 // DataConnectionReference
 const dataConnectionReferenceModel = {
   type: 'data_asset',
   location: {
-    href: "<location of asset>"
-   },
+    href: `/v2/assets/${trainingAssetId}?project_id=${projectId}`,
+  },
 };
 
 // PromptTuning
@@ -135,56 +125,49 @@ const deploymentTextGenPropertiesModel = {
 
 // OnlineDeploymentParameters
 const onlineDeploymentParametersModel = {
-  serving_name: 'test_deployment_example10',
+  serving_name: 'test_deployment_example',
 };
 
 // OnlineDeployment
 const onlineDeploymentModel = {
   parameters: onlineDeploymentParametersModel,
 };
+console.log('\n\n***** EXAMPLE PROMPT TUNNING - TUNE, DEPLOY, INFER (LONG RUNNING ~5mins) *****');
 
-async function tunePromptAndDeploy() {
+const trainingDetails = await watsonxAIService.createTraining(trainingParams);
+const trainingId = trainingDetails.result.metadata.id;
+// Wait until training has been finished, then save id of the model and use it for deployment
+// This step should take ~3 minutes
+const modelId = await getModelId({ trainingId, projectId });
 
-    const trainingDetails = await watsonxAIService.createTraining(trainingParams)
-    const trainingId = trainingDetails.result.metadata.id;
-    // Wait until training has been finished, then save id of the model and use it for deployment
-    // This step should take ~3 minutes
-    const modelId = await getModelId({trainingId, projectId});
+// Rel
+const relModel = {
+  id: modelId,
+};
+// Deployment parameters
+const deploymentParams = {
+  name: 'text_classification',
+  online: onlineDeploymentModel,
+  projectId,
+  spaceId,
+  description: 'First deployment',
+  tags: ['testString'],
+  custom: { anyKey: 'anyValue' },
+  asset: relModel,
+};
 
-    // Rel
-    const relModel = {
-      id: modelId,
-    }
-    // Deployment parameters
-    const deploymentParams = {
-      name: 'text_classification',
-      online: onlineDeploymentModel,
-      projectId: projectId,
-      description: 'First deployment',
-      tags: ['testString'],
-      custom: { anyKey: 'anyValue' },
-      asset: relModel,
-    };
+const deploymentDetails = await watsonxAIService.createDeployment(deploymentParams);
+const deploymentId = deploymentDetails.result.metadata.id;
+// Wait for deployment to be ready inference
+// This step should take ~2-3 minutes
+await waitForDeployment({ deploymentId, projectId });
 
-    const deploymentDetails = await watsonxAIService.createDeployment(deploymentParams);
-    const deploymentId = deploymentDetails.result.metadata.id;
-    // Wait for deployment to be ready inference
-    // This step should take ~2-3 minutes
-    await waitForDeployment({ deploymentId, projectId });
+const genParams = {
+  idOrName: deploymentId,
+  input: 'Narrative: hi company reported debt paid\nProduct:\n',
+  parameters: deploymentTextGenPropertiesModel,
+};
 
-    const genParams = {
-      idOrName: deploymentId,
-      input: "Narrative: hi company reported debt paid\nProduct:\n",
-      parameters: deploymentTextGenPropertiesModel,
-    };
-
-    const textGeneration = await watsonxAIService
-    .deploymentGenerateText(genParams)
-    .then((res) => {
-        console.log("\n\n***** TEXT RESPONSE FROM MODEL *****");
-        console.log(res.result.results[0].generated_text);
-    })
-}
-
-// Execute example function
-tunePromptAndDeploy()
+const textGeneration = await watsonxAIService.deploymentGenerateText(genParams);
+console.log('\n\n***** TEXT RESPONSE FROM MODEL *****');
+console.log(textGeneration.result.results[0].generated_text);

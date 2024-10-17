@@ -387,7 +387,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     // ModerationTextRange
     const moderationTextRangeModel = {
       start: 0,
-      end: 0,
+      end: 10,
     };
 
     // ModerationProperties
@@ -499,7 +499,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     // ModerationTextRange
     const moderationTextRangeModel = {
       start: 0,
-      end: 0,
+      end: 10,
     };
 
     // ModerationProperties

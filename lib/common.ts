@@ -59,6 +59,12 @@ export function getSdkHeaders(
   return headers;
 }
 
+export interface ObjectStreamed<T> {
+  id: number;
+  event: string;
+  data: T;
+}
+
 const stringToObj = (chunk: string[]) => {
   const obj = {};
   chunk.forEach((line) => {
@@ -117,7 +123,7 @@ export class ObjectTransformStream extends StreamTransform {
 }
 
 export async function transformStreamToObjectStream<T>(apiResponse: any) {
-  const readableStream: AsyncIterable<T> = Rdb.from(apiResponse.result).pipe(
+  const readableStream: AsyncIterable<ObjectStreamed<T>> = Rdb.from(apiResponse.result).pipe(
     new ObjectTransformStream()
   );
   return readableStream;

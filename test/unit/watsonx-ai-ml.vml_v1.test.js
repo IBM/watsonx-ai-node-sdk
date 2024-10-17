@@ -15,11 +15,10 @@
  */
 
 /* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable jest/no-focused-tests */
 
 const nock = require('nock');
 const sdkCorePackage = require('ibm-cloud-sdk-core');
+const unitTestUtils = require('@ibm-cloud/sdk-test-utilities');
 const {
   StreamTransform,
   ObjectTransformStream,
@@ -28,7 +27,7 @@ const {
 // need to import the whole package to mock getAuthenticatorFromEnvironment
 const get_authenticator_from_environment = require('../../dist/auth/utils/get-authenticator-from-environment');
 
-const { NoAuthAuthenticator, unitTestUtils } = sdkCorePackage;
+const { NoAuthAuthenticator } = sdkCorePackage;
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
 
 const {
@@ -795,7 +794,7 @@ describe('WatsonxAiMlVml_v1', () => {
       // ModerationTextRange
       const moderationTextRangeModel = {
         start: 0,
-        end: 0,
+        end: 10,
       };
 
       // ModerationProperties
@@ -988,7 +987,7 @@ describe('WatsonxAiMlVml_v1', () => {
       // ModerationTextRange
       const moderationTextRangeModel = {
         start: 0,
-        end: 0,
+        end: 10,
       };
 
       // ModerationProperties
@@ -4066,7 +4065,7 @@ describe('WatsonxAiMlVml_v1', () => {
       // ModerationTextRange
       const moderationTextRangeModel = {
         start: 0,
-        end: 0,
+        end: 10,
       };
 
       // ModerationProperties
@@ -4261,7 +4260,7 @@ describe('WatsonxAiMlVml_v1', () => {
       // ModerationTextRange
       const moderationTextRangeModel = {
         start: 0,
-        end: 0,
+        end: 10,
       };
 
       // ModerationProperties

@@ -1,0 +1,22 @@
+{
+  "name": "examples",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "In this directory, you can find examples how to use IBM watsonx.ai Node.js SDK in different scenarios.",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "text_generation": "node example_list_models_and_generate_text.js && node example_prompt_generate_text.js && node example_prompt_generate_stream_text.js && node example_tokenize_input.js",
+    "embeddings": "node example_generate_embeddings.js",
+    "prompt_tuning": "node example_prompt_tuning.js",
+    "chat": "node example_chat.js && node example_chat_stream.js && node example_chat_image.js && node example_chat_tools.js",
+    "all": "npm run text_generation && npm run embeddings && npm run chat",
+    "all-ext": "npm run all && npm run prompt_tuning"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ibm-cloud/watsonx-ai": "^1.1.0",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5"
+  }
+}
