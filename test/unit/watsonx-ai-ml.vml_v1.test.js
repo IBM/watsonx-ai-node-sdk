@@ -19,11 +19,7 @@
 const nock = require('nock');
 const sdkCorePackage = require('ibm-cloud-sdk-core');
 const unitTestUtils = require('@ibm-cloud/sdk-test-utilities');
-const {
-  StreamTransform,
-  ObjectTransformStream,
-  LineTransformStream,
-} = require('../../dist/lib/common');
+const { StreamTransform } = require('../../dist/lib/common');
 // need to import the whole package to mock getAuthenticatorFromEnvironment
 const get_authenticator_from_environment = require('../../dist/auth/utils/get-authenticator-from-environment');
 
@@ -4320,27 +4316,6 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
       }
 
-      function __generateTextStreamFlagTest(returnObject) {
-        const input =
-          'Generate a marketing email advertising a new sale with the following characteristics:\n\nCompany: Swimwear Unlimited\n\nOffer Keywords: {Select customers only, mid-summer fun, swimwear sale}\n\nOffer End Date: July 15\n\nAdvertisement Tone: Exciting!\n\nInclude no URLs.\n\nInclude no telephone numbers.\n';
-        const modelId = 'google/flan-ul2';
-        const spaceId = 'testString';
-        const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
-        const parameters = textGenParametersModel;
-        const moderations = moderationsModel;
-        const generateTextStreamParams = {
-          input,
-          modelId,
-          spaceId,
-          projectId,
-          parameters,
-          moderations,
-          returnObject,
-        };
-        createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
-        return watsonxAiMlService.generateTextStream(generateTextStreamParams);
-      }
-
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
         __generateTextStreamTest();
@@ -4376,14 +4351,6 @@ describe('WatsonxAiMlVml_v1', () => {
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
         watsonxAiMlService.generateTextStream(generateTextStreamParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
-      });
-
-      test('should return correct values depending on flag', async () => {
-        const textStreamString = await __generateTextStreamFlagTest(false);
-        expect(textStreamString instanceof LineTransformStream).toBe(true);
-
-        const textStreamObject = await __generateTextStreamFlagTest(true);
-        expect(textStreamObject instanceof ObjectTransformStream).toBe(true);
       });
     });
 

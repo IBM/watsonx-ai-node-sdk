@@ -16,11 +16,13 @@
 
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 
-const { Readable } = require('node:stream');
+const { Readable, addAbortSignal } = require('node:stream');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
+const { Stream } = require('../../dist/lib/common.js');
 
 // testcase timeout value (200s).
 const timeout = 200000;
@@ -333,7 +335,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     });
 
     expect(res).toBeDefined();
-    expect(res).toBeInstanceOf(Readable);
+    expect(res).toBeInstanceOf(Stream);
   });
 
   test('tokenizeText', async () => {
@@ -413,6 +415,100 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     });
 
     expect(res).toBeDefined();
-    expect(res).toBeInstanceOf(Readable);
+    expect(res).toBeInstanceOf(Stream);
+  });
+
+  test('textChatStream as string', async () => {
+    const stream = await watsonxAiMlService.textChatStream({
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful assistant.',
+        },
+        {
+          role: 'user',
+          content: 'What is your name?',
+        },
+      ],
+      modelId: 'mistralai/mistral-large',
+      projectId,
+    });
+    for await (const chunk of stream) {
+      expect(typeof chunk === 'string').toBe(true);
+      break;
+    }
+  });
+
+  test('textChatStream as object', async () => {
+    const stream = await watsonxAiMlService.textChatStream({
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful assistant.',
+        },
+        {
+          role: 'user',
+          content: 'What is your name?',
+        },
+      ],
+      modelId: 'mistralai/mistral-large',
+      projectId,
+      returnObject: true,
+    });
+    for await (const chunk of stream) {
+      expect(typeof chunk.id === 'number').toBe(true);
+      break;
+    }
+  });
+
+  test('textChatStream aborting', async () => {
+    const abortStreaming = async () => {
+      const stream = await watsonxAiMlService.textChatStream({
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant.',
+          },
+          {
+            role: 'user',
+            content: 'What is your name?',
+          },
+        ],
+        modelId: 'mistralai/mistral-large',
+        projectId,
+      });
+      const controller = new AbortController();
+      const readable = Readable.from(stream);
+      addAbortSignal(controller.signal, readable);
+      for await (const chunk of readable) {
+        console.log(chunk);
+        controller.abort();
+      }
+    };
+    await expect(abortStreaming()).rejects.toThrowError('The operation was aborted');
+  });
+
+  test('textChatStream build in aborting', async () => {
+    const abortStreaming = async () => {
+      const stream = await watsonxAiMlService.textChatStream({
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant.',
+          },
+          {
+            role: 'user',
+            content: 'What is your name?',
+          },
+        ],
+        modelId: 'mistralai/mistral-large',
+        projectId,
+      });
+      for await (const chunk of stream) {
+        console.log(chunk);
+        stream.controller.abort();
+      }
+    };
+    await expect(abortStreaming()).rejects.toThrowError('The operation was aborted');
   });
 });

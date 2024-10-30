@@ -17,10 +17,10 @@
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
 
-const { Readable } = require('stream');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
+const { Stream } = require('../../dist/lib/common.js');
 
 // testcase timeout value (200s).
 const timeout = 200000;
@@ -525,7 +525,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
     const res = await watsonxAiMlService.deploymentGenerateTextStream(params);
     expect(res).toBeDefined();
-    expect(res).toBeInstanceOf(Readable);
+    expect(res).toBeInstanceOf(Stream);
   });
 
   test('postPrompt', async () => {

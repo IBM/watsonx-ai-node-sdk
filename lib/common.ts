@@ -15,8 +15,9 @@
  */
 
 /* eslint-disable max-classes-per-file */
+/* eslint-disable no-restricted-syntax */
 import os = require('os');
-import { Readable as Rdb, Transform, TransformCallback } from 'stream';
+import { addAbortSignal, Readable as Rdb, Transform, TransformCallback } from 'stream';
 
 const pkg = require('../package.json');
 
@@ -122,11 +123,33 @@ export class ObjectTransformStream extends StreamTransform {
   }
 }
 
+export class Stream<T> implements AsyncIterable<T> {
+  controller: AbortController;
+
+  constructor(private iterator: () => AsyncIterator<T>, controller: AbortController) {
+    this.controller = controller;
+  }
+
+  static async createStream<T>(stream: Transform, controller: AbortController) {
+    async function* iterator() {
+      addAbortSignal(controller.signal, stream);
+      for await (const chunk of stream) {
+        yield chunk;
+      }
+    }
+    return new Stream<T>(iterator, controller);
+  }
+
+  [Symbol.asyncIterator](): AsyncIterator<T> {
+    return this.iterator();
+  }
+}
+
 export async function transformStreamToObjectStream<T>(apiResponse: any) {
-  const readableStream: AsyncIterable<ObjectStreamed<T>> = Rdb.from(apiResponse.result).pipe(
-    new ObjectTransformStream()
-  );
-  return readableStream;
+  const readableStream = Rdb.from(apiResponse.result).pipe(new ObjectTransformStream());
+  const controller = new AbortController();
+  const res = Stream.createStream<T>(readableStream, controller);
+  return res;
 }
 
 export class LineTransformStream extends StreamTransform {
@@ -148,5 +171,7 @@ export class LineTransformStream extends StreamTransform {
 
 export async function transformStreamToStringStream<T>(apiResponse: any) {
   const readableStream = Rdb.from(apiResponse.result).pipe(new LineTransformStream());
-  return readableStream;
+  const controller = new AbortController();
+  const res = Stream.createStream<T>(readableStream, controller);
+  return res;
 }
