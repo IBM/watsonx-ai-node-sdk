@@ -97,12 +97,13 @@ export class ObjectTransformStream extends StreamTransform {
     this.buffer += chunk.toString();
     const parts = this.buffer.split('\n');
     if (parts.indexOf('') !== parts.length - 2 && parts.indexOf('') !== -1) {
-      while (parts.length > 0) {
+      while (parts.length > 0 && parts.indexOf('') !== -1 && parts.length > 3) {
         const newObj = parts.splice(0, parts.indexOf('') + 1);
         const obj = stringToObj(newObj);
         if (obj) this.push(obj);
       }
-      this.buffer = '';
+      if (parts.indexOf('') === -1) this.buffer = parts.join('\n');
+      else this.buffer = '';
     } else if (parts[parts.length - 1] !== '') {
       this.buffer = parts.join('\n');
     } else {

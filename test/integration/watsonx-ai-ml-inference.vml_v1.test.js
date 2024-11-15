@@ -511,4 +511,31 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     };
     await expect(abortStreaming()).rejects.toThrowError('The operation was aborted');
   });
+
+  test('textChatStream with returnObject returning correct object with different models', async () => {
+    const models = [
+      'mistralai/mistral-large',
+      'ibm/granite-3-8b-instruct',
+      'meta-llama/llama-3-1-70b-instruct',
+    ];
+    const streamObject = async (model) => {
+      const stream = await watsonxAiMlService.textChatStream({
+        messages: [
+          {
+            role: 'user',
+            content: 'Hello. How are you?',
+          },
+        ],
+        modelId: model,
+        projectId,
+        returnObject: true,
+      });
+      for await (const chunk of stream) {
+        expect(chunk.id).toBeDefined();
+        expect(chunk.event).toBeDefined();
+        expect(chunk.data).toBeDefined();
+      }
+    };
+    await Promise.all(models.map((model) => streamObject(model)));
+  });
 });

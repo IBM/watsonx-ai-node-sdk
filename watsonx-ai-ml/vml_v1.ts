@@ -2565,11 +2565,11 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
   public async textChatStream(
     params: WatsonxAiMlVml_v1.TextChatStreamParams & { returnObject: true }
-  ): Promise<Stream<ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>>;
+  ): Promise<Stream<ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>>;
 
   public async textChatStream(
     params: WatsonxAiMlVml_v1.TextChatStreamParams
-  ): Promise<Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>> {
+  ): Promise<Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'messages'];
     const _validParams = [
@@ -2649,7 +2649,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     };
     const apiResponse = await this.createRequest(parameters);
     const stream = _params.returnObject
-      ? transformStreamToObjectStream<ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>(
+      ? transformStreamToObjectStream<ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>(
           apiResponse
         )
       : transformStreamToStringStream<string>(apiResponse);
