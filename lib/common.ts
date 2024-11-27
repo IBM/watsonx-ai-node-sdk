@@ -17,7 +17,7 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-restricted-syntax */
 import os = require('os');
-import { addAbortSignal, Readable as Rdb, Transform, TransformCallback } from 'stream';
+import { addAbortSignal, pipeline, Readable as Rdb, Transform, TransformCallback } from 'stream';
 
 const pkg = require('../package.json');
 
@@ -133,7 +133,6 @@ export class Stream<T> implements AsyncIterable<T> {
 
   static async createStream<T>(stream: Transform, controller: AbortController) {
     async function* iterator() {
-      addAbortSignal(controller.signal, stream);
       for await (const chunk of stream) {
         yield chunk;
       }
@@ -147,9 +146,18 @@ export class Stream<T> implements AsyncIterable<T> {
 }
 
 export async function transformStreamToObjectStream<T>(apiResponse: any) {
-  const readableStream = Rdb.from(apiResponse.result).pipe(new ObjectTransformStream());
+  const readableStream = Rdb.from(apiResponse.result);
+  const transformStream = new ObjectTransformStream();
   const controller = new AbortController();
-  const res = Stream.createStream<T>(readableStream, controller);
+  const combinedStream = pipeline(readableStream, transformStream, (err) => {
+    if (err && err.name === 'AbortError') {
+      console.log('Stream pipeline aborted');
+    } else if (err) {
+      console.error('Stream pipeline error:', err);
+    }
+  });
+  const abortableStream = addAbortSignal(controller.signal, combinedStream);
+  const res = Stream.createStream<T>(abortableStream, controller);
   return res;
 }
 
@@ -171,8 +179,17 @@ export class LineTransformStream extends StreamTransform {
 }
 
 export async function transformStreamToStringStream<T>(apiResponse: any) {
-  const readableStream = Rdb.from(apiResponse.result).pipe(new LineTransformStream());
+  const readableStream = Rdb.from(apiResponse.result);
+  const transformStream = new LineTransformStream();
   const controller = new AbortController();
-  const res = Stream.createStream<T>(readableStream, controller);
+  const combinedStream = pipeline(readableStream, transformStream, (err) => {
+    if (err && err.name === 'AbortError') {
+      console.log('Stream pipeline aborted');
+    } else if (err) {
+      console.error('Stream pipeline error:', err);
+    }
+  });
+  const abortableStream = addAbortSignal(controller.signal, combinedStream);
+  const res = Stream.createStream<T>(abortableStream, controller);
   return res;
 }

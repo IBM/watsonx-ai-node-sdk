@@ -22,6 +22,7 @@ const { Readable, addAbortSignal } = require('node:stream');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
+const testHelper = require('../resources/test-helper.js');
 const { Stream } = require('../../dist/lib/common.js');
 
 // testcase timeout value (200s).
@@ -39,6 +40,14 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
   // Service instance
   let watsonxAiMlService;
+  // Generate and log the time series data
+  const timeSeriesData = testHelper.generateTimeSeries();
+  const timeSeriesModelId = 'ibm/granite-ttm-512-96-r2';
+  const tsForecastInputSchemaModel = {
+    timestamp_column: 'date',
+    freq: '1h',
+    target_columns: ['target'],
+  };
 
   test('Initialize service', async () => {
     watsonxAiMlService = WatsonxAiMlVml_v1.newInstance({
@@ -443,10 +452,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     const stream = await watsonxAiMlService.textChatStream({
       messages: [
         {
-          role: 'system',
-          content: 'You are a helpful assistant.',
-        },
-        {
           role: 'user',
           content: 'What is your name?',
         },
@@ -466,10 +471,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const stream = await watsonxAiMlService.textChatStream({
         messages: [
           {
-            role: 'system',
-            content: 'You are a helpful assistant.',
-          },
-          {
             role: 'user',
             content: 'What is your name?',
           },
@@ -485,7 +486,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         controller.abort();
       }
     };
-    await expect(abortStreaming()).rejects.toThrowError('The operation was aborted');
+    await expect(abortStreaming()).rejects.toThrow('The operation was aborted');
   });
 
   test('textChatStream build in aborting', async () => {
@@ -509,7 +510,63 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         stream.controller.abort();
       }
     };
-    await expect(abortStreaming()).rejects.toThrowError('The operation was aborted');
+    await expect(abortStreaming()).rejects.toThrow('The operation was aborted');
+  });
+
+  test('textChatStream aborting chunk count', async () => {
+    const stream = await watsonxAiMlService.textChatStream({
+      messages: [
+        {
+          role: 'user',
+          content: 'What is your name?',
+        },
+      ],
+      modelId: 'mistralai/mistral-large',
+      projectId,
+    });
+    let i = 0;
+    const n = 10;
+    const chunks = [];
+    const controller = new AbortController();
+    const readable = Readable.from(stream);
+    const rdb = addAbortSignal(controller.signal, readable);
+    try {
+      for await (const chunk of rdb) {
+        console.log(chunk);
+        chunks.push(chunk);
+        i += 1;
+        if (i === n) controller.abort();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+    expect(chunks).toHaveLength(n);
+  });
+  test('textChatStream build-in aborting chunk count', async () => {
+    const stream = await watsonxAiMlService.textChatStream({
+      messages: [
+        {
+          role: 'user',
+          content: 'What is your name?',
+        },
+      ],
+      modelId: 'mistralai/mistral-large',
+      projectId,
+    });
+    let i = 0;
+    const n = 10;
+    const chunks = [];
+    try {
+      for await (const chunk of stream) {
+        console.log(chunk);
+        chunks.push(chunk);
+        i += 1;
+        if (i === n) stream.controller.abort();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+    expect(chunks).toHaveLength(n);
   });
 
   test('textChatStream with returnObject returning correct object with different models', async () => {
@@ -537,5 +594,41 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
     };
     await Promise.all(models.map((model) => streamObject(model)));
+  });
+
+  test('timeSeriesForecast with prediction_length', async () => {
+    // TSForecastParameters
+    const tsForecastParametersModel = {
+      prediction_length: 38,
+    };
+
+    const params = {
+      modelId: timeSeriesModelId,
+      data: timeSeriesData,
+      schema: tsForecastInputSchemaModel,
+      projectId,
+      parameters: tsForecastParametersModel,
+    };
+
+    const res = await watsonxAiMlService.timeSeriesForecast(params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(200);
+    expect(res.result).toBeDefined();
+    expect(res.result.results[0].target).toHaveLength(38);
+  });
+
+  test('timeSeriesForecast without prediction_length', async () => {
+    const params = {
+      modelId: timeSeriesModelId,
+      data: timeSeriesData,
+      schema: tsForecastInputSchemaModel,
+      projectId,
+    };
+
+    const res = await watsonxAiMlService.timeSeriesForecast(params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(200);
+    expect(res.result).toBeDefined();
+    expect(res.result.results[0].target).toHaveLength(96);
   });
 });

@@ -2565,11 +2565,11 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
   public async textChatStream(
     params: WatsonxAiMlVml_v1.TextChatStreamParams & { returnObject: true }
-  ): Promise<Stream<ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>>;
+  ): Promise<Stream<ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>>;
 
   public async textChatStream(
     params: WatsonxAiMlVml_v1.TextChatStreamParams
-  ): Promise<Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>> {
+  ): Promise<Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'messages'];
     const _validParams = [
@@ -2649,7 +2649,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     };
     const apiResponse = await this.createRequest(parameters);
     const stream = _params.returnObject
-      ? transformStreamToObjectStream<ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse>>(
+      ? transformStreamToObjectStream<ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>(
           apiResponse
         )
       : transformStreamToStringStream<string>(apiResponse);
@@ -3001,6 +3001,97 @@ class WatsonxAiMlVml_v1 extends BaseService {
     const parameters = {
       options: {
         url: '/ml/v1/text/tokenization',
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+  /*************************
+   * timeSeriesTechPreview
+   ************************/
+
+  /**
+   * Time series forecast.
+   *
+   * Generate forecasts, or predictions for future time points, given historical time series data.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.modelId - The model to be used for generating a forecast.
+   * @param {JsonObject} params.data - A payload of data matching `schema`. We assume the following about your data:
+   *   * All timeseries are of equal length and are uniform in nature (the time difference between two successive rows
+   * is constant). This implies that there are no missing rows of data;
+   *   * The data meet the minimum model-dependent historical context length which
+   *   can be 512 or more rows per timeseries;
+   *
+   * Note that the example payloads shown are for illustration purposes only. An actual payload would necessary be much
+   * larger to meet minimum model-specific context lengths.
+   * @param {TSForecastInputSchema} params.schema - Contains metadata about your timeseries data input.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
+   * to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
+   * be given.
+   * @param {TSForecastParameters} [params.parameters] - The parameters for the forecast request.
+   * @param {JsonObject} [params.futureData] - Exogenous or supporting features that extend into the forecasting horizon
+   * (e.g., a weather forecast or calendar of special promotions) which are known in advance. `future_data` would be in
+   * the same format as `data` except  that all timestamps would be in the forecast horizon and it would not include
+   * previously specified
+   * `target_columns`.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TSForecastResponse>>}
+   */
+  public timeSeriesForecast(
+    params: WatsonxAiMlVml_v1.TimeSeriesForecastParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TSForecastResponse>> {
+    const _params = { ...params };
+    const _requiredParams = ['modelId', 'data', 'schema'];
+    const _validParams = [
+      'modelId',
+      'data',
+      'schema',
+      'projectId',
+      'spaceId',
+      'parameters',
+      'headers',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'model_id': _params.modelId,
+      'data': _params.data,
+      'schema': _params.schema,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+      'parameters': _params.parameters,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'timeSeriesForecast'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/time_series/forecast',
         method: 'POST',
         body,
         qs: query,
@@ -5359,7 +5450,9 @@ namespace WatsonxAiMlVml_v1 {
     /** The score of the input. */
     score: number;
     /** The text that was ranked, if requested. */
-    input?: string;
+    input?: {
+      text: string;
+    };
   }
 
   /** Information related to the revision. */
@@ -5574,6 +5667,26 @@ namespace WatsonxAiMlVml_v1 {
     system?: SystemDetails;
   }
 
+  /** System details. */
+  export interface TextChatStreamResponse {
+    /** A unique identifier for the chat completion. */
+    id: string;
+    /** The model used for the chat completion. */
+    model_id: string;
+    /** The model version (using semantic versioning) if set. */
+    model_version?: string;
+    /** A list of chat completion choices. Can be more than one if `n` is greater than 1. */
+    choices: TextChatStreamResultChoice[];
+    /** The Unix timestamp (in seconds) of when the chat completion was created. */
+    created: number;
+    /** The time when the response was created. */
+    created_at?: string;
+    /** Usage statistics for the completion request. */
+    usage?: TextChatUsage;
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
   /** The chat response format parameters. */
   export interface TextChatResponseFormat {
     /** Used to enable JSON mode, which guarantees the message the model generates is valid JSON.
@@ -5601,6 +5714,23 @@ namespace WatsonxAiMlVml_v1 {
     index?: number;
     /** A message result. */
     message?: TextChatResultMessage;
+    /** The reason why the call stopped, can be one of:
+     *  - `stop` - The model hit a natural stop point or a provided stop sequence.
+     *  - `length` - The maximum number of tokens specified in the request was reached.
+     *  - `tool_calls` - The model called a tool.
+     *  - `time_limit`` - Time limit reached.
+     *  - `cancelled`` - Request canceled by the client.
+     *  - `error`` - Error encountered.
+     *  - `null` - API response still in progress or incomplete.
+     */
+    finish_reason?: TextChatResultChoice.Constants.FinishReason | string;
+  }
+
+  export interface TextChatStreamResultChoice {
+    /** The index of this result. */
+    index?: number;
+    /** A message chunk result. */
+    delta?: TextChatResultMessage;
     /** The reason why the call stopped, can be one of:
      *  - `stop` - The model hit a natural stop point or a provided stop sequence.
      *  - `length` - The maximum number of tokens specified in the request was reached.
@@ -5939,6 +6069,86 @@ namespace WatsonxAiMlVml_v1 {
     tokens?: string[];
   }
 
+  /**
+   * Contains metadata about your timeseries data input.
+   */
+  export interface TSForecastInputSchema {
+    /** A valid column in the data that should be treated as the timestamp. Although not absolutely necessary, if
+     *  using calendar dates  (simple integer time offsets are also allowed), users should consider using a format such
+     *  as ISO 8601 that includes a UTC offset (e.g.,
+     *  '2024-10-18T01:09:21.454746+00:00'). This will avoid potential issues such as duplicate dates appearing due to
+     *  daylight savings change overs. There are many date formats in existence and inferring the correct one can be a
+     *  challenge so please do consider adhering to ISO 8601.
+     */
+    timestamp_column: string;
+    /** Columns that define a unique key for timeseries. This is similar to a compound primary key in a database
+     *  table.
+     */
+    id_columns?: string[];
+    /** A frequency indicator for the given timestamp_column. See
+     *  https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#period-aliases for a description of the
+     *  allowed values. If not provided, we will attempt to infer it from the data.
+     */
+    freq?: string;
+    /** An array of column headings which constitute the target variables in the data. These are the data that will
+     *  be forecasted.
+     */
+    target_columns?: string[];
+  }
+
+  /**
+   * The parameters for the forecast request.
+   */
+  export interface TSForecastParameters {
+    /** The prediction length for the forecast. The service will return this many periods beyond the last timestamp
+     *  in the inference data payload. If specified, `prediction_length` must be an integer >=1 and no more than the
+     *  model default prediction length. When omitted the model default prediction_length will be used.
+     */
+    prediction_length?: number;
+  }
+
+  /**
+   * The time series forecast response.
+   */
+  export interface TSForecastResponse {
+    /** The model used to generate the forecast. */
+    model_id?: string;
+    /** The time when the response was created in ISO 8601 format. */
+    created_at?: string;
+    /** The list of prediction results. There will be a forecast for each time series in the input data. The
+     *  `prediction_length` field in the request specifies the number of predictions in the results. The actual number
+     *  of rows in the results will be equal to the `prediction length` multiplied by the number of unique ids in
+     *  `id_columns`. The `timestamp_column` field in the request indicates the name of the timestamp column in the
+     *  results.
+     */
+    results?: JsonObject[];
+  }
+
+  /** Parameters for the `timeSeriesForecast` operation. */
+  export interface TimeSeriesForecastParams {
+    /** The model to be used for generating a forecast. */
+    modelId: string;
+    /** A payload of data matching `schema`. We assume the following about your data:
+     *    * All timeseries are of equal length and are uniform in nature (the time difference between two successive
+     *  rows is constant). This implies that there are no missing rows of data;
+     *    * The data meet the minimum model-dependent historical context length which
+     *    can be 512 or more rows per timeseries;
+     *
+     *  Note that the example payloads shown are for illustration purposes only. An actual payload would necessary be
+     *  much larger to meet minimum model-specific context lengths.
+     */
+    data: JsonObject;
+    /** Contains metadata about your timeseries data input. */
+    schema: TSForecastInputSchema;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** The parameters for the forecast request. */
+    parameters?: TSForecastParameters;
+    headers?: OutgoingHttpHeaders;
+  }
+
   /** Number of steps to be used for gradient accumulation. Gradient accumulation refers to a method of collecting gradient for configured number of steps instead of updating the model variables at every step and then applying the update to model variables. This can be used as a tool to overcome smaller batch size limitation. Often also referred in conjunction with "effective batch size". */
   export interface TrainingAccumulatedSteps {
     /** The default value. */
@@ -6131,6 +6341,8 @@ namespace WatsonxAiMlVml_v1 {
     results_reference: ObjectLocation;
     /** Status of the training job. */
     status: TrainingStatus;
+    /** Trained model id */
+    model_id: string;
   }
 
   /** Status of the training job. */

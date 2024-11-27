@@ -4484,6 +4484,133 @@ describe('WatsonxAiMlVml_v1', () => {
       });
     });
   });
+  describe('timeSeriesForecast', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // TSForecastInputSchema
+      const tsForecastInputSchemaModel = {
+        timestamp_column: 'date',
+        id_columns: ['ID1'],
+        freq: '1h',
+        target_columns: ['testString'],
+      };
+
+      // TSForecastParameters
+      const tsForecastParametersModel = {
+        prediction_length: 38,
+      };
+
+      function __timeSeriesForecastTest() {
+        // Construct the params object for operation timeSeriesForecast
+        const modelId = 'ibm/ttm-1024-96-r2';
+        const data = {
+          date: ['2020-01-01T00:00:00', '2020-01-01T01:00:00', '2020-01-05T01:00:00'],
+          ID1: ['D1', 'D1', 'D1'],
+          TARGET1: [1.46, 2.34, 4.55],
+        };
+        const schema = tsForecastInputSchemaModel;
+        const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
+        const spaceId = 'testString';
+        const parameters = tsForecastParametersModel;
+        const timeSeriesForecastParams = {
+          modelId,
+          data,
+          schema,
+          projectId,
+          spaceId,
+          parameters,
+        };
+
+        const timeSeriesForecastResult =
+          watsonxAiMlService.timeSeriesForecast(timeSeriesForecastParams);
+
+        // all methods should return a Promise
+        expectToBePromise(timeSeriesForecastResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/time_series/forecast', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.model_id).toEqual(modelId);
+        expect(mockRequestOptions.body.data).toEqual(data);
+        expect(mockRequestOptions.body.schema).toEqual(schema);
+        expect(mockRequestOptions.body.project_id).toEqual(projectId);
+        expect(mockRequestOptions.body.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.body.parameters).toEqual(parameters);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __timeSeriesForecastTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __timeSeriesForecastTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __timeSeriesForecastTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const modelId = 'ibm/ttm-1024-96-r2';
+        const data = {
+          date: ['2020-01-01T00:00:00', '2020-01-01T01:00:00', '2020-01-05T01:00:00'],
+          ID1: ['D1', 'D1', 'D1'],
+          TARGET1: [1.46, 2.34, 4.55],
+        };
+        const schema = tsForecastInputSchemaModel;
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const timeSeriesForecastParams = {
+          modelId,
+          data,
+          schema,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.timeSeriesForecast(timeSeriesForecastParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.timeSeriesForecast({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.timeSeriesForecast();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
 
   describe('createTraining', () => {
     describe('positive tests', () => {
