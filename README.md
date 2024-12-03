@@ -97,7 +97,7 @@ WATSONX_AI_USERNAME=<YOUR_USERNAME>
 WATSONX_AI_PASSWORD=<YOUR_PASSWORD>
 WATSONX_AI_URL=url
 ```
-If any troubles regarding SSL verification appear, such as "Error: self-signed certificate in certificate chain", please try setting up enviromental virables as below:
+If any troubles regarding SSL verification appear, such as "Error: self-signed certificate in certificate chain", please try setting up environment variables as below:
 ```sh
 WATSONX_AI_DISABLE_SSL=true
 WATSONX_AI_AUTH_DISABLE_SSL=true

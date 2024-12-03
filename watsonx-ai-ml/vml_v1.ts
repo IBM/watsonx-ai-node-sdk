@@ -31,10 +31,10 @@ import {
   readExternalSources,
   validateParams,
 } from 'ibm-cloud-sdk-core';
+import { BaseServiceOptions } from 'ibm-cloud-sdk-core/es/lib/base-service';
 import { getAuthenticatorFromEnvironment } from '../auth/utils/get-authenticator-from-environment';
 import {
   getSdkHeaders,
-  ObjectStreamed,
   Stream,
   transformStreamToObjectStream,
   transformStreamToStringStream,
@@ -46,10 +46,12 @@ import {
  */
 
 const PLATFORM_URLS_MAP = {
+  'https://ca-tor.ml.cloud.ibm.com': 'https://ca-tor.dai.cloud.ibm.com',
   'https://jp-tok.ml.cloud.ibm.com': 'https://api.jp-tok.dataplatform.cloud.ibm.com/wx',
   'https://eu-gb.ml.cloud.ibm.com': 'https://api.eu-gb.dataplatform.cloud.ibm.com/wx',
   'https://eu-de.ml.cloud.ibm.com': 'https://api.eu-de.dataplatform.cloud.ibm.com/wx',
   'https://us-south.ml.cloud.ibm.com': 'https://api.dataplatform.cloud.ibm.com/wx',
+  'https://private.ca-tor.ml.cloud.ibm.com': 'https://private.ca-tor.dai.cloud.ibm.com',
   'https://private.jp-tok.ml.cloud.ibm.com': 'https://api.jp-tok.dataplatform.cloud.ibm.com/wx',
   'https://private.eu-gb.ml.cloud.ibm.com': 'https://api.eu-gb.dataplatform.cloud.ibm.com/wx',
   'https://private.eu-de.ml.cloud.ibm.com': 'https://api.eu-de.dataplatform.cloud.ibm.com/wx',
@@ -618,12 +620,18 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @param {Object} callbacks - The parameters to send to the service.
+   * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
+   * @param {ReceiveResponseCallback} [callbacks.responseCallback] - Callback invoked with paramteres response from API call
    * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>>}
    *
    * @category Deployments
    */
   public deploymentGenerateText(
-    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationParams
+    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationParams,
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>> {
     const _params = { ...params };
     const _requiredParams = ['idOrName'];
@@ -672,7 +680,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
       },
     };
 
-    return this.createRequest(parameters);
+    const callbackHandler = callbacks
+      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
+      : undefined;
+    callbackHandler?.handleRequest(parameters);
+    const response = this.createRequest(parameters);
+    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
+      response
+    );
+    return response;
   }
 
   /**
@@ -699,7 +715,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * internally. It is recommended not to leave any trailing spaces.
    *
    * ### Response
-   * Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
+   * Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
    * either stream line by line. Output will stream as follow:
    * - id: 1
    * - event: message
@@ -727,23 +743,37 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @param {boolean} [params.returnObject] - Flag that indicates return type. Set 'true' to return objects.
-   * @returns {Promise<Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>>} return - Promise resolving to Stream object. Stream object is AsyncIterable based class. Stream object contains an additional property holding an AbortController, read more below.
+   * @param {Object} callbacks - The parameters to send to the service.
+   * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
+   * @param {ReceiveResponseCallback} [callbacks.responseCallback] - Callback invoked with paramteres response from API call
+   * @returns {Promise<Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>>} return - Promise resolving to Stream object. Stream object is AsyncIterable based class. Stream object contains an additional property holding an AbortController, read more below.
    * @returns {AbortController} return.controller - Abort controller. Allows user to abort when reading from stream without transition to Readable
    *
    * @category Deployments
    */
 
   public async deploymentGenerateTextStream(
-    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams & { returnObject?: false }
+    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams & { returnObject?: false },
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
   ): Promise<Stream<string>>;
 
   public async deploymentGenerateTextStream(
-    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams & { returnObject: true }
-  ): Promise<Stream<ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
+    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams & { returnObject: true },
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
+  ): Promise<Stream<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
 
   public async deploymentGenerateTextStream(
-    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams
-  ): Promise<AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>> {
+    params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams,
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
+  ): Promise<
+    AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>
+  > {
     const _params = { ...params };
     const _requiredParams = ['idOrName'];
     const _validParams = [
@@ -801,11 +831,18 @@ class WatsonxAiMlVml_v1 extends BaseService {
       },
     };
 
+    const callbackHandler = callbacks
+      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
+      : undefined;
+    callbackHandler?.handleRequest(parameters);
     const apiResponse = await this.createRequest(parameters);
+    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
+      apiResponse
+    );
     const stream = _params.returnObject
-      ? transformStreamToObjectStream<ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>(
-          apiResponse
-        )
+      ? transformStreamToObjectStream<
+          WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>
+        >(apiResponse)
       : transformStreamToStringStream<string>(apiResponse);
     return stream;
   }
@@ -2393,12 +2430,18 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * will stop. The text generated so far will be returned along with the `TIME_LIMIT`` stop reason. Depending on the
    * users plan, and on the model being used, there may be an enforced maximum time limit.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @param {Object} callbacks - The parameters to send to the service.
+   * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
+   * @param {ReceiveResponseCallback} [callbacks.responseCallback] - Callback invoked with paramteres response from API call
    * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>}
    *
    * @category Text Chat
    */
   public textChat(
-    params: WatsonxAiMlVml_v1.TextChatParams
+    params: WatsonxAiMlVml_v1.TextChatParams,
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'messages'];
@@ -2470,8 +2513,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
         },
       },
     };
-
-    return this.createRequest(parameters);
+    const callbackHandler = callbacks
+      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
+      : undefined;
+    callbackHandler?.handleRequest(parameters);
+    const response = this.createRequest(parameters);
+    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
+      response
+    );
+    return response;
   }
 
   /**
@@ -2481,7 +2531,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * tokens as a stream of events
    *
    * ### Response
-   * Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
+   * Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
    * either stream line by line. Output will stream as follow:
    * - id: 1
    * - event: message
@@ -2553,23 +2603,37 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * users plan, and on the model being used, there may be an enforced maximum time limit.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @param {boolean} [params.returnObject] - Flag that indicates return type. Set 'true' to return objects.
-   * @returns {Promise<Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>>} return - Promise resolving to Stream object. Stream object is AsyncIterable based class. Stream object contains an additional property holding an AbortController, read more below.
+   * @param {Object} callbacks - The parameters to send to the service.
+   * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
+   * @param {ReceiveResponseCallback} [callbacks.responseCallback] - Callback invoked with paramteres response from API call
+   * @returns {Promise<Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>>} return - Promise resolving to Stream object. Stream object is AsyncIterable based class. Stream object contains an additional property holding an AbortController, read more below.
    * @returns {AbortController} return.controller - Abort controller. Allows user to abort when reading from stream without transition to Readable
    *
    * @category Text Chat
    */
 
   public async textChatStream(
-    params: WatsonxAiMlVml_v1.TextChatStreamParams & { returnObject?: false }
+    params: WatsonxAiMlVml_v1.TextChatStreamParams & { returnObject?: false },
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
   ): Promise<Stream<string>>;
 
   public async textChatStream(
-    params: WatsonxAiMlVml_v1.TextChatStreamParams & { returnObject: true }
-  ): Promise<Stream<ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>>;
+    params: WatsonxAiMlVml_v1.TextChatStreamParams & { returnObject: true },
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
+  ): Promise<Stream<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>>;
 
   public async textChatStream(
-    params: WatsonxAiMlVml_v1.TextChatStreamParams
-  ): Promise<Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>> {
+    params: WatsonxAiMlVml_v1.TextChatStreamParams,
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
+  ): Promise<
+    Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>
+  > {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'messages'];
     const _validParams = [
@@ -2647,11 +2711,18 @@ class WatsonxAiMlVml_v1 extends BaseService {
         },
       },
     };
+    const callbackHandler = callbacks
+      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
+      : undefined;
+    callbackHandler?.handleRequest(parameters);
     const apiResponse = await this.createRequest(parameters);
+    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
+      apiResponse
+    );
     const stream = _params.returnObject
-      ? transformStreamToObjectStream<ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>(
-          apiResponse
-        )
+      ? transformStreamToObjectStream<
+          WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>
+        >(apiResponse)
       : transformStreamToStringStream<string>(apiResponse);
     return stream;
   }
@@ -2678,12 +2749,18 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * to be given.
    * @param {EmbeddingParameters} [params.parameters] - Parameters for text embedding requests.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @param {Object} callbacks - The parameters to send to the service.
+   * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
+   * @param {ReceiveResponseCallback} [callbacks.responseCallback] - Callback invoked with paramteres response from API call
    * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmbeddingsResponse>>}
    *
    * @category Embeddings
    */
   public embedText(
-    params: WatsonxAiMlVml_v1.TextEmbeddingsParams
+    params: WatsonxAiMlVml_v1.TextEmbeddingsParams,
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmbeddingsResponse>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'inputs'];
@@ -2729,7 +2806,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
       },
     };
 
-    return this.createRequest(parameters);
+    const callbackHandler = callbacks
+      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
+      : undefined;
+    callbackHandler?.handleRequest(parameters);
+    const response = this.createRequest(parameters);
+    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
+      response
+    );
+    return response;
   }
   /*************************
    * textGeneration
@@ -2754,12 +2839,18 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @param {Object} callbacks - The parameters to send to the service.
+   * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
+   * @param {ReceiveResponseCallback} [callbacks.responseCallback] - Callback invoked with paramteres response from API call
    * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>>}
    *
    * @category Text Generation
    */
   public generateText(
-    params: WatsonxAiMlVml_v1.TextGenerationParams
+    params: WatsonxAiMlVml_v1.TextGenerationParams,
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>> {
     const _params = { ...params };
     const _requiredParams = ['input', 'modelId'];
@@ -2814,7 +2905,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
       },
     };
 
-    return this.createRequest(parameters);
+    const callbackHandler = callbacks
+      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
+      : undefined;
+    callbackHandler?.handleRequest(parameters);
+    const response = this.createRequest(parameters);
+    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
+      response
+    );
+    return response;
   }
 
   /**
@@ -2824,7 +2923,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * tokens as a stream of events.
    *
    * ### Response
-   * Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
+   * Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> represents a source of streaming data. If request performed successfully Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>> returns
    * either stream line by line. Output will stream as follow:
    * - id: 1
    * - event: message
@@ -2861,23 +2960,37 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * of moderations.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @param {boolean} [params.returnObject] - Flag that indicates return type. Set 'true' to return objects.
-   * @returns {Promise<Stream<string | ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>>} return - Promise resolving to Stream object. Stream object is AsyncIterable based class. Stream object contains an additional property holding an AbortController, read more below.
+   * @param {Object} callbacks - The parameters to send to the service.
+   * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
+   * @param {ReceiveResponseCallback} [callbacks.responseCallback] - Callback invoked with paramteres response from API call
+   * @returns {Promise<Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>>} return - Promise resolving to Stream object. Stream object is AsyncIterable based class. Stream object contains an additional property holding an AbortController, read more below.
    * @returns {AbortController} return.controller - Abort controller. Allows user to abort when reading from stream without transition to Readable
    *
    * @category Text Generation
    */
 
   public async generateTextStream(
-    params: WatsonxAiMlVml_v1.TextGenerationStreamParams & { returnObject?: false }
+    params: WatsonxAiMlVml_v1.TextGenerationStreamParams & { returnObject?: false },
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
   ): Promise<Stream<string>>;
 
   public async generateTextStream(
-    params: WatsonxAiMlVml_v1.TextGenerationStreamParams & { returnObject: true }
-  ): Promise<Stream<ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
+    params: WatsonxAiMlVml_v1.TextGenerationStreamParams & { returnObject: true },
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
+  ): Promise<Stream<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
 
   public async generateTextStream(
-    params: WatsonxAiMlVml_v1.TextGenerationStreamParams
-  ): Promise<AsyncIterable<string | ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>> {
+    params: WatsonxAiMlVml_v1.TextGenerationStreamParams,
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
+  ): Promise<
+    AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>
+  > {
     const _params = { ...params };
     const _requiredParams = ['input', 'modelId'];
     const _validParams = [
@@ -2935,11 +3048,19 @@ class WatsonxAiMlVml_v1 extends BaseService {
         },
       },
     };
+
+    const callbackHandler = callbacks
+      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
+      : undefined;
+    callbackHandler?.handleRequest(parameters);
     const apiResponse = await this.createRequest(parameters);
+    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
+      apiResponse
+    );
     const stream = _params.returnObject
-      ? transformStreamToObjectStream<ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>(
-          apiResponse
-        )
+      ? transformStreamToObjectStream<
+          WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>
+        >(apiResponse)
       : transformStreamToStringStream<string>(apiResponse);
     return stream;
   }
@@ -3482,13 +3603,19 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
    * to be given.
    * @param {RerankParameters} [params.parameters] - The properties used for reranking.
-   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request header
+   * @param {Object} callbacks - The parameters to send to the service.
+   * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
+   * @param {ReceiveResponseCallback} [callbacks.responseCallback] - Callback invoked with paramteres response from API call
    * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.RerankResponse>>}
    *
    * @category Text Rerank
    */
   public textRerank(
-    params: WatsonxAiMlVml_v1.TextRerankParams
+    params: WatsonxAiMlVml_v1.TextRerankParams,
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.RerankResponse>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'inputs', 'query'];
@@ -3543,7 +3670,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
       },
     };
 
-    return this.createRequest(parameters);
+    const callbackHandler = callbacks
+      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
+      : undefined;
+    callbackHandler?.handleRequest(parameters);
+    const response = this.createRequest(parameters);
+    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
+      response
+    );
+    return response;
   }
 }
 
@@ -6741,6 +6876,30 @@ namespace WatsonxAiMlVml_v1 {
     }
   }
 
+  /** Request parameters */
+  export interface RequestParameters {
+    options: BaseServiceOptions;
+    defaultOptions: Record<string, any> & { headers: Record<string, any> };
+  }
+
+  /** Request parameters without headers */
+  export interface RequestParametersWithoutHeaders {
+    options: BaseServiceOptions;
+    defaultOptions: Record<string, any>;
+  }
+
+  /** Invoke request callback */
+  export type InvokeRequestCallback = (request: RequestParametersWithoutHeaders) => any;
+
+  /** Receive response callback */
+  export type ReceiveResponseCallback<T = any> = (response: T) => any;
+
+  /** The definition of request callbacks */
+  export interface RequestCallbacks<T = any> {
+    requestCallback?: InvokeRequestCallback;
+    responseCallback?: ReceiveResponseCallback<T>;
+  }
+
   /*************************
    * pager classes
    ************************/
@@ -6991,6 +7150,42 @@ namespace WatsonxAiMlVml_v1 {
         results.push(...nextPage);
       }
       return results;
+    }
+  }
+
+  /** Chunk interface when returnObject=true in stream */
+  export interface ObjectStreamed<T> {
+    id: number;
+    event: string;
+    data: T;
+  }
+
+  /**
+   * CallbackHandler class to be used with callbacks provided by user in requests
+   */
+
+  export class CallbackHandler {
+    requestCallback: InvokeRequestCallback | undefined;
+
+    responseCallback: ReceiveResponseCallback | undefined;
+
+    constructor(callbacks: RequestCallbacks) {
+      this.requestCallback = callbacks?.requestCallback;
+      this.responseCallback = callbacks?.responseCallback;
+    }
+
+    handleRequest(parameters: RequestParameters) {
+      if (!this.requestCallback) return;
+      const { defaultOptions, options } = parameters;
+      const { headers, ...defaultOptionsNoHeaders } = defaultOptions;
+      const parametersNoHeaders = { options, defaultOptions: defaultOptionsNoHeaders };
+      this.requestCallback(parametersNoHeaders);
+    }
+
+    async handleResponse<T>(response: Promise<T>) {
+      if (!this.responseCallback) return;
+      const res = await response;
+      this.responseCallback(res);
     }
   }
 }

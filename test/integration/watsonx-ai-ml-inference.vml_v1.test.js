@@ -631,4 +631,116 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(res.result).toBeDefined();
     expect(res.result.results[0].target).toHaveLength(96);
   });
+
+  describe('Callback tests', () => {
+    const requestCallback = (req) => {
+      expect(req).toBeDefined();
+      expect(req.options).toBeDefined();
+      expect(req.defaultOptions).toBeDefined();
+      expect(req.defaultOptions.headers).toBeUndefined();
+    };
+    const responseCallback = (res) => {
+      expect(res).toBeDefined();
+      expect(res.result).toBeDefined();
+      expect(res.status).toBeDefined();
+      expect(res.statusText).toBeDefined();
+      expect(res.headers).toBeDefined();
+    };
+    test('textChat with callbacks', async () => {
+      const res = await watsonxAiMlService.textChat(
+        {
+          messages: [{ role: 'user', content: 'Hello. How are you?' }],
+          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          projectId: process.env.WATSONX_AI_PROJECT_ID,
+        },
+        {
+          requestCallback,
+          responseCallback,
+        }
+      );
+      expect(res).toBeDefined();
+    });
+    test('textChatSteam with callbacks', async () => {
+      const res = await watsonxAiMlService.textChatStream(
+        {
+          messages: [{ role: 'user', content: 'Hello. How are you?' }],
+          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          projectId: process.env.WATSONX_AI_PROJECT_ID,
+        },
+        {
+          requestCallback,
+          responseCallback,
+        }
+      );
+      expect(res).toBeDefined();
+    });
+    test('generateText with callbacks', async () => {
+      const res = await watsonxAiMlService.generateText(
+        {
+          input: 'Hello. How are you? Tell me a lot',
+          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          projectId: process.env.WATSONX_AI_PROJECT_ID,
+        },
+        {
+          requestCallback,
+          responseCallback,
+        }
+      );
+      expect(res).toBeDefined();
+    });
+    test('generateTextStream with callbacks', async () => {
+      const res = await watsonxAiMlService.generateTextStream(
+        {
+          input: 'Hello. How are you? Tell me a lot',
+          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          projectId: process.env.WATSONX_AI_PROJECT_ID,
+        },
+        {
+          requestCallback,
+          responseCallback,
+        }
+      );
+      expect(res).toBeDefined();
+    });
+    test('embedText with callbacks', async () => {
+      const res = await watsonxAiMlService.embedText(
+        {
+          inputs: ['Hello. How are you?', 'Hello world'],
+          modelId: 'ibm/slate-125m-english-rtrvr',
+          projectId: process.env.WATSONX_AI_PROJECT_ID,
+        },
+        {
+          requestCallback,
+          responseCallback,
+        }
+      );
+      expect(res).toBeDefined();
+    });
+    test('generateText with single requestCallback callback', async () => {
+      const res = await watsonxAiMlService.generateText(
+        {
+          input: 'Hello. How are you?',
+          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          projectId: process.env.WATSONX_AI_PROJECT_ID,
+        },
+        {
+          requestCallback,
+        }
+      );
+      expect(res).toBeDefined();
+    });
+    test('generateText with single responseCallback callback', async () => {
+      const res = await watsonxAiMlService.generateText(
+        {
+          input: 'Hello. How are you?',
+          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          projectId: process.env.WATSONX_AI_PROJECT_ID,
+        },
+        {
+          responseCallback,
+        }
+      );
+      expect(res).toBeDefined();
+    });
+  });
 });

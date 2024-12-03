@@ -60,12 +60,6 @@ export function getSdkHeaders(
   return headers;
 }
 
-export interface ObjectStreamed<T> {
-  id: number;
-  event: string;
-  data: T;
-}
-
 const stringToObj = (chunk: string[]) => {
   const obj = {};
   chunk.forEach((line) => {
