@@ -1,0 +1,33 @@
+{
+  "name": "langchain-regresion-tests",
+  "version": "1.0.0",
+  "description": "Regresion tests for langchain/community/ibm",
+  "scripts": {
+    "test": "jest",
+    "test-regression": "yalc add @ibm-cloud/watsonx-ai && npm install && npm install @langchain/community@latest && npm test"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "testEnvironment": "node",
+    "preset": "ts-jest",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testTimeout": 20000
+  },
+  "dependencies": {
+    "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
+    "@langchain/community": "^0.3.17",
+    "@langchain/core": "^0.3.19"
+  },
+  "devDependencies": {
+    "@langchain/langgraph": "^0.2.20",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.9.0",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "path": "^0.12.7",
+    "ts-jest": "^29.2.5"
+  }
+}

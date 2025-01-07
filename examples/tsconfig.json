@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "resolveJsonModule": true,
+    "lib": ["es6", "es5", "es2015", "dom", "scripthost"],
+    "outDir": "./dist",
+    "declaration": true,
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "moduleResolution": "node",
+    "types": ["node", "jest"],
+    "esModuleInterop": true,
+    "paths": {
+      "@ibm-cloud/watsonx-ai": ["../../watsonx-ai-ml"]
+    },
+    "allowJs": true
+  },
+  "include": ["src/sdk/**/*", "src/external/**/*", "src/test/**/*"]
+}

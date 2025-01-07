@@ -8,14 +8,20 @@ jobs:
   include:
   - stage: "Unit tests"
     node_js: 18
-    env: TEST_SUITE=unit
+    env: TEST_SUITE=unit-travis
   - node_js: 20
-    env: TEST_SUITE=unit
+    env: TEST_SUITE=unit-travis
   - node_js: 22
-    env: TEST_SUITE=unit
+    env: TEST_SUITE=unit-travis
   - stage: "Integration tests"
     node_js: 20
-    env: TEST_SUITE=integration
+    env: TEST_SUITE=integration-travis
+  - stage: "Regression tests"
+    node_js: 20
+    env: TEST_SUITE=regression
+  - stage: "Examples tests"
+    node_js: 20
+    env: TEST_SUITE=examples
   - stage: "Security scans"
     name: "Secrets scanning"
     language: python
@@ -33,7 +39,7 @@ jobs:
       - node --version
       - npm --version
     script: npm audit --audit-level moderate
-  
+
 
 before_install:
   - node --version
@@ -42,8 +48,8 @@ before_install:
 
 script:
   - npm run build
-  - npm run test-"${TEST_SUITE}"-travis || travis_terminate 1
-  - if [[ "${TEST_SUITE}" == "unit" ]] ; then 
+  - npm run "test-${TEST_SUITE}" || travis_terminate 1
+  - if [[ "${TEST_SUITE}" == "unit" ]] ; then
       npm run lint ;
     fi
   - npm run check-packages

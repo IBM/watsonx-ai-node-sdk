@@ -93,3 +93,7 @@ openapi-sdkgen/
 # API spec files
 watsonx-ai.json
 watsonx-ai-cp.json
+
+# yalc publish files
+.yalc
+yalc.lock

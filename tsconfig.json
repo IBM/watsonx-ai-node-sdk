@@ -23,5 +23,6 @@
     "types": [
       "node"
     ], /* Type declaration files to be included in compilation. */
-  }
+  },
+  "exclude": ["./test/langchain", "./dist/**/*", "./examples/**/*"]
 }

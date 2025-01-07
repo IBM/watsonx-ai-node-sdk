@@ -29,7 +29,7 @@ const { Stream } = require('../../dist/lib/common.js');
 const timeout = 200000;
 
 // Location of our config file.
-const configFile = 'test/integration/watsonx_ai_ml_vml_v1.env';
+const configFile = 'credentials/watsonx_ai_ml_vml_v1.env';
 
 const describe = authHelper.prepareTests(configFile);
 authHelper.loadEnv();

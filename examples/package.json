@@ -1,22 +1,58 @@
 {
-  "name": "examples",
-  "type": "module",
+  "name": "watsonx-node.js-examples",
   "version": "1.0.0",
-  "description": "In this directory, you can find examples how to use IBM watsonx.ai Node.js SDK in different scenarios.",
-  "main": ".eslintrc.js",
+  "description": "Example usage of SDK as well as external libraries that are implemented with usage of our SDK",
   "scripts": {
-    "text_generation": "node example_list_models_and_generate_text.js && node example_prompt_generate_text.js && node example_prompt_generate_stream_text.js && node example_tokenize_input.js",
-    "embeddings": "node example_generate_embeddings.js",
-    "prompt_tuning": "node example_prompt_tuning.js",
-    "chat": "node example_chat.js && node example_chat_stream.js && node example_chat_image.js && node example_chat_tools.js",
-    "all": "npm run text_generation && npm run embeddings && npm run chat",
-    "all-ext": "npm run all && npm run prompt_tuning"
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand",
+    "build": "tsc",
+    "text_generation": "npm run build && node ./dist/sdk/call/text_generation.js",
+    "embeddings": "npm run build && node ./dist/sdk/call/embeddings.js",
+    "prompt_tuning": "npm run build && node ./dist/sdk/call/prompt.js",
+    "chat": "npm run build && node ./dist/sdk/call/chat.js",
+    "all": "npm run build && npm run text_generation && npm run embeddings && npm run chat",
+    "all-ext": "npm run build && npm run all && npm run prompt_tuning",
+    "test-install": "yalc add @ibm-cloud/watsonx-ai && npm install && npm install @langchain/community@latest @langchain/langgraph@latest",
+    "langchain-chat": "npm run build && node ./dist/external/langchain/call/chat.js",
+    "langchain-chat-image": "npm run build && node ./dist/external/langchain/call/chat_image.js",
+    "langchain-tools": "npm run build && node ./dist/external/langchain/call/chat_tools.js",
+    "langchain-langgraph-tools": "npm run build && node ./dist/external/langchain/call/chat_langgraph.js",
+    "langgraph-rag": "npm run build && node ./dist/external/langchain/call/embeddings_store.js",
+    "all-langchain": "npm run build && node ./dist/external/langchain/call/chat.js && node ./dist/external/langchain/call/chat_image.js && node ./dist/external/langchain/call/chat_tools.js && node ./dist/external/langchain/call/chat_langgraph.js",
+    "all-langchain-ext": "npm all-langchain && node ./dist/external/langchain/call/embeddings_store.js",
+    "test-sdk": "npm run test-install && npm test sdk.test.ts",
+    "test-langchain": "npm run test-install && npm test langchain.test.ts",
+    "test-all": "npm run test-install && npm test"
   },
-  "author": "",
-  "license": "ISC",
+  "jest": {
+    "collectCoverage": true,
+    "testEnvironment": "node",
+    "preset": "ts-jest",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testTimeout": 60000,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ]
+  },
   "dependencies": {
-    "@ibm-cloud/watsonx-ai": "^1.1.0",
-    "axios": "^1.7.7",
-    "dotenv": "^16.4.5"
+    "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
+    "@langchain/community": "^0.3.17",
+    "@langchain/core": "^0.3.19",
+    "@langchain/langgraph": "^0.2.30",
+    "@zilliz/milvus2-sdk-node": "^2.5.0",
+    "axios": "^1.7.8",
+    "dotenv": "^16.4.5",
+    "duck-duck-scrape": "^2.2.6",
+    "langchain": "^0.3.6",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.9.0",
+    "path": "^0.12.7",
+    "ts-jest": "^29.2.5"
   }
 }

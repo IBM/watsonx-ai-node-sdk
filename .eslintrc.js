@@ -36,7 +36,7 @@ module.exports = {
       'extends': ['airbnb-typescript/base', 'prettier'],
       'parser': '@typescript-eslint/parser',
       'parserOptions': {
-        'project': 'tsconfig.json',
+        'project': ['tsconfig.json', './test/langchain/tsconfig.json', './examples/tsconfig.json'],
         'sourceType': 'module',
       },
       'plugins': ['eslint-plugin-jsdoc', 'eslint-plugin-import', '@typescript-eslint', 'prettier'],
@@ -48,6 +48,16 @@ module.exports = {
         'no-underscore-dangle': 'off',
         'prettier/prettier': 'error',
         'spaced-comment': ['error', 'always', { 'exceptions': ['*'] }],
+      },
+    },
+    {
+      'files': ['examples/src/**/*'],
+      'rules': {
+        'no-console': 'off',
+        'import/prefer-default-export': 'off',
+        'no-restricted-syntax': 'off',
+        'prefer-template': 'off',
+        'no-await-in-loop': 'off',
       },
     },
   ],
