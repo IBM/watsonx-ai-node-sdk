@@ -1,9 +1,12 @@
+import path from 'path';
+import { readdir } from 'fs/promises';
 import { chatConversation } from '../external/langchain/chat_conversation';
 import { chatWithImage } from '../external/langchain/chat_image';
 import { chatWithLanggraph } from '../external/langchain/chat_langgraph';
 import { chatWithTools } from '../external/langchain/chat_tools';
 import { rag } from '../external/langchain/rag_memory_vector_store';
 import { milvusRag } from '../external/langchain/rag_milvus';
+import { rerankDocuments } from '../external/langchain/rerank';
 
 describe('Langchain example tests', () => {
   test('Chat conversations', async () => {
@@ -23,5 +26,8 @@ describe('Langchain example tests', () => {
   });
   test('RAG remote vector storage', async () => {
     await milvusRag();
+  });
+  test('Rerank', async () => {
+    await rerankDocuments();
   });
 });

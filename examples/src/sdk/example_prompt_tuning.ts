@@ -123,7 +123,7 @@ export const promptTuning = async () => {
     stop_sequences: ['fail'],
     time_limit: 600000,
     repetition_penalty: 1.5,
-    truncate_input_tokens: 0,
+    truncate_input_tokens: 1,
     return_options: returnOptionPropertiesModel,
     include_stop_sequence: true,
     prompt_variables: {

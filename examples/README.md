@@ -12,12 +12,13 @@ To try examples locally, clone the repository. Once done please follow these ste
 5. You can run the examples now with ```node <file_name>.js```
 6. Also we have provided combined examples that can be run with additional commands:
 
-| Examples | Command | 
+| Examples | Command |
 |---|---|
 | Text generation | ```npm run text_generation``` |
 | Embeddings | ```npm run embeddings``` |
 | Prompt tuning | ```npm run prompt_tuning``` |
 | Chat | ```npm run chat``` |
+| Rerank| ```npm run rerank``` |
 | All short running | ```npm run all``` |
 | All long running | ```npm run all-ext``` |
 | Chat conversations | ```npm run langchain-chat``` |
@@ -25,6 +26,7 @@ To try examples locally, clone the repository. Once done please follow these ste
 | Chat with tools | ```npm run langgraph-tools``` |
 | Chat with langgraph | ```npm run langchain-langgraph-tools``` |
 | Embedding storage with Chroma and questions (RAG) | ```npm run langgraph-rag":``` |
+| Rerank with langchain | ```npm run langchain-rerank``` |
 | All langgraph short running | ```npm run all-langchain``` |
 | All langgraph long running | ```npm run all-langchain-ext``` |
 
@@ -43,6 +45,7 @@ To try examples locally, clone the repository. Once done please follow these ste
 | Chat streaming with history  | This example shows how to perform a simple inference with chat, including chat history and model output is recived as a stream of strings and a stream of objects. | [link](./src/sdk/example_chat_stream.ts) |
 | Chat with tools  | This example shows usage of chat with tools applied. In this case two tools are passed to a model and choice can be made between these two. | [link](./src/sdk/example_chat_tools.ts) |
 | Chat with image as input  | This example shows a use case of non-string input to chat model. An image from a url is passed to a model with question about the image. | [link](./src/sdk/example_chat_image.ts) |
+| Rerank | This example shows a use case of rerank method that allows user to input some data chunks that will be reranked and will recieve individual score regarding on how well they meet the provided query | [link](./src/sdk/example_rerank.ts) |
 
 #### Langchain
 
@@ -53,3 +56,4 @@ To try examples locally, clone the repository. Once done please follow these ste
 | Chat with tools | This example presents usage of chat with simple, own created tools.| [link](./src/external//langchain/chat_tools.ts) |
 | Chat with langgraph | This example shows usage of langchain tool function with langgraph and agents. Also external tools are presented in the last steps such as TavilySearch. | [link](./src/external/langchain/chat_langgraph.ts) |
 | Embedding storage with Chroma and questions (RAG) | This example shows how to build a RAG application with usage of Chroma, some data and questions regarding the data. | [link](./src/sdk/example_tokenize_input.ts) |
+| Rerank | This example presents a rerank solution with usage of vectorStorage and inbuild langchain splitters and loaders | [link](./src/external/langchain/rerank.ts) |
