@@ -9,6 +9,7 @@ import { textGenerationStream } from '../sdk/example_prompt_generate_stream_text
 import { promptTextGeneration } from '../sdk/example_prompt_generate_text';
 import { tokenizeInput } from '../sdk/example_tokenize_input';
 import { promptTuning } from '../sdk/example_prompt_tuning';
+import { instructLabFlow } from '../sdk/example_instruct_lab';
 import { rerankDocuments } from '../sdk/example_rerank';
 
 config({ path: '../../../credentials/watsonx_ai_ml_vml_v1.env' });
@@ -50,4 +51,12 @@ describe('Test examples', () => {
   test('Basic rerank usage', async () => {
     await rerankDocuments();
   });
+  //This test takes around 40min. Only to be run on local machine
+  test.skip(
+    'Instruct Lab flow',
+    async () => {
+      await instructLabFlow();
+    },
+    60000 * 40
+  );
 });

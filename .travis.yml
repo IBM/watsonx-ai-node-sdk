@@ -48,7 +48,11 @@ before_install:
 
 script:
   - npm run build
-  - npm run "test-${TEST_SUITE}" || travis_terminate 1
+  - if [[ "${TEST_SUITE}" == "integration-travis" ]] ; then
+      travis_wait 15 npm run "test-${TEST_SUITE}" || travis_terminate 1;
+    else
+      npm run "test-${TEST_SUITE}" || travis_terminate 1;
+    fi
   - if [[ "${TEST_SUITE}" == "unit" ]] ; then
       npm run lint ;
     fi

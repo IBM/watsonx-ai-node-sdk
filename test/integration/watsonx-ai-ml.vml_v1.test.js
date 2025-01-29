@@ -1,5 +1,5 @@
 /**
- * (C) Copyright IBM Corp. 2024.
+ * (C) Copyright IBM Corp. 2025.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 
+const { Readable, addAbortSignal } = require('node:stream');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
@@ -55,6 +57,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   let promptId;
   let sessionId;
   let entryId;
+  let promptDeploymentId;
 
   test('Initialize service', async () => {
     watsonxAiMlService = WatsonxAiMlVml_v1.newInstance({
@@ -78,8 +81,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     const objectLocationModel = {
       location: { path: 'tune1/results' },
       type: 'container',
-      // id: 'testString',
-      // connection: dataConnectionModel,
     };
 
     // BaseModel
@@ -195,7 +196,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     const retryAsyncCall = async (args = [], retries = 5, delay = 150000) => {
       for (let i = 0; i < retries; i += 1) {
         const result = await watsonxAiMlService.getTraining(args);
-
         if (result.result.entity.model_id !== undefined) {
           return result.result.entity.model_id;
         }
@@ -221,14 +221,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     // SimpleRel
     const simpleRelModel = {
       id: '4cedab6d-e8e4-4214-b81a-2ddb122db2ab',
-    };
-
-    // HardwareSpec
-    const hardwareSpecModel = {
-      id: '4cedab6d-e8e4-4214-b81a-2ddb122db2ab',
-      rev: '2',
-      name: 'testString',
-      num_nodes: 2,
     };
 
     // HardwareRequest
@@ -587,7 +579,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     // PromptWithExternal
     const promptWithExternalModel = {
       input: [['testString', '']],
-      model_id: 'ibm/granite-13b-chat-v2',
+      model_id: 'meta-llama/llama-3-1-70b-instruct',
       data: promptDataModel,
     };
 
@@ -602,9 +594,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       description: 'My First Prompt',
       taskIds: ['testString'],
       lock: promptLockModel,
-      // modelVersion: wxPromptPostModelVersionModel,
-      // promptVariables: { 'key1': { anyKey: 'anyValue' } },
-      inputMode: 'structured',
+      inputMode: 'chat',
       projectId,
     };
 
@@ -663,27 +653,18 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     // Prompt
     const promptModel = {
       input: [['testString', '']],
-      model_id: 'ibm/granite-13b-chat-v2',
+      model_id: 'meta-llama/llama-3-1-70b-instruct',
       // model_parameters: promptModelParametersModel,
       data: promptDataModel,
       // system_prompt: 'testString',
       // chat_items: [chatItemModel],
     };
 
-    // WxPromptPatchModelVersion
-    // const wxPromptPatchModelVersionModel = {
-    //  number: '2.0.0-rc.7',
-    //  tag: 'tag',
-    //  description: 'Description of the model version.',
-    // };
-
     const params = {
       promptId,
       name: 'My Prompt',
       prompt: promptModel,
       description: 'My Updated First Prompt',
-      // modelVersion: wxPromptPatchModelVersionModel,
-      // promptVariable: { 'key1': { anyKey: 'anyValue' } },
       projectId,
     };
 
@@ -761,6 +742,168 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(res).toBeDefined();
     expect(res.status).toBe(201);
     expect(res.result).toBeDefined();
+  });
+
+  test('createPromptDeployment', async () => {
+    const promptParams = {
+      promptId,
+      projectId,
+    };
+
+    // HardwareRequest
+    const hardwareRequestModel = {
+      size: 'gpu_s',
+      num_nodes: 5,
+    };
+
+    // OnlineDeploymentParameters
+    const onlineDeploymentParametersModel = {
+      serving_name: (Math.random() + 1).toString(36).substring(10),
+    };
+
+    // OnlineDeployment
+    const onlineDeploymentModel = {
+      parameters: onlineDeploymentParametersModel,
+    };
+
+    const promptTemplate = {
+      id: promptId,
+    };
+
+    const params = {
+      name: 'text_classification',
+      online: onlineDeploymentModel,
+      baseModelId: 'meta-llama/llama-3-1-70b-instruct',
+      promptTemplate: promptTemplate,
+      projectId,
+      description: 'testString',
+      tags: ['testString'],
+      custom: { anyKey: 'anyValue' },
+      hardwareRequest: hardwareRequestModel,
+    };
+
+    const res = await watsonxAiMlService.createDeployment(params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(202);
+    expect(res.result).toBeDefined();
+    promptDeploymentId = res.result.metadata.id;
+  }, 800000);
+
+  test('deploymentsTextChat()', async () => {
+    // DeploymentTextChatMessagesTextChatMessageAssistant
+    const deploymentTextChatMessagesModel = {
+      role: 'user',
+      content: 'Who won the world series in 2020?',
+    };
+
+    const params = {
+      idOrName: promptDeploymentId,
+      messages: [deploymentTextChatMessagesModel],
+    };
+
+    const res = await watsonxAiMlService.deploymentsTextChat(params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(200);
+    expect(res.result).toBeDefined();
+  });
+
+  test('deploymentsTextChatStream()', async () => {
+    // DeploymentTextChatMessagesTextChatMessageAssistant
+    const deploymentTextChatMessagesModel = {
+      role: 'user',
+      content: 'Who won the world series in 2020?',
+    };
+
+    const params = {
+      idOrName: promptDeploymentId,
+      messages: [deploymentTextChatMessagesModel],
+    };
+
+    const res = await watsonxAiMlService.deploymentsTextChatStream(params);
+    console.log(res)
+    expect(res).toBeInstanceOf(Stream);
+    expect(res).toBeDefined();
+  });
+
+  test('deploymentsTextChatStream() as string', async () => {
+    // DeploymentTextChatMessagesTextChatMessageAssistant
+    const deploymentTextChatMessagesModel = {
+      role: 'user',
+      content: 'Who won the world series in 2020?',
+    };
+
+    const params = {
+      idOrName: promptDeploymentId,
+      messages: [deploymentTextChatMessagesModel],
+    };
+
+    const stream = await watsonxAiMlService.deploymentsTextChatStream(params);
+    for await (const chunk of stream) {
+      expect(typeof chunk === 'string').toBe(true);
+      break;
+    }
+  });
+
+  test('deploymentsTextChatStream() as object', async () => {
+    // DeploymentTextChatMessagesTextChatMessageAssistant
+    const deploymentTextChatMessagesModel = {
+      role: 'user',
+      content: 'Who won the world series in 2020?',
+    };
+
+    const params = {
+      idOrName: promptDeploymentId,
+      messages: [deploymentTextChatMessagesModel],
+      returnObject: true,
+    };
+
+    const stream = await watsonxAiMlService.deploymentsTextChatStream(params);
+    for await (const chunk of stream) {
+      expect(typeof chunk.id === 'number').toBe(true);
+      break;
+    }
+  });
+
+  test('textChatStream aborting', async () => {
+    const abortStreaming = async () => {
+      const stream = await watsonxAiMlService.deploymentsTextChatStream({
+        messages: [
+          {
+            role: 'user',
+            content: 'What is your name?',
+          },
+        ],
+        idOrName: promptDeploymentId,
+      });
+      const controller = new AbortController();
+      const readable = Readable.from(stream);
+      addAbortSignal(controller.signal, readable);
+      for await (const chunk of readable) {
+        console.log(chunk);
+        controller.abort();
+      }
+    };
+
+    await expect(abortStreaming()).rejects.toThrow('The operation was aborted');
+  });
+
+  test('deploymentTextChatStream build in aborting', async () => {
+    const abortStreaming = async () => {
+      const stream = await watsonxAiMlService.deploymentsTextChatStream({
+        messages: [
+          {
+            role: 'user',
+            content: 'What is your name?',
+          },
+        ],
+        idOrName: promptDeploymentId,
+      });
+      for await (const chunk of stream) {
+        console.log(chunk);
+        stream.controller.abort();
+      }
+    };
+  await expect(abortStreaming()).rejects.toThrow('The operation was aborted');
   });
 
   test('createPromptSession', async () => {
@@ -1045,4 +1188,16 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(res.status).toBe(204);
     expect(res.result).toBeDefined();
   });
+
+  test('deletePromptDeployment', async () => {
+    const params = {
+      deploymentId: promptDeploymentId,
+      projectId,
+    };
+
+    const res = await watsonxAiMlService.deleteDeployment(params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(204);
+    expect(res.result).toBeDefined();
+   });
 });

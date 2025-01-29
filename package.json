@@ -1,6 +1,6 @@
 {
   "name": "@ibm-cloud/watsonx-ai",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "IBM watsonx.ai Node.js SDK",
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
     "test-unit-travis": "jest --runInBand --verbose test/unit/",
     "test-integration-travis": "jest --runInBand --verbose --no-colors --testNamePattern='^((?!@slow).)*$' --json test/integration > test-output.log",
     "test-regression": "npm run local-publish && cd ./test/langchain && npm run test-regression",
+    "test-ilab": "npm run build && jest test/integration/watsonx-ai-ml-ilab.vml_v1.test.js --testPathIgnorePatterns=''",
     "check-packages": "installed-check -e -d -v",
     "all": "npm run test-unit && npm run lint",
     "typedoc": "typedoc",
@@ -81,7 +82,8 @@
     ],
     "testPathIgnorePatterns": [
       "<rootDir>/test/langchain/",
-      "<rootDir>/examples"
+      "<rootDir>/examples",
+      "ilab"
     ],
     "testEnvironment": "node"
   },

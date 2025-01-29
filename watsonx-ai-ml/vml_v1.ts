@@ -1,5 +1,5 @@
 /**
- * (C) Copyright IBM Corp. 2024.
+ * (C) Copyright IBM Corp. 2025.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -846,6 +846,236 @@ class WatsonxAiMlVml_v1 extends BaseService {
       : transformStreamToStringStream<string>(apiResponse);
     return stream;
   }
+
+  /**
+   * Infer text chat.
+   *
+   * Infer the next chat message for a given deployment. The deployment must reference a prompt template which has
+   * `input_mode` set to `chat`. The model to the chat request will be from the deployment `base_model_id`. Parameters
+   * to the chat request will be from the prompt template `model_parameters`. Related guides:
+   * [Deployment](https://cloud.ibm.com/apidocs/watsonx-ai#create-deployment), [Prompt
+   * template](https://cloud.ibm.com/apidocs/watsonx-ai#post-prompt), [Text
+   * chat](https://cloud.ibm.com/apidocs/watsonx-ai#text-chat).
+   *
+   * If a `serving_name` is used then it must match the `serving_name` that is returned in the `inference` section when
+   * the deployment was created.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.idOrName - The `id_or_name` can be either the `deployment_id` that identifies the deployment
+   * or a `serving_name` that allows a predefined URL to be used to post a prediction. The deployment must reference a
+   * prompt template with `input_mode` `chat`.
+   *
+   * The WML instance that is associated with the deployment will be used for limits and billing (if a paid plan).
+   * @param {DeploymentTextChatMessages[]} params.messages - The messages for this chat session. You cannot specify
+   * `system` `role` in the messages. Depending on the model, the `content` of `system` `role` may be from
+   * `system_prompt` of the prompt template, and will be automatically inserted into `messages`.
+   *
+   * As an example, depending on the model, if `system_prompt` of a prompt template is "You are Granite Chat, an AI
+   * language model developed by IBM. You are a cautious assistant. You carefully follow instructions. You are helpful
+   * and harmless and you follow ethical guidelines and promote positive behavior.", a message with `system` `role`
+   * having `content` the same as `system_prompt` is inserted.
+   * @param {string} [params.context] - If specified, `context` will be inserted into `messages`. Depending on the
+   * model, `context` may be inserted into the `content` with `system` `role`; or into the `content` of the last message
+   * of `user` `role`.
+   *
+   *
+   * In the example, `context` "Today is Wednesday" is inserted as such
+   * `content` of `user` becomes "Today is Wednesday. Who are you and which day is tomorrow?".
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>}
+   *
+   * @category Deployments
+   */
+  public deploymentsTextChat(
+    params: WatsonxAiMlVml_v1.DeploymentsTextChatParams,
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>> {
+    const _params = { ...params };
+    const _requiredParams = ['idOrName', 'messages'];
+    const _validParams = ['idOrName', 'messages', 'context', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'messages': _params.messages,
+      'context': _params.context,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const path = {
+      'id_or_name': _params.idOrName,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'deploymentsTextChat'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/deployments/{id_or_name}/text/chat',
+        method: 'POST',
+        body,
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    const callbackHandler = callbacks
+      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
+      : undefined;
+    callbackHandler?.handleRequest(parameters);
+    const response = this.createRequest(parameters);
+    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
+      response
+    );
+    return response;
+  }
+
+  /**
+   * Infer text chat event stream.
+   *
+   * Infer the next chat message for a given deployment. This operation will return the output tokens as a stream of
+   * events. The deployment must reference a prompt template which has `input_mode` set to `chat`. The model to the chat
+   * request will be from the deployment `base_model_id`. Parameters to the chat request will be from the prompt
+   * template `model_parameters`. Related guides:
+   * [Deployment](https://cloud.ibm.com/apidocs/watsonx-ai#create-deployment), [Prompt
+   * template](https://cloud.ibm.com/apidocs/watsonx-ai#post-prompt), [Text
+   * chat](https://cloud.ibm.com/apidocs/watsonx-ai#text-chat).
+   *
+   * If a `serving_name` is used then it must match the `serving_name` that is returned in the `inference` section when
+   * the deployment was created.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.idOrName - The `id_or_name` can be either the `deployment_id` that identifies the deployment
+   * or a `serving_name` that allows a predefined URL to be used to post a prediction. The deployment must reference a
+   * prompt template with `input_mode` `chat`.
+   *
+   * The WML instance that is associated with the deployment will be used for limits and billing (if a paid plan).
+   * @param {DeploymentTextChatMessages[]} params.messages - The messages for this chat session. You cannot specify
+   * `system` `role` in the messages. Depending on the model, the `content` of `system` `role` may be from
+   * `system_prompt` of the prompt template, and will be automatically inserted into `messages`.
+   *
+   * As an example, depending on the model, if `system_prompt` of a prompt template is "You are Granite Chat, an AI
+   * language model developed by IBM. You are a cautious assistant. You carefully follow instructions. You are helpful
+   * and harmless and you follow ethical guidelines and promote positive behavior.", a message with `system` `role`
+   * having `content` the same as `system_prompt` is inserted.
+   * @param {string} [params.context] - If specified, `context` will be inserted into `messages`. Depending on the
+   * model, `context` may be inserted into the `content` with `system` `role`; or into the `content` of the last message
+   * of `user` `role`.
+   *
+   *
+   * In the example, `context` "Today is Wednesday" is inserted as such
+   * `content` of `user` becomes "Today is Wednesday. Who are you and which day is tomorrow?".
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatResponse[]>>>} return - Promise resolving to Stream object. Stream object is AsyncIterable based class. Stream object contains an additional property holding an AbortController, read more below.
+   * @returns {AbortController} return.controller - Abort controller. Allows user to abort when reading from stream without transition to Readable
+   * @category Deployments
+   */
+  public async deploymentsTextChatStream(
+    params: WatsonxAiMlVml_v1.DeploymentsTextChatStreamParams & { returnObject?: false },
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
+  ): Promise<Stream<string>>;
+
+  public async deploymentsTextChatStream(
+    params: WatsonxAiMlVml_v1.DeploymentsTextChatStreamParams & { returnObject: true },
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
+  ): Promise<Stream<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>>;
+
+  public async deploymentsTextChatStream(
+    params: WatsonxAiMlVml_v1.DeploymentsTextChatStreamParams,
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+    >
+  ): Promise<
+    Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>
+  > {
+    const _params = { ...params };
+    const _requiredParams = ['idOrName', 'messages'];
+    const _validParams = ['idOrName', 'messages', 'context', 'headers', 'returnObject'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'messages': _params.messages,
+      'context': _params.context,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const path = {
+      'id_or_name': _params.idOrName,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'deploymentsTextChatStream'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/deployments/{id_or_name}/text/chat_stream',
+        method: 'POST',
+        body,
+        qs: query,
+        path,
+        responseType: 'stream',
+        adapter: 'fetch',
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'text/event-stream',
+          'Connection': 'keep-alive',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    const callbackHandler = callbacks
+      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
+      : undefined;
+    callbackHandler?.handleRequest(parameters);
+    const apiResponse = await this.createRequest(parameters);
+    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
+      apiResponse
+    );
+    const stream = _params.returnObject
+      ? transformStreamToObjectStream<
+          WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>
+        >(apiResponse)
+      : transformStreamToStringStream<string>(apiResponse);
+    return stream;
+  }
+
   /*************************
    * foundationModelSpecs
    ************************/
@@ -3680,6 +3910,1068 @@ class WatsonxAiMlVml_v1 extends BaseService {
     );
     return response;
   }
+  /*************************
+   * fineTunings
+   ************************/
+
+  /**
+   * Create a fine tuning job.
+   *
+   * Create a fine tuning job that will fine tune an LLM.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.name - The name of the job.
+   * @param {ObjectLocation[]} params.trainingDataReferences - The training datasets.
+   * @param {ObjectLocation} params.resultsReference - The training results. Normally this is specified as
+   * `type=container` which
+   * means that it is stored in the space or project.
+   * @param {string} [params.description] - The description of the job.
+   * @param {string[]} [params.tags] - A list of tags for this resource.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
+   * to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
+   * be given.
+   * @param {boolean} [params.autoUpdateModel] - This field must not be set while creating a fine tuning job with
+   * InstructLab.
+   *
+   * If set to `true` then the result of the training, if successful, will be uploaded to the repository as a model.
+   * @param {FineTuningParameters} [params.parameters] - This field must not be set while creating a fine tuning job
+   * with InstructLab.
+   *
+   * The parameters for the job. Note that if `verbalizer` is provided
+   * then `response_template` must also be provided (and vice versa).
+   * @param {string} [params.type] - The `type` of Fine Tuning training. The `type` is set to `ilab` for InstructLab
+   * training.
+   * @param {ObjectLocation[]} [params.testDataReferences] - This field must not be set while creating a fine tuning job
+   * with InstructLab.
+   *
+   * The holdout/test datasets.
+   * @param {JsonObject} [params.custom] - User defined properties specified as key-value pairs.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FineTuningResource>>}
+   */
+  public createFineTuning(
+    params: WatsonxAiMlVml_v1.CreateFineTuningParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FineTuningResource>> {
+    const _params = { ...params };
+    const _requiredParams = ['name', 'trainingDataReferences', 'resultsReference'];
+    const _validParams = [
+      'name',
+      'trainingDataReferences',
+      'resultsReference',
+      'description',
+      'tags',
+      'projectId',
+      'spaceId',
+      'autoUpdateModel',
+      'parameters',
+      'type',
+      'testDataReferences',
+      'custom',
+      'headers',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'name': _params.name,
+      'training_data_references': _params.trainingDataReferences,
+      'results_reference': _params.resultsReference,
+      'description': _params.description,
+      'tags': _params.tags,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+      'auto_update_model': _params.autoUpdateModel,
+      'parameters': _params.parameters,
+      'type': _params.type,
+      'test_data_references': _params.testDataReferences,
+      'custom': _params.custom,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'createFineTuning'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/fine_tunings',
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Retrieve the list of fine tuning jobs.
+   *
+   * Retrieve the list of fine tuning jobs for the specified space or project.
+   *
+   * @param {Object} [params] - The parameters to send to the service.
+   * @param {string} [params.start] - Token required for token-based pagination. This token cannot be determined by end
+   * user. It is generated by the service and it is set in the href available in the `next` field.
+   * @param {number} [params.limit] - How many resources should be returned.
+   * @param {boolean} [params.totalCount] - Compute the total count. May have performance impact.
+   * @param {string} [params.tagValue] - Return only the resources with the given tag value.
+   * @param {string} [params.state] - Filter based on on the job state: queued, running, completed, failed etc.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FineTuningResources>>}
+   */
+  public listFineTunings(
+    params?: WatsonxAiMlVml_v1.FineTuningListParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FineTuningResources>> {
+    const _params = { ...params };
+    const _requiredParams = [];
+    const _validParams = [
+      'start',
+      'limit',
+      'totalCount',
+      'tagValue',
+      'state',
+      'spaceId',
+      'projectId',
+      'headers',
+      'type',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'start': _params.start,
+      'limit': _params.limit,
+      'total_count': _params.totalCount,
+      'tag.value': _params.tagValue,
+      'state': _params.state,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+      'type': _params.type,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'fineTuningList'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/fine_tunings',
+        method: 'GET',
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get a fine tuning job.
+   *
+   * Get the results of a fine tuning job, or details if the job failed.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The `id` is the identifier that was returned in the `metadata.id` field of the request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FineTuningResource>>}
+   */
+  public getFineTuning(
+    params: WatsonxAiMlVml_v1.GetFineTuningParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FineTuningResource>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'spaceId', 'projectId', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'getFineTuning'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/fine_tunings/{id}',
+        method: 'GET',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Cancel or delete a fine tuning job.
+   *
+   * Delete a fine tuning job if it exists, once deleted all trace of the job is gone.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The `id` is the identifier that was returned in the `metadata.id` field of the request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job or request metadata.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
+   */
+  public deleteFineTuning(
+    params: WatsonxAiMlVml_v1.DeleteFineTuningParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'spaceId', 'projectId', 'hardDelete', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+      'hard_delete': _params.hardDelete,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'deleteFineTuning'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/fine_tunings/{id}',
+        method: 'DELETE',
+        qs: query,
+        path,
+      },
+      defaultOptions: { ...this.baseOptions, headers: { ...sdkHeaders, ..._params.headers } },
+    };
+
+    return this.createRequest(parameters);
+  }
+  /*************************
+   * documentExtractionTechPreview
+   ************************/
+
+  /**
+   * Create a document extraction.
+   *
+   * Create a document extraction.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.name - The name of the document.
+   * @param {DocumentExtractionObjectLocation[]} params.documentReferences - The documents for text extraction.
+   * @param {ObjectLocationGithub} params.resultsReference - A reference to data.
+   * @param {string[]} [params.tags] - A list of tags for this resource.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
+   * to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
+   * be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResource>>}
+   */
+  public createDocumentExtraction(
+    params: WatsonxAiMlVml_v1.CreateDocumentExtractionParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResource>> {
+    const _params = { ...params };
+    const _requiredParams = ['name', 'documentReferences'];
+    const _validParams = [
+      'name',
+      'documentReferences',
+      'resultsReference',
+      'tags',
+      'projectId',
+      'spaceId',
+      'headers',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'name': _params.name,
+      'document_references': _params.documentReferences,
+      'results_reference': _params.resultsReference,
+      'tags': _params.tags,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'createDocumentExtraction'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/documents',
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get document extractions.
+   *
+   * Get document extractions.
+   *
+   * @param {Object} [params] - The parameters to send to the service.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResources>>}
+   */
+  public listDocumentExtractions(
+    params?: WatsonxAiMlVml_v1.ListDocumentExtractionsParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResources>> {
+    const _params = { ...params };
+    const _requiredParams = [];
+    const _validParams = ['projectId', 'spaceId', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'listDocumentExtractions'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/documents',
+        method: 'GET',
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get document extraction.
+   *
+   * Get document extraction.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The `id` is the identifier that was returned in the `metadata.id` field of the request.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResource>>}
+   */
+  public getDocumentExtraction(
+    params: WatsonxAiMlVml_v1.GetDocumentExtractionParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResource>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'getDocumentExtraction'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/documents/{id}',
+        method: 'GET',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Cancel the document extraction.
+   *
+   * Cancel the specified document extraction and remove it.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The `id` is the identifier that was returned in the `metadata.id` field of the request.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job metadata information.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
+   */
+  public cancelDocumentExtractions(
+    params: WatsonxAiMlVml_v1.CancelDocumentExtractionsParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+      'hard_delete': _params.hardDelete,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'cancelDocumentExtractions'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/documents/{id}',
+        method: 'DELETE',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+  /*************************
+   * syntheticDataGenerationTechPreview
+   ************************/
+
+  /**
+   * Create a synthetic data generation job.
+   *
+   * Create a synthetic data generation job.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.name - The name of the data.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
+   * be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
+   * to be given.
+   * @param {SyntheticDataGenerationDataReference} [params.dataReference] - A reference to data.
+   * @param {ObjectLocation} [params.resultsReference] - A reference to data.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResource>>}
+   */
+  public createSyntheticDataGeneration(
+    params: WatsonxAiMlVml_v1.CreateSyntheticDataGenerationParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResource>> {
+    const _params = { ...params };
+    const _requiredParams = ['name'];
+    const _validParams = [
+      'name',
+      'spaceId',
+      'projectId',
+      'dataReference',
+      'resultsReference',
+      'headers',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'name': _params.name,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+      'data_reference': _params.dataReference,
+      'results_reference': _params.resultsReference,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'createSyntheticDataGeneration'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/synthetic_data',
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get synthetic data generation jobs.
+   *
+   * @param {Object} [params] - The parameters to send to the service.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResources>>}
+   */
+  public listSyntheticDataGenerations(
+    params?: WatsonxAiMlVml_v1.ListSyntheticDataGenerationsParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResources>> {
+    const _params = { ...params };
+    const _requiredParams = [];
+    const _validParams = ['projectId', 'spaceId', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'listSyntheticDataGenerations'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/synthetic_data',
+        method: 'GET',
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get synthetic data generation job.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The `id` is the identifier that was returned in the `metadata.id` field of the request.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResource>>}
+   */
+  public getSyntheticDataGeneration(
+    params: WatsonxAiMlVml_v1.GetSyntheticDataGenerationParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResource>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'getSyntheticDataGeneration'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/synthetic_data/{id}',
+        method: 'GET',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Cancel the synthetic data generation.
+   *
+   * Cancel the synthetic data generation and remove it.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The `id` is the identifier that was returned in the `metadata.id` field of the request.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job metadata information.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
+   */
+  public cancelSyntheticDataGeneration(
+    params: WatsonxAiMlVml_v1.CancelSyntheticDataGenerationParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+      'hard_delete': _params.hardDelete,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'cancelSyntheticDataGeneration'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/synthetic_data/{id}',
+        method: 'DELETE',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+  /*************************
+   * taxonomyTechPreview
+   ************************/
+
+  /**
+   * Create a taxonomy job.
+   *
+   * Create a taxonomy job.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.name - The name of the document.
+   * @param {string} [params.description] - The description of the Taxonomy job.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
+   * be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
+   * to be given.
+   * @param {ObjectLocation} [params.dataReference] - A reference to data.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TaxonomyResource>>}
+   */
+  public createTaxonomy(
+    params: WatsonxAiMlVml_v1.CreateTaxonomyParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TaxonomyResource>> {
+    const _params = { ...params };
+    const _requiredParams = ['name'];
+    const _validParams = [
+      'name',
+      'description',
+      'spaceId',
+      'projectId',
+      'dataReference',
+      'headers',
+      'resultsReference',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'name': _params.name,
+      'description': _params.description,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+      'data_reference': _params.dataReference,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'createTaxonomy'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/taxonomies_imports',
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get taxonomy jobs.
+   *
+   * @param {Object} [params] - The parameters to send to the service.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TaxonomyResources>>}
+   */
+  public listTaxonomies(
+    params?: WatsonxAiMlVml_v1.ListTaxonomiesParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TaxonomyResources>> {
+    const _params = { ...params };
+    const _requiredParams = [];
+    const _validParams = ['projectId', 'spaceId', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'listTaxonomies'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/taxonomies_imports',
+        method: 'GET',
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get taxonomy job.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The `id` is the identifier that was returned in the `metadata.id` field of the request.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TaxonomyResource>>}
+   */
+  public getTaxonomy(
+    params: WatsonxAiMlVml_v1.GetTaxonomyParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TaxonomyResource>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'getTaxonomy'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/taxonomies_imports/{id}',
+        method: 'GET',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Cancel or delete the taxonomy job.
+   *
+   * Cancel or delete the taxonomy job.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The `id` is the identifier that was returned in the `metadata.id` field of the request.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {boolean} [params.hardDelete] - Set to `true` in order to also delete the job metadata information.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
+   */
+  public deleteTaxonomy(
+    params: WatsonxAiMlVml_v1.DeleteTaxonomyParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+      'hard_delete': _params.hardDelete,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'deleteTaxonomy'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/tuning/taxonomies_imports/{id}',
+        method: 'DELETE',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
 }
 
 /*************************
@@ -3878,6 +5170,67 @@ namespace WatsonxAiMlVml_v1 {
     moderations?: Moderations;
     headers?: OutgoingHttpHeaders;
     /* whether to return stream of objects if true or stream of strings if false or undefined */
+    returnObject?: boolean;
+  }
+
+  /** Parameters for the `deploymentsTextChat` operation. */
+  export interface DeploymentsTextChatParams {
+    /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
+     *  allows a predefined URL to be used to post a prediction. The deployment must reference a prompt template with
+     *  `input_mode` `chat`.
+     *
+     *  The WML instance that is associated with the deployment will be used for limits and billing (if a paid plan).
+     */
+    idOrName: string;
+    /** The messages for this chat session. You cannot specify `system` `role` in the messages. Depending on the
+     *  model, the `content` of `system` `role` may be from `system_prompt` of the prompt template, and will be
+     *  automatically inserted into `messages`.
+     *
+     *  As an example, depending on the model, if `system_prompt` of a prompt template is "You are Granite Chat, an AI
+     *  language model developed by IBM. You are a cautious assistant. You carefully follow instructions. You are
+     *  helpful and harmless and you follow ethical guidelines and promote positive behavior.", a message with `system`
+     *  `role` having `content` the same as `system_prompt` is inserted.
+     */
+    messages: DeploymentTextChatMessages[];
+    /** If specified, `context` will be inserted into `messages`. Depending on the model, `context` may be inserted
+     *  into the `content` with `system` `role`; or into the `content` of the last message of `user` `role`.
+     *
+     *
+     *  In the example, `context` "Today is Wednesday" is inserted as such
+     *  `content` of `user` becomes "Today is Wednesday. Who are you and which day is tomorrow?".
+     */
+    context?: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `deploymentsTextChatStream` operation. */
+  export interface DeploymentsTextChatStreamParams {
+    /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
+     *  allows a predefined URL to be used to post a prediction. The deployment must reference a prompt template with
+     *  `input_mode` `chat`.
+     *
+     *  The WML instance that is associated with the deployment will be used for limits and billing (if a paid plan).
+     */
+    idOrName: string;
+    /** The messages for this chat session. You cannot specify `system` `role` in the messages. Depending on the
+     *  model, the `content` of `system` `role` may be from `system_prompt` of the prompt template, and will be
+     *  automatically inserted into `messages`.
+     *
+     *  As an example, depending on the model, if `system_prompt` of a prompt template is "You are Granite Chat, an AI
+     *  language model developed by IBM. You are a cautious assistant. You carefully follow instructions. You are
+     *  helpful and harmless and you follow ethical guidelines and promote positive behavior.", a message with `system`
+     *  `role` having `content` the same as `system_prompt` is inserted.
+     */
+    messages: DeploymentTextChatMessages[];
+    /** If specified, `context` will be inserted into `messages`. Depending on the model, `context` may be inserted
+     *  into the `content` with `system` `role`; or into the `content` of the last message of `user` `role`.
+     *
+     *
+     *  In the example, `context` "Today is Wednesday" is inserted as such
+     *  `content` of `user` becomes "Today is Wednesday. Who are you and which day is tomorrow?".
+     */
+    context?: string;
+    headers?: OutgoingHttpHeaders;
     returnObject?: boolean;
   }
 
@@ -4876,6 +6229,11 @@ namespace WatsonxAiMlVml_v1 {
     /** The stats about deployments. */
     stats?: Stats[];
   }
+
+  /**
+   * DeploymentTextChatMessages.
+   */
+  export interface DeploymentTextChatMessages {}
 
   /** The template properties if this request refers to a prompt template. */
   export interface DeploymentTextGenProperties {
@@ -5903,6 +7261,80 @@ namespace WatsonxAiMlVml_v1 {
     tool_calls?: TextChatToolCall[];
   }
 
+  /**
+   * A message result.
+   */
+  export interface TextChatResultDelta {
+    /** The role of the author of this message. */
+    role: string;
+    /** The contents of the message. */
+    content?: string;
+    /** The refusal message generated by the model. */
+    refusal?: string;
+    /** The tool calls generated by the model, such as function calls. */
+    tool_calls?: TextChatToolCall[];
+  }
+
+  /**
+   * A tool related result.
+   */
+  export interface TextChatResultChoiceStream {
+    /** The index of this result. */
+    index?: number;
+    /** A message result. */
+    delta?: TextChatResultDelta;
+    /** The reason why the call stopped, can be one of:
+     *  - `stop` - The model hit a natural stop point or a provided stop sequence.
+     *  - `length` - The maximum number of tokens specified in the request was reached.
+     *  - `tool_calls` - The model called a tool.
+     *  - `time_limit`` - Time limit reached.
+     *  - `cancelled`` - Request canceled by the client.
+     *  - `error`` - Error encountered.
+     *  - `null` - API response still in progress or incomplete.
+     */
+    finish_reason?: TextChatResultChoiceStream.Constants.FinishReason | string;
+  }
+
+  export namespace TextChatResultChoiceStream {
+    export namespace Constants {
+      /** The reason why the call stopped, can be one of: - `stop` - The model hit a natural stop point or a provided stop sequence. - `length` - The maximum number of tokens specified in the request was reached. - `tool_calls` - The model called a tool. - `time_limit`` - Time limit reached. - `cancelled`` - Request canceled by the client. - `error`` - Error encountered. - `null` - API response still in progress or incomplete. */
+      export enum FinishReason {
+        STOP = 'stop',
+        LENGTH = 'length',
+        TOOL_CALLS = 'tool_calls',
+        TIME_LIMIT = 'time_limit',
+        CANCELLED = 'cancelled',
+        ERROR = 'error',
+      }
+    }
+  }
+
+  /**
+   * System details.
+   */
+  export interface TextChatStreamItem {
+    /** A unique identifier for the chat completion. */
+    id: string;
+    /** The model used for the chat completion. */
+    model_id: string;
+    /** This field is a duplicate of `model_id` and is provided in order to provide better compatibility with other
+     *  APIs.
+     */
+    model?: string;
+    /** The model version (using semantic versioning) if set. */
+    model_version?: string;
+    /** The Unix timestamp (in seconds) of when the chat completion was created. */
+    created: number;
+    /** The time when the response was created in ISO 8601 format. */
+    created_at?: string;
+    /** Usage statistics for the completion request. */
+    usage?: TextChatUsage;
+    /** A list of chat completion choices. Can be more than one if `n` is greater than 1. */
+    choices: TextChatResultChoiceStream[];
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
   /** The tool call. */
   export interface TextChatToolCall {
     /** The ID of the tool call. */
@@ -6900,6 +8332,659 @@ namespace WatsonxAiMlVml_v1 {
     responseCallback?: ReceiveResponseCallback<T>;
   }
 
+  /**
+   * Status of the training job.
+   */
+  export interface FineTuningEntity {
+    /** This field must not be set while creating a fine tuning job with InstructLab.
+     *
+     *  If set to `true` then the result of the training, if successful, will be uploaded to the repository as a model.
+     */
+    auto_update_model?: boolean;
+    /** This field must not be set while creating a fine tuning job with InstructLab.
+     *
+     *  The parameters for the job. Note that if `verbalizer` is provided
+     *  then `response_template` must also be provided (and vice versa).
+     */
+    parameters?: FineTuningParameters;
+    /** The `type` of Fine Tuning training. The `type` is set to `ilab` for InstructLab training. */
+    type?: FineTuningEntity.Constants.Type | string;
+    /** The training datasets. */
+    training_data_references: ObjectLocation[];
+    /** This field must not be set while creating a fine tuning job with InstructLab.
+     *
+     *  The holdout/test datasets.
+     */
+    test_data_references?: ObjectLocation[];
+    /** The training results. Normally this is specified as `type=container` which
+     *  means that it is stored in the space or project.
+     */
+    results_reference: ObjectLocation;
+    /** User defined properties specified as key-value pairs. */
+    custom?: JsonObject;
+    /** Status of the training job. */
+    status: TrainingStatus;
+  }
+  export namespace FineTuningEntity {
+    export namespace Constants {
+      /** The `type` of Fine Tuning training. The `type` is set to `ilab` for InstructLab training. */
+      export enum Type {
+        ILAB = 'ilab',
+      }
+    }
+  }
+
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
+   *
+   * The parameters for the job. Note that if `verbalizer` is provided then `response_template` must also be provided
+   * (and vice versa).
+   */
+  export interface FineTuningParameters {
+    /** The task that is targeted for this model. */
+    task_id?: string;
+    /** Number of updates steps to accumulate the gradients for, before performing a backward/update pass. */
+    accumulate_steps?: number;
+    /** The model id of the base model for this job. */
+    base_model: BaseModel;
+    /** Total number of training epochs to perform. */
+    num_epochs?: number;
+    /** The initial learning rate for AdamW optimizer. */
+    learning_rate?: number;
+    /** The batch size per GPU/XPU/TPU/MPS/NPU core/CPU for training. */
+    batch_size?: number;
+    /** Maximum sequence length in terms of number of tokens. Any sequence beyond this maximum length will be
+     *  truncated.
+     */
+    max_seq_length?: number;
+    /** Separator for the prediction/response in the single sequence to train on completions only. */
+    response_template?: string;
+    /** Verbalizer template to be used for formatting data at train and inference time.
+     *
+     *  This template may use brackets to indicate where fields from the data model must be rendered.
+     */
+    verbalizer?: string;
+    /** The name and number of GPUs used for the Fine Tuning job. */
+    gpu?: GPU;
+  }
+
+  /**
+   * The response of a fine tuning job.
+   */
+  export interface FineTuningResource {
+    /** Common metadata for a resource where `project_id` or `space_id` must be present. */
+    metadata?: ResourceMeta;
+    /** Status of the training job. */
+    entity?: FineTuningEntity;
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
+  /**
+   * System details.
+   */
+  export interface FineTuningResources {
+    /** The total number of resources. Computed explicitly only when 'total_count=true' query parameter is present.
+     *  This is in order to avoid performance penalties.
+     */
+    total_count?: number;
+    /** The number of items to return in each page. */
+    limit: number;
+    /** The reference to the first item in the current page. */
+    first: PaginationFirst;
+    /** A reference to the first item of the next page, if any. */
+    next?: PaginationNext;
+    resources?: FineTuningResource[];
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
+  /** Parameters for the `createFineTuning` operation. */
+  export interface CreateFineTuningParams {
+    /** The name of the job. */
+    name: string;
+    /** The training datasets. */
+    trainingDataReferences: ObjectLocation[];
+    /** The training results. Normally this is specified as `type=container` which
+     *  means that it is stored in the space or project.
+     */
+    resultsReference: ObjectLocation;
+    /** The description of the job. */
+    description?: string;
+    /** A list of tags for this resource. */
+    tags?: string[];
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** This field must not be set while creating a fine tuning job with InstructLab.
+     *
+     *  If set to `true` then the result of the training, if successful, will be uploaded to the repository as a model.
+     */
+    autoUpdateModel?: boolean;
+    /** This field must not be set while creating a fine tuning job with InstructLab.
+     *
+     *  The parameters for the job. Note that if `verbalizer` is provided
+     *  then `response_template` must also be provided (and vice versa).
+     */
+    parameters?: FineTuningParameters;
+    /** The `type` of Fine Tuning training. The `type` is set to `ilab` for InstructLab training. */
+    type?: CreateFineTuningConstants.Type | string;
+    /** This field must not be set while creating a fine tuning job with InstructLab.
+     *
+     *  The holdout/test datasets.
+     */
+    testDataReferences?: ObjectLocation[];
+    /** User defined properties specified as key-value pairs. */
+    custom?: JsonObject;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Constants for the `createFineTuning` operation. */
+  export namespace CreateFineTuningConstants {
+    /** The `type` of Fine Tuning training. The `type` is set to `ilab` for InstructLab training. */
+    export enum Type {
+      ILAB = 'ilab',
+    }
+  }
+
+  /** Parameters for the `fineTuningList` operation. */
+  export interface FineTuningListParams {
+    /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
+     *  the service and it is set in the href available in the `next` field.
+     */
+    start?: string;
+    /** How many resources should be returned. */
+    limit?: number;
+    /** Compute the total count. May have performance impact. */
+    totalCount?: boolean;
+    /** Return only the resources with the given tag value. */
+    tagValue?: string;
+    /** Filter based on on the job state: queued, running, completed, failed etc. */
+    state?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The type of Fine Tuning training. The type is set to ilab for InstructLab training. */
+    type: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `getFineTuning` operation. */
+  export interface GetFineTuningParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `deleteFineTuning` operation. */
+  export interface DeleteFineTuningParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** Set to true in order to also delete the job or request metadata. */
+    hardDelete?: boolean;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `createDocumentExtraction` operation. */
+  export interface CreateDocumentExtractionParams {
+    /** The name of the document. */
+    name: string;
+    /** The documents for text extraction. */
+    documentReferences: DocumentExtractionObjectLocation[];
+    /** A reference to data. */
+    resultsReference: ObjectLocationGithub;
+    /** A list of tags for this resource. */
+    tags?: string[];
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `listDocumentExtractions` operation. */
+  export interface ListDocumentExtractionsParams {
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `getDocumentExtraction` operation. */
+  export interface GetDocumentExtractionParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `cancelDocumentExtractions` operation. */
+  export interface CancelDocumentExtractionsParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** Set to true in order to also delete the job metadata information. */
+    hardDelete?: boolean;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `createSyntheticDataGeneration` operation. */
+  export interface CreateSyntheticDataGenerationParams {
+    /** The name of the data. */
+    name: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** A reference to data. */
+    dataReference?: SyntheticDataGenerationDataReference;
+    /** A reference to data. */
+    resultsReference?: ObjectLocation;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `listSyntheticDataGenerations` operation. */
+  export interface ListSyntheticDataGenerationsParams {
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `getSyntheticDataGeneration` operation. */
+  export interface GetSyntheticDataGenerationParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `cancelSyntheticDataGeneration` operation. */
+  export interface CancelSyntheticDataGenerationParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** Set to true in order to also delete the job metadata information. */
+    hardDelete?: boolean;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `createTaxonomy` operation. */
+  export interface CreateTaxonomyParams {
+    /** The name of the document. */
+    name: string;
+    /** The description of the Taxonomy job. */
+    description?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** A reference to data. */
+    dataReference?: ObjectLocation;
+    /** The training results. Normally this is specified as `type=container` which
+     *  means that it is stored in the space or project.
+     */
+    resultsReference: ObjectLocation;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `listTaxonomies` operation. */
+  export interface ListTaxonomiesParams {
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `getTaxonomy` operation. */
+  export interface GetTaxonomyParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `deleteTaxonomy` operation. */
+  export interface DeleteTaxonomyParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** Set to `true` in order to also delete the job metadata information. */
+    hardDelete?: boolean;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  export interface DocumentExtractionResource {
+    /** Common metadata for a resource where `project_id` or `space_id` must be present. */
+    metadata?: ResourceMeta;
+    /** The document extraction job properties. */
+    entity?: DocumentExtractionResponse;
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
+  /**
+   * The response of getting all document extraction jobs.
+   */
+  export interface DocumentExtractionResources {
+    /** The number of items to return in each page. */
+    limit: number;
+    resources?: DocumentExtractionResource[];
+  }
+
+  /**
+   * The document extraction job properties.
+   */
+  export interface DocumentExtractionResponse {
+    /** The name of the document. */
+    name: string;
+    /** The documents for text extraction. */
+    document_references: DocumentExtractionObjectLocation[];
+    /** A reference to data. */
+    results_reference: ObjectLocationGithub;
+    /** A list of tags for this resource. */
+    tags?: string[];
+    /** Status of the document extraction job. */
+    status?: DocumentExtractionStatus;
+  }
+
+  /**
+   * Status of the document extraction job.
+   */
+  export interface DocumentExtractionStatus {
+    /** Current state of document extraction. */
+    state: DocumentExtractionStatus.Constants.State | string;
+    /** The hash of the git commit when the results were saved. */
+    commit?: string;
+    /** The time when the job completed or failed. */
+    completed_at?: string;
+  }
+  export namespace DocumentExtractionStatus {
+    export namespace Constants {
+      /** Current state of document extraction. */
+      export enum State {
+        QUEUED = 'queued',
+        PENDING = 'pending',
+        RUNNING = 'running',
+        STORING = 'storing',
+        COMPLETED_AT = 'completed_at',
+        FAILED = 'failed',
+        CANCELED = 'canceled',
+      }
+    }
+  }
+
+  /**
+   * The Synthetic Data Generation context.
+   */
+  export interface SyntheticDataGenerationContext {
+    /** The Synthetic Data Generation location metrics. */
+    samples?: SyntheticDataGenerationLocations;
+  }
+
+  /**
+   * A reference to data.
+   */
+  export interface SyntheticDataGenerationDataReference {
+    /** The data source type like `connection_asset` or `data_asset`. */
+    type: SyntheticDataGenerationDataReference.Constants.Type | string;
+    /** Contains a set of fields specific to each connection.
+     *  See here for [details about specifying connections](#datareferences).
+     */
+    connection?: DataConnection;
+    /** Contains a set of fields that describe the location of the data with respect to the `connection`. */
+    location: JsonObject;
+  }
+  export namespace SyntheticDataGenerationDataReference {
+    export namespace Constants {
+      /** The data source type like `connection_asset` or `data_asset`. */
+      export enum Type {
+        CONNECTION_ASSET = 'connection_asset',
+        DATA_ASSET = 'data_asset',
+        CONTAINER = 'container',
+        URL = 'url',
+      }
+    }
+  }
+
+  /**
+   * The Synthetic Data Generation location metrics.
+   */
+  export interface SyntheticDataGenerationLocations {
+    /** The path to the created Knowledge file. */
+    knowledge?: string;
+    /** The path to the created Skills file. */
+    skills?: string;
+    /** The path to the created Logs file. */
+    logs?: string;
+    /** The path to the created Artifacts file. */
+    artifacts?: string;
+  }
+
+  /**
+   * The Synthetic Data Generation metrics.
+   */
+  export interface SyntheticDataGenerationMetric {
+    /** The Synthetic Data Generation sample metrics. */
+    samples?: SyntheticDataGenerationSample;
+  }
+
+  /**
+   * All the Synthetic Data Generation metrics.
+   */
+  export interface SyntheticDataGenerationMetrics {
+    /** The Synthetic Data Generation metrics. */
+    synthetic_data_generation_metrics?: SyntheticDataGenerationMetric;
+    /** The Synthetic Data Generation context. */
+    context?: SyntheticDataGenerationContext;
+  }
+
+  /**
+   * The response from getting a specified synthetic data generation job.
+   */
+  export interface SyntheticDataGenerationResource {
+    /** Common metadata for a resource where `project_id` or `space_id` must be present. */
+    metadata?: ResourceMeta;
+    /** The synthetic data generation job properties. */
+    entity?: SyntheticDataGenerationResponse;
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
+  /**
+   * The response of getting all synthetic data generation jobs.
+   */
+  export interface SyntheticDataGenerationResources {
+    /** The number of items to return in each page. */
+    limit: number;
+    resources?: SyntheticDataGenerationResource[];
+  }
+
+  /**
+   * The synthetic data generation job properties.
+   */
+  export interface SyntheticDataGenerationResponse {
+    /** A reference to data. */
+    results_reference?: ObjectLocation;
+    /** The status of a Synthetic Data Generation job. */
+    status?: SyntheticDataGenerationStatus;
+    /** A reference to data. */
+    data_reference?: ObjectLocation;
+  }
+
+  /**
+   * The Synthetic Data Generation sample metrics.
+   */
+  export interface SyntheticDataGenerationSample {
+    /** The knowledge metric value. */
+    knowledge?: number;
+    /** The skills metric value. */
+    skills?: number;
+    /** The combined value of the metric values. */
+    total?: number;
+  }
+
+  /**
+   * The status of a Synthetic Data Generation job.
+   */
+  export interface SyntheticDataGenerationStatus {
+    /** The status of the job. */
+    state: SyntheticDataGenerationStatus.Constants.State | string;
+    /** The computed metrics. */
+    metrics?: SyntheticDataGenerationMetrics[];
+  }
+  export namespace SyntheticDataGenerationStatus {
+    export namespace Constants {
+      /** The status of the job. */
+      export enum State {
+        QUEUED = 'queued',
+        PENDING = 'pending',
+        RUNNING = 'running',
+        STORING = 'storing',
+        COMPLETED = 'completed',
+        FAILED = 'failed',
+        CANCELED = 'canceled',
+      }
+    }
+  }
+
+  /**
+   * The response fields from a Taxonomy request.
+   */
+  export interface TaxonomyResource {
+    /** Common metadata for a resource where `project_id` or `space_id` must be present. */
+    metadata?: ResourceMeta;
+    /** The Taxonomy entity. */
+    entity?: TaxonomyResponse;
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
+  /**
+   * The list of Taxonomy jobs in specified project or space.
+   */
+  export interface TaxonomyResources {
+    /** The number of items to return in each page. */
+    limit: number;
+    /** The Taxonomy jobs in a project or space. */
+    resources?: TaxonomyResource[];
+  }
+
+  /**
+   * The Taxonomy entity.
+   */
+  export interface TaxonomyResponse {
+    /** A reference to data. */
+    results_reference?: ObjectLocation;
+    /** The status of a Taxonomy job. */
+    status?: TaxonomyStatus;
+    /** A reference to data. */
+    data_reference?: ObjectLocation;
+  }
+
+  /**
+   * The status of a Taxonomy job.
+   */
+  export interface TaxonomyStatus {
+    /** The status of the job. */
+    state?: TaxonomyStatus.Constants.State | string;
+    /** The timestamp when the job completed. */
+    completed_at?: string;
+    /** Date and Time in which current training state has started. */
+    running_at?: string;
+  }
+  export namespace TaxonomyStatus {
+    export namespace Constants {
+      /** The status of the job. */
+      export enum State {
+        QUEUED = 'queued',
+        PENDING = 'pending',
+        RUNNING = 'running',
+        STORING = 'storing',
+        COMPLETED = 'completed',
+        FAILED = 'failed',
+        CANCELED = 'canceled',
+      }
+    }
+  }
+
+  /**
+   * The name and number of GPUs used for the Fine Tuning job.
+   */
+  export interface GPU {
+    /** The number of GPUs used for the Fine Tuning job. */
+    num?: number;
+    /** The name of the GPU(s) used for the Fine Tuning job. The GPU specified must be available on the cluster. */
+    name?: string;
+  }
+
+  /**
+   * A reference to data.
+   */
+  export interface DocumentExtractionObjectLocation {
+    /** The data source type. This field must be set to `container`. */
+    type: DocumentExtractionObjectLocation.Constants.Type | string;
+    /** Contains a set of fields that describe the location of the data with respect to the `connection`. */
+    location: JsonObject;
+  }
+  export namespace DocumentExtractionObjectLocation {
+    export namespace Constants {
+      /** The data source type. This field must be set to `container`. */
+      export enum Type {
+        CONTAINER = 'container',
+      }
+    }
+  }
+
+  /**
+   * A reference to data.
+   */
+  export interface ObjectLocationGithub {
+    /** The data source type, for now only `github` is supported. */
+    type: ObjectLocationGithub.Constants.Type | string;
+    /** Contains a set of fields that describe the location of the data with respect to the `connection`. */
+    location: JsonObject;
+  }
+  export namespace ObjectLocationGithub {
+    export namespace Constants {
+      /** The data source type, for now only `github` is supported. */
+      export enum Type {
+        GITHUB = 'github',
+      }
+    }
+  }
+
   /*************************
    * pager classes
    ************************/
@@ -7145,6 +9230,86 @@ namespace WatsonxAiMlVml_v1 {
      */
     public async getAll(): Promise<WatsonxAiMlVml_v1.TrainingResource[]> {
       const results: TrainingResource[] = [];
+      while (this.hasNext()) {
+        const nextPage = await this.getNext();
+        results.push(...nextPage);
+      }
+      return results;
+    }
+  }
+
+  /**
+   * FineTuningListPager can be used to simplify the use of fineTuningList().
+   */
+  export class FineTuningListPager {
+    protected _hasNext: boolean;
+
+    protected pageContext: any;
+
+    protected client: WatsonxAiMlVml_v1;
+
+    protected params: WatsonxAiMlVml_v1.FineTuningListParams;
+
+    /**
+     * Construct a FineTuningListPager object.
+     *
+     * @param {WatsonxAiMlVml_v1}  client - The service client instance used to invoke fineTuningList()
+     * @param {Object} [params] - The parameters to be passed to fineTuningList()
+     * @constructor
+     */
+    constructor(client: WatsonxAiMlVml_v1, params?: WatsonxAiMlVml_v1.FineTuningListParams) {
+      if (params && params.start) {
+        throw new Error(`the params.start field should not be set`);
+      }
+
+      this._hasNext = true;
+      this.pageContext = { next: undefined };
+      this.client = client;
+      this.params = JSON.parse(JSON.stringify(params || {}));
+    }
+
+    /**
+     * Returns true if there are potentially more results to be retrieved by invoking getNext().
+     * @returns {boolean}
+     */
+    public hasNext(): boolean {
+      return this._hasNext;
+    }
+
+    /**
+     * Returns the next page of results by invoking fineTuningList().
+     * @returns {Promise<WatsonxAiMlVml_v1.FineTuningResource[]>}
+     */
+    public async getNext(): Promise<WatsonxAiMlVml_v1.FineTuningResource[]> {
+      if (!this.hasNext()) {
+        throw new Error('No more results available');
+      }
+
+      if (this.pageContext.next) {
+        this.params.start = this.pageContext.next;
+      }
+      const response = await this.client.listFineTunings(this.params);
+      const { result } = response;
+
+      let next: string;
+      if (result && result.next) {
+        if (result.next.href) {
+          next = getQueryParam(result.next.href, 'start');
+        }
+      }
+      this.pageContext.next = next;
+      if (!this.pageContext.next) {
+        this._hasNext = false;
+      }
+      return result.resources;
+    }
+
+    /**
+     * Returns all results by invoking fineTuningList() repeatedly until all pages of results have been retrieved.
+     * @returns {Promise<WatsonxAiMlVml_v1.FineTuningResource[]>}
+     */
+    public async getAll(): Promise<WatsonxAiMlVml_v1.FineTuningResource[]> {
+      const results: FineTuningResource[] = [];
       while (this.hasNext()) {
         const nextPage = await this.getNext();
         results.push(...nextPage);

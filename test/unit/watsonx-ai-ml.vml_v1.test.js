@@ -1,5 +1,5 @@
 /**
- * (C) Copyright IBM Corp. 2024.
+ * (C) Copyright IBM Corp. 2025.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1095,6 +1095,242 @@ describe('WatsonxAiMlVml_v1', () => {
         let err;
         try {
           await watsonxAiMlService.deploymentGenerateTextStream();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('deploymentsTextChat', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // TextChatFunctionCall
+      const textChatFunctionCallModel = {
+        name: 'testString',
+        arguments: 'testString',
+      };
+
+      // TextChatToolCall
+      const textChatToolCallModel = {
+        id: 'testString',
+        type: 'function',
+        function: textChatFunctionCallModel,
+      };
+
+      // DeploymentTextChatMessagesTextChatMessageAssistant
+      const deploymentTextChatMessagesModel = {
+        role: 'TextChatMessageAssistant',
+        content: 'Who won the world series in 2020?',
+        name: 'testString',
+        refusal: 'testString',
+        tool_calls: [textChatToolCallModel],
+      };
+
+      function __deploymentsTextChatTest() {
+        // Construct the params object for operation deploymentsTextChat
+        const idOrName = 'testString';
+        const messages = [deploymentTextChatMessagesModel];
+        const context = 'testString';
+        const deploymentsTextChatParams = {
+          idOrName,
+          messages,
+          context,
+        };
+        const deploymentsTextChatResult =
+          watsonxAiMlService.deploymentsTextChat(deploymentsTextChatParams);
+
+        // all methods should return a Promise
+        expectToBePromise(deploymentsTextChatResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/deployments/{id_or_name}/text/chat', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.messages).toEqual(messages);
+        expect(mockRequestOptions.body.context).toEqual(context);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.path.id_or_name).toEqual(idOrName);
+      }
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __deploymentsTextChatTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __deploymentsTextChatTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __deploymentsTextChatTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const idOrName = 'testString';
+        const messages = [deploymentTextChatMessagesModel];
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const deploymentsTextChatParams = {
+          idOrName,
+          messages,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.deploymentsTextChat(deploymentsTextChatParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deploymentsTextChat({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deploymentsTextChat();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+  describe('deploymentsTextChatStream', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // TextChatFunctionCall
+      const textChatFunctionCallModel = {
+        name: 'testString',
+        arguments: 'testString',
+      };
+
+      // TextChatToolCall
+      const textChatToolCallModel = {
+        id: 'testString',
+        type: 'function',
+        function: textChatFunctionCallModel,
+      };
+
+      // DeploymentTextChatMessagesTextChatMessageAssistant
+      const deploymentTextChatMessagesModel = {
+        role: 'TextChatMessageAssistant',
+        content: 'Who won the world series in 2020?',
+        name: 'testString',
+        refusal: 'testString',
+        tool_calls: [textChatToolCallModel],
+      };
+
+      function __deploymentsTextChatStreamTest() {
+        // Construct the params object for operation deploymentsTextChatStream
+        const idOrName = 'testString';
+        const messages = [deploymentTextChatMessagesModel];
+        const context = 'testString';
+        const deploymentsTextChatStreamParams = {
+          idOrName,
+          messages,
+          context,
+        };
+
+        const deploymentsTextChatStreamResult = watsonxAiMlService.deploymentsTextChatStream(
+          deploymentsTextChatStreamParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(deploymentsTextChatStreamResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(
+          mockRequestOptions,
+          '/ml/v1/deployments/{id_or_name}/text/chat_stream',
+          'POST'
+        );
+        const expectedAccept = 'text/event-stream';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.messages).toEqual(messages);
+        expect(mockRequestOptions.body.context).toEqual(context);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.path.id_or_name).toEqual(idOrName);
+      }
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __deploymentsTextChatStreamTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __deploymentsTextChatStreamTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __deploymentsTextChatStreamTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const idOrName = 'testString';
+        const messages = [deploymentTextChatMessagesModel];
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const deploymentsTextChatStreamParams = {
+          idOrName,
+          messages,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.deploymentsTextChatStream(deploymentsTextChatStreamParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deploymentsTextChatStream({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deploymentsTextChatStream();
         } catch (e) {
           err = e;
         }
@@ -5096,6 +5332,1128 @@ describe('WatsonxAiMlVml_v1', () => {
         let err;
         try {
           await watsonxAiMlService.deleteTraining();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+  describe('createDocumentExtraction', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // DocumentExtractionObjectLocation
+      const documentExtractionObjectLocationModel = {
+        type: 'container',
+        location: { 'key1': 'testString' },
+      };
+
+      // ObjectLocationGithub
+      const objectLocationGithubModel = {
+        type: 'github',
+        location: { 'key1': 'testString' },
+      };
+
+      function __createDocumentExtractionTest() {
+        // Construct the params object for operation createDocumentExtraction
+        const name = 'testString';
+        const documentReferences = [documentExtractionObjectLocationModel];
+        const resultsReference = objectLocationGithubModel;
+        const tags = ['t1', 't2'];
+        const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
+        const spaceId = '3fc54cf1-252f-424b-b52d-5cdd9814987f';
+        const createDocumentExtractionParams = {
+          name,
+          documentReferences,
+          resultsReference,
+          tags,
+          projectId,
+          spaceId,
+        };
+
+        const createDocumentExtractionResult = watsonxAiMlService.createDocumentExtraction(
+          createDocumentExtractionParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(createDocumentExtractionResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/documents', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.name).toEqual(name);
+        expect(mockRequestOptions.body.document_references).toEqual(documentReferences);
+        expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
+        expect(mockRequestOptions.body.tags).toEqual(tags);
+        expect(mockRequestOptions.body.project_id).toEqual(projectId);
+        expect(mockRequestOptions.body.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __createDocumentExtractionTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __createDocumentExtractionTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __createDocumentExtractionTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const name = 'testString';
+        const documentReferences = [documentExtractionObjectLocationModel];
+        const resultsReference = objectLocationGithubModel;
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const createDocumentExtractionParams = {
+          name,
+          documentReferences,
+          resultsReference,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.createDocumentExtraction(createDocumentExtractionParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createDocumentExtraction({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createDocumentExtraction();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('listDocumentExtractions', () => {
+    describe('positive tests', () => {
+      function __listDocumentExtractionsTest() {
+        // Construct the params object for operation listDocumentExtractions
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const listDocumentExtractionsParams = {
+          projectId,
+          spaceId,
+        };
+
+        const listDocumentExtractionsResult = watsonxAiMlService.listDocumentExtractions(
+          listDocumentExtractionsParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(listDocumentExtractionsResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/documents', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __listDocumentExtractionsTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __listDocumentExtractionsTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __listDocumentExtractionsTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const listDocumentExtractionsParams = {
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.listDocumentExtractions(listDocumentExtractionsParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+
+      test('should not have any problems when no parameters are passed in', () => {
+        // invoke the method with no parameters
+        watsonxAiMlService.listDocumentExtractions({});
+        checkForSuccessfulExecution(createRequestMock);
+      });
+    });
+  });
+
+  describe('getDocumentExtraction', () => {
+    describe('positive tests', () => {
+      function __getDocumentExtractionTest() {
+        // Construct the params object for operation getDocumentExtraction
+        const id = 'testString';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const getDocumentExtractionParams = {
+          id,
+          projectId,
+          spaceId,
+        };
+
+        const getDocumentExtractionResult = watsonxAiMlService.getDocumentExtraction(
+          getDocumentExtractionParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(getDocumentExtractionResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+        console.log(mockRequestOptions);
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/documents/{id}', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        console.log(createRequestMock.mock.calls[0][0].defaultOptions);
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __getDocumentExtractionTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __getDocumentExtractionTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __getDocumentExtractionTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const getDocumentExtractionParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.getDocumentExtraction(getDocumentExtractionParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getDocumentExtraction({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getDocumentExtraction();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('cancelDocumentExtractions', () => {
+    describe('positive tests', () => {
+      function __cancelDocumentExtractionsTest() {
+        // Construct the params object for operation cancelDocumentExtractions
+        const id = 'testString';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const hardDelete = true;
+        const cancelDocumentExtractionsParams = {
+          id,
+          projectId,
+          spaceId,
+          hardDelete,
+        };
+
+        const cancelDocumentExtractionsResult = watsonxAiMlService.cancelDocumentExtractions(
+          cancelDocumentExtractionsParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(cancelDocumentExtractionsResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/documents/{id}', 'DELETE');
+        const expectedAccept = undefined;
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __cancelDocumentExtractionsTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __cancelDocumentExtractionsTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __cancelDocumentExtractionsTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const cancelDocumentExtractionsParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.cancelDocumentExtractions(cancelDocumentExtractionsParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.cancelDocumentExtractions({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.cancelDocumentExtractions();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('createSyntheticDataGeneration', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // DataConnection
+      const dataConnectionModel = {
+        foo: 'testString',
+      };
+
+      // SyntheticDataGenerationDataReference
+      const syntheticDataGenerationDataReferenceModel = {
+        type: 'connection_asset',
+        connection: dataConnectionModel,
+        location: { 'key1': 'testString' },
+      };
+
+      // ObjectLocation
+      const objectLocationModel = {
+        id: 'testString',
+        type: 'connection_asset',
+        connection: dataConnectionModel,
+        location: { 'key1': 'testString' },
+      };
+
+      function __createSyntheticDataGenerationTest() {
+        // Construct the params object for operation createSyntheticDataGeneration
+        const name = 'example name';
+        const spaceId = '3fc54cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
+        const dataReference = syntheticDataGenerationDataReferenceModel;
+        const resultsReference = objectLocationModel;
+        const createSyntheticDataGenerationParams = {
+          name,
+          spaceId,
+          projectId,
+          dataReference,
+          resultsReference,
+        };
+
+        const createSyntheticDataGenerationResult =
+          watsonxAiMlService.createSyntheticDataGeneration(createSyntheticDataGenerationParams);
+
+        // all methods should return a Promise
+        expectToBePromise(createSyntheticDataGenerationResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/synthetic_data', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.name).toEqual(name);
+        expect(mockRequestOptions.body.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.body.project_id).toEqual(projectId);
+        expect(mockRequestOptions.body.data_reference).toEqual(dataReference);
+        expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __createSyntheticDataGenerationTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __createSyntheticDataGenerationTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __createSyntheticDataGenerationTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const name = 'example name';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const createSyntheticDataGenerationParams = {
+          name,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.createSyntheticDataGeneration(createSyntheticDataGenerationParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createSyntheticDataGeneration({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createSyntheticDataGeneration();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('listSyntheticDataGenerations', () => {
+    describe('positive tests', () => {
+      function __listSyntheticDataGenerationsTest() {
+        // Construct the params object for operation listSyntheticDataGenerations
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const listSyntheticDataGenerationsParams = {
+          projectId,
+          spaceId,
+        };
+
+        const listSyntheticDataGenerationsResult = watsonxAiMlService.listSyntheticDataGenerations(
+          listSyntheticDataGenerationsParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(listSyntheticDataGenerationsResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/synthetic_data', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __listSyntheticDataGenerationsTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __listSyntheticDataGenerationsTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __listSyntheticDataGenerationsTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const listSyntheticDataGenerationsParams = {
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.listSyntheticDataGenerations(listSyntheticDataGenerationsParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+
+      test('should not have any problems when no parameters are passed in', () => {
+        // invoke the method with no parameters
+        watsonxAiMlService.listSyntheticDataGenerations({});
+        checkForSuccessfulExecution(createRequestMock);
+      });
+    });
+  });
+
+  describe('getSyntheticDataGeneration', () => {
+    describe('positive tests', () => {
+      function __getSyntheticDataGenerationTest() {
+        // Construct the params object for operation getSyntheticDataGeneration
+        const id = 'testString';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const getSyntheticDataGenerationParams = {
+          id,
+          projectId,
+          spaceId,
+        };
+
+        const getSyntheticDataGenerationResult = watsonxAiMlService.getSyntheticDataGeneration(
+          getSyntheticDataGenerationParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(getSyntheticDataGenerationResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/synthetic_data/{id}', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __getSyntheticDataGenerationTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __getSyntheticDataGenerationTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __getSyntheticDataGenerationTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const getSyntheticDataGenerationParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.getSyntheticDataGeneration(getSyntheticDataGenerationParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getSyntheticDataGeneration({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getSyntheticDataGeneration();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('cancelSyntheticDataGeneration', () => {
+    describe('positive tests', () => {
+      function __cancelSyntheticDataGenerationTest() {
+        // Construct the params object for operation cancelSyntheticDataGeneration
+        const id = 'testString';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const hardDelete = true;
+        const cancelSyntheticDataGenerationParams = {
+          id,
+          projectId,
+          spaceId,
+          hardDelete,
+        };
+
+        const cancelSyntheticDataGenerationResult =
+          watsonxAiMlService.cancelSyntheticDataGeneration(cancelSyntheticDataGenerationParams);
+
+        // all methods should return a Promise
+        expectToBePromise(cancelSyntheticDataGenerationResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/synthetic_data/{id}', 'DELETE');
+        const expectedAccept = undefined;
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __cancelSyntheticDataGenerationTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __cancelSyntheticDataGenerationTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __cancelSyntheticDataGenerationTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const cancelSyntheticDataGenerationParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.cancelSyntheticDataGeneration(cancelSyntheticDataGenerationParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.cancelSyntheticDataGeneration({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.cancelSyntheticDataGeneration();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('createTaxonomy', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // DataConnection
+      const dataConnectionModel = {
+        foo: 'testString',
+      };
+
+      // ObjectLocation
+      const objectLocationModel = {
+        id: 'testString',
+        type: 'connection_asset',
+        connection: dataConnectionModel,
+        location: { 'key1': 'testString' },
+      };
+
+      function __createTaxonomyTest() {
+        // Construct the params object for operation createTaxonomy
+        const name = 'testString';
+        const description = 'testString';
+        const spaceId = '3fc54cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
+        const dataReference = objectLocationModel;
+        const createTaxonomyParams = {
+          name,
+          description,
+          spaceId,
+          projectId,
+          dataReference,
+        };
+
+        const createTaxonomyResult = watsonxAiMlService.createTaxonomy(createTaxonomyParams);
+
+        // all methods should return a Promise
+        expectToBePromise(createTaxonomyResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/taxonomies_imports', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.name).toEqual(name);
+        expect(mockRequestOptions.body.description).toEqual(description);
+        expect(mockRequestOptions.body.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.body.project_id).toEqual(projectId);
+        expect(mockRequestOptions.body.data_reference).toEqual(dataReference);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __createTaxonomyTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __createTaxonomyTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __createTaxonomyTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const name = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const createTaxonomyParams = {
+          name,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.createTaxonomy(createTaxonomyParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createTaxonomy({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createTaxonomy();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('listTaxonomies', () => {
+    describe('positive tests', () => {
+      function __listTaxonomiesTest() {
+        // Construct the params object for operation listTaxonomies
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const listTaxonomiesParams = {
+          projectId,
+          spaceId,
+        };
+
+        const listTaxonomiesResult = watsonxAiMlService.listTaxonomies(listTaxonomiesParams);
+
+        // all methods should return a Promise
+        expectToBePromise(listTaxonomiesResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/taxonomies_imports', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __listTaxonomiesTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __listTaxonomiesTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __listTaxonomiesTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const listTaxonomiesParams = {
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.listTaxonomies(listTaxonomiesParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+
+      test('should not have any problems when no parameters are passed in', () => {
+        // invoke the method with no parameters
+        watsonxAiMlService.listTaxonomies({});
+        checkForSuccessfulExecution(createRequestMock);
+      });
+    });
+  });
+
+  describe('getTaxonomy', () => {
+    describe('positive tests', () => {
+      function __getTaxonomyTest() {
+        // Construct the params object for operation getTaxonomy
+        const id = 'testString';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const getTaxonomyParams = {
+          id,
+          projectId,
+          spaceId,
+        };
+
+        const getTaxonomyResult = watsonxAiMlService.getTaxonomy(getTaxonomyParams);
+
+        // all methods should return a Promise
+        expectToBePromise(getTaxonomyResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/taxonomies_imports/{id}', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __getTaxonomyTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __getTaxonomyTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __getTaxonomyTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const getTaxonomyParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.getTaxonomy(getTaxonomyParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getTaxonomy({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getTaxonomy();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('deleteTaxonomy', () => {
+    describe('positive tests', () => {
+      function __deleteTaxonomyTest() {
+        // Construct the params object for operation deleteTaxonomy
+        const id = 'testString';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const hardDelete = true;
+        const deleteTaxonomyParams = {
+          id,
+          projectId,
+          spaceId,
+          hardDelete,
+        };
+
+        const deleteTaxonomyResult = watsonxAiMlService.deleteTaxonomy(deleteTaxonomyParams);
+
+        // all methods should return a Promise
+        expectToBePromise(deleteTaxonomyResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/taxonomies_imports/{id}', 'DELETE');
+        const expectedAccept = undefined;
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __deleteTaxonomyTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __deleteTaxonomyTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __deleteTaxonomyTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const deleteTaxonomyParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.deleteTaxonomy(deleteTaxonomyParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deleteTaxonomy({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deleteTaxonomy();
         } catch (e) {
           err = e;
         }
