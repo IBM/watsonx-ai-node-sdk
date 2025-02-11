@@ -51,7 +51,7 @@ describe('Test examples', () => {
   test('Basic rerank usage', async () => {
     await rerankDocuments();
   });
-  //This test takes around 40min. Only to be run on local machine
+  // This test takes around 40min. Only to be run on local machine
   test.skip(
     'Instruct Lab flow',
     async () => {

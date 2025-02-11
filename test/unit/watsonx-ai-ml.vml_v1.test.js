@@ -5340,6 +5340,717 @@ describe('WatsonxAiMlVml_v1', () => {
       });
     });
   });
+
+  describe('createFineTuning', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // DataConnection
+      const dataConnectionModel = {
+        foo: 'testString',
+      };
+
+      // ObjectLocation
+      const objectLocationModel = {
+        id: 'testString',
+        type: 'connection_asset',
+        connection: dataConnectionModel,
+        location: { 'key1': 'testString' },
+      };
+
+      // BaseModel
+      const baseModelModel = {
+        model_id: 'google/flan-t5-xl',
+      };
+
+      // GPU
+      const gpuModel = {
+        num: 4,
+        name: 'NVIDIA-A100-80GB-PCIe',
+      };
+
+      // FineTuningPeftParameters
+      const fineTuningPeftParametersModel = {
+        type: 'lora',
+        rank: 8,
+        target_modules: [],
+        lora_alpha: 32,
+        lora_dropout: 0.05,
+      };
+
+      // FineTuningParameters
+      const fineTuningParametersModel = {
+        task_id: 'testString',
+        accumulate_steps: 1,
+        base_model: baseModelModel,
+        num_epochs: 5,
+        learning_rate: 0.2,
+        batch_size: 5,
+        max_seq_length: 1024,
+        response_template: '\\n\\n### Response:',
+        verbalizer: '### Input: {{input}} \\n\\n### Response: {{output}}',
+        gpu: gpuModel,
+        peft_parameters: fineTuningPeftParametersModel,
+      };
+
+      function __createFineTuningTest() {
+        // Construct the params object for operation createFineTuning
+        const name = 'testString';
+        const trainingDataReferences = [objectLocationModel];
+        const resultsReference = objectLocationModel;
+        const description = 'testString';
+        const tags = ['t1', 't2'];
+        const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
+        const spaceId = '3fc54cf1-252f-424b-b52d-5cdd9814987f';
+        const autoUpdateModel = false;
+        const parameters = fineTuningParametersModel;
+        const type = 'ilab';
+        const testDataReferences = [objectLocationModel];
+        const custom = { name: 'model', size: 2 };
+        const createFineTuningParams = {
+          name,
+          trainingDataReferences,
+          resultsReference,
+          description,
+          tags,
+          projectId,
+          spaceId,
+          autoUpdateModel,
+          parameters,
+          type,
+          testDataReferences,
+          custom,
+        };
+
+        const createFineTuningResult = watsonxAiMlService.createFineTuning(createFineTuningParams);
+
+        // all methods should return a Promise
+        expectToBePromise(createFineTuningResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/fine_tunings', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.name).toEqual(name);
+        expect(mockRequestOptions.body.training_data_references).toEqual(trainingDataReferences);
+        expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
+        expect(mockRequestOptions.body.description).toEqual(description);
+        expect(mockRequestOptions.body.tags).toEqual(tags);
+        expect(mockRequestOptions.body.project_id).toEqual(projectId);
+        expect(mockRequestOptions.body.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.body.auto_update_model).toEqual(autoUpdateModel);
+        expect(mockRequestOptions.body.parameters).toEqual(parameters);
+        expect(mockRequestOptions.body.type).toEqual(type);
+        expect(mockRequestOptions.body.test_data_references).toEqual(testDataReferences);
+        expect(mockRequestOptions.body.custom).toEqual(custom);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __createFineTuningTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __createFineTuningTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __createFineTuningTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const name = 'testString';
+        const trainingDataReferences = [objectLocationModel];
+        const resultsReference = objectLocationModel;
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const createFineTuningParams = {
+          name,
+          trainingDataReferences,
+          resultsReference,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.createFineTuning(createFineTuningParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createFineTuning({});
+        } catch (e) {
+          err = e;
+        }
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createFineTuning();
+        } catch (e) {
+          err = e;
+        }
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('listFineTunings', () => {
+    describe('positive tests', () => {
+      function __fineTuningListTest() {
+        // Construct the params object for operation listFineTunings
+        const start = 'testString';
+        const limit = 100;
+        const totalCount = true;
+        const tagValue = 'testString';
+        const state = 'testString';
+        const type = 'ilab';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const fineTuningListParams = {
+          start,
+          limit,
+          totalCount,
+          tagValue,
+          state,
+          type,
+          spaceId,
+          projectId,
+        };
+
+        const fineTuningListResult = watsonxAiMlService.listFineTunings(fineTuningListParams);
+
+        // all methods should return a Promise
+        expectToBePromise(fineTuningListResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/fine_tunings', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.start).toEqual(start);
+        expect(mockRequestOptions.qs.limit).toEqual(limit);
+        expect(mockRequestOptions.qs.total_count).toEqual(totalCount);
+        expect(mockRequestOptions.qs['tag.value']).toEqual(tagValue);
+        expect(mockRequestOptions.qs.state).toEqual(state);
+        expect(mockRequestOptions.qs.type).toEqual(type);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __fineTuningListTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __fineTuningListTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __fineTuningListTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const fineTuningListParams = {
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.listFineTunings(fineTuningListParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+
+      test('should not have any problems when no parameters are passed in', () => {
+        // invoke the method with no parameters
+        watsonxAiMlService.listFineTunings({});
+        checkForSuccessfulExecution(createRequestMock);
+      });
+    });
+
+    describe('FineTuningListPager tests', () => {
+      const serviceUrl = watsonxAiMlServiceOptions.url;
+      const path = '/ml/v1/fine_tunings';
+      const mockPagerResponse1 = {
+        'next': { 'href': 'https://myhost.com/somePath?start=1' },
+        'total_count': 2,
+        'limit': 1,
+        'resources': [
+          {
+            'metadata': {
+              'id': 'id',
+              'created_at': '2019-01-01T12:00:00.000Z',
+              'rev': 'rev',
+              'owner': 'owner',
+              'modified_at': '2019-01-01T12:00:00.000Z',
+              'parent_id': 'parent_id',
+              'name': 'name',
+              'description': 'description',
+              'tags': ['tags'],
+              'commit_info': {
+                'committed_at': '2019-01-01T12:00:00.000Z',
+                'commit_message': 'commit_message',
+              },
+              'space_id': '3fc54cf1-252f-424b-b52d-5cdd9814987f',
+              'project_id': '12ac4cf1-252f-424b-b52d-5cdd9814987f',
+            },
+            'entity': {
+              'auto_update_model': false,
+              'parameters': {
+                'task_id': 'task_id',
+                'accumulate_steps': 1,
+                'base_model': { 'model_id': 'google/flan-t5-xl' },
+                'num_epochs': 5,
+                'learning_rate': 0.2,
+                'batch_size': 5,
+                'max_seq_length': 1024,
+                'response_template': '\n\n### Response:',
+                'verbalizer': '### Input: {{input}} \n\n### Response: {{output}}',
+                'gpu': { 'num': 4, 'name': 'NVIDIA-A100-80GB-PCIe' },
+                'peft_parameters': {
+                  'type': 'lora',
+                  'rank': 8,
+                  'target_modules': ['target_modules'],
+                  'lora_alpha': 32,
+                  'lora_dropout': 0.05,
+                },
+              },
+              'type': 'ilab',
+              'training_data_references': [
+                {
+                  'id': 'id',
+                  'type': 'connection_asset',
+                  'connection': {},
+                  'location': { 'mapKey': 'inner' },
+                },
+              ],
+              'test_data_references': [
+                {
+                  'id': 'id',
+                  'type': 'connection_asset',
+                  'connection': {},
+                  'location': { 'mapKey': 'inner' },
+                },
+              ],
+              'results_reference': {
+                'id': 'id',
+                'type': 'connection_asset',
+                'connection': {},
+                'location': { 'mapKey': 'inner' },
+              },
+              'custom': { 'anyKey': 'anyValue' },
+              'status': {
+                'running_at': '2017-01-30T10:11:12.000Z',
+                'completed_at': '2017-01-30T10:11:12.000Z',
+                'state': 'queued',
+                'message': { 'level': 'info', 'text': 'The deployment is successful' },
+                'metrics': [
+                  {
+                    'timestamp': '2023-09-22T02:52:03.324Z',
+                    'iteration': 0,
+                    'ml_metrics': { 'mapKey': 5 },
+                    'fine_tuning_metrics': { 'anyKey': 'anyValue' },
+                    'context': {
+                      'deployment_id': 'deployment_id',
+                      'prompt_tuning': { 'metrics_location': 'metrics_location' },
+                      'locations': ['locations'],
+                    },
+                  },
+                ],
+                'failure': {
+                  'trace': '3fd543d2-36e0-4f83-9be3-5c6dd498af4f',
+                  'errors': [
+                    {
+                      'code': 'missing_field',
+                      'message': "The 'name' field is required.",
+                      'more_info': 'https://cloud.ibm.com/apidocs/machine-learning#models-get',
+                      'target': { 'type': 'field', 'name': 'name' },
+                    },
+                  ],
+                },
+              },
+            },
+            'system': {
+              'warnings': [
+                {
+                  'message': 'The framework TF 1.1 is deprecated.',
+                  'id': '2fc54cf1-252f-424b-b52d-5cdd98149871',
+                  'more_info': 'more_info',
+                  'additional_properties': { 'anyKey': 'anyValue' },
+                },
+              ],
+            },
+          },
+        ],
+      };
+      const mockPagerResponse2 = {
+        'total_count': 2,
+        'limit': 1,
+        'resources': [
+          {
+            'metadata': {
+              'id': 'id',
+              'created_at': '2019-01-01T12:00:00.000Z',
+              'rev': 'rev',
+              'owner': 'owner',
+              'modified_at': '2019-01-01T12:00:00.000Z',
+              'parent_id': 'parent_id',
+              'name': 'name',
+              'description': 'description',
+              'tags': ['tags'],
+              'commit_info': {
+                'committed_at': '2019-01-01T12:00:00.000Z',
+                'commit_message': 'commit_message',
+              },
+              'space_id': '3fc54cf1-252f-424b-b52d-5cdd9814987f',
+              'project_id': '12ac4cf1-252f-424b-b52d-5cdd9814987f',
+            },
+            'entity': {
+              'auto_update_model': false,
+              'parameters': {
+                'task_id': 'task_id',
+                'accumulate_steps': 1,
+                'base_model': { 'model_id': 'google/flan-t5-xl' },
+                'num_epochs': 5,
+                'learning_rate': 0.2,
+                'batch_size': 5,
+                'max_seq_length': 1024,
+                'response_template': '\n\n### Response:',
+                'verbalizer': '### Input: {{input}} \n\n### Response: {{output}}',
+                'gpu': { 'num': 4, 'name': 'NVIDIA-A100-80GB-PCIe' },
+                'peft_parameters': {
+                  'type': 'lora',
+                  'rank': 8,
+                  'target_modules': ['target_modules'],
+                  'lora_alpha': 32,
+                  'lora_dropout': 0.05,
+                },
+              },
+              'type': 'ilab',
+              'training_data_references': [
+                {
+                  'id': 'id',
+                  'type': 'connection_asset',
+                  'connection': {},
+                  'location': { 'mapKey': 'inner' },
+                },
+              ],
+              'test_data_references': [
+                {
+                  'id': 'id',
+                  'type': 'connection_asset',
+                  'connection': {},
+                  'location': { 'mapKey': 'inner' },
+                },
+              ],
+              'results_reference': {
+                'id': 'id',
+                'type': 'connection_asset',
+                'connection': {},
+                'location': { 'mapKey': 'inner' },
+              },
+              'custom': { 'anyKey': 'anyValue' },
+              'status': {
+                'running_at': '2017-01-30T10:11:12.000Z',
+                'completed_at': '2017-01-30T10:11:12.000Z',
+                'state': 'queued',
+                'message': { 'level': 'info', 'text': 'The deployment is successful' },
+                'metrics': [
+                  {
+                    'timestamp': '2023-09-22T02:52:03.324Z',
+                    'iteration': 0,
+                    'ml_metrics': { 'mapKey': 5 },
+                    'fine_tuning_metrics': { 'anyKey': 'anyValue' },
+                    'context': {
+                      'deployment_id': 'deployment_id',
+                      'prompt_tuning': { 'metrics_location': 'metrics_location' },
+                      'locations': ['locations'],
+                    },
+                  },
+                ],
+                'failure': {
+                  'trace': '3fd543d2-36e0-4f83-9be3-5c6dd498af4f',
+                  'errors': [
+                    {
+                      'code': 'missing_field',
+                      'message': "The 'name' field is required.",
+                      'more_info': 'https://cloud.ibm.com/apidocs/machine-learning#models-get',
+                      'target': { 'type': 'field', 'name': 'name' },
+                    },
+                  ],
+                },
+              },
+            },
+            'system': {
+              'warnings': [
+                {
+                  'message': 'The framework TF 1.1 is deprecated.',
+                  'id': '2fc54cf1-252f-424b-b52d-5cdd98149871',
+                  'more_info': 'more_info',
+                  'additional_properties': { 'anyKey': 'anyValue' },
+                },
+              ],
+            },
+          },
+        ],
+      };
+
+      beforeEach(() => {
+        unmock_createRequest();
+        const scope = nock(serviceUrl)
+          .get((uri) => uri.includes(path))
+          .reply(200, mockPagerResponse1)
+          .get((uri) => uri.includes(path))
+          .reply(200, mockPagerResponse2);
+      });
+
+      afterEach(() => {
+        nock.cleanAll();
+        mock_createRequest();
+      });
+
+      test('getNext()', async () => {
+        const params = {
+          limit: 10,
+          totalCount: true,
+          tagValue: 'testString',
+          state: 'testString',
+          type: 'ilab',
+          spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
+          projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
+        };
+        const allResults = [];
+        const pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAiMlService, params);
+        while (pager.hasNext()) {
+          const nextPage = await pager.getNext();
+          expect(nextPage).not.toBeNull();
+          allResults.push(...nextPage);
+        }
+        expect(allResults).not.toBeNull();
+        expect(allResults).toHaveLength(2);
+      });
+
+      test('getAll()', async () => {
+        const params = {
+          limit: 10,
+          totalCount: true,
+          tagValue: 'testString',
+          state: 'testString',
+          type: 'ilab',
+          spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
+          projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
+        };
+        const pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAiMlService, params);
+        const allResults = await pager.getAll();
+        expect(allResults).not.toBeNull();
+        expect(allResults).toHaveLength(2);
+      });
+    });
+  });
+
+  describe('getFineTuning', () => {
+    describe('positive tests', () => {
+      function __getFineTuningTest() {
+        // Construct the params object for operation getFineTuning
+        const id = 'testString';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const getFineTuningParams = {
+          id,
+          spaceId,
+          projectId,
+        };
+
+        const getFineTuningResult = watsonxAiMlService.getFineTuning(getFineTuningParams);
+
+        // all methods should return a Promise
+        expectToBePromise(getFineTuningResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/fine_tunings/{id}', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __getFineTuningTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __getFineTuningTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __getFineTuningTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const getFineTuningParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.getFineTuning(getFineTuningParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getFineTuning({});
+        } catch (e) {
+          err = e;
+        }
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getFineTuning();
+        } catch (e) {
+          err = e;
+        }
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('deleteFineTuning', () => {
+    describe('positive tests', () => {
+      function __deleteFineTuningTest() {
+        // Construct the params object for operation deleteFineTuning
+        const id = 'testString';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const hardDelete = true;
+        const deleteFineTuningParams = {
+          id,
+          spaceId,
+          projectId,
+          hardDelete,
+        };
+
+        const deleteFineTuningResult = watsonxAiMlService.deleteFineTuning(deleteFineTuningParams);
+
+        // all methods should return a Promise
+        expectToBePromise(deleteFineTuningResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/fine_tunings/{id}', 'DELETE');
+        const expectedAccept = undefined;
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __deleteFineTuningTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __deleteFineTuningTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __deleteFineTuningTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const deleteFineTuningParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.deleteFineTuning(deleteFineTuningParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deleteFineTuning({});
+        } catch (e) {
+          err = e;
+        }
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deleteFineTuning();
+        } catch (e) {
+          err = e;
+        }
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
   describe('createDocumentExtraction', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
@@ -5554,11 +6265,9 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(createRequestMock).toHaveBeenCalledTimes(1);
 
         const mockRequestOptions = getOptions(createRequestMock);
-        console.log(mockRequestOptions);
         checkUrlAndMethod(mockRequestOptions, '/ml/v1/tuning/documents/{id}', 'GET');
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
-        console.log(createRequestMock.mock.calls[0][0].defaultOptions);
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -6454,6 +7163,924 @@ describe('WatsonxAiMlVml_v1', () => {
         let err;
         try {
           await watsonxAiMlService.deleteTaxonomy();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+  describe('createModel', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // SoftwareSpecRel
+      const softwareSpecRelModel = {
+        id: '4cedab6d-e8e4-4214-b81a-2ddb122db2ab',
+        rev: '2',
+        name: 'testString',
+      };
+
+      // Rel
+      const relModel = {
+        id: '4cedab6d-e8e4-4214-b81a-2ddb122db2ab',
+        rev: '2',
+      };
+
+      // ModelDefinitionId
+      const modelDefinitionIdModel = {
+        id: '4cedab6d-e8e4-4214-b81a-2ddb122db2ab',
+      };
+
+      // DataConnection
+      const dataConnectionModel = {
+        foo: 'testString',
+      };
+
+      // DataSchema
+      const dataSchemaModel = {
+        id: 't1',
+        name: 'Tasks',
+        fields: [{ name: 'duration', type: 'number' }],
+        type: 'struct',
+      };
+
+      // DataConnectionReference
+      const dataConnectionReferenceModel = {
+        id: '8d3682dd-2858-43c9-bfd7-12a79abcfb0c',
+        type: 'connection_asset',
+        connection: dataConnectionModel,
+        location: { 'key1': 'testString' },
+        schema: dataSchemaModel,
+      };
+
+      // ModelEntitySchemas
+      const modelEntitySchemasModel = {
+        input: [dataSchemaModel],
+        output: [dataSchemaModel],
+      };
+
+      // ModelEntitySize
+      const modelEntitySizeModel = {
+        in_memory: 72.5,
+        content: 72.5,
+      };
+
+      // TsTrainingTraining
+      const tsTrainingTrainingModel = {
+        neg_symmetric_mean_absolute_percentage_error: -38.35790647931252,
+      };
+
+      // MetricTsMetricsTsTraining
+      const metricTsMetricsModel = {
+        training: tsTrainingTrainingModel,
+      };
+
+      // TsadHoldoutIterationsItemAveragePrecision
+      const tsadHoldoutIterationsItemAveragePrecisionModel = {
+        localized_extreme: 0.5294117647058824,
+        level_shift: 1,
+        variance: 0.5471792823589406,
+        trend: 0.8183221870721871,
+      };
+
+      // TsadHoldoutIterationsItem
+      const tsadHoldoutIterationsItemModel = {
+        average_precision: tsadHoldoutIterationsItemAveragePrecisionModel,
+        roc_auc: {
+          localized_extreme: 0.13559322033898305,
+          level_shift: 0,
+          variance: 0.2501797268152408,
+          trend: 0.009259259259259259,
+        },
+        f1: {
+          localized_extreme: 0.16666666666666669,
+          level_shift: 0.8,
+          variance: 0.41666666666666663,
+          trend: 0.7741935483870968,
+        },
+        precision: {
+          localized_extreme: 0.1,
+          level_shift: 0.6666666666666666,
+          variance: 0.45454545454545453,
+          trend: 0.631578947368421,
+        },
+        recall: { localized_extreme: 0.5, level_shift: 1, variance: 0.38461538461538464, trend: 1 },
+      };
+
+      // TsadHoldoutAggAveragePrecisionLevelShift
+      const tsadHoldoutAggAveragePrecisionLevelShiftModel = {
+        mean: 1,
+        range: [-1, 1],
+      };
+
+      // TsadHoldoutAggAveragePrecisionLocalizedExtreme
+      const tsadHoldoutAggAveragePrecisionLocalizedExtremeModel = {
+        mean: 1,
+        range: [-1, 1],
+      };
+
+      // TsadHoldoutAggAveragePrecisionTrend
+      const tsadHoldoutAggAveragePrecisionTrendModel = {
+        mean: 1,
+        range: [-1, 1],
+      };
+
+      // Variance
+      const varianceModel = {
+        mean: 1,
+        range: [-1, 1],
+      };
+
+      // TsadHoldoutAggAveragePrecision
+      const tsadHoldoutAggAveragePrecisionModel = {
+        level_shift: tsadHoldoutAggAveragePrecisionLevelShiftModel,
+        localized_extreme: tsadHoldoutAggAveragePrecisionLocalizedExtremeModel,
+        trend: tsadHoldoutAggAveragePrecisionTrendModel,
+        variance: varianceModel,
+      };
+
+      // TsadHoldoutAggF1
+      const tsadHoldoutAggF1Model = {
+        level_shift: { mean: '0.7798245614035088,', range: [0.7499999999999999, 0.8] },
+        localized_extreme: {
+          mean: 0.17676767676767677,
+          range: [0.16666666666666669, 0.1818181818181818],
+        },
+        trend: { mean: 0.7585532746823068, range: [0.7272727272727273, 0.7741935483870968] },
+        variance: varianceModel,
+      };
+
+      // TsadHoldoutAggPrecision
+      const tsadHoldoutAggPrecisionModel = {
+        level_shift: { mean: 0.7798245614035088, range: [0.7499999999999999, 0.8] },
+        localized_extreme: {
+          mean: 0.17676767676767677,
+          range: [0.16666666666666669, 0.1818181818181818],
+        },
+        trend: { mean: 0.7585532746823068, range: [0.7272727272727273, 0.7741935483870968] },
+        variance: varianceModel,
+      };
+
+      // TsadHoldoutAggRecall
+      const tsadHoldoutAggRecallModel = {
+        level_shift: { mean: 0.7798245614035088, range: [0.7499999999999999, 0.8] },
+        localized_extreme: {
+          mean: 0.17676767676767677,
+          range: [0.16666666666666669, 0.1818181818181818],
+        },
+        trend: { mean: 0.7585532746823068, range: [0.7272727272727273, 0.7741935483870968] },
+        variance: varianceModel,
+      };
+
+      // TsadHoldoutAggRocAuc
+      const tsadHoldoutAggRocAucModel = {
+        level_shift: { mean: 0.7798245614035088, range: [0.7499999999999999, 0.8] },
+        localized_extreme: {
+          mean: 0.17676767676767677,
+          range: [0.16666666666666669, 0.1818181818181818],
+        },
+        trend: { mean: 0.7585532746823068, range: [0.7272727272727273, 0.7741935483870968] },
+        variance: varianceModel,
+      };
+
+      // TsadHoldoutAgg
+      const tsadHoldoutAggModel = {
+        average_precision: tsadHoldoutAggAveragePrecisionModel,
+        f1: tsadHoldoutAggF1Model,
+        precision: tsadHoldoutAggPrecisionModel,
+        recall: tsadHoldoutAggRecallModel,
+        roc_auc: tsadHoldoutAggRocAucModel,
+      };
+
+      // TsadHoldoutSupportingRankAveragePrecisionLevelShift
+      const tsadHoldoutSupportingRankAveragePrecisionLevelShiftModel = {
+        p1: 2,
+        p2: 2,
+        p3: 2,
+        p4: 5,
+        p5: 5,
+        p6: 6,
+      };
+
+      // TsadHoldoutSupportingRankAveragePrecision
+      const tsadHoldoutSupportingRankAveragePrecisionModel = {
+        level_shift: tsadHoldoutSupportingRankAveragePrecisionLevelShiftModel,
+        localized_extreme: { p1: 1, p2: 2, p3: 3, p4: 4, p5: 5, p6: 6 },
+        trend: { p1: 1, p2: 2, p3: 3, p4: 4, p5: 5, p6: 6 },
+        variance: { p1: 1, p2: 2, p3: 3, p4: 4, p5: 5, p6: 6 },
+      };
+
+      // TsadHoldoutSupportingRank
+      const tsadHoldoutSupportingRankModel = {
+        average_precision: tsadHoldoutSupportingRankAveragePrecisionModel,
+        f1: {
+          level_shift: { p1: 2, p2: 2, p5: 2, p4: 4, p6: 5, p3: 6 },
+          localized_extreme: { p1: 1, p2: 2, p3: 3, p4: 4, p5: 5, p6: 6 },
+          trend: { p1: 1.5, p2: 1.5, p5: 3, p6: 4, p4: 5, p3: 6 },
+          variance: { p4: 1, p5: 2, p6: 3, p3: 4, p1: 5, p2: 6 },
+        },
+        roc_auc: {
+          level_shift: { p1: 2, p2: 2, p5: 2, p4: 4, p6: 5, p3: 6 },
+          localized_extreme: { p1: 1, p2: 2, p3: 3, p4: 4, p5: 5, p6: 6 },
+          trend: { p1: 1.5, p2: 1.5, p5: 3, p6: 4, p4: 5, p3: 6 },
+          variance: { p4: 1, p5: 2, p6: 3, p3: 4, p1: 5, p2: 6 },
+        },
+        precision: {
+          level_shift: { p1: 2, p2: 2, p5: 2, p4: 4, p6: 5, p3: 6 },
+          localized_extreme: { p1: 1, p2: 2, p3: 3, p4: 4, p5: 5, p6: 6 },
+          trend: { p1: 1.5, p2: 1.5, p5: 3, p6: 4, p4: 5, p3: 6 },
+          variance: { p4: 1, p5: 2, p6: 3, p3: 4, p1: 5, p2: 6 },
+        },
+        recall: {
+          level_shift: { p1: 2, p2: 2, p5: 2, p4: 4, p6: 5, p3: 6 },
+          localized_extreme: { p1: 1, p2: 2, p3: 3, p4: 4, p5: 5, p6: 6 },
+          trend: { p1: 1.5, p2: 1.5, p5: 3, p6: 4, p4: 5, p3: 6 },
+          variance: { p4: 1, p5: 2, p6: 3, p3: 4, p1: 5, p2: 6 },
+        },
+      };
+
+      // TsadHoldoutAggregatedScoreItem
+      const tsadHoldoutAggregatedScoreItemModel = {
+        p1: 14.5,
+        p2: 12,
+        p3: 12,
+        p4: 10,
+        p5: 6,
+        p6: 5,
+      };
+
+      // MetricTsadMetricsTsadHoldout
+      const metricTsadMetricsModel = {
+        iterations: [tsadHoldoutIterationsItemModel],
+        agg: tsadHoldoutAggModel,
+        supporting_rank: tsadHoldoutSupportingRankModel,
+        aggregated_score: [tsadHoldoutAggregatedScoreItemModel],
+      };
+
+      // RemoteTrainingSystemMetric
+      const remoteTrainingSystemMetricModel = {
+        id: 'testString',
+        local: 72.5,
+        fused: 72.5,
+      };
+
+      // MlFederatedMetric
+      const mlFederatedMetricModel = {
+        remote_training_systems: [remoteTrainingSystemMetricModel],
+        global: 72.5,
+      };
+
+      // ModelLocation
+      const modelLocationModel = {
+        pipeline: 'testString',
+        pipeline_model: 'testString',
+        model: 'testString',
+      };
+
+      // IntermediateModel
+      const intermediateModelModel = {
+        name: 'my_pipeline',
+        process: 'testString',
+        location: modelLocationModel,
+        notebook_location: 'testString',
+        sdk_notebook_location: 'testString',
+        pipeline_nodes: ['testString'],
+        composition_steps: ['testString'],
+        duration: 38,
+        model_asset: 'testString',
+      };
+
+      // StepInfo
+      const stepInfoModel = {
+        id: 'testString',
+        name: 'testString',
+        started_at: '2019-01-01T12:00:00.000Z',
+        completed_at: '2019-01-01T12:00:00.000Z',
+        hyper_parameters: { anyKey: 'anyValue' },
+        data_allocation: 38,
+        estimator: 'testString',
+        transformer: 'testString',
+        score: 72.5,
+      };
+
+      // ConfusionMatrix
+      const confusionMatrixModel = {
+        true_class: 'testString',
+        tp: 38,
+        tn: 38,
+        fp: 38,
+        fn: 38,
+      };
+
+      // RocCurve
+      const rocCurveModel = {
+        true_class: 'testString',
+        tpr: [72.5],
+        fpr: [72.5],
+        thresholds: [72.5],
+      };
+
+      // BinaryClassification
+      const binaryClassificationModel = {
+        confusion_matrices: [confusionMatrixModel],
+        roc_curves: [rocCurveModel],
+      };
+
+      // MultiClassClassification
+      const multiClassClassificationModel = {
+        class: 'testString',
+        confusion_matrix_location:
+          'data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/confusion_matrix.json',
+        confusion_matrix: confusionMatrixModel,
+        roc_curve_location:
+          'data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/roc_curve.json',
+        roc_curve: rocCurveModel,
+      };
+
+      // MultiClassClassifications
+      const multiClassClassificationsModel = {
+        one_vs_all: [multiClassClassificationModel],
+        one_vs_all_location:
+          'data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/one_vs_all.json',
+      };
+
+      // FeatureImportance
+      const featureImportanceModel = {
+        computation_type: 'testString',
+        features: { 'key1': 72.5 },
+        min_max_normalization: true,
+      };
+
+      // IncrementalTraining
+      const incrementalTrainingModel = {
+        iteration: 10,
+        total_iterations: 30,
+        measures_location: '/path_to_csv',
+        train_batch_samples_count: 10786,
+        holdout_samples_count: 6784,
+        early_stop_triggered: true,
+      };
+
+      // MetricsContext
+      const metricsContextModel = {
+        deployment_id: 'testString',
+        intermediate_model: intermediateModelModel,
+        phase: 'testString',
+        step: stepInfoModel,
+        classes: ['positive', 'negative', 'neutral'],
+        binary_classification: binaryClassificationModel,
+        multi_class_classification: multiClassClassificationsModel,
+        features_importance: [featureImportanceModel],
+        schema: 'testString',
+        estimators: ['testString'],
+        incremental_training: incrementalTrainingModel,
+        prediction_type: 'regression',
+      };
+
+      // Metric
+      const metricModel = {
+        timestamp: '2018-12-01T10:11:12.000Z',
+        iteration: 2,
+        ml_metrics: { 'key1': 72.5 },
+        ts_metrics: metricTsMetricsModel,
+        tsad_metrics: metricTsadMetricsModel,
+        ml_federated_metrics: { 'key1': mlFederatedMetricModel },
+        context: metricsContextModel,
+      };
+
+      // ModelEntityModelVersion
+      const modelEntityModelVersionModel = {
+        number: '1.0.0',
+        tag: 'xgb classifier',
+        description: 'Providing an update to the version.',
+      };
+
+      // DataInput
+      const dataInputModel = {
+        rows: 50000,
+        columns: 81,
+      };
+
+      // DataOutput
+      const dataOutputModel = {
+        rows: 1463,
+        columns: 81,
+      };
+
+      // DataPreprocessingTransformation
+      const dataPreprocessingTransformationModel = {
+        stage: 'sampling',
+        input: dataInputModel,
+        output: dataOutputModel,
+        props: { outliers_count: 1, duplicated_rows_count: 2 },
+      };
+
+      // BaseModel
+      const baseModelModel = {
+        model_id: 'google/flan-t5-xl',
+      };
+
+      // TrainingDetails
+      const trainingDetailsModel = {
+        id: 'b8e64f4b-ead1-47f3-abf6-8247b2826763',
+        base_model: baseModelModel,
+        task_id: 'summarization',
+        verbalizer: '{{input}}',
+      };
+
+      // ContentInfo
+      const contentInfoModel = {
+        content_format: 'testString',
+        location: 'testString',
+        file_name: 'testString',
+        pipeline_node_id: 'testString',
+        deployment_id: 'testString',
+      };
+
+      // ContentLocation
+      const contentLocationModel = {
+        contents: [contentInfoModel],
+        type: 'connection_asset',
+        connection: { 'key1': 'testString' },
+        location: { 'key1': 'testString' },
+      };
+
+      function __modelsCreateTest() {
+        // Construct the params object for operation modelsCreate
+        const name = 'my-flan-t5-xl';
+        const type = 'curated_foundation_model_1.0';
+        const projectId = 'testString';
+        const spaceId = '37c69d0e-a2c2-413b-bd27-a03c15967b2f';
+        const description = 'testString';
+        const tags = ['testString'];
+        const softwareSpec = softwareSpecRelModel;
+        const pipeline = relModel;
+        const modelDefinition = modelDefinitionIdModel;
+        const hyperParameters = { anyKey: 'anyValue' };
+        const domain = 'testString';
+        const trainingDataReferences = [dataConnectionReferenceModel];
+        const testDataReferences = [dataConnectionReferenceModel];
+        const schemas = modelEntitySchemasModel;
+        const labelColumn = 'testString';
+        const transformedLabelColumn = 'testString';
+        const size = modelEntitySizeModel;
+        const metrics = [metricModel];
+        const custom = { anyKey: 'anyValue' };
+        const userDefinedObjects = { 'key1': 'testString' };
+        const hybridPipelineSoftwareSpecs = [softwareSpecRelModel];
+        const modelVersion = modelEntityModelVersionModel;
+        const trainingId = 'testString';
+        const dataPreprocessing = [dataPreprocessingTransformationModel];
+        const training = trainingDetailsModel;
+        const contentLocation = contentLocationModel;
+        const modelsCreateParams = {
+          name,
+          type,
+          projectId,
+          spaceId,
+          description,
+          tags,
+          softwareSpec,
+          pipeline,
+          modelDefinition,
+          hyperParameters,
+          domain,
+          trainingDataReferences,
+          testDataReferences,
+          schemas,
+          labelColumn,
+          transformedLabelColumn,
+          size,
+          metrics,
+          custom,
+          userDefinedObjects,
+          hybridPipelineSoftwareSpecs,
+          modelVersion,
+          trainingId,
+          dataPreprocessing,
+          training,
+          contentLocation,
+        };
+
+        const modelsCreateResult = watsonxAiMlService.createModel(modelsCreateParams);
+
+        // all methods should return a Promise
+        expectToBePromise(modelsCreateResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v4/models', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.name).toEqual(name);
+        expect(mockRequestOptions.body.type).toEqual(type);
+        expect(mockRequestOptions.body.project_id).toEqual(projectId);
+        expect(mockRequestOptions.body.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.body.description).toEqual(description);
+        expect(mockRequestOptions.body.tags).toEqual(tags);
+        expect(mockRequestOptions.body.software_spec).toEqual(softwareSpec);
+        expect(mockRequestOptions.body.pipeline).toEqual(pipeline);
+        expect(mockRequestOptions.body.model_definition).toEqual(modelDefinition);
+        expect(mockRequestOptions.body.hyper_parameters).toEqual(hyperParameters);
+        expect(mockRequestOptions.body.domain).toEqual(domain);
+        expect(mockRequestOptions.body.training_data_references).toEqual(trainingDataReferences);
+        expect(mockRequestOptions.body.test_data_references).toEqual(testDataReferences);
+        expect(mockRequestOptions.body.schemas).toEqual(schemas);
+        expect(mockRequestOptions.body.label_column).toEqual(labelColumn);
+        expect(mockRequestOptions.body.transformed_label_column).toEqual(transformedLabelColumn);
+        expect(mockRequestOptions.body.size).toEqual(size);
+        expect(mockRequestOptions.body.metrics).toEqual(metrics);
+        expect(mockRequestOptions.body.custom).toEqual(custom);
+        expect(mockRequestOptions.body.user_defined_objects).toEqual(userDefinedObjects);
+        expect(mockRequestOptions.body.hybrid_pipeline_software_specs).toEqual(
+          hybridPipelineSoftwareSpecs
+        );
+        expect(mockRequestOptions.body.model_version).toEqual(modelVersion);
+        expect(mockRequestOptions.body.training_id).toEqual(trainingId);
+        expect(mockRequestOptions.body.data_preprocessing).toEqual(dataPreprocessing);
+        expect(mockRequestOptions.body.training).toEqual(training);
+        expect(mockRequestOptions.body.content_location).toEqual(contentLocation);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __modelsCreateTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __modelsCreateTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __modelsCreateTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const name = 'my-flan-t5-xl';
+        const type = 'curated_foundation_model_1.0';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const modelsCreateParams = {
+          name,
+          type,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.createModel(modelsCreateParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createModel({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createModel();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('listModels', () => {
+    describe('positive tests', () => {
+      function __modelsListTest() {
+        // Construct the params object for operation modelsList
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const start = 'testString';
+        const limit = 50;
+        const tagValue = 'tf2.0 or tf2.1';
+        const search = 'testString';
+        const modelsListParams = {
+          spaceId,
+          projectId,
+          start,
+          limit,
+          tagValue,
+          search,
+        };
+
+        const modelsListResult = watsonxAiMlService.listModels(modelsListParams);
+
+        // all methods should return a Promise
+        expectToBePromise(modelsListResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v4/models', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.start).toEqual(start);
+        expect(mockRequestOptions.qs.limit).toEqual(limit);
+        expect(mockRequestOptions.qs['tag.value']).toEqual(tagValue);
+        expect(mockRequestOptions.qs.search).toEqual(search);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __modelsListTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __modelsListTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __modelsListTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const modelsListParams = {
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.listModels(modelsListParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+
+      test('should not have any problems when no parameters are passed in', () => {
+        // invoke the method with no parameters
+        watsonxAiMlService.listModels({});
+        checkForSuccessfulExecution(createRequestMock);
+      });
+    });
+
+    describe('ModelsListPager tests', () => {
+      const serviceUrl = watsonxAiMlServiceOptions.url;
+      const path = '/ml/v4/models';
+      const mockPagerResponse1 =
+        '{"next":{"href":"https://myhost.com/somePath?start=1"},"total_count":2,"limit":1,"resources":[{"metadata":{"id":"id","created_at":"2019-01-01T12:00:00.000Z","rev":"rev","owner":"owner","modified_at":"2019-01-01T12:00:00.000Z","parent_id":"parent_id","name":"name","description":"description","tags":["tags"],"commit_info":{"committed_at":"2019-01-01T12:00:00.000Z","commit_message":"commit_message"},"space_id":"3fc54cf1-252f-424b-b52d-5cdd9814987f","project_id":"12ac4cf1-252f-424b-b52d-5cdd9814987f"},"entity":{"type":"tensorflow_1.5","software_spec":{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab","rev":"2","name":"name"},"pipeline":{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab","rev":"2"},"model_definition":{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab"},"hyper_parameters":{"anyKey":"anyValue"},"domain":"domain","training_data_references":[{"id":"8d3682dd-2858-43c9-bfd7-12a79abcfb0c","type":"connection_asset","connection":{},"location":{"mapKey":"inner"},"schema":{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}}],"test_data_references":[{"id":"8d3682dd-2858-43c9-bfd7-12a79abcfb0c","type":"connection_asset","connection":{},"location":{"mapKey":"inner"},"schema":{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}}],"schemas":{"input":[{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}],"output":[{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}]},"label_column":"label_column","transformed_label_column":"transformed_label_column","size":{"in_memory":9,"content":7},"metrics":[{"timestamp":"2018-12-01T10:11:12.000Z","iteration":2,"ml_metrics":{"mapKey":5},"ts_metrics":{"training":{"neg_symmetric_mean_absolute_percentage_error":-38.35790647931252}},"tsad_metrics":{"iterations":[{"average_precision":{"localized_extreme":0.5294117647058824,"level_shift":1,"variance":0.5471792823589406,"trend":0.8183221870721871},"roc_auc":{"anyKey":"anyValue"},"f1":{"anyKey":"anyValue"},"precision":{"anyKey":"anyValue"},"recall":{"anyKey":"anyValue"}}],"agg":{"average_precision":{"level_shift":{"mean":1,"range":[5]},"localized_extreme":{"mean":1,"range":[5]},"trend":{"mean":1,"range":[5]},"variance":{"mean":1,"range":[5]}},"f1":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}},"precision":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}},"recall":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}},"roc_auc":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}}},"supporting_rank":{"average_precision":{"level_shift":{"p1":2,"p2":2,"p3":2,"p4":5,"p5":5,"p6":6},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"anyKey":"anyValue"}},"f1":{"anyKey":"anyValue"},"roc_auc":{"anyKey":"anyValue"},"precision":{"anyKey":"anyValue"},"recall":{"anyKey":"anyValue"}},"aggregated_score":[{"p1":14.5,"p2":12,"p3":12,"p4":10,"p5":6,"p6":5}]},"ml_federated_metrics":{"mapKey":{"remote_training_systems":[{"id":"id","local":5,"fused":5}],"global":6}},"context":{"deployment_id":"deployment_id","intermediate_model":{"name":"my_pipeline","process":"process","location":{"pipeline":"pipeline","pipeline_model":"pipeline_model","model":"model"},"notebook_location":"notebook_location","sdk_notebook_location":"sdk_notebook_location","pipeline_nodes":["pipeline_nodes"],"composition_steps":["composition_steps"],"duration":8,"model_asset":"model_asset"},"phase":"phase","step":{"id":"id","name":"name","started_at":"2019-01-01T12:00:00.000Z","completed_at":"2019-01-01T12:00:00.000Z","hyper_parameters":{"anyKey":"anyValue"},"data_allocation":15,"estimator":"estimator","transformer":"transformer","score":5},"classes":["anyValue"],"binary_classification":{"confusion_matrices":[{"true_class":"true_class","tp":2,"tn":2,"fp":2,"fn":2}],"roc_curves":[{"true_class":"true_class","tpr":[3],"fpr":[3],"thresholds":[10]}]},"multi_class_classification":{"one_vs_all":[{"class":"class","confusion_matrix_location":"data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/confusion_matrix.json","confusion_matrix":{"true_class":"true_class","tp":2,"tn":2,"fp":2,"fn":2},"roc_curve_location":"data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/roc_curve.json","roc_curve":{"true_class":"true_class","tpr":[3],"fpr":[3],"thresholds":[10]}}],"one_vs_all_location":"data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/one_vs_all.json"},"features_importance":[{"computation_type":"computation_type","features":{"mapKey":5},"min_max_normalization":true}],"schema":"schema","estimators":["estimators"],"incremental_training":{"iteration":10,"total_iterations":30,"measures_location":"/path_to_csv","train_batch_samples_count":10786,"holdout_samples_count":6784,"early_stop_triggered":true},"prediction_type":"regression"}}],"custom":{"anyKey":"anyValue"},"user_defined_objects":{"mapKey":"inner"},"hybrid_pipeline_software_specs":[{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab","rev":"2","name":"name"}],"model_version":{"number":"1.0.0","tag":"xgb classifier","description":"Providing an update to the version."},"training_id":"b8e64f4b-ead1-47f3-abf6-8247b2826763","data_preprocessing":[{"stage":"sampling","input":{"rows":50000,"columns":81},"output":{"rows":1463,"columns":81},"props":{"anyKey":"anyValue"}}],"training":{"id":"b8e64f4b-ead1-47f3-abf6-8247b2826763","base_model":{"model_id":"google/flan-t5-xl"},"task_id":"summarization","verbalizer":"{{input}}"},"content_import_state":"completed"},"system":{"warnings":[{"message":"The framework TF 1.1 is deprecated.","id":"2fc54cf1-252f-424b-b52d-5cdd98149871","more_info":"more_info","additional_properties":{"anyKey":"anyValue"}}]}}]}';
+      const mockPagerResponse2 =
+        '{"total_count":2,"limit":1,"resources":[{"metadata":{"id":"id","created_at":"2019-01-01T12:00:00.000Z","rev":"rev","owner":"owner","modified_at":"2019-01-01T12:00:00.000Z","parent_id":"parent_id","name":"name","description":"description","tags":["tags"],"commit_info":{"committed_at":"2019-01-01T12:00:00.000Z","commit_message":"commit_message"},"space_id":"3fc54cf1-252f-424b-b52d-5cdd9814987f","project_id":"12ac4cf1-252f-424b-b52d-5cdd9814987f"},"entity":{"type":"tensorflow_1.5","software_spec":{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab","rev":"2","name":"name"},"pipeline":{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab","rev":"2"},"model_definition":{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab"},"hyper_parameters":{"anyKey":"anyValue"},"domain":"domain","training_data_references":[{"id":"8d3682dd-2858-43c9-bfd7-12a79abcfb0c","type":"connection_asset","connection":{},"location":{"mapKey":"inner"},"schema":{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}}],"test_data_references":[{"id":"8d3682dd-2858-43c9-bfd7-12a79abcfb0c","type":"connection_asset","connection":{},"location":{"mapKey":"inner"},"schema":{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}}],"schemas":{"input":[{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}],"output":[{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}]},"label_column":"label_column","transformed_label_column":"transformed_label_column","size":{"in_memory":9,"content":7},"metrics":[{"timestamp":"2018-12-01T10:11:12.000Z","iteration":2,"ml_metrics":{"mapKey":5},"ts_metrics":{"training":{"neg_symmetric_mean_absolute_percentage_error":-38.35790647931252}},"tsad_metrics":{"iterations":[{"average_precision":{"localized_extreme":0.5294117647058824,"level_shift":1,"variance":0.5471792823589406,"trend":0.8183221870721871},"roc_auc":{"anyKey":"anyValue"},"f1":{"anyKey":"anyValue"},"precision":{"anyKey":"anyValue"},"recall":{"anyKey":"anyValue"}}],"agg":{"average_precision":{"level_shift":{"mean":1,"range":[5]},"localized_extreme":{"mean":1,"range":[5]},"trend":{"mean":1,"range":[5]},"variance":{"mean":1,"range":[5]}},"f1":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}},"precision":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}},"recall":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}},"roc_auc":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}}},"supporting_rank":{"average_precision":{"level_shift":{"p1":2,"p2":2,"p3":2,"p4":5,"p5":5,"p6":6},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"anyKey":"anyValue"}},"f1":{"anyKey":"anyValue"},"roc_auc":{"anyKey":"anyValue"},"precision":{"anyKey":"anyValue"},"recall":{"anyKey":"anyValue"}},"aggregated_score":[{"p1":14.5,"p2":12,"p3":12,"p4":10,"p5":6,"p6":5}]},"ml_federated_metrics":{"mapKey":{"remote_training_systems":[{"id":"id","local":5,"fused":5}],"global":6}},"context":{"deployment_id":"deployment_id","intermediate_model":{"name":"my_pipeline","process":"process","location":{"pipeline":"pipeline","pipeline_model":"pipeline_model","model":"model"},"notebook_location":"notebook_location","sdk_notebook_location":"sdk_notebook_location","pipeline_nodes":["pipeline_nodes"],"composition_steps":["composition_steps"],"duration":8,"model_asset":"model_asset"},"phase":"phase","step":{"id":"id","name":"name","started_at":"2019-01-01T12:00:00.000Z","completed_at":"2019-01-01T12:00:00.000Z","hyper_parameters":{"anyKey":"anyValue"},"data_allocation":15,"estimator":"estimator","transformer":"transformer","score":5},"classes":["anyValue"],"binary_classification":{"confusion_matrices":[{"true_class":"true_class","tp":2,"tn":2,"fp":2,"fn":2}],"roc_curves":[{"true_class":"true_class","tpr":[3],"fpr":[3],"thresholds":[10]}]},"multi_class_classification":{"one_vs_all":[{"class":"class","confusion_matrix_location":"data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/confusion_matrix.json","confusion_matrix":{"true_class":"true_class","tp":2,"tn":2,"fp":2,"fn":2},"roc_curve_location":"data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/roc_curve.json","roc_curve":{"true_class":"true_class","tpr":[3],"fpr":[3],"thresholds":[10]}}],"one_vs_all_location":"data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/one_vs_all.json"},"features_importance":[{"computation_type":"computation_type","features":{"mapKey":5},"min_max_normalization":true}],"schema":"schema","estimators":["estimators"],"incremental_training":{"iteration":10,"total_iterations":30,"measures_location":"/path_to_csv","train_batch_samples_count":10786,"holdout_samples_count":6784,"early_stop_triggered":true},"prediction_type":"regression"}}],"custom":{"anyKey":"anyValue"},"user_defined_objects":{"mapKey":"inner"},"hybrid_pipeline_software_specs":[{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab","rev":"2","name":"name"}],"model_version":{"number":"1.0.0","tag":"xgb classifier","description":"Providing an update to the version."},"training_id":"b8e64f4b-ead1-47f3-abf6-8247b2826763","data_preprocessing":[{"stage":"sampling","input":{"rows":50000,"columns":81},"output":{"rows":1463,"columns":81},"props":{"anyKey":"anyValue"}}],"training":{"id":"b8e64f4b-ead1-47f3-abf6-8247b2826763","base_model":{"model_id":"google/flan-t5-xl"},"task_id":"summarization","verbalizer":"{{input}}"},"content_import_state":"completed"},"system":{"warnings":[{"message":"The framework TF 1.1 is deprecated.","id":"2fc54cf1-252f-424b-b52d-5cdd98149871","more_info":"more_info","additional_properties":{"anyKey":"anyValue"}}]}}]}';
+
+      beforeEach(() => {
+        unmock_createRequest();
+        const scope = nock(serviceUrl)
+          .get((uri) => uri.includes(path))
+          .reply(200, mockPagerResponse1)
+          .get((uri) => uri.includes(path))
+          .reply(200, mockPagerResponse2);
+      });
+
+      afterEach(() => {
+        nock.cleanAll();
+        mock_createRequest();
+      });
+
+      test('getNext()', async () => {
+        const params = {
+          spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
+          projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
+          limit: 50,
+          tagValue: 'tf2.0 or tf2.1',
+          search: 'testString',
+        };
+        const allResults = [];
+        const pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAiMlService, params);
+        while (pager.hasNext()) {
+          const nextPage = await pager.getNext();
+          expect(nextPage).not.toBeNull();
+          allResults.push(...nextPage);
+        }
+        expect(allResults).not.toBeNull();
+        expect(allResults).toHaveLength(2);
+      });
+
+      test('getAll()', async () => {
+        const params = {
+          spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
+          projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
+          limit: 50,
+          tagValue: 'tf2.0 or tf2.1',
+          search: 'testString',
+        };
+        const pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAiMlService, params);
+        const allResults = await pager.getAll();
+        expect(allResults).not.toBeNull();
+        expect(allResults).toHaveLength(2);
+      });
+    });
+  });
+
+  describe('getModel', () => {
+    describe('positive tests', () => {
+      function __modelsGetTest() {
+        // Construct the params object for operation modelsGet
+        const modelId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const rev = '2';
+        const modelsGetParams = {
+          modelId,
+          spaceId,
+          projectId,
+          rev,
+        };
+
+        const modelsGetResult = watsonxAiMlService.getModel(modelsGetParams);
+
+        // all methods should return a Promise
+        expectToBePromise(modelsGetResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v4/models/{model_id}', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.rev).toEqual(rev);
+        expect(mockRequestOptions.path.model_id).toEqual(modelId);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __modelsGetTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __modelsGetTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __modelsGetTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const modelId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const modelsGetParams = {
+          modelId,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.getModel(modelsGetParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getModel({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getModel();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('deleteModel', () => {
+    describe('positive tests', () => {
+      function __modelsDeleteTest() {
+        // Construct the params object for operation modelsDelete
+        const modelId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const modelsDeleteParams = {
+          modelId,
+          spaceId,
+          projectId,
+        };
+
+        const modelsDeleteResult = watsonxAiMlService.deleteModel(modelsDeleteParams);
+
+        // all methods should return a Promise
+        expectToBePromise(modelsDeleteResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v4/models/{model_id}', 'DELETE');
+        const expectedAccept = undefined;
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.path.model_id).toEqual(modelId);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __modelsDeleteTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __modelsDeleteTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __modelsDeleteTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const modelId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const modelsDeleteParams = {
+          modelId,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.deleteModel(modelsDeleteParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deleteModel({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deleteModel();
         } catch (e) {
           err = e;
         }

@@ -34,6 +34,7 @@
     "test-integration-travis": "jest --runInBand --verbose --no-colors --testNamePattern='^((?!@slow).)*$' --json test/integration > test-output.log",
     "test-regression": "npm run local-publish && cd ./test/langchain && npm run test-regression",
     "test-ilab": "npm run build && jest test/integration/watsonx-ai-ml-ilab.vml_v1.test.js --testPathIgnorePatterns=''",
+    "test-lora": "npm run build && jest test/integration/watsonx-ai-ml-lora_qlora.vml_v1.test.js --testPathIgnorePatterns=''",
     "check-packages": "installed-check -e -d -v",
     "all": "npm run test-unit && npm run lint",
     "typedoc": "typedoc",
@@ -83,7 +84,8 @@
     "testPathIgnorePatterns": [
       "<rootDir>/test/langchain/",
       "<rootDir>/examples",
-      "ilab"
+      "ilab",
+      "lora"
     ],
     "testEnvironment": "node"
   },

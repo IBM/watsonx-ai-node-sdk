@@ -57,6 +57,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   let promptId;
   let sessionId;
   let entryId;
+  let modelId;
   let promptDeploymentId;
 
   test('Initialize service', async () => {
@@ -204,10 +205,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       throw new Error('Failed to get a valid response after maximum retries');
     };
 
-    const modelId = await retryAsyncCall(trainingParams);
+    const deployedModelId = await retryAsyncCall(trainingParams);
 
     // Request models needed by this operation.
-    console.log(modelId);
+    console.log(deployedModelId);
     // OnlineDeploymentParameters
     const onlineDeploymentParametersModel = {
       serving_name: (Math.random() + 1).toString(36).substring(10),
@@ -231,7 +232,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
     // Rel
     const relModel = {
-      id: modelId,
+      id: deployedModelId,
     };
 
     const params = {
@@ -1200,4 +1201,86 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(res.status).toBe(204);
     expect(res.result).toBeDefined();
    });
+  
+  test('createModel()', async () => {
+    const params = {
+      name: 'my-flan-t5-xl',
+      type: 'curated_foundation_model_1.0',
+      projectId,
+      softwareSpec: { name: 'watsonx-cfm-caikit-1.1' },
+      foundationModel: {
+        model_id: 'meta-llama/llama-3-1-8b',
+      },
+    };
+
+    const res = await watsonxAiMlService.createModel(params);
+    modelId = res.result.metadata.id;
+    expect(res).toBeDefined();
+    expect(res.status).toBe(201);
+    expect(res.result).toBeDefined();
+  });
+
+  test('listModels()', async () => {
+    const params = {
+      projectId,
+      limit: 50,
+    };
+
+    const res = await watsonxAiMlService.listModels(params);
+    console.log(res.result.resources);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(200);
+    expect(res.result).toBeDefined();
+  });
+
+  test('modelsList() via ModelsListPager', async () => {
+    const params = {
+      projectId,
+      limit: 50,
+      tagValue: 'tf2.0 or tf2.1',
+      search: '',
+    };
+
+    const allResults = [];
+
+    // Test getNext().
+    let pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAiMlService, params);
+    while (pager.hasNext()) {
+      const nextPage = await pager.getNext();
+      expect(nextPage).not.toBeNull();
+      allResults.push(...nextPage);
+    }
+
+    // Test getAll().
+    pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAiMlService, params);
+    const allItems = await pager.getAll();
+    expect(allItems).not.toBeNull();
+    expect(allItems).toHaveLength(allResults.length);
+    console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
+  });
+
+  test('getModel()', async () => {
+    const params = {
+      modelId,
+      projectId,
+    };
+
+    const res = await watsonxAiMlService.getModel(params);
+    console.log(res);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(200);
+    expect(res.result).toBeDefined();
+  });
+
+  test('deleteModel()', async () => {
+    const params = {
+      modelId,
+      projectId,
+    };
+
+    const res = await watsonxAiMlService.deleteModel(params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(204);
+    expect(res.result).toBeDefined();
+  });
 });

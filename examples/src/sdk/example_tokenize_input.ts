@@ -27,7 +27,7 @@ export const tokenizeInput = async () => {
 
   // Specify two models
   const model1 = 'google/flan-ul2';
-  const model2 = 'meta-llama/llama-3-8b-instruct';
+  const model2 = 'meta-llama/llama-3-1-70b-instruct';
 
   // Specify input data
   const input =

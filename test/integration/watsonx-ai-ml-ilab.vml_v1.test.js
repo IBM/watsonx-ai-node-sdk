@@ -169,7 +169,7 @@ describe('Ilab tests', () => {
   test.skip('getSyntheticDataGeneration()', async () => {
     const params = {
       projectId: process.env.WATSONX_AI_PROJECT_ID,
-      id: sdgId,
+      id: syntheticDataId,
     };
 
     const res = await watsonxAiMlService.getSyntheticDataGeneration(params);
