@@ -1,27 +1,33 @@
 {
-  "name": "watsonx-node.js-examples",
+  "name": "watsonx-node.ts-examples",
   "version": "1.0.0",
   "description": "Example usage of SDK as well as external libraries that are implemented with usage of our SDK",
+  "type": "module",
   "scripts": {
-    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand",
+    "eslint:fix": "eslint . --fix",
+    "eslint:check": "eslint . --cache",
+    "lint": "npm run eslint:check",
+    "lint-fix": "npm run eslint:fix",
+    "test": "npm run lint && NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand",
     "build": "tsc",
-    "text_generation": "npm run build && node ./dist/sdk/call/text_generation.js",
-    "embeddings": "npm run build && node ./dist/sdk/call/embeddings.js",
-    "prompt_tuning": "npm run build && node ./dist/sdk/call/prompt.js",
-    "chat": "npm run build && node ./dist/sdk/call/chat.js",
-    "ilab": "npm run build && node ./dist/sdk/call/ilab.js",
-    "rerank": "npm run build && node ./dist/sdk/call/rerank.js",
+    "run-ts": "node --no-warnings --loader ts-node/esm",
+    "text_generation": "npm run build && run-ts ./src/sdk/example_list_models_and_generate_text.ts && run-ts ./src/sdk/example_tokenize_input.ts",
+    "embeddings": "npm run build && run-ts ./src/sdk/example_generate_embeddings.ts",
+    "prompt_tuning": "npm run build && run-ts ./src/sdk/example_prompt_tuning.ts && run-ts ./src/sdk/example_prompt_generate_text.ts && run-ts ./src/sdk/example_prompt_generate_stream_text.ts",
+    "chat": "npm run build && run-ts ./src/sdk/example_chat.ts && run-ts ./src/sdk/example_chat_image.ts && run-ts ./src/sdk/example_chat_stream.ts && run-ts ./src/sdk/example_chat_tools.ts",
+    "ilab": "npm run build && run-ts ./src/sdk/example_instruct_lab.ts",
+    "rerank": "npm run build && npm run run-ts ./src/sdk/example_rerank.ts",
     "all": "npm run build && npm run text_generation && npm run embeddings && npm run chat",
     "all-ext": "npm run build && npm run all && npm run prompt_tuning",
     "test-install": "yalc add @ibm-cloud/watsonx-ai && npm install && npm install @langchain/community@latest @langchain/langgraph@latest",
-    "langchain-chat": "npm run build && node ./dist/external/langchain/call/chat.js",
-    "langchain-chat-image": "npm run build && node ./dist/external/langchain/call/chat_image.js",
-    "langchain-tools": "npm run build && node ./dist/external/langchain/call/chat_tools.js",
-    "langchain-langgraph-tools": "npm run build && node ./dist/external/langchain/call/chat_langgraph.js",
-    "langgraph-rag": "npm run build && node ./dist/external/langchain/call/embeddings_store.js",
-    "langchain-rerank": "npm run build && node ./dist/external/langchain/call/rerank.js",
-    "all-langchain": "npm run build && node ./dist/external/langchain/call/chat.js && node ./dist/external/langchain/call/chat_image.js && node ./dist/external/langchain/call/chat_tools.js && node ./dist/external/langchain/call/chat_langgraph.js",
-    "all-langchain-ext": "npm all-langchain && node ./dist/external/langchain/call/embeddings_store.js",
+    "langchain-chat": "npm run build && run-ts ./src/external/langchain/chat_conversation.ts",
+    "langchain-chat-image": "npm run build && run-ts ./src/external/langchain/chat_image.ts",
+    "langchain-tools": "npm run build && run-ts ./src/external/langchain/chat_tools.ts",
+    "langchain-langgraph-tools": "npm run build && run-ts ./src/external/langchain/chat_langgraph.ts",
+    "langgraph-rag": "npm run build && run-ts ./src/external/langchain/rag_memory_vector_store.ts && run-ts ./src/external/langchain/rag_milvus.ts",
+    "langchain-rerank": "npm run build && run-ts ./src/external/langchain/rerank.ts",
+    "all-langchain": "npm run build && run-ts ./src/external/langchain/chat_conversation.ts && run-ts ./src/external/langchain/chat_image.ts && run-ts ./src/external/langchain/chat_tools.ts && run-ts ./src/external/langchain/call/chat_langgraph.ts",
+    "all-langchain-ext": "npm all-langchain && run-ts ./src/external/langchain/call/rag_memory_vector_store.ts && run-ts ./src/external/langchain/rag_milvus.ts",
     "test-sdk": "npm run test-install && npm test sdk.test.ts",
     "test-langchain": "npm run test-install && npm test langchain.test.ts",
     "test-all": "npm run test-install && npm test"
@@ -29,7 +35,7 @@
   "jest": {
     "collectCoverage": true,
     "testEnvironment": "node",
-    "preset": "ts-jest",
+    "preset": "ts-jest/presets/default-esm",
     "moduleFileExtensions": [
       "ts",
       "js"
@@ -37,25 +43,50 @@
     "testTimeout": 60000,
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/dist/"
+      "/dist/",
+      ".yalc"
+    ],
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
+    "collectCoverageFrom": [
+      "**src/**/*.{js,ts,jsx,tsx}",
+      "!**/.yalc/**",
+      "!**/dist/**",
+      "!**/coverage/**"
     ]
+  },
+  "ts-node": {
+    "esm": true
   },
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
-    "@langchain/community": "^0.3.26",
+    "@langchain/community": "^0.3.32",
     "@langchain/core": "^0.3.19",
-    "@langchain/langgraph": "^0.2.41",
+    "@langchain/langgraph": "^0.2.49",
+    "@typescript-eslint/eslint-plugin": "^8.25.0",
+    "@typescript-eslint/parser": "^8.25.0",
     "@zilliz/milvus2-sdk-node": "^2.5.0",
     "axios": "^1.7.8",
     "dotenv": "^16.4.5",
     "duck-duck-scrape": "^2.2.6",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jest": "^28.11.0",
+    "eslint-plugin-jsdoc": "^50.6.3",
+    "eslint-plugin-prettier": "^5.2.3",
     "langchain": "^0.3.6",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
+    "@types/needle": "^3.3.0",
     "@types/node": "^22.9.0",
+    "jest": "^29.7.0",
     "path": "^0.12.7",
-    "ts-jest": "^29.2.5"
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
   }
 }

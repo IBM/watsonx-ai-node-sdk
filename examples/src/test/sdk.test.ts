@@ -1,62 +1,54 @@
-import { config } from 'dotenv';
-import { basicChat } from '../sdk/example_chat';
-import { chatWithImage } from '../sdk/example_chat_image';
-import { streamChat } from '../sdk/example_chat_stream';
-import { chatWithTools } from '../sdk/example_chat_tools';
-import { basicEmbeddings } from '../sdk/example_generate_embeddings';
-import { textGeneration } from '../sdk/example_list_models_and_generate_text';
-import { textGenerationStream } from '../sdk/example_prompt_generate_stream_text';
-import { promptTextGeneration } from '../sdk/example_prompt_generate_text';
-import { tokenizeInput } from '../sdk/example_tokenize_input';
-import { promptTuning } from '../sdk/example_prompt_tuning';
-import { instructLabFlow } from '../sdk/example_instruct_lab';
-import { rerankDocuments } from '../sdk/example_rerank';
-
-config({ path: '../../../credentials/watsonx_ai_ml_vml_v1.env' });
 describe('Test examples', () => {
   test('Text generation', async () => {
-    await textGeneration();
+    await expect(import('../sdk/example_list_models_and_generate_text')).resolves.not.toThrow();
   });
   test('Generate text with prompt', async () => {
-    await promptTextGeneration();
+    await expect(import('../sdk/example_prompt_generate_text')).resolves.not.toThrow();
   });
   test('Stream generated text', async () => {
-    await textGenerationStream();
+    await expect(import('../sdk/example_prompt_generate_stream_text')).resolves.not.toThrow();
   });
   test('Tokenize input', async () => {
-    await tokenizeInput();
+    await expect(import('../sdk/example_tokenize_input')).resolves.not.toThrow();
   });
   test.skip(
     'Prompt and infere',
     async () => {
-      await promptTuning();
+      await expect(import('../sdk/example_prompt_tuning')).resolves.not.toThrow();
     },
     60000 * 10
   );
   test('Basic chat generation', async () => {
-    await basicChat();
+    await expect(import('../sdk/example_chat')).resolves.not.toThrow();
   });
   test('Chat with image', async () => {
-    await chatWithImage();
+    await expect(import('../sdk/example_chat_image')).resolves.not.toThrow();
   });
   test('Chat stream', async () => {
-    await streamChat();
+    await expect(import('../sdk/example_chat_stream')).resolves.not.toThrow();
   });
   test('Chat with tools', async () => {
-    await chatWithTools();
+    await expect(import('../sdk/example_chat_tools')).resolves.not.toThrow();
   });
   test('Basic embeddings generation', async () => {
-    await basicEmbeddings();
+    await expect(import('../sdk/example_generate_embeddings')).resolves.not.toThrow();
   });
   test('Basic rerank usage', async () => {
-    await rerankDocuments();
+    await expect(import('../sdk/example_rerank')).resolves.not.toThrow();
   });
   // This test takes around 40min. Only to be run on local machine
   test.skip(
     'Instruct Lab flow',
     async () => {
-      await instructLabFlow();
+      await expect(import('../sdk/example_instruct_lab')).resolves.not.toThrow();
     },
     60000 * 40
+  );
+  test(
+    'Basic rerank usage',
+    async () => {
+      await expect(import('../sdk/example_text_extraction')).resolves.not.toThrow();
+    },
+    60000 * 4
   );
 });

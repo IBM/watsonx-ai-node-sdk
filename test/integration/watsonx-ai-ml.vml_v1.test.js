@@ -40,7 +40,7 @@ const checkIfDeploymentIsReady = async (service, args = [], retries = 5, delay =
   for (let i = 0; i < retries; i += 1) {
     const result = await service.getDeployment(args);
     if (result.result.entity.status.state === 'ready') {
-      return;
+      return result;
     }
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
@@ -59,6 +59,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   let entryId;
   let modelId;
   let promptDeploymentId;
+  let deployedModelId;
+  let textExtId;
 
   test('Initialize service', async () => {
     watsonxAiMlService = WatsonxAiMlVml_v1.newInstance({
@@ -205,10 +207,9 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       throw new Error('Failed to get a valid response after maximum retries');
     };
 
-    const deployedModelId = await retryAsyncCall(trainingParams);
+    deployedModelId = await retryAsyncCall(trainingParams);
 
     // Request models needed by this operation.
-    console.log(deployedModelId);
     // OnlineDeploymentParameters
     const onlineDeploymentParametersModel = {
       serving_name: (Math.random() + 1).toString(36).substring(10),
@@ -775,7 +776,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       name: 'text_classification',
       online: onlineDeploymentModel,
       baseModelId: 'meta-llama/llama-3-1-70b-instruct',
-      promptTemplate: promptTemplate,
+      promptTemplate,
       projectId,
       description: 'testString',
       tags: ['testString'],
@@ -789,6 +790,17 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(res.result).toBeDefined();
     promptDeploymentId = res.result.metadata.id;
   }, 800000);
+
+  test('getPromptDeployment', async () => {
+    const params = {
+      deploymentId: promptDeploymentId,
+      projectId,
+    };
+    const res = await checkIfDeploymentIsReady(watsonxAiMlService, params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(200);
+    expect(res.result).toBeDefined();
+  });
 
   test('deploymentsTextChat()', async () => {
     // DeploymentTextChatMessagesTextChatMessageAssistant
@@ -821,7 +833,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     };
 
     const res = await watsonxAiMlService.deploymentsTextChatStream(params);
-    console.log(res)
+    console.log(res);
     expect(res).toBeInstanceOf(Stream);
     expect(res).toBeDefined();
   });
@@ -904,7 +916,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         stream.controller.abort();
       }
     };
-  await expect(abortStreaming()).rejects.toThrow('The operation was aborted');
+    await expect(abortStreaming()).rejects.toThrow('The operation was aborted');
   });
 
   test('createPromptSession', async () => {
@@ -1154,6 +1166,18 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
+  test('deleteTrainedModel', async () => {
+    const params = {
+      modelId: deployedModelId,
+      projectId,
+    };
+
+    const res = await watsonxAiMlService.deleteModel(params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(204);
+    expect(res.result).toBeDefined();
+  });
+
   test('deleteDeployment', async () => {
     const params = {
       deploymentId,
@@ -1178,6 +1202,18 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
+  test('deletePromptDeployment', async () => {
+    const params = {
+      deploymentId: promptDeploymentId,
+      projectId,
+    };
+
+    const res = await watsonxAiMlService.deleteDeployment(params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(204);
+    expect(res.result).toBeDefined();
+  });
+
   test('deletePrompt', async () => {
     const params = {
       promptId,
@@ -1190,18 +1226,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(res.result).toBeDefined();
   });
 
-  test('deletePromptDeployment', async () => {
-    const params = {
-      deploymentId: promptDeploymentId,
-      projectId,
-    };
-
-    const res = await watsonxAiMlService.deleteDeployment(params);
-    expect(res).toBeDefined();
-    expect(res.status).toBe(204);
-    expect(res.result).toBeDefined();
-   });
-  
   test('createModel()', async () => {
     const params = {
       name: 'my-flan-t5-xl',
@@ -1279,6 +1303,139 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     };
 
     const res = await watsonxAiMlService.deleteModel(params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(204);
+    expect(res.result).toBeDefined();
+  });
+
+  test('createTextExtraction()', async () => {
+    // Request models needed by this operation.
+
+    // CosDataConnection
+    const cosDataConnectionModel = {
+      id: process.env.WATSONX_AI_COS_ID,
+    };
+
+    // CosDataLocation
+    const cosDataLocationModel = {
+      file_name: 'experienced.pdf',
+      bucket: 'wx-nodejs-test-text-extraction',
+    };
+
+    const cosResultLocationModel = {
+      file_name: 'experienced.md',
+      bucket: 'wx-nodejs-test-text-extraction',
+    };
+
+    // TextExtractionDataReference
+    const textExtractionDataReferenceModel = {
+      type: 'connection_asset',
+      connection: cosDataConnectionModel,
+      location: cosDataLocationModel,
+    };
+    // TextExtractionDataReference
+    const textExtractionResultReferenceModel = {
+      type: 'connection_asset',
+      connection: cosDataConnectionModel,
+      location: cosResultLocationModel,
+    };
+
+    // TextExtractionStepOcr
+    const textExtractionStepOcrModel = {
+      languages_list: ['en'],
+    };
+
+    // TextExtractionStepTablesProcessing
+    const textExtractionStepTablesProcessingModel = {
+      enabled: true,
+    };
+
+    // TextExtractionSteps
+    const textExtractionStepsModel = {
+      ocr: textExtractionStepOcrModel,
+      tables_processing: textExtractionStepTablesProcessingModel,
+    };
+
+    const params = {
+      documentReference: textExtractionDataReferenceModel,
+      resultsReference: textExtractionResultReferenceModel,
+      steps: textExtractionStepsModel,
+      projectId,
+      assemblyMd: {},
+    };
+
+    const res = await watsonxAiMlService.createTextExtraction(params);
+    textExtId = res.result.metadata.id;
+    expect(res).toBeDefined();
+    expect(res.status).toBe(201);
+    expect(res.result).toBeDefined();
+  });
+
+  test('listTextExtractions()', async () => {
+    const params = {
+      projectId,
+      limit: 50,
+    };
+
+    const res = await watsonxAiMlService.listTextExtractions(params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(200);
+    expect(res.result).toBeDefined();
+  });
+
+  test('listTextExtractions() via TextExtractionsPager', async () => {
+    const params = {
+      projectId,
+      limit: 50,
+    };
+
+    const allResults = [];
+
+    // Test getNext().
+    let pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAiMlService, params);
+    while (pager.hasNext()) {
+      const nextPage = await pager.getNext();
+      expect(nextPage).not.toBeNull();
+      allResults.push(...nextPage);
+    }
+
+    // Test getAll().
+    pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAiMlService, params);
+    const allItems = await pager.getAll();
+    expect(allItems).not.toBeNull();
+    expect(allItems).toHaveLength(allResults.length);
+    console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
+  });
+
+  test('getTextExtraction()', async () => {
+    const params = {
+      id: textExtId,
+      projectId,
+    };
+
+    const checkIfExtractionIsReady = async (parameters, n = 5, delay = 10000) => {
+      for (let i = 0; i <= n; i += 1) {
+        const res = await watsonxAiMlService.getTextExtraction(parameters);
+        if (res.result.entity.results.status === 'completed') return res;
+        if (res.result.entity.results.status === 'failed')
+          throw new Error(res.result.entity.resultss.error.message);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+      throw new Error('Unable to finish extraction after maximum retries');
+    };
+    const res = await checkIfExtractionIsReady(params);
+    expect(res).toBeDefined();
+    expect(res.status).toBe(200);
+    expect(res.result).toBeDefined();
+  });
+
+  test('deleteTextExtraction()', async () => {
+    const params = {
+      id: textExtId,
+      projectId,
+      hardDelete: true,
+    };
+    const res = await watsonxAiMlService.deleteTextExtraction(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(204);
     expect(res.result).toBeDefined();

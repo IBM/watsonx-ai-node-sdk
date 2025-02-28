@@ -61,7 +61,7 @@ export function getSdkHeaders(
 }
 
 const stringToObj = (chunk: string[]) => {
-  const obj = {};
+  const obj: Record<string, any> = {};
   chunk.forEach((line) => {
     const index = line.indexOf(': ');
     const key = line.substring(0, index);
@@ -159,7 +159,7 @@ export class LineTransformStream extends StreamTransform {
   _transform(chunk: any, _encoding: string, callback: TransformCallback) {
     this.buffer += chunk.toString();
     const lines = this.buffer.split('\n');
-    this.buffer = lines.pop();
+    this.buffer = lines.pop() ?? '';
     lines.forEach((line) => this.push(line));
     callback();
   }

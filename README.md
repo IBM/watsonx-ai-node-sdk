@@ -89,7 +89,7 @@ WATSONX_AI_AUTH_TYPE=bearertoken
 WATSONX_AI_BEARER_TOKEN=<YOUR-BEARER-TOKEN>
 ```
 
-#### CP4D authentication
+#### IBM watsonx.ai software authentication
 
 ```sh
 WATSONX_AI_AUTH_TYPE=cp4d
@@ -102,6 +102,8 @@ If any troubles regarding SSL verification appear, such as "Error: self-signed c
 WATSONX_AI_DISABLE_SSL=true
 WATSONX_AI_AUTH_DISABLE_SSL=true
 ```
+
+
 
 ### With an external credentials file
 To use an external configuration file, please see the [general SDK usage information](https://github.com/IBM/ibm-cloud-sdk-common#using-external-configuration) for guidance. Additionally, please see the following template files for:
@@ -117,6 +119,7 @@ To learn more about how to use programmatic authentication, see the [Node.js SDK
 ### Basic example - text generation/inference
 The following code examples authenticate with the environment variables.
 Please set environment variables before proceeding with examples:
+It is mandatory to set `projectId` or `spaceId` unless you are working with lightweight engine.
 ```ts
 const { WatsonXAI } = require('@ibm-cloud/watsonx-ai');
 
@@ -153,6 +156,35 @@ When you run this code, you should see result similar to the following output:
 ```text
 ***** TEXT RESPONSE FROM MODEL *****
 Welcome to the project kick-off meeting. I'm glad you could make it.
+```
+
+### Lightweight engine
+For a watsonx.ai lightweight engine, you do not need to provide a `projectId` or `spaceId`. Remember to set environment variables (`IBM watsonx.ai software authentication`) before proceeding.
+
+```ts
+const { WatsonXAI } = require('@ibm-cloud/watsonx-ai');
+
+// Service instance
+const watsonxAIService = WatsonXAI.newInstance({
+    version: '2024-05-31',
+    serviceUrl: process.env.SERVICE_URL,
+});
+
+const params = {
+    input: 'Generate a short greeting for project kick-off meeting.',
+    modelId: 'mistralai/ministral-8b-instruct',
+};
+
+try {
+    const textGeneration = watsonxAIService
+    .generateText(params)
+    .then((res) => {
+        console.log("\n\n***** TEXT RESPONSE FROM MODEL *****");
+        console.log(res.result.results[0].generated_text);
+    })
+} catch (err) {
+    console.warn(err);
+}
 ```
 
 ### More examples

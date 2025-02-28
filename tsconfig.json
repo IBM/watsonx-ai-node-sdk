@@ -11,6 +11,7 @@
       "dom",
       "scripthost"
     ],
+    "strict": true,
     /* Build source files into a folder called `dist` to maintain clean directories, free of ts-generated files */
     "outDir": "./dist",
     /* Specify library files to be included in the compilation:  */

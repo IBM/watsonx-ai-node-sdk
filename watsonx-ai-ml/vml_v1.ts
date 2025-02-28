@@ -154,9 +154,12 @@ class WatsonxAiMlVml_v1 extends BaseService {
     options = options || {};
 
     const _requiredParams = ['version'];
+    // @ts-expect-error
     const _validationErrors = validateParams(options, _requiredParams, null);
     if (_validationErrors) {
       throw _validationErrors;
+    } else {
+      options.version = options.version as string;
     }
     super(options);
     if (options.serviceUrl) {
@@ -164,10 +167,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
     } else {
       this.setServiceUrl(WatsonxAiMlVml_v1.DEFAULT_SERVICE_URL);
     }
+
+    if (!this.baseOptions.serviceUrl)
+      throw new Error('Something went wrong with setting up serviceUrl');
+    type PlatformUrlKeys = keyof typeof PLATFORM_URLS_MAP;
+
     if (options.platformUrl) {
       this.wxServiceUrl = options.platformUrl.concat('/wx');
-    } else if (PLATFORM_URLS_MAP[this.baseOptions.serviceUrl]) {
-      this.wxServiceUrl = PLATFORM_URLS_MAP[this.baseOptions.serviceUrl];
+    } else if (Object.keys(PLATFORM_URLS_MAP).includes(this.baseOptions.serviceUrl)) {
+      this.wxServiceUrl = PLATFORM_URLS_MAP[this.baseOptions.serviceUrl as PlatformUrlKeys];
     } else {
       this.wxServiceUrl = this.baseOptions.serviceUrl.concat('/wx');
     }
@@ -330,7 +338,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     params?: WatsonxAiMlVml_v1.ListDeploymentsParams
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResourceCollection>> {
     const _params = { ...params };
-    const _requiredParams = [];
+    const _requiredParams: string[] = [];
     const _validParams = [
       'spaceId',
       'projectId',
@@ -1128,7 +1136,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     params?: WatsonxAiMlVml_v1.ListFoundationModelSpecsParams
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FoundationModels>> {
     const _params = { ...params };
-    const _requiredParams = [];
+    const _requiredParams: string[] = [];
     const _validParams = ['start', 'limit', 'filters', 'techPreview', 'headers'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -1187,7 +1195,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     params?: WatsonxAiMlVml_v1.ListFoundationModelTasksParams
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FoundationModelTasks>> {
     const _params = { ...params };
-    const _requiredParams = [];
+    const _requiredParams: string[] = [];
     const _validParams = ['start', 'limit', 'headers'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -2685,12 +2693,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'toolChoiceOption',
       'toolChoice',
       'frequencyPenalty',
+      'logitBias',
       'logprobs',
       'topLogprobs',
       'maxTokens',
       'n',
       'presencePenalty',
       'responseFormat',
+      'seed',
+      'stop',
       'temperature',
       'topP',
       'timeLimit',
@@ -2700,7 +2711,6 @@ class WatsonxAiMlVml_v1 extends BaseService {
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
-
     const body = {
       'model_id': _params.modelId,
       'messages': _params.messages,
@@ -2710,12 +2720,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'tool_choice_option': _params.toolChoiceOption,
       'tool_choice': _params.toolChoice,
       'frequency_penalty': _params.frequencyPenalty,
+      'logit_bias': _params.logitBias,
       'logprobs': _params.logprobs,
       'top_logprobs': _params.topLogprobs,
       'max_tokens': _params.maxTokens,
       'n': _params.n,
       'presence_penalty': _params.presencePenalty,
       'response_format': _params.responseFormat,
+      'seed': _params.seed,
+      'stop': _params.stop,
       'temperature': _params.temperature,
       'top_p': _params.topP,
       'time_limit': _params.timeLimit,
@@ -2876,12 +2889,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'toolChoiceOption',
       'toolChoice',
       'frequencyPenalty',
+      'logitBias',
       'logprobs',
       'topLogprobs',
       'maxTokens',
       'n',
       'presencePenalty',
       'responseFormat',
+      'seed',
+      'stop',
       'temperature',
       'topP',
       'timeLimit',
@@ -2902,12 +2918,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'tool_choice_option': _params.toolChoiceOption,
       'tool_choice': _params.toolChoice,
       'frequency_penalty': _params.frequencyPenalty,
+      'logit_bias': _params.logitBias,
       'logprobs': _params.logprobs,
       'top_logprobs': _params.topLogprobs,
       'max_tokens': _params.maxTokens,
       'n': _params.n,
       'presence_penalty': _params.presencePenalty,
       'response_format': _params.responseFormat,
+      'seed': _params.seed,
+      'stop': _params.stop,
       'temperature': _params.temperature,
       'top_p': _params.topP,
       'time_limit': _params.timeLimit,
@@ -3047,6 +3066,290 @@ class WatsonxAiMlVml_v1 extends BaseService {
     );
     return response;
   }
+
+  /*************************
+   * createTextExtraction
+   ************************/
+
+  /**
+   * Start a text extraction request.
+   *
+   * Start a request to extract text and metadata from documents.
+   *
+   * See the
+   * [documentation](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-api-text-extraction.html?context=wx&audience=wdp)
+   * for a description of text extraction.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {TextExtractionDataReference} params.documentReference - A reference to data.
+   * @param {TextExtractionDataReference} params.resultsReference - A reference to data.
+   * @param {TextExtractionSteps} [params.steps] - The steps for the text extraction pipeline.
+   * @param {JsonObject} [params.assemblyJson] - Set this as an empty object to specify `json` output.
+   *
+   * Note that this is not strictly required because if an
+   * `assembly_md` object is not found then the default will be `json`.
+   * @param {JsonObject} [params.assemblyMd] - Set this as an empty object to specify `markdown` output.
+   * @param {JsonObject} [params.custom] - User defined properties specified as key-value pairs.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
+   * to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
+   * be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextExtractionResponse>>}
+   */
+  public createTextExtraction(
+    params: WatsonxAiMlVml_v1.TextExtractionParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextExtractionResponse>> {
+    const _params = { ...params };
+    const _requiredParams = ['documentReference', 'resultsReference'];
+    const _validParams = [
+      'documentReference',
+      'resultsReference',
+      'steps',
+      'assemblyJson',
+      'assemblyMd',
+      'custom',
+      'projectId',
+      'spaceId',
+      'headers',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'document_reference': _params.documentReference,
+      'results_reference': _params.resultsReference,
+      'steps': _params.steps,
+      'assembly_json': _params.assemblyJson,
+      'assembly_md': _params.assemblyMd,
+      'custom': _params.custom,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'textExtraction'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/text/extractions',
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Retrieve the text extraction requests.
+   *
+   * Retrieve the list of text extraction requests for the specified space or project.
+   *
+   * This operation does not save the history, any requests that were deleted or purged will not appear in this list.
+   *
+   * @param {Object} [params] - The parameters to send to the service.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {string} [params.start] - Token required for token-based pagination. This token cannot be determined by end
+   * user. It is generated by the service and it is set in the href available in the `next` field.
+   * @param {number} [params.limit] - How many resources should be returned. By default limit is 100. Max limit allowed
+   * is 200.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextExtractionResources>>}
+   */
+  public listTextExtractions(
+    params?: WatsonxAiMlVml_v1.ListTextExtractionsParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextExtractionResources>> {
+    const _params = { ...params };
+    const _requiredParams: string[] = [];
+    const _validParams = ['spaceId', 'projectId', 'start', 'limit', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+      'start': _params.start,
+      'limit': _params.limit,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'listTextExtractions'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/text/extractions',
+        method: 'GET',
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get the results of the request.
+   *
+   * Retrieve the text extraction request with the specified identifier.
+   *
+   * Note that there is a retention period of 2 days. If this retention period is exceeded then the request will be
+   * deleted and the results no longer available. In this case this operation will return `404`.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the extraction request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextExtractionResponse>>}
+   */
+  public getTextExtraction(
+    params: WatsonxAiMlVml_v1.TextExtractionGetParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextExtractionResponse>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'spaceId', 'projectId', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'textExtractionGet'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/text/extractions/{id}',
+        method: 'GET',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Delete the request.
+   *
+   * Cancel the specified text extraction request and delete any associated results.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the extraction request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job or request metadata.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
+   */
+  public deleteTextExtraction(
+    params: WatsonxAiMlVml_v1.TextExtractionDeleteParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'spaceId', 'projectId', 'hardDelete', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+      'hard_delete': _params.hardDelete,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'textExtractionDelete'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/text/extractions/{id}',
+        method: 'DELETE',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+
+          ..._params.headers,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
   /*************************
    * textGeneration
    ************************/
@@ -3643,7 +3946,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     params?: WatsonxAiMlVml_v1.TrainingsListParams
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TrainingResourceCollection>> {
     const _params = { ...params };
-    const _requiredParams = [];
+    const _requiredParams: string[] = [];
     const _validParams = [
       'start',
       'limit',
@@ -4045,7 +4348,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     params?: WatsonxAiMlVml_v1.FineTuningListParams
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FineTuningResources>> {
     const _params = { ...params };
-    const _requiredParams = [];
+    const _requiredParams: string[] = [];
     const _validParams = [
       'start',
       'limit',
@@ -4312,7 +4615,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     params?: WatsonxAiMlVml_v1.ListDocumentExtractionsParams
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResources>> {
     const _params = { ...params };
-    const _requiredParams = [];
+    const _requiredParams: string[] = [];
     const _validParams = ['projectId', 'spaceId', 'headers'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -4564,7 +4867,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     params?: WatsonxAiMlVml_v1.ListSyntheticDataGenerationsParams
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResources>> {
     const _params = { ...params };
-    const _requiredParams = [];
+    const _requiredParams: string[] = [];
     const _validParams = ['projectId', 'spaceId', 'headers'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -4815,7 +5118,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     params?: WatsonxAiMlVml_v1.ListTaxonomiesParams
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TaxonomyResources>> {
     const _params = { ...params };
-    const _requiredParams = [];
+    const _requiredParams: string[] = [];
     const _validParams = ['projectId', 'spaceId', 'headers'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -5163,7 +5466,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
     params?: WatsonxAiMlVml_v1.ModelsListParams
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.ModelResources>> {
     const _params = { ...params };
-    const _requiredParams = [];
+    const _requiredParams: string[] = [];
     const _validParams = [
       'spaceId',
       'projectId',
@@ -6081,6 +6384,10 @@ namespace WatsonxAiMlVml_v1 {
      *  model's likelihood to repeat the same line verbatim.
      */
     frequencyPenalty?: number;
+    /** Increasing or decreasing probability of tokens being selected during generation; a positive bias makes a
+     *  token more likely to appear, while a negative bias makes it less likely.
+     */
+    logitBias?: JsonObject;
     /** Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of
      *  each output token returned in the content of message.
      */
@@ -6103,6 +6410,13 @@ namespace WatsonxAiMlVml_v1 {
     presencePenalty?: number;
     /** The chat response format parameters. */
     responseFormat?: TextChatResponseFormat;
+    /** Random number generator seed to use in sampling mode for experimental repeatability. */
+    seed?: number;
+    /** Stop sequences are one or more strings which will cause the text generation to stop if/when they are
+     *  produced as part of the output. Stop sequences encountered prior to the minimum number of tokens being generated
+     *  will be ignored.
+     */
+    stop?: string[];
     /** What sampling temperature to use,. Higher values like 0.8 will make the output more random, while lower
      *  values like 0.2 will make it more focused and deterministic.
      *
@@ -6170,6 +6484,10 @@ namespace WatsonxAiMlVml_v1 {
      *  model's likelihood to repeat the same line verbatim.
      */
     frequencyPenalty?: number;
+    /** Increasing or decreasing probability of tokens being selected during generation; a positive bias makes a
+     *  token more likely to appear, while a negative bias makes it less likely.
+     */
+    logitBias?: JsonObject;
     /** Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of
      *  each output token returned in the content of message.
      */
@@ -6192,6 +6510,13 @@ namespace WatsonxAiMlVml_v1 {
     presencePenalty?: number;
     /** The chat response format parameters. */
     responseFormat?: TextChatResponseFormat;
+    /** Random number generator seed to use in sampling mode for experimental repeatability. */
+    seed?: number;
+    /** Stop sequences are one or more strings which will cause the text generation to stop if/when they are
+     *  produced as part of the output. Stop sequences encountered prior to the minimum number of tokens being generated
+     *  will be ignored.
+     */
+    stop?: string[];
     /** What sampling temperature to use,. Higher values like 0.8 will make the output more random, while lower
      *  values like 0.2 will make it more focused and deterministic.
      *
@@ -6239,6 +6564,70 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
     /** Parameters for text embedding requests. */
     parameters?: EmbeddingParameters;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `textExtraction` operation. */
+  export interface TextExtractionParams {
+    /** A reference to data. */
+    documentReference: TextExtractionDataReference;
+    /** A reference to data. */
+    resultsReference: TextExtractionDataReference;
+    /** The steps for the text extraction pipeline. */
+    steps?: TextExtractionSteps;
+    /** Set this as an empty object to specify `json` output.
+     *
+     *  Note that this is not strictly required because if an
+     *  `assembly_md` object is not found then the default will be `json`.
+     */
+    assemblyJson?: JsonObject;
+    /** Set this as an empty object to specify `markdown` output. */
+    assemblyMd?: JsonObject;
+    /** User defined properties specified as key-value pairs. */
+    custom?: JsonObject;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `listTextExtractions` operation. */
+  export interface ListTextExtractionsParams {
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
+     *  the service and it is set in the href available in the `next` field.
+     */
+    start?: string;
+    /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
+    limit?: number;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `textExtractionGet` operation. */
+  export interface TextExtractionGetParams {
+    /** The identifier of the extraction request. */
+    id: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `textExtractionDelete` operation. */
+  export interface TextExtractionDeleteParams {
+    /** The identifier of the extraction request. */
+    id: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** Set to true in order to also delete the job or request metadata. */
+    hardDelete?: boolean;
     headers?: OutgoingHttpHeaders;
   }
 
@@ -6480,6 +6869,24 @@ namespace WatsonxAiMlVml_v1 {
   export interface DataConnection {
     /** DataConnection accepts additional properties. */
     [propName: string]: any;
+  }
+
+  /**
+   * Contains a set of location fields specific to each data source.
+   */
+  export interface CosDataConnection {
+    /** The id of the connection asset that contains the credentials required to access the data. */
+    id: string;
+  }
+
+  /**
+   * Contains a set of fields specific to each connection.
+   */
+  export interface CosDataLocation {
+    /** The name of the file. */
+    file_name: string;
+    /** Can be used to overide the bucket name from the connection asset. */
+    bucket?: string;
   }
 
   /** A reference to data with an optional data schema. If necessary, it is possible to provide a data connection that contains just the data schema. */
@@ -7832,6 +8239,180 @@ namespace WatsonxAiMlVml_v1 {
         AUTO = 'auto',
       }
     }
+  }
+
+  /**
+   * A reference to data.
+   */
+  export interface TextExtractionDataReference {
+    /** The data source type. */
+    type: TextExtractionDataReference.Constants.Type | string;
+    /** Contains a set of location fields specific to each data source. */
+    connection?: CosDataConnection;
+    /** Contains a set of fields specific to each connection. */
+    location?: CosDataLocation;
+  }
+  export namespace TextExtractionDataReference {
+    export namespace Constants {
+      /** The data source type. */
+      export enum Type {
+        CONNECTION_ASSET = 'connection_asset',
+      }
+    }
+  }
+
+  /**
+   * Common metadata for a resource where `project_id` or `space_id` must be present.
+   */
+  export interface TextExtractionMetadata {
+    /** The id of the resource. */
+    id: string;
+    /** The time when the resource was created. */
+    created_at: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    space_id?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    project_id?: string;
+  }
+
+  /**
+   * The text extraction resource.
+   */
+  export interface TextExtractionResource {
+    /** Common metadata for a resource where `project_id` or `space_id` must be present. */
+    metadata?: TextExtractionMetadata;
+    /** The document details for the text extraction. */
+    entity?: TextExtractionResourceEntity;
+  }
+
+  /**
+   * The document details for the text extraction.
+   */
+  export interface TextExtractionResourceEntity {
+    /** A reference to data. */
+    document_reference: TextExtractionDataReference;
+    /** A reference to data. */
+    results_reference: TextExtractionDataReference;
+    /** The steps for the text extraction pipeline. */
+    steps?: TextExtractionSteps;
+    /** Set this as an empty object to specify `json` output.
+     *
+     *  Note that this is not strictly required because if an
+     *  `assembly_md` object is not found then the default will be `json`.
+     */
+    assembly_json?: JsonObject;
+    /** Set this as an empty object to specify `markdown` output. */
+    assembly_md?: JsonObject;
+    /** User defined properties specified as key-value pairs. */
+    custom?: JsonObject;
+    /** The current status of the text extraction. */
+    results: TextExtractionResults;
+  }
+
+  /**
+   * A paginated list of resources.
+   */
+  export interface TextExtractionResources {
+    /** The total number of resources. Computed explicitly only when 'total_count=true' query parameter is present.
+     *  This is in order to avoid performance penalties.
+     */
+    total_count?: number;
+    /** The number of items to return in each page. */
+    limit: number;
+    /** The reference to the first item in the current page. */
+    first: PaginationFirst;
+    /** A reference to the first item of the next page, if any. */
+    next?: PaginationNext;
+    /** A list of resources. */
+    resources?: TextExtractionResource[];
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
+  /**
+   * The text extraction response.
+   */
+  export interface TextExtractionResponse {
+    /** Common metadata for a resource where `project_id` or `space_id` must be present. */
+    metadata?: TextExtractionMetadata;
+    /** The document details for the text extraction. */
+    entity?: TextExtractionResourceEntity;
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
+  /**
+   * The current status of the text extraction.
+   */
+  export interface TextExtractionResults {
+    /** The status of the request. */
+    status: TextExtractionResults.Constants.Status | string;
+    /** The time when the request is successfully running on the processor. */
+    running_at?: string;
+    /** The time when the request completed or failed. */
+    completed_at?: string;
+    /** The number of pages that have been processed in the document. If the status is `completed` then this is the
+     *  number of pages that will be billed.
+     */
+    number_pages_processed: number;
+    /** The total number of pages to be processed. */
+    total_pages?: number;
+    /** A service error message. */
+    error?: ServiceError;
+  }
+
+  /**
+   * A service error message.
+   */
+  export interface ServiceError {
+    /** A simple code that should convey the general sense of the error. */
+    code: string;
+    /** The message that describes the error. */
+    message: string;
+    /** A URL to a more detailed explanation when available. */
+    more_info?: string;
+  }
+  export namespace TextExtractionResults {
+    export namespace Constants {
+      /** The status of the request. */
+      export enum Status {
+        SUBMITTED = 'submitted',
+        UPLOADING = 'uploading',
+        RUNNING = 'running',
+        DOWNLOADING = 'downloading',
+        DOWNLOADED = 'downloaded',
+        COMPLETED = 'completed',
+        FAILED = 'failed',
+      }
+    }
+  }
+
+  /**
+   * The OCR text extraction step.
+   */
+  export interface TextExtractionStepOcr {
+    /** Set of languages to be expected in the document. The language codes follow `ISO 639`. See the documentation
+     *  for the currently supported languages.
+     */
+    languages_list?: string[];
+  }
+
+  /**
+   * The tables processing text extraction step.
+   */
+  export interface TextExtractionStepTablesProcessing {
+    /** Should tables be processed for text extraction. */
+    enabled?: boolean;
+  }
+
+  /**
+   * The steps for the text extraction pipeline.
+   */
+  export interface TextExtractionSteps {
+    /** The OCR text extraction step. */
+    ocr?: TextExtractionStepOcr;
+    /** The tables processing text extraction step. */
+    tables_processing?: TextExtractionStepTablesProcessing;
   }
 
   /** It can be used to exponentially increase the likelihood of the text generation terminating once a specified number of tokens have been generated. */
@@ -10008,6 +10589,7 @@ namespace WatsonxAiMlVml_v1 {
       if (!this.pageContext.next) {
         this._hasNext = false;
       }
+      if (!result.resources) throw new Error('Something went wrong when retrieving results.');
       return result.resources;
     }
 
@@ -10092,6 +10674,7 @@ namespace WatsonxAiMlVml_v1 {
       if (!this.pageContext.next) {
         this._hasNext = false;
       }
+      if (!result.resources) throw new Error('Something went wrong when retrieving results.');
       return result.resources;
     }
 
@@ -10101,6 +10684,88 @@ namespace WatsonxAiMlVml_v1 {
      */
     public async getAll(): Promise<WatsonxAiMlVml_v1.FoundationModelTask[]> {
       const results: FoundationModelTask[] = [];
+      while (this.hasNext()) {
+        const nextPage = await this.getNext();
+        results.push(...nextPage);
+      }
+      return results;
+    }
+  }
+
+  /**
+   * TextExtractionsPager can be used to simplify the use of listTextExtractions().
+   */
+  export class TextExtractionsPager {
+    protected _hasNext: boolean;
+
+    protected pageContext: any;
+
+    protected client: WatsonxAiMlVml_v1;
+
+    protected params: WatsonxAiMlVml_v1.ListTextExtractionsParams;
+
+    /**
+     * Construct a TextExtractionsPager object.
+     *
+     * @param {WatsonxAiMlVml_v1}  client - The service client instance used to invoke listTextExtractions()
+     * @param {Object} [params] - The parameters to be passed to listTextExtractions()
+     * @constructor
+     * @returns {TextExtractionsPager}
+     */
+    constructor(client: WatsonxAiMlVml_v1, params?: WatsonxAiMlVml_v1.ListTextExtractionsParams) {
+      if (params && params.start) {
+        throw new Error(`the params.start field should not be set`);
+      }
+
+      this._hasNext = true;
+      this.pageContext = { next: undefined };
+      this.client = client;
+      this.params = JSON.parse(JSON.stringify(params || {}));
+    }
+
+    /**
+     * Returns true if there are potentially more results to be retrieved by invoking getNext().
+     * @returns {boolean}
+     */
+    public hasNext(): boolean {
+      return this._hasNext;
+    }
+
+    /**
+     * Returns the next page of results by invoking listTextExtractions().
+     * @returns {Promise<WatsonxAiMlVml_v1.TextExtractionResource[]>}
+     */
+    public async getNext(): Promise<WatsonxAiMlVml_v1.TextExtractionResource[]> {
+      if (!this.hasNext()) {
+        throw new Error('No more results available');
+      }
+
+      if (this.pageContext.next) {
+        this.params.start = this.pageContext.next;
+      }
+      const response = await this.client.listTextExtractions(this.params);
+      const { result } = response;
+
+      let next;
+      if (result && result.next) {
+        if (result.next.href) {
+          next = getQueryParam(result.next.href, 'start');
+        }
+      }
+      this.pageContext.next = next;
+      if (!this.pageContext.next) {
+        this._hasNext = false;
+      }
+      if (!result.resources) throw new Error('Something went wrong when retrieving results.');
+      return result.resources;
+    }
+
+    /**
+     * Returns all results by invoking listTextExtractions() repeatedly until all pages of results have been retrieved.
+     * @returns {Promise<WatsonxAiMlVml_v1.TextExtractionResource[]>}
+     */
+    public async getAll(): Promise<WatsonxAiMlVml_v1.TextExtractionResource[]> {
+      const results: TextExtractionResource[] = [];
       while (this.hasNext()) {
         const nextPage = await this.getNext();
         results.push(...nextPage);
@@ -10173,6 +10838,7 @@ namespace WatsonxAiMlVml_v1 {
       if (!this.pageContext.next) {
         this._hasNext = false;
       }
+      if (!result.resources) throw new Error('Something went wrong when retrieving results.');
       return result.resources;
     }
 
@@ -10243,7 +10909,7 @@ namespace WatsonxAiMlVml_v1 {
       const response = await this.client.listFineTunings(this.params);
       const { result } = response;
 
-      let next: string;
+      let next;
       if (result && result.next) {
         if (result.next.href) {
           next = getQueryParam(result.next.href, 'start');
@@ -10253,6 +10919,7 @@ namespace WatsonxAiMlVml_v1 {
       if (!this.pageContext.next) {
         this._hasNext = false;
       }
+      if (!result.resources) throw new Error('Something went wrong when retrieving results.');
       return result.resources;
     }
 
@@ -10334,6 +11001,7 @@ namespace WatsonxAiMlVml_v1 {
       if (!this.pageContext.next) {
         this._hasNext = false;
       }
+      if (!result.resources) throw new Error('Something went wrong when retrieving results.');
       return result.resources;
     }
 

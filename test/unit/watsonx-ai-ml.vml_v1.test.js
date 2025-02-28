@@ -713,6 +713,465 @@ describe('WatsonxAiMlVml_v1', () => {
     });
   });
 
+  describe('createTextExtraction', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // CosDataConnection
+      const cosDataConnectionModel = {
+        id: '6f5688fd-f3bf-42c2-a18b-49c0d8a1920d',
+      };
+
+      // CosDataLocation
+      const cosDataLocationModel = {
+        file_name: 'files/document.pdf',
+        bucket: 'testString',
+      };
+
+      // TextExtractionDataReference
+      const textExtractionDataReferenceModel = {
+        type: 'connection_asset',
+        connection: cosDataConnectionModel,
+        location: cosDataLocationModel,
+      };
+
+      // TextExtractionStepOcr
+      const textExtractionStepOcrModel = {
+        languages_list: ['en'],
+      };
+
+      // TextExtractionStepTablesProcessing
+      const textExtractionStepTablesProcessingModel = {
+        enabled: true,
+      };
+
+      // TextExtractionSteps
+      const textExtractionStepsModel = {
+        ocr: textExtractionStepOcrModel,
+        tables_processing: textExtractionStepTablesProcessingModel,
+      };
+
+      function __textExtractionTest() {
+        // Construct the params object for operation textExtraction
+        const documentReference = textExtractionDataReferenceModel;
+        const resultsReference = textExtractionDataReferenceModel;
+        const steps = textExtractionStepsModel;
+        const assemblyJson = {};
+        const assemblyMd = { anyKey: 'anyValue' };
+        const custom = { anyKey: 'anyValue' };
+        const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
+        const spaceId = 'testString';
+        const textExtractionParams = {
+          documentReference,
+          resultsReference,
+          steps,
+          assemblyJson,
+          assemblyMd,
+          custom,
+          projectId,
+          spaceId,
+        };
+
+        const textExtractionResult = watsonxAiMlService.createTextExtraction(textExtractionParams);
+
+        // all methods should return a Promise
+        expectToBePromise(textExtractionResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/text/extractions', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.document_reference).toEqual(documentReference);
+        expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
+        expect(mockRequestOptions.body.steps).toEqual(steps);
+        expect(mockRequestOptions.body.assembly_json).toEqual(assemblyJson);
+        expect(mockRequestOptions.body.assembly_md).toEqual(assemblyMd);
+        expect(mockRequestOptions.body.custom).toEqual(custom);
+        expect(mockRequestOptions.body.project_id).toEqual(projectId);
+        expect(mockRequestOptions.body.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __textExtractionTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __textExtractionTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __textExtractionTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const documentReference = textExtractionDataReferenceModel;
+        const resultsReference = textExtractionDataReferenceModel;
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const textExtractionParams = {
+          documentReference,
+          resultsReference,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.createTextExtraction(textExtractionParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createTextExtraction({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.createTextExtraction();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('listTextExtractions', () => {
+    describe('positive tests', () => {
+      function __listTextExtractionsTest() {
+        // Construct the params object for operation listTextExtractions
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const start = 'testString';
+        const limit = 50;
+        const listTextExtractionsParams = {
+          spaceId,
+          projectId,
+          start,
+          limit,
+        };
+
+        const listTextExtractionsResult =
+          watsonxAiMlService.listTextExtractions(listTextExtractionsParams);
+
+        // all methods should return a Promise
+        expectToBePromise(listTextExtractionsResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/text/extractions', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.start).toEqual(start);
+        expect(mockRequestOptions.qs.limit).toEqual(limit);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __listTextExtractionsTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __listTextExtractionsTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __listTextExtractionsTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const listTextExtractionsParams = {
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.listTextExtractions(listTextExtractionsParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+
+      test('should not have any problems when no parameters are passed in', () => {
+        // invoke the method with no parameters
+        watsonxAiMlService.listTextExtractions({});
+        checkForSuccessfulExecution(createRequestMock);
+      });
+    });
+
+    describe('TextExtractionsPager tests', () => {
+      const serviceUrl = watsonxAiMlServiceOptions.url;
+      const path = '/ml/v1/text/extractions';
+      const mockPagerResponse1 =
+        '{"next":{"href":"https://myhost.com/somePath?start=1"},"total_count":2,"limit":1,"resources":[{"metadata":{"id":"id","created_at":"2019-01-01T12:00:00.000Z","space_id":"3fc54cf1-252f-424b-b52d-5cdd9814987f","project_id":"12ac4cf1-252f-424b-b52d-5cdd9814987f"},"entity":{"document_reference":{"type":"connection_asset","connection":{"id":"id"},"location":{"file_name":"file_name","bucket":"bucket"}},"results_reference":{"type":"connection_asset","connection":{"id":"id"},"location":{"file_name":"file_name","bucket":"bucket"}},"steps":{"ocr":{"languages_list":["languages_list"]},"tables_processing":{"enabled":true}},"assembly_json":{"anyKey":"anyValue"},"assembly_md":{"anyKey":"anyValue"},"custom":{"anyKey":"anyValue"},"results":{"status":"submitted","running_at":"2019-01-01T12:00:00.000Z","completed_at":"2019-01-01T12:00:00.000Z","number_pages_processed":22,"total_pages":11,"error":{"code":"code","message":"message","more_info":"more_info"}}}}]}';
+      const mockPagerResponse2 =
+        '{"total_count":2,"limit":1,"resources":[{"metadata":{"id":"id","created_at":"2019-01-01T12:00:00.000Z","space_id":"3fc54cf1-252f-424b-b52d-5cdd9814987f","project_id":"12ac4cf1-252f-424b-b52d-5cdd9814987f"},"entity":{"document_reference":{"type":"connection_asset","connection":{"id":"id"},"location":{"file_name":"file_name","bucket":"bucket"}},"results_reference":{"type":"connection_asset","connection":{"id":"id"},"location":{"file_name":"file_name","bucket":"bucket"}},"steps":{"ocr":{"languages_list":["languages_list"]},"tables_processing":{"enabled":true}},"assembly_json":{"anyKey":"anyValue"},"assembly_md":{"anyKey":"anyValue"},"custom":{"anyKey":"anyValue"},"results":{"status":"submitted","running_at":"2019-01-01T12:00:00.000Z","completed_at":"2019-01-01T12:00:00.000Z","number_pages_processed":22,"total_pages":11,"error":{"code":"code","message":"message","more_info":"more_info"}}}}]}';
+
+      beforeEach(() => {
+        unmock_createRequest();
+        const scope = nock(serviceUrl)
+          .get((uri) => uri.includes(path))
+          .reply(200, mockPagerResponse1)
+          .get((uri) => uri.includes(path))
+          .reply(200, mockPagerResponse2);
+      });
+
+      afterEach(() => {
+        nock.cleanAll();
+        mock_createRequest();
+      });
+
+      test('getNext()', async () => {
+        const params = {
+          spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
+          projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
+          limit: 50,
+        };
+        const allResults = [];
+        const pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAiMlService, params);
+        while (pager.hasNext()) {
+          const nextPage = await pager.getNext();
+          expect(nextPage).not.toBeNull();
+          allResults.push(...nextPage);
+        }
+        expect(allResults).not.toBeNull();
+        expect(allResults).toHaveLength(2);
+      });
+
+      test('getAll()', async () => {
+        const params = {
+          spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
+          projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
+          limit: 50,
+        };
+        const pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAiMlService, params);
+        const allResults = await pager.getAll();
+        expect(allResults).not.toBeNull();
+        expect(allResults).toHaveLength(2);
+      });
+    });
+  });
+
+  describe('getTextExtraction', () => {
+    describe('positive tests', () => {
+      function __textExtractionGetTest() {
+        // Construct the params object for operation getTextExtraction
+        const id = 'testString';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const textExtractionGetParams = {
+          id,
+          spaceId,
+          projectId,
+        };
+
+        const textExtractionGetResult =
+          watsonxAiMlService.getTextExtraction(textExtractionGetParams);
+
+        // all methods should return a Promise
+        expectToBePromise(textExtractionGetResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/text/extractions/{id}', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __textExtractionGetTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __textExtractionGetTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __textExtractionGetTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const textExtractionGetParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.getTextExtraction(textExtractionGetParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getTextExtraction({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getTextExtraction();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('deleteTextExtraction', () => {
+    describe('positive tests', () => {
+      function __textExtractionDeleteTest() {
+        // Construct the params object for operation deleteTextExtraction
+        const id = 'testString';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const hardDelete = true;
+        const textExtractionDeleteParams = {
+          id,
+          spaceId,
+          projectId,
+          hardDelete,
+        };
+
+        const textExtractionDeleteResult = watsonxAiMlService.deleteTextExtraction(
+          textExtractionDeleteParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(textExtractionDeleteResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/text/extractions/{id}', 'DELETE');
+        const expectedAccept = undefined;
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __textExtractionDeleteTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __textExtractionDeleteTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __textExtractionDeleteTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const textExtractionDeleteParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.deleteTextExtraction(textExtractionDeleteParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deleteTextExtraction({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.deleteTextExtraction();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
   describe('deploymentGenerateText', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
@@ -3799,12 +4258,15 @@ describe('WatsonxAiMlVml_v1', () => {
         const toolChoiceOption = 'none';
         const toolChoice = textChatToolChoiceToolModel;
         const frequencyPenalty = 0;
+        const logitBias = { anyKey: 'anyValue' };
         const logprobs = false;
         const topLogprobs = 0;
         const maxTokens = 100;
         const n = 1;
         const presencePenalty = 0;
         const responseFormat = textChatResponseFormatModel;
+        const seed = 38;
+        const stop = ['testString'];
         const temperature = 0;
         const topP = 1;
         const timeLimit = 1000;
@@ -3817,12 +4279,15 @@ describe('WatsonxAiMlVml_v1', () => {
           toolChoiceOption,
           toolChoice,
           frequencyPenalty,
+          logitBias,
           logprobs,
           topLogprobs,
           maxTokens,
           n,
           presencePenalty,
           responseFormat,
+          seed,
+          stop,
           temperature,
           topP,
           timeLimit,
@@ -3850,12 +4315,15 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.tool_choice_option).toEqual(toolChoiceOption);
         expect(mockRequestOptions.body.tool_choice).toEqual(toolChoice);
         expect(mockRequestOptions.body.frequency_penalty).toEqual(frequencyPenalty);
+        expect(mockRequestOptions.body.logit_bias).toEqual(logitBias);
         expect(mockRequestOptions.body.logprobs).toEqual(logprobs);
         expect(mockRequestOptions.body.top_logprobs).toEqual(topLogprobs);
         expect(mockRequestOptions.body.max_tokens).toEqual(maxTokens);
         expect(mockRequestOptions.body.n).toEqual(n);
         expect(mockRequestOptions.body.presence_penalty).toEqual(presencePenalty);
         expect(mockRequestOptions.body.response_format).toEqual(responseFormat);
+        expect(mockRequestOptions.body.seed).toEqual(seed);
+        expect(mockRequestOptions.body.stop).toEqual(stop);
         expect(mockRequestOptions.body.temperature).toEqual(temperature);
         expect(mockRequestOptions.body.top_p).toEqual(topP);
         expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);
@@ -3987,12 +4455,15 @@ describe('WatsonxAiMlVml_v1', () => {
         const toolChoiceOption = 'none';
         const toolChoice = textChatToolChoiceToolModel;
         const frequencyPenalty = 0;
+        const logitBias = { '1003': -100, '1004': -100 };
         const logprobs = false;
         const topLogprobs = 0;
         const maxTokens = 1024;
         const n = 1;
         const presencePenalty = 0;
         const responseFormat = textChatResponseFormatModel;
+        const seed = 41;
+        const stop = ['this', 'the'];
         const temperature = 1;
         const topP = 1;
         const timeLimit = 600000;
@@ -4005,12 +4476,15 @@ describe('WatsonxAiMlVml_v1', () => {
           toolChoiceOption,
           toolChoice,
           frequencyPenalty,
+          logitBias,
           logprobs,
           topLogprobs,
           maxTokens,
           n,
           presencePenalty,
           responseFormat,
+          seed,
+          stop,
           temperature,
           topP,
           timeLimit,
@@ -4038,12 +4512,15 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.tool_choice_option).toEqual(toolChoiceOption);
         expect(mockRequestOptions.body.tool_choice).toEqual(toolChoice);
         expect(mockRequestOptions.body.frequency_penalty).toEqual(frequencyPenalty);
+        expect(mockRequestOptions.body.logit_bias).toEqual(logitBias);
         expect(mockRequestOptions.body.logprobs).toEqual(logprobs);
         expect(mockRequestOptions.body.top_logprobs).toEqual(topLogprobs);
         expect(mockRequestOptions.body.max_tokens).toEqual(maxTokens);
         expect(mockRequestOptions.body.n).toEqual(n);
         expect(mockRequestOptions.body.presence_penalty).toEqual(presencePenalty);
         expect(mockRequestOptions.body.response_format).toEqual(responseFormat);
+        expect(mockRequestOptions.body.seed).toEqual(seed);
+        expect(mockRequestOptions.body.stop).toEqual(stop);
         expect(mockRequestOptions.body.temperature).toEqual(temperature);
         expect(mockRequestOptions.body.top_p).toEqual(topP);
         expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);

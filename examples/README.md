@@ -7,10 +7,9 @@ In this directory, you can find examples how to use IBM watsonx.ai Node.js SDK i
 To try examples locally, clone the repository. Once done please follow these steps.
 1. ```cd ./examples```
 2. ```npm install```
-3. Modify ```.env.template``` file content with your variables and rename to ```.env```
-4. Open auth folder and modify ```*.env.template``` file content according to your authentication method.
-5. You can run the examples now with ```node <file_name>.js```
-6. Also we have provided combined examples that can be run with additional commands:
+3. Modify ```../credentials/watsonx_ai_ml_vml_v1.env.template``` file content with your variables and run ```git mv ../credentials/watsonx_ai_ml_vml_v1.env.template ../credentials/watsonx_ai_ml_vml_v1.env``` to rename the file (Depending on the authentication method you may use another file in that location)
+4. You can run the examples now with ```npm run run-ts src/<file_path>/<file_name>.js```
+5. Also we have provided combined examples that can be run with additional commands:
 
 | Examples | Command |
 |---|---|
