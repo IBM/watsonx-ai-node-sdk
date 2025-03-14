@@ -2,14 +2,19 @@
 /* eslint-disable no-restricted-syntax */
 
 import { ChatWatsonx } from '@langchain/community/chat_models/ibm';
+import { ToolCall } from '@langchain/core/messages/tool';
+import { tool } from '@langchain/core/tools';
+import { concat } from '@langchain/core/utils/stream';
+import { HumanMessage, AIMessageChunk, AIMessage } from '@langchain/core/messages';
 import { config } from 'dotenv';
+import { z } from 'zod';
 
 config({ path: '../../credentials/watsonx_ai_ml_vml_v1.env' });
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const spaceId = process.env.WATSONX_AI_SPACE_ID;
 const version = '2024-05-31';
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
-const models = ['meta-llama/llama-3-1-70b-instruct'];
+const models = ['meta-llama/llama-3-1-70b-instruct', 'mistralai/mistral-large'];
 models.forEach((model) => {
   describe(`Regression tests regarding langchain chat for model: ${model}`, () => {
     describe('Positive tests', () => {
@@ -191,6 +196,70 @@ models.forEach((model) => {
               const result = await llms.stream('Hello. How are you?');
               for await (const chunk of result) {
                 expect(typeof chunk.content).toBe('string');
+              }
+            });
+            test('Passing tool to chat model and invoking the tools with stream', async () => {
+              const service = new ChatWatsonx({
+                model: 'mistralai/mistral-large',
+                version: '2024-05-31',
+                serviceUrl: process.env.WATSONX_AI_SERVICE_URL ?? 'testString',
+                projectId: process.env.WATSONX_AI_PROJECT_ID ?? 'testString',
+              });
+              const addTool = tool(async (input) => Number(input.a) + Number(input.b), {
+                name: 'add',
+                description: 'Adds a and b.',
+                schema: z.object({
+                  a: z.string(),
+                  b: z.string(),
+                }),
+              });
+
+              const multiplyTool = tool(async (input) => Number(input.a) * Number(input.b), {
+                name: 'multiply',
+                description: 'Multiplies a and b.',
+                schema: z.object({
+                  a: z.string(),
+                  b: z.string(),
+                }),
+              });
+              const tools = [addTool, multiplyTool];
+              const toolsByName = {
+                add: addTool,
+                multiply: multiplyTool,
+              };
+              const modelWithTools = service.bindTools(tools);
+              const messages = [
+                new HumanMessage(
+                  'You are bad at calculations and need to use calculator at all times. What is 3 * 12? Also, what is 11 + 49?'
+                ),
+              ];
+              const res = await modelWithTools.stream(messages);
+              let toolMessage: AIMessageChunk | undefined;
+              for await (const chunk of res) {
+                toolMessage = toolMessage !== undefined ? concat(toolMessage, chunk) : chunk;
+              }
+              expect(toolMessage).toBeInstanceOf(AIMessageChunk);
+              expect(toolMessage?.tool_calls).toBeDefined();
+              toolMessage = toolMessage as AIMessageChunk;
+              messages.push(new AIMessage(toolMessage));
+
+              for (const tool_call of toolMessage?.tool_calls as ToolCall[]) {
+                const toolCallMessage = await toolsByName[
+                  tool_call.name as keyof typeof toolsByName
+                ].invoke(tool_call);
+                messages.push(toolCallMessage);
+              }
+              console.log(messages);
+
+              try {
+                const result = await modelWithTools.invoke([...messages], {
+                  watsonxCallbacks: {
+                    requestCallback: (item) => console.log(item.options.body.messages),
+                  },
+                });
+                console.log(result);
+              } catch (e: any) {
+                console.log(e.result.errors);
               }
             });
           });

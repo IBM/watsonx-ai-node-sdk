@@ -44,8 +44,11 @@ describe('Test examples', () => {
     },
     60000 * 40
   );
+  test('Time series', async () => {
+    await expect(import('../sdk/example_time_series')).resolves.not.toThrow();
+  });
   test(
-    'Basic rerank usage',
+    'Text extraction',
     async () => {
       await expect(import('../sdk/example_text_extraction')).resolves.not.toThrow();
     },

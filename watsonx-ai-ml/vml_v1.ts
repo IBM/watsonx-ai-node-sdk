@@ -240,6 +240,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'asset',
       'baseModelId',
       'headers',
+      'signal',
       'baseDeploymentId',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
@@ -287,6 +288,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           Accept: 'application/json',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -351,6 +355,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'state',
       'conflict',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -390,6 +395,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -417,7 +425,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResource>> {
     const _params = { ...params };
     const _requiredParams = ['deploymentId'];
-    const _validParams = ['deploymentId', 'spaceId', 'projectId', 'headers'];
+    const _validParams = ['deploymentId', 'spaceId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -452,6 +460,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           ...sdkHeaders,
           'Accept': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -496,7 +507,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResource>> {
     const _params = { ...params };
     const _requiredParams = ['deploymentId', 'jsonPatch'];
-    const _validParams = ['deploymentId', 'jsonPatch', 'spaceId', 'projectId', 'headers'];
+    const _validParams = ['deploymentId', 'jsonPatch', 'spaceId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -535,6 +546,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json-patch+json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -562,7 +576,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['deploymentId'];
-    const _validParams = ['deploymentId', 'spaceId', 'projectId', 'headers'];
+    const _validParams = ['deploymentId', 'spaceId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -594,6 +608,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
       defaultOptions: {
         ...this.baseOptions,
         headers: { ...sdkHeaders, ..._params.headers },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -644,7 +661,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>> {
     const _params = { ...params };
     const _requiredParams = ['idOrName'];
-    const _validParams = ['idOrName', 'input', 'parameters', 'moderations', 'headers'];
+    const _validParams = ['idOrName', 'input', 'parameters', 'moderations', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -685,6 +702,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -791,6 +811,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'parameters',
       'moderations',
       'headers',
+      'signal',
       'returnObject',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
@@ -836,6 +857,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Connection': 'keep-alive',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -903,7 +927,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>> {
     const _params = { ...params };
     const _requiredParams = ['idOrName', 'messages'];
-    const _validParams = ['idOrName', 'messages', 'context', 'headers'];
+    const _validParams = ['idOrName', 'messages', 'context', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -943,6 +967,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -1022,7 +1049,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   > {
     const _params = { ...params };
     const _requiredParams = ['idOrName', 'messages'];
-    const _validParams = ['idOrName', 'messages', 'context', 'headers', 'returnObject'];
+    const _validParams = ['idOrName', 'messages', 'context', 'headers', 'signal', 'returnObject'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -1065,6 +1092,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Connection': 'keep-alive',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -1137,7 +1167,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FoundationModels>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['start', 'limit', 'filters', 'techPreview', 'headers'];
+    const _validParams = ['start', 'limit', 'filters', 'techPreview', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -1170,6 +1200,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -1196,7 +1229,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FoundationModelTasks>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['start', 'limit', 'headers'];
+    const _validParams = ['start', 'limit', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -1226,6 +1259,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           ...sdkHeaders,
           'Accept': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -1278,6 +1314,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'projectId',
       'spaceId',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -1323,6 +1360,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -1352,7 +1392,14 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
-    const _validParams = ['promptId', 'projectId', 'spaceId', 'restrictModelParameters', 'headers'];
+    const _validParams = [
+      'promptId',
+      'projectId',
+      'spaceId',
+      'restrictModelParameters',
+      'headers',
+      'signal',
+    ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -1384,6 +1431,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           ...sdkHeaders,
           'Accept': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -1435,6 +1485,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'projectId',
       'spaceId',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -1485,6 +1536,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -1512,7 +1566,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
-    const _validParams = ['promptId', 'projectId', 'spaceId', 'headers'];
+    const _validParams = ['promptId', 'projectId', 'spaceId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -1544,6 +1598,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
         ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
         headers: { ...sdkHeaders, ..._params.headers },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -1585,6 +1642,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'spaceId',
       'force',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -1630,6 +1688,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -1657,7 +1718,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
-    const _validParams = ['promptId', 'spaceId', 'projectId', 'headers'];
+    const _validParams = ['promptId', 'spaceId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -1692,6 +1753,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           ...sdkHeaders,
           'Accept': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -1731,6 +1795,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'spaceId',
       'projectId',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -1774,6 +1839,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -1802,7 +1870,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['promptId', 'chatItem'];
-    const _validParams = ['promptId', 'chatItem', 'spaceId', 'projectId', 'headers'];
+    const _validParams = ['promptId', 'chatItem', 'spaceId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -1839,6 +1907,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           ...sdkHeaders,
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -1888,6 +1959,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'prompts',
       'projectId',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -1932,6 +2004,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -1958,7 +2033,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSession>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
-    const _validParams = ['sessionId', 'projectId', 'prefetch', 'headers'];
+    const _validParams = ['sessionId', 'projectId', 'prefetch', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -1994,6 +2069,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -2021,7 +2099,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSession>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
-    const _validParams = ['sessionId', 'name', 'description', 'projectId', 'headers'];
+    const _validParams = ['sessionId', 'name', 'description', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -2063,6 +2141,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -2088,7 +2169,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
-    const _validParams = ['sessionId', 'projectId', 'headers'];
+    const _validParams = ['sessionId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -2119,6 +2200,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
         ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
         headers: { ...sdkHeaders, ..._params.headers },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -2164,6 +2248,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'inputMode',
       'projectId',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -2212,6 +2297,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -2239,7 +2327,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSessionEntryList>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
-    const _validParams = ['sessionId', 'projectId', 'bookmark', 'limit', 'headers'];
+    const _validParams = ['sessionId', 'projectId', 'bookmark', 'limit', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -2276,6 +2364,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -2303,7 +2394,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'entryId', 'chatItem'];
-    const _validParams = ['sessionId', 'entryId', 'chatItem', 'projectId', 'headers'];
+    const _validParams = ['sessionId', 'entryId', 'chatItem', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -2340,6 +2431,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           ...sdkHeaders,
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -2379,6 +2473,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'projectId',
       'force',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -2423,6 +2518,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -2448,7 +2546,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
-    const _validParams = ['sessionId', 'projectId', 'headers'];
+    const _validParams = ['sessionId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -2483,6 +2581,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -2509,7 +2610,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'entryId'];
-    const _validParams = ['sessionId', 'entryId', 'projectId', 'headers'];
+    const _validParams = ['sessionId', 'entryId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -2545,6 +2646,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -2571,7 +2675,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'entryId'];
-    const _validParams = ['sessionId', 'entryId', 'projectId', 'headers'];
+    const _validParams = ['sessionId', 'entryId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -2603,6 +2707,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
         ...this.baseOptions,
         serviceUrl: this.wxServiceUrl,
         headers: { ...sdkHeaders, ..._params.headers },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -2706,6 +2813,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'topP',
       'timeLimit',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -2754,6 +2862,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -2902,6 +3013,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'topP',
       'timeLimit',
       'headers',
+      'signal',
       'returnObject',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
@@ -2959,6 +3071,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
     const callbackHandler = callbacks
@@ -3014,7 +3129,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmbeddingsResponse>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'inputs'];
-    const _validParams = ['modelId', 'inputs', 'spaceId', 'projectId', 'parameters', 'headers'];
+    const _validParams = [
+      'modelId',
+      'inputs',
+      'spaceId',
+      'projectId',
+      'parameters',
+      'headers',
+      'signal',
+    ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -3052,6 +3175,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -3112,6 +3238,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'projectId',
       'spaceId',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -3154,6 +3281,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -3184,7 +3314,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextExtractionResources>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['spaceId', 'projectId', 'start', 'limit', 'headers'];
+    const _validParams = ['spaceId', 'projectId', 'start', 'limit', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -3217,6 +3347,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -3245,7 +3378,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextExtractionResponse>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'spaceId', 'projectId', 'headers'];
+    const _validParams = ['id', 'spaceId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -3281,6 +3414,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -3307,7 +3443,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'spaceId', 'projectId', 'hardDelete', 'headers'];
+    const _validParams = ['id', 'spaceId', 'projectId', 'hardDelete', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -3343,6 +3479,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           ...sdkHeaders,
 
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -3396,6 +3535,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'parameters',
       'moderations',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -3435,6 +3575,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -3535,6 +3678,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'parameters',
       'moderations',
       'headers',
+      'signal',
       'returnObject',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
@@ -3579,6 +3723,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Connection': 'keep-alive',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -3629,7 +3776,15 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextTokenizeResponse>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'input'];
-    const _validParams = ['modelId', 'input', 'spaceId', 'projectId', 'parameters', 'headers'];
+    const _validParams = [
+      'modelId',
+      'input',
+      'spaceId',
+      'projectId',
+      'parameters',
+      'headers',
+      'signal',
+    ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -3667,6 +3822,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -3719,6 +3877,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'spaceId',
       'parameters',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -3758,6 +3917,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -3870,6 +4032,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'custom',
       'autoUpdateModel',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -3914,6 +4077,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -3956,6 +4122,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'spaceId',
       'projectId',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -3992,6 +4159,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -4019,7 +4189,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TrainingResource>> {
     const _params = { ...params };
     const _requiredParams = ['trainingId'];
-    const _validParams = ['trainingId', 'spaceId', 'projectId', 'headers'];
+    const _validParams = ['trainingId', 'spaceId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -4055,6 +4225,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -4083,7 +4256,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['trainingId'];
-    const _validParams = ['trainingId', 'spaceId', 'projectId', 'hardDelete', 'headers'];
+    const _validParams = ['trainingId', 'spaceId', 'projectId', 'hardDelete', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -4113,7 +4286,13 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: { ...this.baseOptions, headers: { ...sdkHeaders, ..._params.headers } },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: { ...sdkHeaders, ..._params.headers },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -4161,6 +4340,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'projectId',
       'parameters',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -4200,6 +4380,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -4273,6 +4456,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'testDataReferences',
       'custom',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -4319,6 +4503,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -4358,6 +4545,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'spaceId',
       'projectId',
       'headers',
+      'signal',
       'type',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
@@ -4396,6 +4584,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -4421,7 +4612,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FineTuningResource>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'spaceId', 'projectId', 'headers'];
+    const _validParams = ['id', 'spaceId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -4457,6 +4648,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -4483,7 +4677,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'spaceId', 'projectId', 'hardDelete', 'headers'];
+    const _validParams = ['id', 'spaceId', 'projectId', 'hardDelete', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -4513,7 +4707,13 @@ class WatsonxAiMlVml_v1 extends BaseService {
         qs: query,
         path,
       },
-      defaultOptions: { ...this.baseOptions, headers: { ...sdkHeaders, ..._params.headers } },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: { ...sdkHeaders, ..._params.headers },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
     };
 
     return this.createRequest(parameters);
@@ -4552,6 +4752,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'projectId',
       'spaceId',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -4592,6 +4793,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -4616,7 +4820,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResources>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['projectId', 'spaceId', 'headers'];
+    const _validParams = ['projectId', 'spaceId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -4647,6 +4851,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -4672,7 +4879,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResource>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'headers'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -4708,6 +4915,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -4734,7 +4944,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -4769,6 +4979,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
         headers: {
           ...sdkHeaders,
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -4807,6 +5020,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'dataReference',
       'resultsReference',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -4846,6 +5060,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -4868,7 +5085,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResources>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['projectId', 'spaceId', 'headers'];
+    const _validParams = ['projectId', 'spaceId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -4899,6 +5116,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -4922,7 +5142,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResource>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'headers'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -4958,6 +5178,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -4984,7 +5207,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -5019,6 +5242,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
         headers: {
           ...sdkHeaders,
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -5057,6 +5283,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'projectId',
       'dataReference',
       'headers',
+      'signal',
       'resultsReference',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
@@ -5097,6 +5324,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -5119,7 +5349,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TaxonomyResources>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['projectId', 'spaceId', 'headers'];
+    const _validParams = ['projectId', 'spaceId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -5150,6 +5380,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -5173,7 +5406,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TaxonomyResource>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'headers'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -5209,6 +5442,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -5235,7 +5471,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers'];
+    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -5270,6 +5506,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
         headers: {
           ...sdkHeaders,
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -5377,6 +5616,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'contentLocation',
       'foundationModel',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -5434,6 +5674,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -5475,6 +5718,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'tagValue',
       'search',
       'headers',
+      'signal',
     ];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
@@ -5506,6 +5750,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Accept': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -5534,7 +5781,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.ModelResource>> {
     const _params = { ...params };
     const _requiredParams = ['modelId'];
-    const _validParams = ['modelId', 'spaceId', 'projectId', 'rev', 'headers'];
+    const _validParams = ['modelId', 'spaceId', 'projectId', 'rev', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -5566,6 +5813,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           ...sdkHeaders,
           'Accept': 'application/json',
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -5600,7 +5850,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.ModelResource>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'jsonPatch'];
-    const _validParams = ['modelId', 'jsonPatch', 'spaceId', 'projectId', 'headers'];
+    const _validParams = ['modelId', 'jsonPatch', 'spaceId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -5635,6 +5885,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
           'Content-Type': 'application/json',
           ..._params.headers,
         },
+        axiosOptions: {
+          signal: _params.signal,
+        },
       },
     };
 
@@ -5661,7 +5914,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['modelId'];
-    const _validParams = ['modelId', 'spaceId', 'projectId', 'headers'];
+    const _validParams = ['modelId', 'spaceId', 'projectId', 'headers', 'signal'];
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -5691,6 +5944,9 @@ class WatsonxAiMlVml_v1 extends BaseService {
         headers: {
           ...sdkHeaders,
           ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
         },
       },
     };
@@ -5733,8 +5989,13 @@ namespace WatsonxAiMlVml_v1 {
    * request interfaces
    ************************/
 
+  interface DefaultParams {
+    signal?: AbortSignal;
+    headers?: OutgoingHttpHeaders;
+  }
+
   /** Parameters for the `createDeployment` operation. */
-  export interface CreateDeploymentParams {
+  export interface CreateDeploymentParams extends DefaultParams {
     /** The name of the resource. */
     name: string;
     /** Indicates that this is an online deployment. An object has to be specified but can be empty.
@@ -5767,11 +6028,10 @@ namespace WatsonxAiMlVml_v1 {
      * The base deployment when this is a custom foundation model with a prompt template. The id must be the id of the custom foundation model deployment.
      */
     baseDeploymentId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `listDeployments` operation. */
-  export interface ListDeploymentsParams {
+  export interface ListDeploymentsParams extends DefaultParams {
     /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
@@ -5812,22 +6072,20 @@ namespace WatsonxAiMlVml_v1 {
      *  other parameter except for `serving_name`.
      */
     conflict?: boolean;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `deploymentsGet` operation. */
-  export interface DeploymentsGetParams {
+  export interface DeploymentsGetParams extends DefaultParams {
     /** The deployment id. */
     deploymentId: string;
     /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `deploymentsUpdate` operation. */
-  export interface DeploymentsUpdateParams {
+  export interface DeploymentsUpdateParams extends DefaultParams {
     /** The deployment id. */
     deploymentId: string;
     /** The json patch. */
@@ -5836,22 +6094,20 @@ namespace WatsonxAiMlVml_v1 {
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `deploymentsDelete` operation. */
-  export interface DeploymentsDeleteParams {
+  export interface DeploymentsDeleteParams extends DefaultParams {
     /** The deployment id. */
     deploymentId: string;
     /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `deploymentsTextGeneration` operation. */
-  export interface DeploymentsTextGenerationParams {
+  export interface DeploymentsTextGenerationParams extends DefaultParams {
     /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
      *  allows a predefined URL to be used to post a prediction.
      *
@@ -5872,11 +6128,10 @@ namespace WatsonxAiMlVml_v1 {
      *  identifiable information` (PII) filtering. This list can be extended with new types of moderations.
      */
     moderations?: Moderations;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `deploymentsTextGenerationStream` operation. */
-  export interface DeploymentsTextGenerationStreamParams {
+  export interface DeploymentsTextGenerationStreamParams extends DefaultParams {
     /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
      *  allows a predefined URL to be used to post a prediction.
      *
@@ -5897,13 +6152,13 @@ namespace WatsonxAiMlVml_v1 {
      *  identifiable information` (PII) filtering. This list can be extended with new types of moderations.
      */
     moderations?: Moderations;
-    headers?: OutgoingHttpHeaders;
+
     /* whether to return stream of objects if true or stream of strings if false or undefined */
     returnObject?: boolean;
   }
 
   /** Parameters for the `deploymentsTextChat` operation. */
-  export interface DeploymentsTextChatParams {
+  export interface DeploymentsTextChatParams extends DefaultParams {
     /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
      *  allows a predefined URL to be used to post a prediction. The deployment must reference a prompt template with
      *  `input_mode` `chat`.
@@ -5929,11 +6184,10 @@ namespace WatsonxAiMlVml_v1 {
      *  `content` of `user` becomes "Today is Wednesday. Who are you and which day is tomorrow?".
      */
     context?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `deploymentsTextChatStream` operation. */
-  export interface DeploymentsTextChatStreamParams {
+  export interface DeploymentsTextChatStreamParams extends DefaultParams {
     /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
      *  allows a predefined URL to be used to post a prediction. The deployment must reference a prompt template with
      *  `input_mode` `chat`.
@@ -5959,12 +6213,12 @@ namespace WatsonxAiMlVml_v1 {
      *  `content` of `user` becomes "Today is Wednesday. Who are you and which day is tomorrow?".
      */
     context?: string;
-    headers?: OutgoingHttpHeaders;
+
     returnObject?: boolean;
   }
 
   /** Parameters for the `listFoundationModelSpecs` operation. */
-  export interface ListFoundationModelSpecsParams {
+  export interface ListFoundationModelSpecsParams extends DefaultParams {
     /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
      *  the service and it is set in the href available in the `next` field.
      */
@@ -6001,22 +6255,20 @@ namespace WatsonxAiMlVml_v1 {
     filters?: string;
     /** See all the `Tech Preview` models if entitled. */
     techPreview?: boolean;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `listFoundationModelTasks` operation. */
-  export interface ListFoundationModelTasksParams {
+  export interface ListFoundationModelTasksParams extends DefaultParams {
     /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
      *  the service and it is set in the href available in the `next` field.
      */
     start?: string;
     /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
     limit?: number;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `postPrompt` operation. */
-  export interface PostPromptParams {
+  export interface PostPromptParams extends DefaultParams {
     /** Name used to display the prompt. */
     name: string;
     prompt: PromptWithExternal;
@@ -6034,7 +6286,6 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
     /** [REQUIRED] Specifies the space ID as the target. One target must be supplied per request. */
     spaceId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Constants for the `postPrompt` operation. */
@@ -6049,7 +6300,7 @@ namespace WatsonxAiMlVml_v1 {
   }
 
   /** Parameters for the `getPrompt` operation. */
-  export interface GetPromptParams {
+  export interface GetPromptParams extends DefaultParams {
     /** Prompt ID. */
     promptId: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
@@ -6058,11 +6309,10 @@ namespace WatsonxAiMlVml_v1 {
     spaceId?: string;
     /** Only return a set of model parameters compatiable with inferencing. */
     restrictModelParameters?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `patchPrompt` operation. */
-  export interface PatchPromptParams {
+  export interface PatchPromptParams extends DefaultParams {
     /** Prompt ID. */
     promptId: string;
     /** Name used to display the prompt. */
@@ -6082,7 +6332,6 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
     /** [REQUIRED] Specifies the space ID as the target. One target must be supplied per request. */
     spaceId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Constants for the `patchPrompt` operation. */
@@ -6095,18 +6344,17 @@ namespace WatsonxAiMlVml_v1 {
   }
 
   /** Parameters for the `deletePrompt` operation. */
-  export interface DeletePromptParams {
+  export interface DeletePromptParams extends DefaultParams {
     /** Prompt ID. */
     promptId: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
     /** [REQUIRED] Specifies the space ID as the target. One target must be supplied per request. */
     spaceId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `putPromptLock` operation. */
-  export interface PutPromptLockParams {
+  export interface PutPromptLockParams extends DefaultParams {
     /** Prompt ID. */
     promptId: string;
     /** True if the prompt is currently locked. */
@@ -6123,7 +6371,6 @@ namespace WatsonxAiMlVml_v1 {
     spaceId?: string;
     /** Override a lock if it is currently taken. */
     force?: boolean;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Constants for the `putPromptLock` operation. */
@@ -6136,18 +6383,17 @@ namespace WatsonxAiMlVml_v1 {
   }
 
   /** Parameters for the `getPromptLock` operation. */
-  export interface GetPromptLockParams {
+  export interface GetPromptLockParams extends DefaultParams {
     /** Prompt ID. */
     promptId: string;
     /** [REQUIRED] Specifies the space ID as the target. One target must be supplied per request. */
     spaceId?: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `getPromptInput` operation. */
-  export interface GetPromptInputParams {
+  export interface GetPromptInputParams extends DefaultParams {
     /** Prompt ID. */
     promptId: string;
     /** Override input string that will be used to generate the response. The string can contain template
@@ -6162,11 +6408,10 @@ namespace WatsonxAiMlVml_v1 {
     spaceId?: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `postPromptChatItem` operation. */
-  export interface PostPromptChatItemParams {
+  export interface PostPromptChatItemParams extends DefaultParams {
     /** Prompt ID. */
     promptId: string;
     chatItem: ChatItem[];
@@ -6174,11 +6419,10 @@ namespace WatsonxAiMlVml_v1 {
     spaceId?: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `postPromptSession` operation. */
-  export interface PostPromptSessionParams {
+  export interface PostPromptSessionParams extends DefaultParams {
     /** Name used to display the prompt session. */
     name: string;
     /** The prompt session's id. This value cannot be set. It is returned in responses only. */
@@ -6197,22 +6441,20 @@ namespace WatsonxAiMlVml_v1 {
     prompts?: WxPromptSessionEntry[];
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `getPromptSession` operation. */
-  export interface GetPromptSessionParams {
+  export interface GetPromptSessionParams extends DefaultParams {
     /** Prompt Session ID. */
     sessionId: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
     /** Include the most recent entry. */
     prefetch?: boolean;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `patchPromptSession` operation. */
-  export interface PatchPromptSessionParams {
+  export interface PatchPromptSessionParams extends DefaultParams {
     /** Prompt Session ID. */
     sessionId: string;
     name?: string;
@@ -6220,20 +6462,18 @@ namespace WatsonxAiMlVml_v1 {
     description?: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `deletePromptSession` operation. */
-  export interface DeletePromptSessionParams {
+  export interface DeletePromptSessionParams extends DefaultParams {
     /** Prompt Session ID. */
     sessionId: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `postPromptSessionEntry` operation. */
-  export interface PostPromptSessionEntryParams {
+  export interface PostPromptSessionEntryParams extends DefaultParams {
     /** Prompt Session ID. */
     sessionId: string;
     /** Name used to display the prompt. */
@@ -6251,7 +6491,6 @@ namespace WatsonxAiMlVml_v1 {
     inputMode?: PostPromptSessionEntryConstants.InputMode | string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Constants for the `postPromptSessionEntry` operation. */
@@ -6265,7 +6504,7 @@ namespace WatsonxAiMlVml_v1 {
   }
 
   /** Parameters for the `getPromptSessionEntries` operation. */
-  export interface GetPromptSessionEntriesParams {
+  export interface GetPromptSessionEntriesParams extends DefaultParams {
     /** Prompt Session ID. */
     sessionId: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
@@ -6274,11 +6513,10 @@ namespace WatsonxAiMlVml_v1 {
     bookmark?: string;
     /** Limit for results to retrieve, default 20. */
     limit?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `postPromptSessionEntryChatItem` operation. */
-  export interface PostPromptSessionEntryChatItemParams {
+  export interface PostPromptSessionEntryChatItemParams extends DefaultParams {
     /** Prompt Session ID. */
     sessionId: string;
     /** Prompt Session Entry ID. */
@@ -6286,11 +6524,10 @@ namespace WatsonxAiMlVml_v1 {
     chatItem: ChatItem[];
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `putPromptSessionLock` operation. */
-  export interface PutPromptSessionLockParams {
+  export interface PutPromptSessionLockParams extends DefaultParams {
     /** Prompt Session ID. */
     sessionId: string;
     /** True if the prompt is currently locked. */
@@ -6305,7 +6542,6 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
     /** Override a lock if it is currently taken. */
     force?: boolean;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Constants for the `putPromptSessionLock` operation. */
@@ -6318,38 +6554,35 @@ namespace WatsonxAiMlVml_v1 {
   }
 
   /** Parameters for the `getPromptSessionLock` operation. */
-  export interface GetPromptSessionLockParams {
+  export interface GetPromptSessionLockParams extends DefaultParams {
     /** Prompt Session ID. */
     sessionId: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `getPromptSessionEntry` operation. */
-  export interface GetPromptSessionEntryParams {
+  export interface GetPromptSessionEntryParams extends DefaultParams {
     /** Prompt Session ID. */
     sessionId: string;
     /** Prompt Session Entry ID. */
     entryId: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `deletePromptSessionEntry` operation. */
-  export interface DeletePromptSessionEntryParams {
+  export interface DeletePromptSessionEntryParams extends DefaultParams {
     /** Prompt Session ID. */
     sessionId: string;
     /** Prompt Session Entry ID. */
     entryId: string;
     /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `textChat` operation. */
-  export interface TextChatParams {
+  export interface TextChatParams extends DefaultParams {
     /** The model to use for the chat completion.
      *
      *  Please refer to the [list of
@@ -6435,7 +6668,6 @@ namespace WatsonxAiMlVml_v1 {
      *  being used, there may be an enforced maximum time limit.
      */
     timeLimit?: number;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Constants for the `textChat` operation. */
@@ -6449,7 +6681,7 @@ namespace WatsonxAiMlVml_v1 {
   }
 
   /** Parameters for the `textChatStream` operation. */
-  export interface TextChatStreamParams {
+  export interface TextChatStreamParams extends DefaultParams {
     /** The model to use for the chat completion.
      *
      *  Please refer to the [list of
@@ -6535,7 +6767,7 @@ namespace WatsonxAiMlVml_v1 {
      *  being used, there may be an enforced maximum time limit.
      */
     timeLimit?: number;
-    headers?: OutgoingHttpHeaders;
+
     /* whether to return stream of objects if true or stream of strings if false or undefined */
     returnObject?: boolean;
   }
@@ -6551,7 +6783,7 @@ namespace WatsonxAiMlVml_v1 {
   }
 
   /** Parameters for the `textEmbeddings` operation. */
-  export interface TextEmbeddingsParams {
+  export interface TextEmbeddingsParams extends DefaultParams {
     /** The `id` of the model to be used for this request. Please refer to the [list of
      *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
      */
@@ -6564,11 +6796,10 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
     /** Parameters for text embedding requests. */
     parameters?: EmbeddingParameters;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `textExtraction` operation. */
-  export interface TextExtractionParams {
+  export interface TextExtractionParams extends DefaultParams {
     /** A reference to data. */
     documentReference: TextExtractionDataReference;
     /** A reference to data. */
@@ -6589,11 +6820,10 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
     /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
     spaceId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `listTextExtractions` operation. */
-  export interface ListTextExtractionsParams {
+  export interface ListTextExtractionsParams extends DefaultParams {
     /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
@@ -6604,22 +6834,20 @@ namespace WatsonxAiMlVml_v1 {
     start?: string;
     /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
     limit?: number;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `textExtractionGet` operation. */
-  export interface TextExtractionGetParams {
+  export interface TextExtractionGetParams extends DefaultParams {
     /** The identifier of the extraction request. */
     id: string;
     /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `textExtractionDelete` operation. */
-  export interface TextExtractionDeleteParams {
+  export interface TextExtractionDeleteParams extends DefaultParams {
     /** The identifier of the extraction request. */
     id: string;
     /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
@@ -6628,11 +6856,10 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
     /** Set to true in order to also delete the job or request metadata. */
     hardDelete?: boolean;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `textGeneration` operation. */
-  export interface TextGenerationParams {
+  export interface TextGenerationParams extends DefaultParams {
     /** The prompt to generate completions. Note: The method tokenizes the input internally. It is recommended not
      *  to leave any trailing spaces.
      */
@@ -6651,11 +6878,10 @@ namespace WatsonxAiMlVml_v1 {
      *  identifiable information` (PII) filtering. This list can be extended with new types of moderations.
      */
     moderations?: Moderations;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `textGenerationStream` operation. */
-  export interface TextGenerationStreamParams {
+  export interface TextGenerationStreamParams extends DefaultParams {
     /** The prompt to generate completions. Note: The method tokenizes the input internally. It is recommended not
      *  to leave any trailing spaces.
      */
@@ -6674,13 +6900,13 @@ namespace WatsonxAiMlVml_v1 {
      *  identifiable information` (PII) filtering. This list can be extended with new types of moderations.
      */
     moderations?: Moderations;
-    headers?: OutgoingHttpHeaders;
+
     /* whether to return stream of objects if true or stream of strings if false or undefined */
     returnObject?: boolean;
   }
 
   /** Parameters for the `textTokenization` operation. */
-  export interface TextTokenizationParams {
+  export interface TextTokenizationParams extends DefaultParams {
     /** The `id` of the model to be used for this request. Please refer to the [list of
      *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
      */
@@ -6693,11 +6919,10 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
     /** The parameters for text tokenization. */
     parameters?: TextTokenizeParameters;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `trainingsCreate` operation. */
-  export interface TrainingsCreateParams {
+  export interface TrainingsCreateParams extends DefaultParams {
     /** The name of the training. */
     name: string;
     /** The training results. Normally this is specified as `type=container` which
@@ -6722,11 +6947,10 @@ namespace WatsonxAiMlVml_v1 {
      *  model.
      */
     autoUpdateModel?: boolean;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `trainingsList` operation. */
-  export interface TrainingsListParams {
+  export interface TrainingsListParams extends DefaultParams {
     /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
      *  the service and it is set in the href available in the `next` field.
      */
@@ -6743,7 +6967,6 @@ namespace WatsonxAiMlVml_v1 {
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Constants for the `trainingsList` operation. */
@@ -6761,18 +6984,17 @@ namespace WatsonxAiMlVml_v1 {
   }
 
   /** Parameters for the `trainingsGet` operation. */
-  export interface TrainingsGetParams {
+  export interface TrainingsGetParams extends DefaultParams {
     /** The training identifier. */
     trainingId: string;
     /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `trainingsDelete` operation. */
-  export interface TrainingsDeleteParams {
+  export interface TrainingsDeleteParams extends DefaultParams {
     /** The training identifier. */
     trainingId: string;
     /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
@@ -6781,11 +7003,10 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
     /** Set to true in order to also delete the job or request metadata. */
     hardDelete?: boolean;
-    headers?: OutgoingHttpHeaders;
   }
 
   /** Parameters for the `textRerank` operation. */
-  export interface TextRerankParams {
+  export interface TextRerankParams extends DefaultParams {
     /** The `id` of the model to be used for this request. Please refer to the [list of
      *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
      */
@@ -6800,7 +7021,402 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
     /** The properties used for reranking. */
     parameters?: RerankParameters;
-    headers?: OutgoingHttpHeaders;
+  }
+
+  /** Parameters for the `timeSeriesForecast` operation. */
+  export interface TimeSeriesForecastParams extends DefaultParams {
+    /** The model to be used for generating a forecast. */
+    modelId: string;
+    /** A payload of data matching `schema`. We assume the following about your data:
+     *    * All timeseries are of equal length and are uniform in nature (the time difference between two successive
+     *  rows is constant). This implies that there are no missing rows of data;
+     *    * The data meet the minimum model-dependent historical context length which
+     *    can be 512 or more rows per timeseries;
+     *
+     *  Note that the example payloads shown are for illustration purposes only. An actual payload would necessary be
+     *  much larger to meet minimum model-specific context lengths.
+     */
+    data: JsonObject;
+    /** Contains metadata about your timeseries data input. */
+    schema: TSForecastInputSchema;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** The parameters for the forecast request. */
+    parameters?: TSForecastParameters;
+  }
+
+  /** Parameters for the `createFineTuning` operation. */
+  export interface CreateFineTuningParams extends DefaultParams {
+    /** The name of the job. */
+    name: string;
+    /** The training datasets. */
+    trainingDataReferences: ObjectLocation[];
+    /** The training results. Normally this is specified as `type=container` which
+     *  means that it is stored in the space or project.
+     */
+    resultsReference: ObjectLocation;
+    /** The description of the job. */
+    description?: string;
+    /** A list of tags for this resource. */
+    tags?: string[];
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** This field must not be set while creating a fine tuning job with InstructLab.
+     *
+     *  If set to `true` then the result of the training, if successful, will be uploaded to the repository as a model.
+     */
+    autoUpdateModel?: boolean;
+    /** This field must not be set while creating a fine tuning job with InstructLab.
+     *
+     *  The parameters for the job. Note that if `verbalizer` is provided
+     *  then `response_template` must also be provided (and vice versa).
+     */
+    parameters?: FineTuningParameters;
+    /** The `type` of Fine Tuning training. The `type` is set to `ilab` for InstructLab training. */
+    type?: CreateFineTuningConstants.Type | string;
+    /** This field must not be set while creating a fine tuning job with InstructLab.
+     *
+     *  The holdout/test datasets.
+     */
+    testDataReferences?: ObjectLocation[];
+    /** User defined properties specified as key-value pairs. */
+    custom?: JsonObject;
+  }
+
+  /** Constants for the `createFineTuning` operation. */
+  export namespace CreateFineTuningConstants {
+    /** The `type` of Fine Tuning training. The `type` is set to `ilab` for InstructLab training. */
+    export enum Type {
+      ILAB = 'ilab',
+    }
+  }
+
+  /** Parameters for the `fineTuningList` operation. */
+  export interface FineTuningListParams extends DefaultParams {
+    /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
+     *  the service and it is set in the href available in the `next` field.
+     */
+    start?: string;
+    /** How many resources should be returned. */
+    limit?: number;
+    /** Compute the total count. May have performance impact. */
+    totalCount?: boolean;
+    /** Return only the resources with the given tag value. */
+    tagValue?: string;
+    /** Filter based on on the job state: queued, running, completed, failed etc. */
+    state?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The type of Fine Tuning training. The type is set to ilab for InstructLab training. */
+    type: string;
+  }
+
+  /** Parameters for the `getFineTuning` operation. */
+  export interface GetFineTuningParams extends DefaultParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+  }
+
+  /** Parameters for the `deleteFineTuning` operation. */
+  export interface DeleteFineTuningParams extends DefaultParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** Set to true in order to also delete the job or request metadata. */
+    hardDelete?: boolean;
+  }
+
+  /** Parameters for the `createDocumentExtraction` operation. */
+  export interface CreateDocumentExtractionParams extends DefaultParams {
+    /** The name of the document. */
+    name: string;
+    /** The documents for text extraction. */
+    documentReferences: DocumentExtractionObjectLocation[];
+    /** A reference to data. */
+    resultsReference: ObjectLocationGithub;
+    /** A list of tags for this resource. */
+    tags?: string[];
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+  }
+
+  /** Parameters for the `listDocumentExtractions` operation. */
+  export interface ListDocumentExtractionsParams extends DefaultParams {
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+  }
+
+  /** Parameters for the `getDocumentExtraction` operation. */
+  export interface GetDocumentExtractionParams extends DefaultParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+  }
+
+  /** Parameters for the `cancelDocumentExtractions` operation. */
+  export interface CancelDocumentExtractionsParams extends DefaultParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** Set to true in order to also delete the job metadata information. */
+    hardDelete?: boolean;
+  }
+
+  /** Parameters for the `createSyntheticDataGeneration` operation. */
+  export interface CreateSyntheticDataGenerationParams extends DefaultParams {
+    /** The name of the data. */
+    name: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** A reference to data. */
+    dataReference?: SyntheticDataGenerationDataReference;
+    /** A reference to data. */
+    resultsReference?: ObjectLocation;
+  }
+
+  /** Parameters for the `listSyntheticDataGenerations` operation. */
+  export interface ListSyntheticDataGenerationsParams extends DefaultParams {
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+  }
+
+  /** Parameters for the `getSyntheticDataGeneration` operation. */
+  export interface GetSyntheticDataGenerationParams extends DefaultParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+  }
+
+  /** Parameters for the `cancelSyntheticDataGeneration` operation. */
+  export interface CancelSyntheticDataGenerationParams extends DefaultParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** Set to true in order to also delete the job metadata information. */
+    hardDelete?: boolean;
+  }
+
+  /** Parameters for the `createTaxonomy` operation. */
+  export interface CreateTaxonomyParams extends DefaultParams {
+    /** The name of the document. */
+    name: string;
+    /** The description of the Taxonomy job. */
+    description?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** A reference to data. */
+    dataReference?: ObjectLocation;
+    /** The training results. Normally this is specified as `type=container` which
+     *  means that it is stored in the space or project.
+     */
+    resultsReference: ObjectLocation;
+  }
+
+  /** Parameters for the `listTaxonomies` operation. */
+  export interface ListTaxonomiesParams extends DefaultParams {
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+  }
+
+  /** Parameters for the `getTaxonomy` operation. */
+  export interface GetTaxonomyParams extends DefaultParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+  }
+
+  /** Parameters for the `deleteTaxonomy` operation. */
+  export interface DeleteTaxonomyParams extends DefaultParams {
+    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
+    id: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** Set to `true` in order to also delete the job metadata information. */
+    hardDelete?: boolean;
+  }
+
+  export interface ModelsCreateParams extends DefaultParams {
+    /** The name of the resource. */
+    name: string;
+    /** The model type. The supported model types can be found in the documentation
+     *  [here](https://dataplatform.cloud.ibm.com/docs/content/wsj/wmls/wmls-deploy-python-types.html?context=analytics).
+     */
+    type: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** A description of the resource. */
+    description?: string;
+    /** A list of tags for this resource. */
+    tags?: string[];
+    /** A software specification. */
+    softwareSpec?: SoftwareSpecRel;
+    /** A reference to a resource. */
+    pipeline?: Rel;
+    /** The model definition. */
+    modelDefinition?: ModelDefinitionId;
+    /** Hyper parameters used for training this model. */
+    hyperParameters?: JsonObject;
+    /** User provided domain name for this model. For example: sentiment, entity, visual-recognition, finance,
+     *  retail, real estate etc.
+     */
+    domain?: string;
+    /** The training data that was used to create this model. */
+    trainingDataReferences?: DataConnectionReference[];
+    /** The holdout/test datasets. */
+    testDataReferences?: DataConnectionReference[];
+    /** If the prediction schemas are provided here then they take precedent over any schemas
+     *  provided in the data references. Note that data references contain the schema for the
+     *  associated data and this object contains the schema(s) for the associated prediction, if any.
+     *  In the case that the prediction input data matches exactly the schema of the training data
+     *  references then the prediction schema can be omitted. However it is highly recommended to
+     *  always specify the prediction schemas using this field.
+     */
+    schemas?: ModelEntitySchemas;
+    /** The name of the label column. */
+    labelColumn?: string;
+    /** The name of the  label column seen by the estimator, which may have been transformed by the previous
+     *  transformers in the pipeline. This is not necessarily the same column as the `label_column` in the initial data
+     *  set.
+     */
+    transformedLabelColumn?: string;
+    /** This will be used by scoring to record the size of the model. */
+    size?: ModelEntitySize;
+    /** Metrics that can be returned by an operation. */
+    metrics?: Metric[];
+    /** User defined properties specified as key-value pairs. */
+    custom?: JsonObject;
+    /** User defined objects referenced by the model. For any user defined class or function used in the model, its
+     *  name, as referenced in the model, must be specified as the `key` and its fully qualified class or function name
+     *  must be specified as the `value`. This is applicable for `Tensorflow 2.X` models serialized in `H5` format using
+     *  the `tf.keras` API.
+     */
+    userDefinedObjects?: JsonObject;
+    /** The list of the software specifications that are used by the pipeline that generated this model, if the
+     *  model was generated by a pipeline.
+     */
+    hybridPipelineSoftwareSpecs?: SoftwareSpecRel[];
+    /** Optional metadata that can be used to provide information
+     *  about this model that can be tracked with IBM AI Factsheets.
+     *  See [Using AI
+     *  Factsheets](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/factsheets-model-inventory.html)
+     *  for more details.
+     */
+    modelVersion?: ModelEntityModelVersion;
+    /** Deprecated: this is replaced by `training.id`. This field can be used to store the `id` of the training job
+     *  that was used to produce this model.
+     */
+    trainingId?: string;
+    /** An optional array which contains the data preprocessing transformations that were executed by the training
+     *  job that created this model.
+     */
+    dataPreprocessing?: DataPreprocessingTransformation[];
+    /** Information about the training job that created this model. */
+    training?: TrainingDetails;
+    /** Details about the attachments that should be uploaded with this model. */
+    contentLocation?: ContentLocation;
+    /** The model id of the base model for this job. */
+    foundationModel?: BaseModel;
+  }
+
+  /** Parameters for the `modelsList` operation. */
+  export interface ModelsListParams extends DefaultParams {
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
+     *  the service and it is set in the href available in the `next` field.
+     */
+    start?: string;
+    /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
+    limit?: number;
+    /** Return only the resources with the given tag values, separated by `or` or `and` to support multiple tags. */
+    tagValue?: string;
+    /** Returns only resources that match this search string. The path to the field must be the complete path to the
+     *  field, and this field must be one of the indexed fields for this resource type. Note that the search string must
+     *  be URL encoded.
+     */
+    search?: string;
+  }
+
+  /** Parameters for the `modelsGet` operation. */
+  export interface ModelsGetParams extends DefaultParams {
+    /** Model identifier. */
+    modelId: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** The revision number of the resource. */
+    rev?: string;
+  }
+
+  /** Parameters for the `modelsUpdate` operation. */
+  export interface ModelsUpdateParams extends DefaultParams {
+    /** Model identifier. */
+    modelId: string;
+    /** Input For Patch. This is the patch body which corresponds to the JavaScript Object Notation (JSON) Patch
+     *  standard (RFC 6902).
+     */
+    jsonPatch: JsonPatchOperation[];
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+  }
+
+  /** Parameters for the `modelsDelete` operation. */
+  export interface ModelsDeleteParams extends DefaultParams {
+    /** Model identifier. */
+    modelId: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
   }
 
   /*************************
@@ -8698,31 +9314,6 @@ namespace WatsonxAiMlVml_v1 {
     results?: JsonObject[];
   }
 
-  /** Parameters for the `timeSeriesForecast` operation. */
-  export interface TimeSeriesForecastParams {
-    /** The model to be used for generating a forecast. */
-    modelId: string;
-    /** A payload of data matching `schema`. We assume the following about your data:
-     *    * All timeseries are of equal length and are uniform in nature (the time difference between two successive
-     *  rows is constant). This implies that there are no missing rows of data;
-     *    * The data meet the minimum model-dependent historical context length which
-     *    can be 512 or more rows per timeseries;
-     *
-     *  Note that the example payloads shown are for illustration purposes only. An actual payload would necessary be
-     *  much larger to meet minimum model-specific context lengths.
-     */
-    data: JsonObject;
-    /** Contains metadata about your timeseries data input. */
-    schema: TSForecastInputSchema;
-    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
-    spaceId?: string;
-    /** The parameters for the forecast request. */
-    parameters?: TSForecastParameters;
-    headers?: OutgoingHttpHeaders;
-  }
-
   /** Number of steps to be used for gradient accumulation. Gradient accumulation refers to a method of collecting gradient for configured number of steps instead of updating the model variables at every step and then applying the update to model variables. This can be used as a tool to overcome smaller batch size limitation. Often also referred in conjunction with "effective batch size". */
   export interface TrainingAccumulatedSteps {
     /** The default value. */
@@ -9415,6 +10006,8 @@ namespace WatsonxAiMlVml_v1 {
     gpu?: GPU;
     /** Parameters to be set when running a Fine Tuning job with LoRA/QLoRA. */
     peft_parameters?: FineTuningPeftParameters;
+    /** Enabling gradient checkpointing reduces GPU memory required at the cost of slowing training by approx 20%. */
+    gradient_checkpointing?: boolean;
   }
 
   /**
@@ -9490,252 +10083,6 @@ namespace WatsonxAiMlVml_v1 {
     resources?: FineTuningResource[];
     /** Optional details coming from the service and related to the API call or the associated resource. */
     system?: SystemDetails;
-  }
-
-  /** Parameters for the `createFineTuning` operation. */
-  export interface CreateFineTuningParams {
-    /** The name of the job. */
-    name: string;
-    /** The training datasets. */
-    trainingDataReferences: ObjectLocation[];
-    /** The training results. Normally this is specified as `type=container` which
-     *  means that it is stored in the space or project.
-     */
-    resultsReference: ObjectLocation;
-    /** The description of the job. */
-    description?: string;
-    /** A list of tags for this resource. */
-    tags?: string[];
-    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
-    spaceId?: string;
-    /** This field must not be set while creating a fine tuning job with InstructLab.
-     *
-     *  If set to `true` then the result of the training, if successful, will be uploaded to the repository as a model.
-     */
-    autoUpdateModel?: boolean;
-    /** This field must not be set while creating a fine tuning job with InstructLab.
-     *
-     *  The parameters for the job. Note that if `verbalizer` is provided
-     *  then `response_template` must also be provided (and vice versa).
-     */
-    parameters?: FineTuningParameters;
-    /** The `type` of Fine Tuning training. The `type` is set to `ilab` for InstructLab training. */
-    type?: CreateFineTuningConstants.Type | string;
-    /** This field must not be set while creating a fine tuning job with InstructLab.
-     *
-     *  The holdout/test datasets.
-     */
-    testDataReferences?: ObjectLocation[];
-    /** User defined properties specified as key-value pairs. */
-    custom?: JsonObject;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Constants for the `createFineTuning` operation. */
-  export namespace CreateFineTuningConstants {
-    /** The `type` of Fine Tuning training. The `type` is set to `ilab` for InstructLab training. */
-    export enum Type {
-      ILAB = 'ilab',
-    }
-  }
-
-  /** Parameters for the `fineTuningList` operation. */
-  export interface FineTuningListParams {
-    /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
-     *  the service and it is set in the href available in the `next` field.
-     */
-    start?: string;
-    /** How many resources should be returned. */
-    limit?: number;
-    /** Compute the total count. May have performance impact. */
-    totalCount?: boolean;
-    /** Return only the resources with the given tag value. */
-    tagValue?: string;
-    /** Filter based on on the job state: queued, running, completed, failed etc. */
-    state?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** The type of Fine Tuning training. The type is set to ilab for InstructLab training. */
-    type: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `getFineTuning` operation. */
-  export interface GetFineTuningParams {
-    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
-    id: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `deleteFineTuning` operation. */
-  export interface DeleteFineTuningParams {
-    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
-    id: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** Set to true in order to also delete the job or request metadata. */
-    hardDelete?: boolean;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `createDocumentExtraction` operation. */
-  export interface CreateDocumentExtractionParams {
-    /** The name of the document. */
-    name: string;
-    /** The documents for text extraction. */
-    documentReferences: DocumentExtractionObjectLocation[];
-    /** A reference to data. */
-    resultsReference: ObjectLocationGithub;
-    /** A list of tags for this resource. */
-    tags?: string[];
-    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
-    spaceId?: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `listDocumentExtractions` operation. */
-  export interface ListDocumentExtractionsParams {
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `getDocumentExtraction` operation. */
-  export interface GetDocumentExtractionParams {
-    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
-    id: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `cancelDocumentExtractions` operation. */
-  export interface CancelDocumentExtractionsParams {
-    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
-    id: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    /** Set to true in order to also delete the job metadata information. */
-    hardDelete?: boolean;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `createSyntheticDataGeneration` operation. */
-  export interface CreateSyntheticDataGenerationParams {
-    /** The name of the data. */
-    name: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
-    spaceId?: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
-    projectId?: string;
-    /** A reference to data. */
-    dataReference?: SyntheticDataGenerationDataReference;
-    /** A reference to data. */
-    resultsReference?: ObjectLocation;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `listSyntheticDataGenerations` operation. */
-  export interface ListSyntheticDataGenerationsParams {
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `getSyntheticDataGeneration` operation. */
-  export interface GetSyntheticDataGenerationParams {
-    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
-    id: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `cancelSyntheticDataGeneration` operation. */
-  export interface CancelSyntheticDataGenerationParams {
-    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
-    id: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    /** Set to true in order to also delete the job metadata information. */
-    hardDelete?: boolean;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `createTaxonomy` operation. */
-  export interface CreateTaxonomyParams {
-    /** The name of the document. */
-    name: string;
-    /** The description of the Taxonomy job. */
-    description?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
-    spaceId?: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
-    projectId?: string;
-    /** A reference to data. */
-    dataReference?: ObjectLocation;
-    /** The training results. Normally this is specified as `type=container` which
-     *  means that it is stored in the space or project.
-     */
-    resultsReference: ObjectLocation;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `listTaxonomies` operation. */
-  export interface ListTaxonomiesParams {
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `getTaxonomy` operation. */
-  export interface GetTaxonomyParams {
-    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
-    id: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `deleteTaxonomy` operation. */
-  export interface DeleteTaxonomyParams {
-    /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
-    id: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    /** Set to `true` in order to also delete the job metadata information. */
-    hardDelete?: boolean;
-    headers?: OutgoingHttpHeaders;
   }
 
   export interface DocumentExtractionResource {
@@ -10259,152 +10606,6 @@ namespace WatsonxAiMlVml_v1 {
     resources?: ModelResource[];
     /** Optional details coming from the service and related to the API call or the associated resource. */
     system?: SystemDetails;
-  }
-  export interface ModelsCreateParams {
-    /** The name of the resource. */
-    name: string;
-    /** The model type. The supported model types can be found in the documentation
-     *  [here](https://dataplatform.cloud.ibm.com/docs/content/wsj/wmls/wmls-deploy-python-types.html?context=analytics).
-     */
-    type: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
-    projectId?: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
-    spaceId?: string;
-    /** A description of the resource. */
-    description?: string;
-    /** A list of tags for this resource. */
-    tags?: string[];
-    /** A software specification. */
-    softwareSpec?: SoftwareSpecRel;
-    /** A reference to a resource. */
-    pipeline?: Rel;
-    /** The model definition. */
-    modelDefinition?: ModelDefinitionId;
-    /** Hyper parameters used for training this model. */
-    hyperParameters?: JsonObject;
-    /** User provided domain name for this model. For example: sentiment, entity, visual-recognition, finance,
-     *  retail, real estate etc.
-     */
-    domain?: string;
-    /** The training data that was used to create this model. */
-    trainingDataReferences?: DataConnectionReference[];
-    /** The holdout/test datasets. */
-    testDataReferences?: DataConnectionReference[];
-    /** If the prediction schemas are provided here then they take precedent over any schemas
-     *  provided in the data references. Note that data references contain the schema for the
-     *  associated data and this object contains the schema(s) for the associated prediction, if any.
-     *  In the case that the prediction input data matches exactly the schema of the training data
-     *  references then the prediction schema can be omitted. However it is highly recommended to
-     *  always specify the prediction schemas using this field.
-     */
-    schemas?: ModelEntitySchemas;
-    /** The name of the label column. */
-    labelColumn?: string;
-    /** The name of the  label column seen by the estimator, which may have been transformed by the previous
-     *  transformers in the pipeline. This is not necessarily the same column as the `label_column` in the initial data
-     *  set.
-     */
-    transformedLabelColumn?: string;
-    /** This will be used by scoring to record the size of the model. */
-    size?: ModelEntitySize;
-    /** Metrics that can be returned by an operation. */
-    metrics?: Metric[];
-    /** User defined properties specified as key-value pairs. */
-    custom?: JsonObject;
-    /** User defined objects referenced by the model. For any user defined class or function used in the model, its
-     *  name, as referenced in the model, must be specified as the `key` and its fully qualified class or function name
-     *  must be specified as the `value`. This is applicable for `Tensorflow 2.X` models serialized in `H5` format using
-     *  the `tf.keras` API.
-     */
-    userDefinedObjects?: JsonObject;
-    /** The list of the software specifications that are used by the pipeline that generated this model, if the
-     *  model was generated by a pipeline.
-     */
-    hybridPipelineSoftwareSpecs?: SoftwareSpecRel[];
-    /** Optional metadata that can be used to provide information
-     *  about this model that can be tracked with IBM AI Factsheets.
-     *  See [Using AI
-     *  Factsheets](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/factsheets-model-inventory.html)
-     *  for more details.
-     */
-    modelVersion?: ModelEntityModelVersion;
-    /** Deprecated: this is replaced by `training.id`. This field can be used to store the `id` of the training job
-     *  that was used to produce this model.
-     */
-    trainingId?: string;
-    /** An optional array which contains the data preprocessing transformations that were executed by the training
-     *  job that created this model.
-     */
-    dataPreprocessing?: DataPreprocessingTransformation[];
-    /** Information about the training job that created this model. */
-    training?: TrainingDetails;
-    /** Details about the attachments that should be uploaded with this model. */
-    contentLocation?: ContentLocation;
-    /** The model id of the base model for this job. */
-    foundationModel?: BaseModel;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `modelsList` operation. */
-  export interface ModelsListParams {
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
-     *  the service and it is set in the href available in the `next` field.
-     */
-    start?: string;
-    /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
-    limit?: number;
-    /** Return only the resources with the given tag values, separated by `or` or `and` to support multiple tags. */
-    tagValue?: string;
-    /** Returns only resources that match this search string. The path to the field must be the complete path to the
-     *  field, and this field must be one of the indexed fields for this resource type. Note that the search string must
-     *  be URL encoded.
-     */
-    search?: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `modelsGet` operation. */
-  export interface ModelsGetParams {
-    /** Model identifier. */
-    modelId: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    /** The revision number of the resource. */
-    rev?: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `modelsUpdate` operation. */
-  export interface ModelsUpdateParams {
-    /** Model identifier. */
-    modelId: string;
-    /** Input For Patch. This is the patch body which corresponds to the JavaScript Object Notation (JSON) Patch
-     *  standard (RFC 6902).
-     */
-    jsonPatch: JsonPatchOperation[];
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    headers?: OutgoingHttpHeaders;
-  }
-
-  /** Parameters for the `modelsDelete` operation. */
-  export interface ModelsDeleteParams {
-    /** Model identifier. */
-    modelId: string;
-    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    spaceId?: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
-    projectId?: string;
-    headers?: OutgoingHttpHeaders;
   }
 
   /**

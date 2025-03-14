@@ -58,7 +58,7 @@ const objectLocationModel = {
 };
 
 const documentExtractionParams = {
-  name: 'testString',
+  name: 'docext-nodejs-sdk',
   documentReferences: [dataConnectionReferenceModel],
   resultsReference: objectLocationModel,
   tags: ['t1', 't2'],
@@ -81,7 +81,7 @@ const documentExtractionResult = await checkIfJobFinshed(docExtGetter, 20);
 console.log(documentExtractionResult);
 
 const params = {
-  name: 'teststring',
+  name: 'taxonomy-nodejs-sdk',
   description: 'teststring',
   projectId,
   resultsReference: { location: { path: '.' }, 'type': 'container' },
@@ -106,7 +106,7 @@ console.log(taxonomyResultReference);
 const syntheticDataGenerationDataReferenceModel = taxonomyResultReference;
 
 const sdgParams = {
-  name: 'name_01',
+  name: 'sdg-nodejs-sdk',
   projectId: process.env.WATSONX_AI_PROJECT_ID,
   dataReference: syntheticDataGenerationDataReferenceModel,
   resultsReference: objectLocationModel,
@@ -133,7 +133,7 @@ console.log(trainingDataReferences);
 const fineTuningResultReference = { 'type': 'container', 'location': { 'path': '.' } };
 
 const fineTuningParams = {
-  name: 'test-string',
+  name: 'finetuning-nodejs-sdk',
   trainingDataReferences: [trainingDataReferences],
   resultsReference: fineTuningResultReference,
   description: 'testString',

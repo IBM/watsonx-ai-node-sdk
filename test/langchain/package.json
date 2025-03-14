@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Regresion tests for langchain/community/ibm",
   "scripts": {
-    "test": "jest",
+    "test": "jest --verbose",
     "test-regression": "yalc add @ibm-cloud/watsonx-ai && npm install && npm install @langchain/community@latest && npm test"
   },
   "jest": {
@@ -18,8 +18,9 @@
   },
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
-    "@langchain/community": "^0.3.32",
-    "@langchain/core": "^0.3.19"
+    "@langchain/community": "^0.3.34",
+    "@langchain/core": "^0.3.19",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@langchain/langgraph": "^0.2.20",

@@ -44,8 +44,8 @@ const toolsCalc = [
       name: 'add',
       parameters: {
         properties: {
-          a: { type: 'float' },
-          b: { type: 'float' },
+          a: { type: 'number' },
+          b: { type: 'number' },
         },
         required: ['a', 'b'],
         type: 'object',
@@ -59,8 +59,8 @@ const toolsCalc = [
       name: 'multiply',
       parameters: {
         properties: {
-          a: { type: 'float' },
-          b: { type: 'float' },
+          a: { type: 'number' },
+          b: { type: 'number' },
         },
         required: ['a', 'b'],
         type: 'object',

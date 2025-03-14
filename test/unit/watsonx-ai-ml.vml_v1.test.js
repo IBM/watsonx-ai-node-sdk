@@ -34,6 +34,10 @@ const {
   checkForSuccessfulExecution,
 } = unitTestUtils;
 
+function checkAxiosOptions(createRequestMock, signal) {
+  const { axiosOptions } = createRequestMock.mock.calls[0][0].defaultOptions;
+  expect(axiosOptions.signal).toEqual(signal);
+}
 const watsonxAiMlServiceOptions = {
   authenticator: new NoAuthAuthenticator(),
   url: 'https://us-south.ml.cloud.ibm.com',
@@ -229,6 +233,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const hardwareRequest = hardwareRequestModel;
         const asset = relModel;
         const baseModelId = 'testString';
+        const { signal } = new AbortController();
         const createDeploymentParams = {
           name,
           online,
@@ -242,6 +247,7 @@ describe('WatsonxAiMlVml_v1', () => {
           hardwareRequest,
           asset,
           baseModelId,
+          signal,
         };
 
         const createDeploymentResult = watsonxAiMlService.createDeployment(createDeploymentParams);
@@ -258,6 +264,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.online).toEqual(online);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
@@ -347,6 +354,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const type = 'testString';
         const state = 'testString';
         const conflict = false;
+        const { signal } = new AbortController();
         const listDeploymentsParams = {
           spaceId,
           projectId,
@@ -358,6 +366,7 @@ describe('WatsonxAiMlVml_v1', () => {
           type,
           state,
           conflict,
+          signal,
         };
 
         const listDeploymentsResult = watsonxAiMlService.listDeployments(listDeploymentsParams);
@@ -374,6 +383,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -432,10 +442,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const deploymentId = 'testString';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const { signal } = new AbortController();
         const getDeploymentParams = {
           deploymentId,
           spaceId,
           projectId,
+          signal,
         };
 
         const getDeploymentResult = watsonxAiMlService.getDeployment(getDeploymentParams);
@@ -452,6 +464,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -534,11 +547,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const jsonPatch = [jsonPatchOperationModel];
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const { signal } = new AbortController();
         const updateDeploymentParams = {
           deploymentId,
           jsonPatch,
           spaceId,
           projectId,
+          signal,
         };
 
         const updateDeploymentResult = watsonxAiMlService.updateDeployment(updateDeploymentParams);
@@ -555,6 +570,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json-patch+json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body).toEqual(jsonPatch);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -629,10 +645,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const deploymentId = 'testString';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const { signal } = new AbortController();
         const deleteDeploymentParams = {
           deploymentId,
           spaceId,
           projectId,
+          signal,
         };
 
         const deleteDeploymentResult = watsonxAiMlService.deleteDeployment(deleteDeploymentParams);
@@ -649,6 +667,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -761,6 +780,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const custom = { anyKey: 'anyValue' };
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const spaceId = 'testString';
+        const { signal } = new AbortController();
         const textExtractionParams = {
           documentReference,
           resultsReference,
@@ -770,6 +790,7 @@ describe('WatsonxAiMlVml_v1', () => {
           custom,
           projectId,
           spaceId,
+          signal,
         };
 
         const textExtractionResult = watsonxAiMlService.createTextExtraction(textExtractionParams);
@@ -786,6 +807,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.document_reference).toEqual(documentReference);
         expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
         expect(mockRequestOptions.body.steps).toEqual(steps);
@@ -865,11 +887,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const start = 'testString';
         const limit = 50;
+        const { signal } = new AbortController();
         const listTextExtractionsParams = {
           spaceId,
           projectId,
           start,
           limit,
+          signal,
         };
 
         const listTextExtractionsResult =
@@ -887,6 +911,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -991,10 +1016,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const id = 'testString';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const { signal } = new AbortController();
         const textExtractionGetParams = {
           id,
           spaceId,
           projectId,
+          signal,
         };
 
         const textExtractionGetResult =
@@ -1012,6 +1039,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -1084,11 +1112,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const hardDelete = true;
+        const { signal } = new AbortController();
         const textExtractionDeleteParams = {
           id,
           spaceId,
           projectId,
           hardDelete,
+          signal,
         };
 
         const textExtractionDeleteResult = watsonxAiMlService.deleteTextExtraction(
@@ -1107,6 +1137,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -1273,11 +1304,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const input = 'how far is paris from bangalore:\n';
         const parameters = deploymentTextGenPropertiesModel;
         const moderations = moderationsModel;
+        const { signal } = new AbortController();
         const deploymentGenerateTextParams = {
           idOrName,
           input,
           parameters,
           moderations,
+          signal,
         };
 
         const deploymentGenerateTextResult = watsonxAiMlService.deploymentGenerateText(
@@ -1300,6 +1333,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.moderations).toEqual(moderations);
@@ -1467,11 +1501,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const parameters = deploymentTextGenPropertiesModel;
         const moderations = moderationsModel;
         const accept = 'text/event-stream';
+        const { signal } = new AbortController();
         const deploymentGenerateTextStreamParams = {
           idOrName,
           input,
           parameters,
           moderations,
+          signal,
         };
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
         const deploymentGenerateTextStreamResult = watsonxAiMlService.deploymentGenerateTextStream(
@@ -1494,6 +1530,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = accept;
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.moderations).toEqual(moderations);
@@ -1594,10 +1631,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const idOrName = 'testString';
         const messages = [deploymentTextChatMessagesModel];
         const context = 'testString';
+        const { signal } = new AbortController();
         const deploymentsTextChatParams = {
           idOrName,
           messages,
           context,
+          signal,
         };
         const deploymentsTextChatResult =
           watsonxAiMlService.deploymentsTextChat(deploymentsTextChatParams);
@@ -1614,6 +1653,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.messages).toEqual(messages);
         expect(mockRequestOptions.body.context).toEqual(context);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
@@ -1708,10 +1748,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const idOrName = 'testString';
         const messages = [deploymentTextChatMessagesModel];
         const context = 'testString';
+        const { signal } = new AbortController();
         const deploymentsTextChatStreamParams = {
           idOrName,
           messages,
           context,
+          signal,
         };
 
         const deploymentsTextChatStreamResult = watsonxAiMlService.deploymentsTextChatStream(
@@ -1734,6 +1776,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'text/event-stream';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.messages).toEqual(messages);
         expect(mockRequestOptions.body.context).toEqual(context);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
@@ -1807,11 +1850,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const limit = 50;
         const filters = 'modelid_ibm/granite-13b-instruct-v2';
         const techPreview = false;
+        const { signal } = new AbortController();
         const listFoundationModelSpecsParams = {
           start,
           limit,
           filters,
           techPreview,
+          signal,
         };
 
         const listFoundationModelSpecsResult = watsonxAiMlService.listFoundationModelSpecs(
@@ -1830,6 +1875,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
@@ -1933,9 +1979,11 @@ describe('WatsonxAiMlVml_v1', () => {
         // Construct the params object for operation listFoundationModelTasks
         const start = 'testString';
         const limit = 50;
+        const { signal } = new AbortController();
         const listFoundationModelTasksParams = {
           start,
           limit,
+          signal,
         };
 
         const listFoundationModelTasksResult = watsonxAiMlService.listFoundationModelTasks(
@@ -1954,6 +2002,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
@@ -2142,6 +2191,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const inputMode = 'structured';
         const projectId = 'testString';
         const spaceId = 'testString';
+        const { signal } = new AbortController();
         const createPromptParams = {
           name,
           prompt,
@@ -2154,6 +2204,7 @@ describe('WatsonxAiMlVml_v1', () => {
           inputMode,
           projectId,
           spaceId,
+          signal,
         };
 
         const createPromptResult = watsonxAiMlService.createPrompt(createPromptParams);
@@ -2170,6 +2221,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.prompt).toEqual(prompt);
         expect(mockRequestOptions.body.description).toEqual(description);
@@ -2251,11 +2303,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const projectId = 'testString';
         const spaceId = 'testString';
         const restrictModelParameters = 'true';
+        const { signal } = new AbortController();
         const getPromptParams = {
           promptId,
           projectId,
           spaceId,
           restrictModelParameters,
+          signal,
         };
 
         const getPromptResult = watsonxAiMlService.getPrompt(getPromptParams);
@@ -2272,6 +2326,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.restrict_model_parameters).toEqual(restrictModelParameters);
@@ -2400,6 +2455,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const inputMode = 'structured';
         const projectId = 'testString';
         const spaceId = 'testString';
+        const { signal } = new AbortController();
         const updatePromptParams = {
           promptId,
           name,
@@ -2413,6 +2469,7 @@ describe('WatsonxAiMlVml_v1', () => {
           inputMode,
           projectId,
           spaceId,
+          signal,
         };
 
         const updatePromptResult = watsonxAiMlService.updatePrompt(updatePromptParams);
@@ -2429,6 +2486,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.prompt).toEqual(prompt);
         expect(mockRequestOptions.body.id).toEqual(id);
@@ -2512,10 +2570,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const promptId = 'testString';
         const projectId = 'testString';
         const spaceId = 'testString';
+        const { signal } = new AbortController();
         const deletePromptParams = {
           promptId,
           projectId,
           spaceId,
+          signal,
         };
 
         const deletePromptResult = watsonxAiMlService.deletePrompt(deletePromptParams);
@@ -2532,6 +2592,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.path.prompt_id).toEqual(promptId);
@@ -2606,6 +2667,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const projectId = 'testString';
         const spaceId = 'testString';
         const force = true;
+        const { signal } = new AbortController();
         const updatePromptLockParams = {
           promptId,
           locked,
@@ -2614,6 +2676,7 @@ describe('WatsonxAiMlVml_v1', () => {
           projectId,
           spaceId,
           force,
+          signal,
         };
 
         const updatePromptLockResult = watsonxAiMlService.updatePromptLock(updatePromptLockParams);
@@ -2630,6 +2693,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.locked).toEqual(locked);
         expect(mockRequestOptions.body.lock_type).toEqual(lockType);
         expect(mockRequestOptions.body.locked_by).toEqual(lockedBy);
@@ -2706,10 +2770,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const promptId = 'testString';
         const spaceId = 'testString';
         const projectId = 'testString';
+        const { signal } = new AbortController();
         const getPromptLockParams = {
           promptId,
           spaceId,
           projectId,
+          signal,
         };
 
         const getPromptLockResult = watsonxAiMlService.getPromptLock(getPromptLockParams);
@@ -2726,6 +2792,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.prompt_id).toEqual(promptId);
@@ -2798,12 +2865,14 @@ describe('WatsonxAiMlVml_v1', () => {
         const promptVariables = { 'key1': 'var1' };
         const spaceId = 'testString';
         const projectId = 'testString';
+        const { signal } = new AbortController();
         const getPromptInputParams = {
           promptId,
           input,
           promptVariables,
           spaceId,
           projectId,
+          signal,
         };
 
         const getPromptInputResult = watsonxAiMlService.getPromptInput(getPromptInputParams);
@@ -2820,6 +2889,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.prompt_variables).toEqual(promptVariables);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -2903,11 +2973,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const chatItem = [chatItemModel];
         const spaceId = 'testString';
         const projectId = 'testString';
+        const { signal } = new AbortController();
         const createPromptChatItemParams = {
           promptId,
           chatItem,
           spaceId,
           projectId,
+          signal,
         };
 
         const createPromptChatItemResult = watsonxAiMlService.createPromptChatItem(
@@ -2926,6 +2998,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body).toEqual(chatItem);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -3066,6 +3139,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const lock = promptLockModel;
         const prompts = [wxPromptSessionEntryModel];
         const projectId = 'testString';
+        const { signal } = new AbortController();
         const createPromptSessionParams = {
           name,
           id,
@@ -3077,6 +3151,7 @@ describe('WatsonxAiMlVml_v1', () => {
           lock,
           prompts,
           projectId,
+          signal,
         };
 
         const createPromptSessionResult =
@@ -3094,6 +3169,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.id).toEqual(id);
         expect(mockRequestOptions.body.description).toEqual(description);
@@ -3171,10 +3247,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const sessionId = 'testString';
         const projectId = 'testString';
         const prefetch = true;
+        const { signal } = new AbortController();
         const getPromptSessionParams = {
           sessionId,
           projectId,
           prefetch,
+          signal,
         };
 
         const getPromptSessionResult = watsonxAiMlService.getPromptSession(getPromptSessionParams);
@@ -3191,6 +3269,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.prefetch).toEqual(prefetch);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
@@ -3262,11 +3341,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const name = 'Session 1';
         const description = 'My First Prompt Session';
         const projectId = 'testString';
+        const { signal } = new AbortController();
         const updatePromptSessionParams = {
           sessionId,
           name,
           description,
           projectId,
+          signal,
         };
 
         const updatePromptSessionResult =
@@ -3284,6 +3365,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.description).toEqual(description);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -3354,9 +3436,11 @@ describe('WatsonxAiMlVml_v1', () => {
         // Construct the params object for operation deletePromptSession
         const sessionId = 'testString';
         const projectId = 'testString';
+        const { signal } = new AbortController();
         const deletePromptSessionParams = {
           sessionId,
           projectId,
+          signal,
         };
 
         const deletePromptSessionResult =
@@ -3374,6 +3458,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
       }
@@ -3491,6 +3576,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const isTemplate = true;
         const inputMode = 'structured';
         const projectId = 'testString';
+        const { signal } = new AbortController();
         const createPromptSessionEntryParams = {
           sessionId,
           name,
@@ -3502,6 +3588,7 @@ describe('WatsonxAiMlVml_v1', () => {
           isTemplate,
           inputMode,
           projectId,
+          signal,
         };
 
         const createPromptSessionEntryResult = watsonxAiMlService.createPromptSessionEntry(
@@ -3520,6 +3607,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.created_at).toEqual(createdAt);
         expect(mockRequestOptions.body.prompt).toEqual(prompt);
@@ -3604,11 +3692,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const projectId = 'testString';
         const bookmark = 'testString';
         const limit = 'testString';
+        const { signal } = new AbortController();
         const listPromptSessionEntriesParams = {
           sessionId,
           projectId,
           bookmark,
           limit,
+          signal,
         };
 
         const listPromptSessionEntriesResult = watsonxAiMlService.listPromptSessionEntries(
@@ -3627,6 +3717,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.bookmark).toEqual(bookmark);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
@@ -3709,11 +3800,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const entryId = 'testString';
         const chatItem = [chatItemModel];
         const projectId = 'testString';
+        const { signal } = new AbortController();
         const createPromptSessionEntryChatItemParams = {
           sessionId,
           entryId,
           chatItem,
           projectId,
+          signal,
         };
 
         const createPromptSessionEntryChatItemResult =
@@ -3737,6 +3830,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body).toEqual(chatItem);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
@@ -3815,6 +3909,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const lockedBy = 'IBMid-000000YYY0';
         const projectId = 'testString';
         const force = true;
+        const { signal } = new AbortController();
         const updatePromptSessionLockParams = {
           sessionId,
           locked,
@@ -3822,6 +3917,7 @@ describe('WatsonxAiMlVml_v1', () => {
           lockedBy,
           projectId,
           force,
+          signal,
         };
 
         const updatePromptSessionLockResult = watsonxAiMlService.updatePromptSessionLock(
@@ -3840,6 +3936,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.locked).toEqual(locked);
         expect(mockRequestOptions.body.lock_type).toEqual(lockType);
         expect(mockRequestOptions.body.locked_by).toEqual(lockedBy);
@@ -3914,9 +4011,11 @@ describe('WatsonxAiMlVml_v1', () => {
         // Construct the params object for operation getPromptSessionLock
         const sessionId = 'testString';
         const projectId = 'testString';
+        const { signal } = new AbortController();
         const getPromptSessionLockParams = {
           sessionId,
           projectId,
+          signal,
         };
 
         const getPromptSessionLockResult = watsonxAiMlService.getPromptSessionLock(
@@ -3935,6 +4034,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
       }
@@ -4004,10 +4104,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const sessionId = 'testString';
         const entryId = 'testString';
         const projectId = 'testString';
+        const { signal } = new AbortController();
         const getPromptSessionEntryParams = {
           sessionId,
           entryId,
           projectId,
+          signal,
         };
 
         const getPromptSessionEntryResult = watsonxAiMlService.getPromptSessionEntry(
@@ -4030,6 +4132,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
         expect(mockRequestOptions.path.entry_id).toEqual(entryId);
@@ -4102,10 +4205,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const sessionId = 'testString';
         const entryId = 'testString';
         const projectId = 'testString';
+        const { signal } = new AbortController();
         const deletePromptSessionEntryParams = {
           sessionId,
           entryId,
           projectId,
+          signal,
         };
 
         const deletePromptSessionEntryResult = watsonxAiMlService.deletePromptSessionEntry(
@@ -4128,6 +4233,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
         expect(mockRequestOptions.path.entry_id).toEqual(entryId);
@@ -4270,6 +4376,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const temperature = 0;
         const topP = 1;
         const timeLimit = 1000;
+        const { signal } = new AbortController();
         const textChatParams = {
           modelId,
           messages,
@@ -4291,6 +4398,7 @@ describe('WatsonxAiMlVml_v1', () => {
           temperature,
           topP,
           timeLimit,
+          signal,
         };
 
         const textChatResult = watsonxAiMlService.textChat(textChatParams);
@@ -4307,6 +4415,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.messages).toEqual(messages);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -4467,6 +4576,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const temperature = 1;
         const topP = 1;
         const timeLimit = 600000;
+        const { signal } = new AbortController();
         const textChatStreamParams = {
           modelId,
           messages,
@@ -4488,6 +4598,7 @@ describe('WatsonxAiMlVml_v1', () => {
           temperature,
           topP,
           timeLimit,
+          signal,
         };
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
         const textChatStreamResult = watsonxAiMlService.textChatStream(textChatStreamParams);
@@ -4504,6 +4615,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'text/event-stream';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.messages).toEqual(messages);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -4609,12 +4721,14 @@ describe('WatsonxAiMlVml_v1', () => {
         const spaceId = 'testString';
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const parameters = embeddingParametersModel;
+        const { signal } = new AbortController();
         const embedTextParams = {
           modelId,
           inputs,
           spaceId,
           projectId,
           parameters,
+          signal,
         };
 
         const embedTextResult = watsonxAiMlService.embedText(embedTextParams);
@@ -4631,6 +4745,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.inputs).toEqual(inputs);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -4801,6 +4916,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const parameters = textGenParametersModel;
         const moderations = moderationsModel;
+        const { signal } = new AbortController();
         const generateTextParams = {
           input,
           modelId,
@@ -4808,6 +4924,7 @@ describe('WatsonxAiMlVml_v1', () => {
           projectId,
           parameters,
           moderations,
+          signal,
         };
 
         const generateTextResult = watsonxAiMlService.generateText(generateTextParams);
@@ -4824,6 +4941,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -4996,6 +5114,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const parameters = textGenParametersModel;
         const moderations = moderationsModel;
+        const { signal } = new AbortController();
         const generateTextStreamParams = {
           input,
           modelId,
@@ -5003,6 +5122,7 @@ describe('WatsonxAiMlVml_v1', () => {
           projectId,
           parameters,
           moderations,
+          signal,
         };
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
         const generateTextStreamResult =
@@ -5020,6 +5140,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'text/event-stream';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -5108,12 +5229,14 @@ describe('WatsonxAiMlVml_v1', () => {
         const spaceId = 'testString';
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const parameters = textTokenizeParametersModel;
+        const { signal } = new AbortController();
         const tokenizeTextParams = {
           modelId,
           input,
           spaceId,
           projectId,
           parameters,
+          signal,
         };
 
         const tokenizeTextResult = watsonxAiMlService.tokenizeText(tokenizeTextParams);
@@ -5130,6 +5253,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -5226,6 +5350,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const spaceId = 'testString';
         const parameters = tsForecastParametersModel;
+        const { signal } = new AbortController();
         const timeSeriesForecastParams = {
           modelId,
           data,
@@ -5233,6 +5358,7 @@ describe('WatsonxAiMlVml_v1', () => {
           projectId,
           spaceId,
           parameters,
+          signal,
         };
 
         const timeSeriesForecastResult =
@@ -5250,6 +5376,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.data).toEqual(data);
         expect(mockRequestOptions.body.schema).toEqual(schema);
@@ -5392,6 +5519,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const trainingDataReferences = [dataConnectionReferenceModel];
         const custom = { anyKey: 'anyValue' };
         const autoUpdateModel = true;
+        const { signal } = new AbortController();
         const createTrainingParams = {
           name,
           resultsReference,
@@ -5403,6 +5531,7 @@ describe('WatsonxAiMlVml_v1', () => {
           trainingDataReferences,
           custom,
           autoUpdateModel,
+          signal,
         };
 
         const createTrainingResult = watsonxAiMlService.createTraining(createTrainingParams);
@@ -5419,6 +5548,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -5503,6 +5633,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const state = 'queued';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const { signal } = new AbortController();
         const listTrainingsParams = {
           start,
           limit,
@@ -5511,6 +5642,7 @@ describe('WatsonxAiMlVml_v1', () => {
           state,
           spaceId,
           projectId,
+          signal,
         };
 
         const listTrainingsResult = watsonxAiMlService.listTrainings(listTrainingsParams);
@@ -5527,6 +5659,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
@@ -5640,10 +5773,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const trainingId = 'testString';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const { signal } = new AbortController();
         const getTrainingParams = {
           trainingId,
           spaceId,
           projectId,
+          signal,
         };
 
         const getTrainingResult = watsonxAiMlService.getTraining(getTrainingParams);
@@ -5660,6 +5795,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -5732,11 +5868,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const hardDelete = true;
+        const { signal } = new AbortController();
         const deleteTrainingParams = {
           trainingId,
           spaceId,
           projectId,
           hardDelete,
+          signal,
         };
 
         const deleteTrainingResult = watsonxAiMlService.deleteTraining(deleteTrainingParams);
@@ -5753,6 +5891,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -5884,6 +6023,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const type = 'ilab';
         const testDataReferences = [objectLocationModel];
         const custom = { name: 'model', size: 2 };
+        const { signal } = new AbortController();
         const createFineTuningParams = {
           name,
           trainingDataReferences,
@@ -5897,6 +6037,7 @@ describe('WatsonxAiMlVml_v1', () => {
           type,
           testDataReferences,
           custom,
+          signal,
         };
 
         const createFineTuningResult = watsonxAiMlService.createFineTuning(createFineTuningParams);
@@ -5913,6 +6054,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.training_data_references).toEqual(trainingDataReferences);
         expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
@@ -5998,6 +6140,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const type = 'ilab';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const { signal } = new AbortController();
         const fineTuningListParams = {
           start,
           limit,
@@ -6007,6 +6150,7 @@ describe('WatsonxAiMlVml_v1', () => {
           type,
           spaceId,
           projectId,
+          signal,
         };
 
         const fineTuningListResult = watsonxAiMlService.listFineTunings(fineTuningListParams);
@@ -6023,6 +6167,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
@@ -6358,10 +6503,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const id = 'testString';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const { signal } = new AbortController();
         const getFineTuningParams = {
           id,
           spaceId,
           projectId,
+          signal,
         };
 
         const getFineTuningResult = watsonxAiMlService.getFineTuning(getFineTuningParams);
@@ -6378,6 +6525,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -6446,11 +6594,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const hardDelete = true;
+        const { signal } = new AbortController();
         const deleteFineTuningParams = {
           id,
           spaceId,
           projectId,
           hardDelete,
+          signal,
         };
 
         const deleteFineTuningResult = watsonxAiMlService.deleteFineTuning(deleteFineTuningParams);
@@ -6467,6 +6617,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -6552,6 +6703,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const tags = ['t1', 't2'];
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const spaceId = '3fc54cf1-252f-424b-b52d-5cdd9814987f';
+        const { signal } = new AbortController();
         const createDocumentExtractionParams = {
           name,
           documentReferences,
@@ -6559,6 +6711,7 @@ describe('WatsonxAiMlVml_v1', () => {
           tags,
           projectId,
           spaceId,
+          signal,
         };
 
         const createDocumentExtractionResult = watsonxAiMlService.createDocumentExtraction(
@@ -6577,6 +6730,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.document_references).toEqual(documentReferences);
         expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
@@ -6654,9 +6808,11 @@ describe('WatsonxAiMlVml_v1', () => {
         // Construct the params object for operation listDocumentExtractions
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const { signal } = new AbortController();
         const listDocumentExtractionsParams = {
           projectId,
           spaceId,
+          signal,
         };
 
         const listDocumentExtractionsResult = watsonxAiMlService.listDocumentExtractions(
@@ -6675,6 +6831,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -6725,10 +6882,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const id = 'testString';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const { signal } = new AbortController();
         const getDocumentExtractionParams = {
           id,
           projectId,
           spaceId,
+          signal,
         };
 
         const getDocumentExtractionResult = watsonxAiMlService.getDocumentExtraction(
@@ -6746,6 +6905,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -6818,11 +6978,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const hardDelete = true;
+        const { signal } = new AbortController();
         const cancelDocumentExtractionsParams = {
           id,
           projectId,
           spaceId,
           hardDelete,
+          signal,
         };
 
         const cancelDocumentExtractionsResult = watsonxAiMlService.cancelDocumentExtractions(
@@ -6841,6 +7003,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -6937,12 +7100,14 @@ describe('WatsonxAiMlVml_v1', () => {
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const dataReference = syntheticDataGenerationDataReferenceModel;
         const resultsReference = objectLocationModel;
+        const { signal } = new AbortController();
         const createSyntheticDataGenerationParams = {
           name,
           spaceId,
           projectId,
           dataReference,
           resultsReference,
+          signal,
         };
 
         const createSyntheticDataGenerationResult =
@@ -6960,6 +7125,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
@@ -7032,9 +7198,11 @@ describe('WatsonxAiMlVml_v1', () => {
         // Construct the params object for operation listSyntheticDataGenerations
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const { signal } = new AbortController();
         const listSyntheticDataGenerationsParams = {
           projectId,
           spaceId,
+          signal,
         };
 
         const listSyntheticDataGenerationsResult = watsonxAiMlService.listSyntheticDataGenerations(
@@ -7053,6 +7221,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -7103,10 +7272,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const id = 'testString';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const { signal } = new AbortController();
         const getSyntheticDataGenerationParams = {
           id,
           projectId,
           spaceId,
+          signal,
         };
 
         const getSyntheticDataGenerationResult = watsonxAiMlService.getSyntheticDataGeneration(
@@ -7125,6 +7296,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -7197,11 +7369,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const hardDelete = true;
+        const { signal } = new AbortController();
         const cancelSyntheticDataGenerationParams = {
           id,
           projectId,
           spaceId,
           hardDelete,
+          signal,
         };
 
         const cancelSyntheticDataGenerationResult =
@@ -7219,6 +7393,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -7308,12 +7483,14 @@ describe('WatsonxAiMlVml_v1', () => {
         const spaceId = '3fc54cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const dataReference = objectLocationModel;
+        const { signal } = new AbortController();
         const createTaxonomyParams = {
           name,
           description,
           spaceId,
           projectId,
           dataReference,
+          signal,
         };
 
         const createTaxonomyResult = watsonxAiMlService.createTaxonomy(createTaxonomyParams);
@@ -7330,6 +7507,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.description).toEqual(description);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -7402,9 +7580,11 @@ describe('WatsonxAiMlVml_v1', () => {
         // Construct the params object for operation listTaxonomies
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const { signal } = new AbortController();
         const listTaxonomiesParams = {
           projectId,
           spaceId,
+          signal,
         };
 
         const listTaxonomiesResult = watsonxAiMlService.listTaxonomies(listTaxonomiesParams);
@@ -7421,6 +7601,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -7471,10 +7652,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const id = 'testString';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const { signal } = new AbortController();
         const getTaxonomyParams = {
           id,
           projectId,
           spaceId,
+          signal,
         };
 
         const getTaxonomyResult = watsonxAiMlService.getTaxonomy(getTaxonomyParams);
@@ -7491,6 +7674,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -7563,11 +7747,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const hardDelete = true;
+        const { signal } = new AbortController();
         const deleteTaxonomyParams = {
           id,
           projectId,
           spaceId,
           hardDelete,
+          signal,
         };
 
         const deleteTaxonomyResult = watsonxAiMlService.deleteTaxonomy(deleteTaxonomyParams);
@@ -7584,6 +7770,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -8112,6 +8299,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const dataPreprocessing = [dataPreprocessingTransformationModel];
         const training = trainingDetailsModel;
         const contentLocation = contentLocationModel;
+        const { signal } = new AbortController();
         const modelsCreateParams = {
           name,
           type,
@@ -8139,6 +8327,7 @@ describe('WatsonxAiMlVml_v1', () => {
           dataPreprocessing,
           training,
           contentLocation,
+          signal,
         };
 
         const modelsCreateResult = watsonxAiMlService.createModel(modelsCreateParams);
@@ -8155,6 +8344,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.type).toEqual(type);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
@@ -8256,6 +8446,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const limit = 50;
         const tagValue = 'tf2.0 or tf2.1';
         const search = 'testString';
+        const { signal } = new AbortController();
         const modelsListParams = {
           spaceId,
           projectId,
@@ -8263,6 +8454,7 @@ describe('WatsonxAiMlVml_v1', () => {
           limit,
           tagValue,
           search,
+          signal,
         };
 
         const modelsListResult = watsonxAiMlService.listModels(modelsListParams);
@@ -8279,6 +8471,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -8390,11 +8583,13 @@ describe('WatsonxAiMlVml_v1', () => {
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
         const rev = '2';
+        const { signal } = new AbortController();
         const modelsGetParams = {
           modelId,
           spaceId,
           projectId,
           rev,
+          signal,
         };
 
         const modelsGetResult = watsonxAiMlService.getModel(modelsGetParams);
@@ -8411,6 +8606,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -8483,10 +8679,12 @@ describe('WatsonxAiMlVml_v1', () => {
         const modelId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
         const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const { signal } = new AbortController();
         const modelsDeleteParams = {
           modelId,
           spaceId,
           projectId,
+          signal,
         };
 
         const modelsDeleteResult = watsonxAiMlService.deleteModel(modelsDeleteParams);
@@ -8503,6 +8701,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);

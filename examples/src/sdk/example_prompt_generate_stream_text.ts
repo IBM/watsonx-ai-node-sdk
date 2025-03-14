@@ -44,7 +44,7 @@ const promptContentParams = {
 
 // Define parameters for prompt creation request
 const promptParameters = {
-  name: 'WXAI SDK Example Prompt',
+  name: 'WXAI Node.js SDK Example Prompt',
   description: 'Example prompt created from watsonx-ai-node-sdk library',
   projectId,
   spaceId,
@@ -55,59 +55,70 @@ const promptParameters = {
     },
   },
 };
+let createdPromptId: string | undefined;
+let createdDeployId: string | undefined;
+try {
+  console.log('\n\n***** EXAMPLE TEXT GENERATION 3 - PROMPT CREATION AND TEXT STREAMING *****');
+  // Store prompt
+  const savePrompt = await watsonxAIService.createPrompt(promptParameters);
+  createdPromptId = savePrompt.result.id;
+  if (!createdPromptId) throw new Error('There was an error creating a prompt');
 
-console.log('\n\n***** EXAMPLE TEXT GENERATION 3 - PROMPT CREATION AND TEXT STREAMING *****');
+  console.log('\n\n ***** PROMPT SAVED *****');
+  console.log('Prompt ID: %s', createdPromptId);
 
-// Store prompt
-const savePrompt = await watsonxAIService.createPrompt(promptParameters);
-const createdPromptId = savePrompt.result.id;
-if (!createdPromptId) throw new Error('There was an error creating a prompt');
+  // Get stored prompt
+  const getPrompt = await watsonxAIService.getPrompt({
+    promptId: createdPromptId,
+    projectId,
+    spaceId,
+  });
+  console.log('\n\n***** PROMPT CONTENT *****');
+  console.log(JSON.stringify(getPrompt.result, null, 2));
 
-console.log('\n\n ***** PROMPT SAVED *****');
-console.log('Prompt ID: %s', createdPromptId);
+  // Deploy stored prompt
+  const createDeploy = await watsonxAIService.createDeployment({
+    name: 'WXAI Node.js SDK Example Prompt Deployment',
+    baseModelId: promptContentParams.model_id,
+    promptTemplate: { id: createdPromptId },
+    projectId,
+    spaceId,
+    online: {},
+  });
+  console.log(JSON.stringify(createDeploy.result, null, 2));
 
-// Get stored prompt
-const getPrompt = await watsonxAIService.getPrompt({
-  promptId: createdPromptId,
-  projectId,
-  spaceId,
-});
-console.log('\n\n***** PROMPT CONTENT *****');
-console.log(JSON.stringify(getPrompt.result, null, 2));
+  createdDeployId = createDeploy.result.metadata?.id;
+  if (!createdDeployId) throw new Error('There was an error creating a deploument');
 
-// Deploy stored prompt
-const createDeploy = await watsonxAIService.createDeployment({
-  name: 'Prompt deployment from WXAI NODE SDK',
-  baseModelId: promptContentParams.model_id,
-  promptTemplate: { id: createdPromptId },
-  projectId,
-  spaceId,
-  online: {},
-});
-console.log(JSON.stringify(createDeploy.result, null, 2));
+  console.log('\n\n ***** PROMPT DEPLOYED *****');
+  console.log('Prompt ID: %s', createdDeployId);
 
-const createdDeployId = createDeploy.result.metadata?.id;
-if (!createdDeployId) throw new Error('There was an error creating a deploument');
-
-console.log('\n\n ***** PROMPT DEPLOYED *****');
-console.log('Prompt ID: %s', createdDeployId);
-
-// Infer deployed prompt
-const modelInput = "It's sunny outside.";
-const streamInferDeployedPrompt = await watsonxAIService.deploymentGenerateTextStream({
-  idOrName: createdDeployId,
-  parameters: {
-    prompt_variables: {
-      'input': modelInput,
+  // Infer deployed prompt
+  const modelInput = "It's sunny outside.";
+  const streamInferDeployedPrompt = await watsonxAIService.deploymentGenerateTextStream({
+    idOrName: createdDeployId,
+    parameters: {
+      prompt_variables: {
+        'input': modelInput,
+      },
     },
-  },
-});
-console.log('\n\n***** TEXT INPUT INTO MODEL *****');
-console.log(modelInput);
-console.log('\n\n***** TEXT RESPONSE FROM MODEL *****');
-for await (const line of streamInferDeployedPrompt) {
-  console.log(line);
+  });
+  console.log('\n\n***** TEXT INPUT INTO MODEL *****');
+  console.log(modelInput);
+  console.log('\n\n***** TEXT RESPONSE FROM MODEL *****');
+  for await (const line of streamInferDeployedPrompt) {
+    console.log(line);
+  }
+} catch (e) {
+  throw e;
+} finally {
+  // All resources will be deleted after this example. If you want to use them afterward, please comment out the lines below.
+  if (createdDeployId)
+    await watsonxAIService.deleteDeployment({
+      deploymentId: createdDeployId,
+      projectId,
+      spaceId,
+    });
+  if (createdPromptId)
+    await watsonxAIService.deletePrompt({ promptId: createdPromptId, projectId, spaceId });
 }
-// All resources will be deleted after this example. If you want to use them afterward, please comment out the lines below.
-await watsonxAIService.deleteDeployment({ deploymentId: createdDeployId, projectId, spaceId });
-await watsonxAIService.deletePrompt({ promptId: createdPromptId, projectId, spaceId });

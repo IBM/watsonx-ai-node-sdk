@@ -86,7 +86,7 @@ const promptTuningModel = {
 };
 // Training parameters
 const trainingParams = {
-  name: 'prompt-tune-training',
+  name: 'WXAI Node.js SDK Example Prompt',
   resultsReference: objectLocationModel,
   projectId,
   description: 'First prompt tuning training',
@@ -164,7 +164,7 @@ try {
   };
   // Deployment parameters
   const deploymentParams = {
-    name: 'text_classification',
+    name: 'text_classification_wx_nodejs_sdk',
     online: onlineDeploymentModel,
     projectId,
     spaceId,
