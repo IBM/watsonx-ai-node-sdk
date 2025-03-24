@@ -35,8 +35,8 @@ const describe = authHelper.prepareTests(configFile);
 authHelper.loadEnv();
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 
-const checkAborting = async (requestFnc, params) => {
-  return test(`Aborting function: ${requestFnc}`, async () => {
+const checkAborting = async (requestFnc, params) =>
+  test(`Aborting function: ${requestFnc}`, async () => {
     const controller = new AbortController();
     const { signal } = controller;
     try {
@@ -49,7 +49,6 @@ const checkAborting = async (requestFnc, params) => {
       expect(e.message).toBe('canceled');
     }
   });
-};
 
 describe('WatsonxAiMlVml_v1_integration', () => {
   jest.setTimeout(timeout);
@@ -858,7 +857,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         res: (args) => watsonxAiMlService.textChatStream(args),
       },
     ];
-    for (let { res, params } of testArray) {
+    for (const { res, params } of testArray) {
       checkAborting(res, params);
     }
   });

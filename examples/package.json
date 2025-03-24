@@ -61,9 +61,9 @@
   },
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
-    "@langchain/community": "^0.3.34",
+    "@langchain/community": "^0.3.36",
     "@langchain/core": "^0.3.19",
-    "@langchain/langgraph": "^0.2.54",
+    "@langchain/langgraph": "^0.2.57",
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.25.0",
     "@zilliz/milvus2-sdk-node": "^2.5.0",

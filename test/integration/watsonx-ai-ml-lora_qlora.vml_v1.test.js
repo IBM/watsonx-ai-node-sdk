@@ -1,4 +1,4 @@
-/* This test suit is not executed on the Travis pipeline. Anytime changes are made regarding InstructLab */
+/* This test suit is not executed on the Tekton pipeline. Anytime changes are made regarding InstructLab */
 /* These tests should be run on your local machine. Especially the main flow test. Command: `npm run test-ilab` */
 
 /* eslint-disable no-console */
@@ -179,17 +179,17 @@ describe('Ilab tests', () => {
   test('Store model', async () => {
     const data = {
       'name': 'base foundation model asset',
-      'project_id': projectId,
-      'foundation_model': {
+      projectId,
+      'foundationModel': {
         'model_id': model,
       },
       'type': 'base_foundation_model_1.0',
-      'software_spec': {
+      'softwareSpec': {
         'name': 'watsonx-cfm-caikit-1.1',
       },
     };
 
-    const response = await watsonxAiMlService.storeModel(data);
+    const response = await watsonxAiMlService.createModel(data);
 
     console.log(response.result);
     storedModelId = response.result.metadata.id;

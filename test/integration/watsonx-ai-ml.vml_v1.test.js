@@ -1440,7 +1440,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           const res = await watsonxAiMlService.getTextExtraction(parameters);
           if (res.result.entity.results.status === 'completed') return res;
           if (res.result.entity.results.status === 'failed')
-            throw new Error(res.result.entity.resultss.error.message);
+            throw new Error(res.result.entity.results.error.message);
           await new Promise((resolve) => setTimeout(resolve, delay));
         }
         throw new Error('Unable to finish extraction after maximum retries');
@@ -1460,6 +1460,70 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const res = await watsonxAiMlService.deleteTextExtraction(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(204);
+      expect(res.result).toBeDefined();
+    });
+  });
+
+  describe('Toolkits', () => {
+    test('listUtilityAgentTools()', async () => {
+      const res = await watsonxAiMlService.listUtilityAgentTools();
+      console.log(res.result);
+      expect(res).toBeDefined();
+      expect(res.status).toBe(200);
+      expect(res.result).toBeDefined();
+    });
+
+    test('getUtilityAgentTool()', async () => {
+      const params = {
+        toolId: 'WebCrawler',
+      };
+
+      const res = await watsonxAiMlService.getUtilityAgentTool(params);
+      expect(res).toBeDefined();
+      expect(res.status).toBe(200);
+      expect(res.result).toBeDefined();
+    });
+
+    test('runUtilityAgentTool()', async () => {
+      // Request models needed by this operation.
+
+      // WxUtilityAgentToolsRunRequestUtilityAgentToolUnstructuredInput
+      const wxUtilityAgentToolsRunRequestModel = {
+        tool_name: 'GoogleSearch',
+        input: 'What was the weather in Toronto on January 13th 2025?',
+        config: { maxResults: 3 },
+      };
+
+      const params = {
+        wxUtilityAgentToolsRunRequest: wxUtilityAgentToolsRunRequestModel,
+      };
+
+      const res = await watsonxAiMlService.runUtilityAgentTool(params);
+      expect(res).toBeDefined();
+      expect(res.status).toBe(200);
+      expect(res.result).toBeDefined();
+    });
+
+    test('runUtilityAgentToolByName()', async () => {
+      // Request models needed by this operation.
+
+      // WxUtilityAgentToolsRunRequestUtilityAgentToolUnstructuredInput
+      const wxUtilityAgentToolsRunRequestModel = {
+        tool_name: 'GoogleSearch',
+        input: 'What is a project?',
+        config: {
+          projectId,
+        },
+      };
+
+      const params = {
+        toolId: 'GoogleSearch',
+        wxUtilityAgentToolsRunRequest: wxUtilityAgentToolsRunRequestModel,
+      };
+
+      const res = await watsonxAiMlService.runUtilityAgentToolByName(params);
+      expect(res).toBeDefined();
+      expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
     });
   });

@@ -54,4 +54,7 @@ describe('Test examples', () => {
     },
     60000 * 4
   );
+  test('Toolkit', async () => {
+    await expect(import('../sdk/example_toolkit')).resolves.not.toThrow();
+  });
 });

@@ -8765,4 +8765,348 @@ describe('WatsonxAiMlVml_v1', () => {
       });
     });
   });
+  describe('listUtilityAgentTools', () => {
+    describe('positive tests', () => {
+      function __getUtilityAgentToolsTest() {
+        // Construct the params object for operation listUtilityAgentTools
+        const getUtilityAgentToolsParams = {};
+
+        const getUtilityAgentToolsResult = watsonxAiMlService.listUtilityAgentTools(
+          getUtilityAgentToolsParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(getUtilityAgentToolsResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/v1-beta/utility_agent_tools', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __getUtilityAgentToolsTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __getUtilityAgentToolsTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __getUtilityAgentToolsTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const getUtilityAgentToolsParams = {
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.listUtilityAgentTools(getUtilityAgentToolsParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+
+      test('should not have any problems when no parameters are passed in', () => {
+        // invoke the method with no parameters
+        watsonxAiMlService.listUtilityAgentTools({});
+        checkForSuccessfulExecution(createRequestMock);
+      });
+    });
+  });
+
+  describe('getUtilityAgentTool', () => {
+    describe('positive tests', () => {
+      function __getUtilityAgentToolTest() {
+        // Construct the params object for operation getUtilityAgentTool
+        const toolId = 'testString';
+        const getUtilityAgentToolParams = {
+          toolId,
+        };
+
+        const getUtilityAgentToolResult =
+          watsonxAiMlService.getUtilityAgentTool(getUtilityAgentToolParams);
+
+        // all methods should return a Promise
+        expectToBePromise(getUtilityAgentToolResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/v1-beta/utility_agent_tools/{tool_id}', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.path.tool_id).toEqual(toolId);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __getUtilityAgentToolTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __getUtilityAgentToolTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __getUtilityAgentToolTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const toolId = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const getUtilityAgentToolParams = {
+          toolId,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.getUtilityAgentTool(getUtilityAgentToolParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getUtilityAgentTool({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.getUtilityAgentTool();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('runUtilityAgentTool', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // WxUtilityAgentToolsRunRequestUtilityAgentToolUnstructuredInput
+      const wxUtilityAgentToolsRunRequestModel = {
+        tool_name: 'GoogleSearch',
+        input: 'What was the weather in Toronto on January 13th 2025?',
+        config: { maxResults: 3 },
+      };
+
+      function __postUtilityAgentToolsRunTest() {
+        // Construct the params object for operation runUtilityAgentTool
+        const wxUtilityAgentToolsRunRequest = wxUtilityAgentToolsRunRequestModel;
+        const postUtilityAgentToolsRunParams = {
+          wxUtilityAgentToolsRunRequest,
+        };
+
+        const postUtilityAgentToolsRunResult = watsonxAiMlService.runUtilityAgentTool(
+          postUtilityAgentToolsRunParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(postUtilityAgentToolsRunResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/v1-beta/utility_agent_tools/run', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body).toEqual(wxUtilityAgentToolsRunRequest);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __postUtilityAgentToolsRunTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __postUtilityAgentToolsRunTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __postUtilityAgentToolsRunTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const wxUtilityAgentToolsRunRequest = wxUtilityAgentToolsRunRequestModel;
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const postUtilityAgentToolsRunParams = {
+          wxUtilityAgentToolsRunRequest,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.runUtilityAgentTool(postUtilityAgentToolsRunParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.runUtilityAgentTool({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.runUtilityAgentTool();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('runUtilityAgentToolByName', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // WxUtilityAgentToolsRunRequestUtilityAgentToolUnstructuredInput
+      const wxUtilityAgentToolsRunRequestModel = {
+        tool_name: 'GoogleSearch',
+        input: 'What is a project?',
+        config: {
+          projectId: 'd514c8ef-423f-429c-8947-fa900dee338a',
+          vectorIndexId: 'dda284ec-22e9-4091-89d5-19b8e526ea0d',
+        },
+      };
+
+      function __postUtilityAgentToolsRunByNameTest() {
+        // Construct the params object for operation runUtilityAgentToolByName
+        const toolId = 'testString';
+        const wxUtilityAgentToolsRunRequest = wxUtilityAgentToolsRunRequestModel;
+        const postUtilityAgentToolsRunByNameParams = {
+          toolId,
+          wxUtilityAgentToolsRunRequest,
+        };
+
+        const postUtilityAgentToolsRunByNameResult = watsonxAiMlService.runUtilityAgentToolByName(
+          postUtilityAgentToolsRunByNameParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(postUtilityAgentToolsRunByNameResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/v1-beta/utility_agent_tools/run/{tool_id}', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body).toEqual(wxUtilityAgentToolsRunRequest);
+        expect(mockRequestOptions.path.tool_id).toEqual(toolId);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __postUtilityAgentToolsRunByNameTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        __postUtilityAgentToolsRunByNameTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        __postUtilityAgentToolsRunByNameTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const toolId = 'testString';
+        const wxUtilityAgentToolsRunRequest = wxUtilityAgentToolsRunRequestModel;
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const postUtilityAgentToolsRunByNameParams = {
+          toolId,
+          wxUtilityAgentToolsRunRequest,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.runUtilityAgentToolByName(postUtilityAgentToolsRunByNameParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.runUtilityAgentToolByName({});
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        let err;
+        try {
+          await watsonxAiMlService.runUtilityAgentToolByName();
+        } catch (e) {
+          err = e;
+        }
+
+        expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
 });

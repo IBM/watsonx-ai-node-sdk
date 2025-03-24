@@ -1,0 +1,346 @@
+version: '2'
+
+tasks:
+
+  pr-code-checks:
+    include:
+      - dind
+    steps:
+      - name: checks-setup
+        include:
+          - docker-socket
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+          if [[ "$(get_env pipeline_namespace)" == *"pr"* ]]; then
+            cd "${WORKSPACE}/$(load_repo app-repo path)"
+
+            NODE_VERSION="$(get_env node-version)"
+            if ! command -v npm &> /dev/null; then
+              scripts/setup-code.sh --node-version "${NODE_VERSION}"
+            fi
+
+            npm ci
+          fi
+
+      - name: detect-secrets
+        include:
+          - docker-socket
+
+      - name: unit-test
+        include:
+          - docker-socket
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+          if [[ "$(get_env pipeline_namespace)" == *"pr"* ]]; then
+            cd "${WORKSPACE}/$(load_repo app-repo path)"
+
+            NODE_VERSION="$(get_env node-version)"
+            if ! command -v npm &> /dev/null; then
+              scripts/setup-code.sh --node-version "${NODE_VERSION}"
+            fi
+
+            scripts/test.sh --node-version "${NODE_VERSION}" --test-suite unit
+          fi
+
+      - name: compliance-checks
+        include:
+          - docker-socket
+
+  async-stage:
+    include:
+      - dind
+    steps:
+      - name: integration-test
+        include:
+          - docker-socket
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+          if [[ "$(get_env pipeline_namespace)" == *"pr"* ]]; then
+            cd "${WORKSPACE}/$(load_repo app-repo path)"
+
+            NODE_VERSION="$(get_env node-version)"
+            if ! command -v npm &> /dev/null; then
+              scripts/setup-code.sh --node-version "${NODE_VERSION}"
+            fi
+
+            npm ci
+            scripts/setup-test.sh
+            scripts/test.sh --node-version "${NODE_VERSION}" --test-suite integration
+          fi
+
+      - name: regression-test
+        include:
+          - docker-socket
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+          if [[ "$(get_env pipeline_namespace)" == *"pr"* ]]; then
+            cd "${WORKSPACE}/$(load_repo app-repo path)"
+
+            NODE_VERSION="$(get_env node-version)"
+            if ! command -v npm &> /dev/null; then
+              scripts/setup-code.sh --node-version "${NODE_VERSION}"
+            fi
+
+            npm ci
+            scripts/setup-test.sh
+            scripts/test.sh --node-version "${NODE_VERSION}" --test-suite regression
+          fi
+
+      - name: examples-test
+        include:
+          - docker-socket
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+          if [[ "$(get_env pipeline_namespace)" == *"pr"* ]]; then
+            cd "${WORKSPACE}/$(load_repo app-repo path)"
+
+            NODE_VERSION="$(get_env node-version)"
+            if ! command -v npm &> /dev/null; then
+              scripts/setup-code.sh --node-version "${NODE_VERSION}"
+            fi
+
+            npm ci
+            scripts/setup-test.sh
+            scripts/test.sh --node-version "${NODE_VERSION}" --test-suite examples
+          fi
+
+  code-checks:
+    include:
+      - dind
+    steps:
+      - name: checks-setup
+        include:
+          - docker-socket
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+      - name: detect-secrets
+        include:
+          - docker-socket
+
+      - name: compliance-checks
+        include:
+          - docker-socket
+
+      - name: static-scan
+        include:
+          - docker-socket
+
+  code-build:
+    include:
+      - dind
+    steps:
+      - name: setup
+        include:
+          - docker-socket
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+          if [[ "$(get_env pipeline_namespace)" == *"ci"* ]]; then
+            cd "${WORKSPACE}/$(load_repo app-repo path)"
+
+            source scripts/utils.sh
+
+            TAG="$(jq -r '.version' package.json)"
+
+            setup-git enterprise
+
+            git tag "${TAG}"
+            git push origin tag "${TAG}"
+
+            NODE_VERSION="$(get_env node-version)"
+            if ! command -v npm &> /dev/null; then
+              scripts/setup-code.sh --node-version "${NODE_VERSION}"
+            fi
+
+            npm ci
+          fi
+
+      - name: unit-test
+        include:
+          - docker-socket
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+          if [[ "$(get_env pipeline_namespace)" == *"ci"* ]]; then
+            cd "${WORKSPACE}/$(load_repo app-repo path)"
+
+            NODE_VERSION="$(get_env node-version)"
+            if ! command -v npm &> /dev/null; then
+              scripts/setup-code.sh --node-version "${NODE_VERSION}"
+            fi
+
+            scripts/test.sh --node-version "${NODE_VERSION}" --test-suite unit
+          fi
+
+      - name: build-artifact
+        runAfter:
+          - code-checks
+        include:
+          - docker-socket
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+          if [[ "$(get_env pipeline_namespace)" == *"ci"* ]]; then
+            cd "${WORKSPACE}/$(load_repo app-repo path)"
+
+            NODE_VERSION="$(get_env node-version)"
+            if ! command -v npm &> /dev/null; then
+              scripts/setup-code.sh --node-version "${NODE_VERSION}"
+            fi
+
+            scripts/generate-docs.sh
+          fi
+
+      - name: sign-artifact
+        include:
+          - docker-socket
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+      - name: scan-artifact
+        include:
+          - docker-socket
+
+  deploy-checks:
+    include:
+      - dind
+    steps:
+      - name: deploy
+        runAfter:
+          - code-checks
+        include:
+          - docker-socket
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+
+          if [[ "$PIPELINE_DEBUG" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+          if [[ "$(get_env pipeline_namespace)" == *"ci"* ]]; then
+            cd "${WORKSPACE}/$(load_repo app-repo path)"
+
+            scripts/sync-public-git.sh
+          fi
+
+      - name: dynamic-scan
+        include:
+          - docker-socket
+
+      - name: acceptance-test
+        include:
+          - docker-socket
+        skip: true
+
+  deploy-release:
+    steps:
+      - name: run-stage
+        runAfter:
+          - code-checks
+          - deploy-checks
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+          if [[ "$(get_env pipeline_namespace)" == *"ci"* ]]; then
+            cd "${WORKSPACE}/$(load_repo app-repo path)"
+
+            NODE_VERSION="$(get_env node-version)"
+            if ! command -v npm &> /dev/null; then
+              scripts/setup-code.sh --node-version "${NODE_VERSION}"
+            fi
+
+            scripts/setup-release.sh
+            scripts/release.sh
+          fi
+
+finally:
+  code-pr-finish:
+    steps:
+      - name: run-stage
+        image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.58
+        script: |
+          #!/usr/bin/env bash
+          if [[ "${PIPELINE_DEBUG}" == 1 ]]; then
+            trap env EXIT
+            env
+            set -x
+          fi
+
+          trigger-task integration-test
+          trigger-task regression-test
+          trigger-task examples-test

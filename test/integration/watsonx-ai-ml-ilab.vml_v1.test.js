@@ -1,4 +1,4 @@
-/* This test suit is not executed on the Travis pipeline. Anytime changes are made regarding InstructLab */
+/* This test suit is not executed on the Tekton pipeline. Anytime changes are made regarding InstructLab */
 /* These tests should be run on your local machine. Especially the main flow test. Command: `npm run test-ilab` */
 
 /* eslint-disable no-console */

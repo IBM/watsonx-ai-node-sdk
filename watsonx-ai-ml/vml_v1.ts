@@ -5953,6 +5953,232 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
     return this.createRequest(parameters);
   }
+
+  /*************************
+   * utilityAgentToolsBeta
+   ************************/
+
+  /**
+   * Get utility agent tools.
+   *
+   * This retrieves the complete list of supported utility agent tools and contains information required for running
+   * each tool.
+   *
+   * @param {Object} [params] - The parameters to send to the service.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxUtilityAgentToolsResponse>>}
+   */
+  public listUtilityAgentTools(
+    params?: WatsonxAiMlVml_v1.GetUtilityAgentToolsParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxUtilityAgentToolsResponse>> {
+    const _params = { ...params };
+    const _requiredParams: string[] = [];
+    const _validParams = ['signal', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'listUtilityAgentTools'
+    );
+
+    const parameters = {
+      options: {
+        url: '/v1-beta/utility_agent_tools',
+        method: 'GET',
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        serviceUrl: this.wxServiceUrl,
+        headers: {
+          ...sdkHeaders,
+          ...this.baseOptions.headers,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get utility agent tool.
+   *
+   * This retrieves the details of an utility agent tool and contains information required for running the tool.
+   * Providing authentication and configuration params may return additional details.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.toolId - Tool name.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.UtilityAgentTool>>}
+   */
+  public getUtilityAgentTool(
+    params: WatsonxAiMlVml_v1.GetUtilityAgentToolParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.UtilityAgentTool>> {
+    const _params = { ...params };
+    const _requiredParams = ['toolId'];
+    const _validParams = ['toolId', 'signal', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const path = {
+      'tool_id': _params.toolId,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'getUtilityAgentTool'
+    );
+
+    const parameters = {
+      options: {
+        url: '/v1-beta/utility_agent_tools/{tool_id}',
+        method: 'GET',
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        serviceUrl: this.wxServiceUrl,
+        headers: {
+          ...sdkHeaders,
+          ...this.baseOptions.headers,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Run a utility agent tool.
+   *
+   * This runs a utility agent tool given an input and optional configuration parameters.
+   *
+   * Some tools can choose to tailor the response based on the access token identity.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {WxUtilityAgentToolsRunRequest} params.wxUtilityAgentToolsRunRequest -
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxUtilityAgentToolsRunResponse>>}
+   */
+  public runUtilityAgentTool(
+    params: WatsonxAiMlVml_v1.PostUtilityAgentToolsRunParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxUtilityAgentToolsRunResponse>> {
+    const _params = { ...params };
+    const _requiredParams = ['wxUtilityAgentToolsRunRequest'];
+    const _validParams = ['wxUtilityAgentToolsRunRequest', 'signal', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = _params.wxUtilityAgentToolsRunRequest;
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'runUtilityAgentTool'
+    );
+
+    const parameters = {
+      options: {
+        url: '/v1-beta/utility_agent_tools/run',
+        method: 'POST',
+        body,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        serviceUrl: this.wxServiceUrl,
+        headers: {
+          ...sdkHeaders,
+          ...this.baseOptions.headers,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Run a utility agent tool.
+   *
+   * This runs a utility agent tool given an input and optional configuration parameters.
+   *
+   * Some tools can choose to tailor the response based on the access token identity.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.toolId - Tool name.
+   * @param {WxUtilityAgentToolsRunRequest} params.wxUtilityAgentToolsRunRequest -
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxUtilityAgentToolsRunResponse>>}
+   */
+  public runUtilityAgentToolByName(
+    params: WatsonxAiMlVml_v1.PostUtilityAgentToolsRunByNameParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxUtilityAgentToolsRunResponse>> {
+    const _params = { ...params };
+    const _requiredParams = ['toolId', 'wxUtilityAgentToolsRunRequest'];
+    const _validParams = ['toolId', 'wxUtilityAgentToolsRunRequest', 'signal', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = _params.wxUtilityAgentToolsRunRequest;
+    const path = {
+      'tool_id': _params.toolId,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'runUtilityAgentToolByName'
+    );
+
+    const parameters = {
+      options: {
+        url: '/v1-beta/utility_agent_tools/run/{tool_id}',
+        method: 'POST',
+        body,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        serviceUrl: this.wxServiceUrl,
+        headers: {
+          ...sdkHeaders,
+          ...this.baseOptions.headers,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
 }
 
 /*************************
@@ -7417,6 +7643,27 @@ namespace WatsonxAiMlVml_v1 {
     spaceId?: string;
     /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
     projectId?: string;
+  }
+
+  /** Parameters for the `listUtilityAgentTools` operation. */
+  export interface GetUtilityAgentToolsParams extends DefaultParams {}
+
+  /** Parameters for the `getUtilityAgentTool` operation. */
+  export interface GetUtilityAgentToolParams extends DefaultParams {
+    /** Tool name. */
+    toolId: string;
+  }
+
+  /** Parameters for the `runUtilityAgentTool` operation. */
+  export interface PostUtilityAgentToolsRunParams extends DefaultParams {
+    wxUtilityAgentToolsRunRequest: WxUtilityAgentToolsRunRequest;
+  }
+
+  /** Parameters for the `runUtilityAgentToolByName` operation. */
+  export interface PostUtilityAgentToolsRunByNameParams extends DefaultParams {
+    /** Tool name. */
+    toolId: string;
+    wxUtilityAgentToolsRunRequest: WxUtilityAgentToolsRunRequest;
   }
 
   /*************************
@@ -9687,6 +9934,24 @@ namespace WatsonxAiMlVml_v1 {
     external_information?: ExternalInformation;
   }
 
+  /**
+   * UtilityAgentTool.
+   */
+  export interface UtilityAgentTool {
+    /** Name of the tool. */
+    name: string;
+    /** A plain text description of what the tool is used for. */
+    description: string;
+    /** The precise instruction to agent LLMs and should be treated as part of the system prompt. If not provided,
+     *  `description` can be used in it's place.
+     */
+    agent_description?: string;
+    /** The JSON schema of the input that is provided when running the tool if applicable. */
+    input_schema?: JsonObject;
+    /** The JSON schema of the config that can be provided when running the tool if applicable. */
+    config_schema?: JsonObject;
+  }
+
   /** WxPromptResponse. */
   export interface WxPromptResponse {
     /** The prompt's id. This value cannot be set. It is returned in responses only. */
@@ -9777,6 +10042,30 @@ namespace WatsonxAiMlVml_v1 {
   export interface WxPromptSessionEntryList {
     results?: WxPromptSessionEntryListResultsItem[];
     bookmark?: string;
+  }
+
+  /**
+   * WxUtilityAgentToolsResponse.
+   */
+  export interface WxUtilityAgentToolsResponse {
+    resources: UtilityAgentTool[];
+  }
+
+  /**
+   * WxUtilityAgentToolsRunRequest.
+   */
+  export interface WxUtilityAgentToolsRunRequest {
+    input: string | Record<string, any>;
+    tool_name: string;
+    config?: Record<string, any>;
+  }
+
+  /**
+   * WxUtilityAgentToolsRunResponse.
+   */
+  export interface WxUtilityAgentToolsRunResponse {
+    /** The output from running the tool. */
+    output: any;
   }
 
   /** The definition of an assistant message. */

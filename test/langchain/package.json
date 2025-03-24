@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
-    "@langchain/community": "^0.3.34",
+    "@langchain/community": "^0.3.36",
     "@langchain/core": "^0.3.19",
     "zod": "^3.24.2"
   },

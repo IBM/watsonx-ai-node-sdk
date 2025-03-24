@@ -24,6 +24,7 @@
     "types": [
       "node"
     ], /* Type declaration files to be included in compilation. */
+    "esModuleInterop": true
   },
   "exclude": ["./test/langchain", "./dist/**/*", "./examples/**/*"]
 }

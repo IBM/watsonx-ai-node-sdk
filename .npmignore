@@ -1,6 +1,6 @@
 test
 coverage
-.travis.yml
+.pipeline-config.yaml
 scripts/
 tslint.json
 .eslintrc.js

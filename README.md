@@ -1,6 +1,5 @@
-[![Build Status](https://app.travis-ci.com/IBM/watsonx-ai-node-sdk.svg?branch=main)](https://app.travis-ci.com/IBM/watsonx-ai-node-sdk)
 [![npm-version](https://img.shields.io/npm/v/@ibm-cloud/watsonx-ai.svg)](https://www.npmjs.com/package/@ibm-cloud/watsonx-ai)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+![NPM Downloads](https://img.shields.io/npm/dw/%40ibm-cloud%2Fwatsonx-ai)
 
 # IBM watsonx.ai Node.js SDK
 Node.js client library to interact with [IBM watsonx.ai service](https://dataplatform.cloud.ibm.com/docs/content/wsj/getting-started/overview-wx.html?context=wx).
@@ -29,11 +28,12 @@ Node.js client library to interact with [IBM watsonx.ai service](https://datapla
     - [With environment variables](#with-environment-variables)
       - [IAM authentication](#iam-authentication)
       - [Bearer token authentication](#bearer-token-authentication)
-      - [CP4D authentication](#cp4d-authentication)
+      - [IBM watsonx.ai software authentication](#ibm-watsonxai-software-authentication)
     - [With an external credentials file](#with-an-external-credentials-file)
     - [With programmatic approach](#with-programmatic-approach)
   - [Code examples](#code-examples)
     - [Basic example - text generation/inference](#basic-example---text-generationinference)
+    - [Lightweight engine](#lightweight-engine)
     - [More examples](#more-examples)
   - [Questions](#questions)
   - [Issues](#issues)
