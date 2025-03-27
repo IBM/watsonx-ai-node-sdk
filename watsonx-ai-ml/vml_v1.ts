@@ -6221,7 +6221,7 @@ namespace WatsonxAiMlVml_v1 {
     | 'float';
 
   export interface WatsonxToolJsonSchema {
-    type: WatsonxToolParamType | string;
+    type?: WatsonxToolParamType | string;
     title?: string;
     description?: string;
     pattern?: string;
