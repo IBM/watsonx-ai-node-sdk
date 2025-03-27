@@ -27,7 +27,7 @@ cd -
 # git checkout main
 TRACKED_FILES_TO_UPLOAD=$(git ls-files)
 for ITEM in ${TRACKED_FILES_TO_UPLOAD} ; do
-    cp -f "${ITEM}" "${PUBLIC_REPO_DIR}/${ITEM}"
+    cp -f --parents "${ITEM}" "${PUBLIC_REPO_DIR}"
 done
 
 cd "${PUBLIC_REPO_DIR}"
@@ -40,7 +40,7 @@ fi
 
 git status
 git add --all
-git commit -m "release: ${TAG}"
+git commit -m "release: ${TAG}" || echo "There was some issuie when commiting changes. Skipping..."
 git push -u origin main
 
 # Documentation branch
@@ -54,13 +54,13 @@ cd -
 git checkout gh-pages
 TRACKED_FILES_TO_UPLOAD=$(git ls-files)
 for ITEM in ${TRACKED_FILES_TO_UPLOAD} ; do
-    cp -f "${ITEM}" "${PUBLIC_REPO_DIR}/${ITEM}"
+    cp -f --parents "${ITEM}" "${PUBLIC_REPO_DIR}"
 done
 
 cd "${PUBLIC_REPO_DIR}"
 git status
 git add --all
-git commit -m "release: ${TAG}"
+git commit -m "release: ${TAG}" || echo "There was some issuie when commiting changes. Skipping..."
 git push -u origin gh-pages
 
 # Create git tag in public GitHub repository

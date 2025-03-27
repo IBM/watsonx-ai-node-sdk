@@ -40,5 +40,6 @@ rm -rf "${DOCS_DIR}"
 
 git status
 git add --all
-git commit -m "Documentation generated at ${GENERATION_TIMESTAMP}"
+git commit -m "Documentation generated at ${GENERATION_TIMESTAMP}" || \
+    echo "There was some issuie when commiting changes. Skipping..."
 git push

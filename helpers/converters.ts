@@ -3,16 +3,11 @@ import WatsonxAiMlVml_v1 = require('../watsonx-ai-ml/vml_v1');
 function convertUtilityToolToWatsonxTool(
   utilityTool: WatsonxAiMlVml_v1.UtilityAgentTool
 ): WatsonxAiMlVml_v1.TextChatParameterTools {
-  const { name, description, input_schema, config_schema } = utilityTool;
+  const { name, description, input_schema } = utilityTool;
 
   const parseParameters = (
-    input?: WatsonxAiMlVml_v1.JsonObject,
-    config?: WatsonxAiMlVml_v1.JsonObject
-  ) => {
-    if (config) {
-      config.properties.input = { type: 'string', description: 'Input for the tool' };
-      return config;
-    }
+    input?: WatsonxAiMlVml_v1.WatsonxToolJsonSchema
+  ): WatsonxAiMlVml_v1.WatsonxToolJsonSchema => {
     if (input) return input;
     return {
       properties: {
@@ -27,22 +22,23 @@ function convertUtilityToolToWatsonxTool(
     function: {
       name,
       description,
-      parameters: parseParameters(input_schema, config_schema),
+      parameters: parseParameters(input_schema),
     },
   };
   return tool;
 }
 
 function convertWatsonxToolCallToUtilityToolCall(
-  toolCall: WatsonxAiMlVml_v1.TextChatToolCall
+  toolCall: WatsonxAiMlVml_v1.TextChatToolCall,
+  config?: WatsonxAiMlVml_v1.JsonObject
 ): WatsonxAiMlVml_v1.WxUtilityAgentToolsRunRequest {
   const { name, arguments: stringifiedArguments } = toolCall.function;
   const jsonArguments: WatsonxAiMlVml_v1.JsonObject = JSON.parse(stringifiedArguments);
-  const { input, ...args } = jsonArguments;
+  const { input } = jsonArguments;
   return {
-    input: input ?? args,
+    input: input ?? jsonArguments,
     tool_name: name,
-    config: input ? args : {},
+    config,
   };
 }
 export = { convertUtilityToolToWatsonxTool, convertWatsonxToolCallToUtilityToolCall };

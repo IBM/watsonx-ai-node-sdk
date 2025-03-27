@@ -19,6 +19,7 @@
  */
 
 import helpers from './helpers/converters';
-const { convertUtilityToolToWatsonxTool, convertWatsonxToolCallToUtilityToolCall } = helpers;
+
 export import WatsonXAI = require('./watsonx-ai-ml/vml_v1');
+const { convertUtilityToolToWatsonxTool, convertWatsonxToolCallToUtilityToolCall } = helpers;
 export { convertUtilityToolToWatsonxTool, convertWatsonxToolCallToUtilityToolCall };

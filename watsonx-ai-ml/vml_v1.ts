@@ -6211,6 +6211,25 @@ namespace WatsonxAiMlVml_v1 {
     [key: string]: any;
   }
 
+  export type WatsonxToolParamType =
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'array'
+    | 'object'
+    | 'integer'
+    | 'float';
+
+  export interface WatsonxToolJsonSchema {
+    type: WatsonxToolParamType | string;
+    title?: string;
+    description?: string;
+    pattern?: string;
+    items?: WatsonxToolJsonSchema;
+    properties?: Record<string, WatsonxToolJsonSchema>;
+    [key: string]: any;
+  }
+
   /*************************
    * request interfaces
    ************************/
@@ -8817,7 +8836,7 @@ namespace WatsonxAiMlVml_v1 {
      *
      *  Omitting parameters defines a function with an empty parameter list.
      */
-    parameters?: JsonObject;
+    parameters?: WatsonxToolJsonSchema;
   }
 
   /** The chat tool parameters. */
@@ -9947,9 +9966,9 @@ namespace WatsonxAiMlVml_v1 {
      */
     agent_description?: string;
     /** The JSON schema of the input that is provided when running the tool if applicable. */
-    input_schema?: JsonObject;
+    input_schema?: WatsonxToolJsonSchema;
     /** The JSON schema of the config that can be provided when running the tool if applicable. */
-    config_schema?: JsonObject;
+    config_schema?: WatsonxToolJsonSchema;
   }
 
   /** WxPromptResponse. */
