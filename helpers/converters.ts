@@ -5,9 +5,7 @@ function convertUtilityToolToWatsonxTool(
 ): WatsonxAiMlVml_v1.TextChatParameterTools {
   const { name, description, input_schema } = utilityTool;
 
-  const parseParameters = (
-    input?: WatsonxAiMlVml_v1.WatsonxToolJsonSchema
-  ): WatsonxAiMlVml_v1.WatsonxToolJsonSchema => {
+  const parseParameters = (input?: WatsonxAiMlVml_v1.JsonObject): WatsonxAiMlVml_v1.JsonObject => {
     if (input) return input;
     return {
       properties: {
