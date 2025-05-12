@@ -38,7 +38,7 @@ const promptData = {
 const promptContentParams = {
   data: promptData,
   input: [['{input}', '']],
-  model_id: 'ibm/granite-20b-multilingual',
+  model_id: 'mistralai/mistral-large',
   model_parameters: textGenRequestParametersModel,
 };
 

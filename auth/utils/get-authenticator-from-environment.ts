@@ -25,6 +25,7 @@ import {
   NoAuthAuthenticator,
   readExternalSources,
 } from 'ibm-cloud-sdk-core';
+import { JWTRequestBaseAuthenticator } from './authenticators';
 
 /**
  * Look for external configuration of authenticator.
@@ -34,10 +35,14 @@ import {
  * 2. Environment variables
  * 3. VCAP Services (Cloud Foundry)
  *
- * @param serviceName - the service name prefix.
+ * @param {string} serviceName - the service name prefix.
+ * @param {() => Promise<string>} requestToken - function for requesting JWToken.
  *
  */
-export function getAuthenticatorFromEnvironment(serviceName: string): Authenticator {
+export function getAuthenticatorFromEnvironment(
+  serviceName: string,
+  requestToken?: () => Promise<string>
+): Authenticator {
   if (!serviceName) {
     throw new Error('Service name is required.');
   }
@@ -82,20 +87,37 @@ export function getAuthenticatorFromEnvironment(serviceName: string): Authentica
   // Compare the authType against our constants case-insensitively to
   // determine which authenticator type needs to be constructed.
   authType = authType.toLowerCase();
-
-  if (authType === Authenticator.AUTHTYPE_NOAUTH.toLowerCase()) {
-    authenticator = new NoAuthAuthenticator();
-  } else if (authType === Authenticator.AUTHTYPE_BASIC.toLowerCase()) {
-    authenticator = new BasicAuthenticator(credentials);
-  } else if (authType === Authenticator.AUTHTYPE_BEARERTOKEN.toLowerCase()) {
-    authenticator = new BearerTokenAuthenticator(credentials);
-  } else if (authType === Authenticator.AUTHTYPE_CP4D.toLowerCase()) {
-    credentials.url = credentials.url.concat('/icp4d-api/v1/authorize');
-    authenticator = new CloudPakForDataAuthenticator(credentials);
-  } else if (authType === Authenticator.AUTHTYPE_IAM.toLowerCase()) {
-    authenticator = new IamAuthenticator(credentials);
-  } else {
-    throw new Error(`Invalid value for AUTH_TYPE: ${authType}`);
+  if (requestToken && authType !== JWTRequestBaseAuthenticator.AUTHTYPE_ZEN) {
+    throw new Error('requestToken function is only valid for zen authentication');
+  }
+  switch (authType) {
+    case Authenticator.AUTHTYPE_NOAUTH:
+      authenticator = new NoAuthAuthenticator();
+      break;
+    case Authenticator.AUTHTYPE_BASIC:
+      authenticator = new BasicAuthenticator(credentials);
+      break;
+    case Authenticator.AUTHTYPE_BEARERTOKEN:
+      authenticator = new BearerTokenAuthenticator(credentials);
+      break;
+    case Authenticator.AUTHTYPE_CP4D:
+      credentials.url = credentials.url.concat('/icp4d-api/v1/authorize');
+      authenticator = new CloudPakForDataAuthenticator(credentials);
+      break;
+    case Authenticator.AUTHTYPE_IAM:
+      authenticator = new IamAuthenticator(credentials);
+      break;
+    case JWTRequestBaseAuthenticator.AUTHTYPE_ZEN:
+      console.log(!!requestToken);
+      if (requestToken) {
+        authenticator = new JWTRequestBaseAuthenticator(credentials, requestToken);
+      } else
+        throw new Error(
+          'requestToken function not provided. This function is necessary for zen authentication.'
+        );
+      break;
+    default:
+      throw new Error(`Invalid value for AUTH_TYPE: ${authType}`);
   }
 
   return authenticator;

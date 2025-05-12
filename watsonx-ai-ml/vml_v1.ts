@@ -112,14 +112,19 @@ class WatsonxAiMlVml_v1 extends BaseService {
    *
    */
 
-  public static newInstance(options: UserOptions): WatsonxAiMlVml_v1 {
+  public static newInstance(
+    options: UserOptions & WatsonxAiMlVml_v1.TokenAuthenticationOptions
+  ): WatsonxAiMlVml_v1 {
     options = options || {};
 
     if (!options.serviceName) {
       options.serviceName = this.DEFAULT_SERVICE_NAME;
     }
     if (!options.authenticator) {
-      options.authenticator = getAuthenticatorFromEnvironment(options.serviceName);
+      options.authenticator = getAuthenticatorFromEnvironment(
+        options.serviceName,
+        options.requestToken
+      );
     }
     if (!options.platformUrl) {
       options.platformUrl = readExternalSources(options.serviceName).platformUrl;
@@ -1430,6 +1435,96 @@ class WatsonxAiMlVml_v1 extends BaseService {
         headers: {
           ...sdkHeaders,
           'Accept': 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * List all prompts.
+   *
+   * This retrieves all prompts within the given project/space.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} [params.projectId] - [REQUIRED] Specifies the project ID as the target. One target must be supplied
+   * per request.
+   * @param {string} [params.spaceId] - [REQUIRED] Specifies the space ID as the target. One target must be supplied per
+   * request.
+   * @param {string} [params.limit] - The limit request body field can be specified to limit the number of assets in the search results. The default limit is 200. The maximum limit value is 200, and any greater value is ignored.
+   * @param {string} [params.counts] - Returns the number of query results for each unique value of each named field.
+   * @param {string} [params.drilldown] - Restrict results to documents with a dimension equal to the specified label. Note that, multiple values for a single key in a drilldown means an OR relation between them and there is an AND relation between multiple keys.
+   * @param {string} [params.bookmark] - Bookmark of the query result
+   * @param {string} [params.sort] - Sort order for the query
+   * @param {string} [params.include] - Entity
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.ListPromptsResponse>>}
+   *
+   * @category Prompts / Prompt Templates
+   */
+  public listPrompts(
+    params: WatsonxAiMlVml_v1.PromptListParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.ListPromptsResponse>> {
+    const _params = { ...params };
+    const _requiredParams: string[] = [];
+    const _validParams = [
+      'projectId',
+      'spaceId',
+      'query',
+      'limit',
+      'counts',
+      'drilldown',
+      'bookmark',
+      'sort',
+      'include',
+      'headers',
+      'signal',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+    };
+
+    const body = {
+      'query': 'asset.asset_type:wx_prompt',
+      'limit': _params.limit,
+      'counts': _params.counts,
+      'drilldown': _params.drilldown,
+      'bookmark': _params.bookmark,
+      'sort': _params.sort,
+      'include': _params.include,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'listPrompts'
+    );
+
+    const parameters = {
+      options: {
+        url: '/v2/asset_types/wx_prompt/search',
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        serviceUrl: this.wxServiceUrl.split('/wx')[0],
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
           ..._params.headers,
         },
         axiosOptions: {
@@ -6192,6 +6287,10 @@ namespace WatsonxAiMlVml_v1 {
     version: string;
   }
 
+  export interface TokenAuthenticationOptions {
+    requestToken?: () => Promise<string>;
+  }
+
   /** An operation response. */
   export interface Response<T = any> {
     result: T;
@@ -6535,6 +6634,29 @@ namespace WatsonxAiMlVml_v1 {
     spaceId?: string;
     /** Only return a set of model parameters compatiable with inferencing. */
     restrictModelParameters?: string;
+  }
+
+  export interface CatalogSearch {
+    /** The limit request body field can be specified to limit the number of assets in the search results.
+    The default limit is 200. The maximum limit value is 200, and any greater value is ignored. */
+    limit?: number;
+    /** Returns the number of query results for each unique value of each named field. */
+    counts?: string[];
+    /** Restrict results to documents with a dimension equal to the specified label. Note that, multiple values for a single key in a drilldown means an OR relation between them and there is an AND relation between multiple keys. */
+    drilldown?: Record<string, any>;
+    /** Bookmark of the query result */
+    bookmark?: string;
+    /** Sort order for the query */
+    sort?: string;
+    /** Entity */
+    include?: string;
+  }
+
+  export interface PromptListParams extends DefaultParams, CatalogSearch {
+    /** [REQUIRED] Specifies the project ID as the target. One target must be supplied per request. */
+    projectId?: string;
+    /** [REQUIRED] Specifies the space ID as the target. One target must be supplied per request. */
+    spaceId?: string;
   }
 
   /** Parameters for the `patchPrompt` operation. */
@@ -9991,6 +10113,22 @@ namespace WatsonxAiMlVml_v1 {
     }
   }
 
+  export interface CatalogSearchResponseAsset {
+    entity: Record<string, any>;
+    metadata: {
+      asset_id: string;
+      name: string;
+      description: string;
+      [key: string]: any;
+    };
+  }
+  export interface ListPromptsResponse {
+    /** Catalog Search Model */
+    next?: CatalogSearch;
+    total_rows?: number;
+    results?: CatalogSearchResponseAsset[];
+  }
+
   /** WxPromptSession. */
   export interface WxPromptSession {
     /** The prompt session's id. This value cannot be set. It is returned in responses only. */
@@ -11501,6 +11639,72 @@ namespace WatsonxAiMlVml_v1 {
      */
     public async getAll(): Promise<WatsonxAiMlVml_v1.ModelResource[]> {
       const results: ModelResource[] = [];
+      while (this.hasNext()) {
+        const nextPage = await this.getNext();
+        results.push(...nextPage);
+      }
+      return results;
+    }
+  }
+
+  /**
+   * ListPromptsPager can be used to simplify the use of listPrompts().
+   */
+  export class ListPromptsPager {
+    protected _hasNext: boolean;
+
+    protected client: WatsonxAiMlVml_v1;
+
+    protected params: WatsonxAiMlVml_v1.PromptListParams;
+
+    /**
+     * Construct a ListPromptsPager object.
+     *
+     * @param {WatsonxAiMlVml_v1}  client - The service client instance used to invoke listPrompts()
+     * @param {WatsonxAiMlVml_v1.PromptListParams} [params] - The parameters to be passed to listPrompts()
+     * @constructor
+     */
+    constructor(client: WatsonxAiMlVml_v1, params: WatsonxAiMlVml_v1.PromptListParams) {
+      this._hasNext = true;
+      this.client = client;
+      this.params = params;
+    }
+
+    /**
+     * Returns true if there are potentially more results to be retrieved by invoking getNext().
+     * @returns {boolean}
+     */
+    public hasNext(): boolean {
+      return this._hasNext;
+    }
+
+    /**
+     * Returns the next page of results by invoking listPrompts().
+     * @returns {Promise<WatsonxAiMlVml_v1.CatalogSearchResponseAsset[]>}
+     */
+    public async getNext(): Promise<WatsonxAiMlVml_v1.CatalogSearchResponseAsset[]> {
+      if (!this.hasNext()) {
+        throw new Error('No more results available');
+      }
+
+      const response = await this.client.listPrompts(this.params);
+      const { result } = response;
+
+      const { next } = result;
+      this.params = { ...this.params, ...next };
+      if (!next) {
+        this._hasNext = false;
+      }
+
+      return result.results || [];
+    }
+
+    /**
+     * Returns all results by invoking listPrompts() repeatedly until all pages of results have been retrieved.
+     * @returns {Promise<WatsonxAiMlVml_v1.CatalogSearchResponseAsset[]>}
+     */
+    public async getAll(): Promise<WatsonxAiMlVml_v1.CatalogSearchResponseAsset[]> {
+      const results: CatalogSearchResponseAsset[] = [];
       while (this.hasNext()) {
         const nextPage = await this.getNext();
         results.push(...nextPage);

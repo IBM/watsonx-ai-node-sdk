@@ -2656,6 +2656,192 @@ describe('WatsonxAiMlVml_v1', () => {
     });
   });
 
+  describe('listPrompt', () => {
+    describe('positive tests', () => {
+      function listPrompts() {
+        // Construct the params object for operation listPrompts
+        const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
+        const spaceId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
+        const query = 'test-query';
+        const limit = 20;
+        const counts = ['asset.tags', 'asset.asset_type'];
+        const drilldown = [
+          {
+            'asset.tags': ['tag1', 'untagged'],
+            'asset.asset_type': ['data_asset', 'job'],
+          },
+        ];
+        const bookmark = 'g1AAAXXXXXXXX';
+        const sort = 'asset.name<string>';
+        const include = 'entity';
+
+        const { signal } = new AbortController();
+        const fineTuningListParams = {
+          projectId,
+          spaceId,
+          limit,
+          query,
+          counts,
+          drilldown,
+          bookmark,
+          sort,
+          include,
+          signal,
+        };
+
+        const fineTuningListResult = watsonxAiMlService.listPrompts(fineTuningListParams);
+
+        // all methods should return a Promise
+        expectToBePromise(fineTuningListResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/v2/asset_types/wx_prompt/search', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        checkAxiosOptions(createRequestMock, signal);
+
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.body.limit).toEqual(limit);
+        expect(mockRequestOptions.body.query).toEqual('asset.asset_type:wx_prompt');
+        expect(mockRequestOptions.body.counts).toEqual(counts);
+        expect(mockRequestOptions.body.drilldown).toEqual(drilldown);
+        expect(mockRequestOptions.body.bookmark).toEqual(bookmark);
+        expect(mockRequestOptions.body.sort).toEqual(sort);
+        expect(mockRequestOptions.body.include).toEqual(include);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        listPrompts();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.enableRetries();
+        listPrompts();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAiMlService.disableRetries();
+        listPrompts();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const fineTuningListParams = {
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAiMlService.listPrompts(fineTuningListParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+
+      test('should not have any problems when no parameters are passed in', () => {
+        // invoke the method with no parameters
+        watsonxAiMlService.listFineTunings({});
+        checkForSuccessfulExecution(createRequestMock);
+      });
+    });
+
+    describe('ListPromptsPager tests', () => {
+      const serviceUrl = 'https://api.dataplatform.cloud.ibm.com';
+      const path = '/v2/asset_types/wx_prompt/search';
+      const singleResult = {
+        metadata: {
+          project_id: '12ac4cf1-252f-424b-b52d-5cdd9814987f',
+          sandbox_id: '12ac4cf1-252f-424b-b52d-5cdd9814987f',
+          is_linked_with_sub_container: false,
+          is_primary_attachment_downloadable: true,
+          name: 'prompt',
+          description: 'My Updated First Prompt',
+          asset_type: 'wx_prompt',
+          origin_country: 'us',
+          resource_key: 'ag8d2g38dg2de2pwdnpdwjjdp;w2d2wd',
+          rating: 0,
+          total_ratings: 0,
+          catalog_id: '12ac4cf1-252f-424b-b52d-5cdd9814987f',
+          created: 1743089973107,
+          created_at: '2025-03-27T15:39:33Z',
+          owner_id: 'weffwefwefwef-wef',
+          size: 169,
+          version: 0,
+          asset_state: '23847fgp2be39h2394f',
+          asset_id: '12ac4cf1-252f-424b-b52d-5cdd9814987f',
+          asset_category: 'USER',
+          creator_id: '23847fgp2be39h2394f',
+        },
+      };
+      const mockPagerResponse1 = {
+        next: {
+          query: 'asset.asset_type:wx_prompt',
+          limit: 1,
+          bookmark:
+            'XXXXXLKNOJXNANXOAONXIPBDUGVAPIDGADVIBDVAIBD:OABDOABDOABDOABDOABDILHABDLHAVDLALD',
+        },
+        total_rows: 2,
+        results: [singleResult],
+      };
+
+      const mockPagerResponse2 = {
+        total_rows: 2,
+        results: [singleResult],
+      };
+
+      beforeEach(() => {
+        unmock_createRequest();
+        const scope = nock(serviceUrl)
+          .post((uri) => uri.includes(path))
+          .reply(200, mockPagerResponse1)
+          .post((uri) => uri.includes(path))
+          .reply(200, mockPagerResponse2);
+      });
+
+      afterEach(() => {
+        nock.cleanAll();
+        mock_createRequest();
+      });
+
+      test('getNext()', async () => {
+        const params = {
+          projectId: '12ac4cf1-252f-424b-b52d-5cdd9814987f',
+          spaceId: '12ac4cf1-252f-424b-b52d-5cdd9814987f',
+          limit: 2,
+        };
+        const allResults = [];
+        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAiMlService, params);
+        while (pager.hasNext()) {
+          const nextPage = await pager.getNext();
+          expect(nextPage).not.toBeNull();
+          allResults.push(...nextPage);
+        }
+        expect(allResults).not.toBeNull();
+        expect(allResults).toHaveLength(2);
+      });
+
+      test('getAll()', async () => {
+        const params = {
+          projectId: '12ac4cf1-252f-424b-b52d-5cdd9814987f',
+          spaceId: '12ac4cf1-252f-424b-b52d-5cdd9814987f',
+          limit: 2,
+        };
+        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAiMlService, params);
+        const allResults = await pager.getAll();
+        expect(allResults).not.toBeNull();
+        expect(allResults).toHaveLength(2);
+      });
+    });
+  });
+
   describe('updatePromptLock', () => {
     describe('positive tests', () => {
       function __updatePromptLockTest() {

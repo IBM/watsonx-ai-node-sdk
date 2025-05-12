@@ -725,6 +725,48 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         expect(res.result).toBeDefined();
       });
 
+      test('listPrompts', async () => {
+        const params = {
+          'projectId': projectId,
+          'limit': 1,
+        };
+
+        const { result } = await watsonxAiMlService.listPrompts(params);
+
+        expect(result.results).toBeInstanceOf(Array);
+        expect(result.results).toHaveLength(1);
+      });
+
+      test('listPrompts via ListPromptsPager.getNext()', async () => {
+        const params = {
+          'projectId': projectId,
+          'limit': 20,
+        };
+
+        const allResults = [];
+
+        // Test getNext()
+        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAiMlService, params);
+        while (pager.hasNext()) {
+          const nextPage = await pager.getNext();
+          expect(nextPage).not.toBeNull();
+          allResults.push(...nextPage);
+        }
+        expect(allResults.length).toBeGreaterThanOrEqual(1);
+      });
+
+      test('listPrompts via ListPromptsPager.getAll()', async () => {
+        const params = {
+          'projectId': projectId,
+          'limit': 20,
+        };
+
+        // Test getAll()
+        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAiMlService, params);
+        const allResults = await pager.getAll();
+        expect(allResults.length).toBeGreaterThanOrEqual(1);
+      });
+
       test('updatePromptLock', async () => {
         const params = {
           promptId,
