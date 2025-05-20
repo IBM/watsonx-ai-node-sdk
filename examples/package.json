@@ -61,13 +61,14 @@
   },
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
-    "@langchain/community": "^0.3.36",
+    "@langchain/community": "^0.3.43",
     "@langchain/core": "^0.3.19",
     "@langchain/langgraph": "^0.2.57",
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.25.0",
     "@zilliz/milvus2-sdk-node": "^2.5.0",
     "axios": "^1.7.8",
+    "cheerio": "^1.0.0",
     "dotenv": "^16.4.5",
     "duck-duck-scrape": "^2.2.6",
     "eslint": "^9.21.0",
@@ -76,7 +77,7 @@
     "eslint-plugin-jest": "^28.11.0",
     "eslint-plugin-jsdoc": "^50.6.3",
     "eslint-plugin-prettier": "^5.2.3",
-    "langchain": "^0.3.6",
+    "langchain": "^0.3.26",
     "zod": "^3.23.8"
   },
   "devDependencies": {

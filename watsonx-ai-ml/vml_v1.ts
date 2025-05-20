@@ -23,7 +23,6 @@
 
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
 import {
-  Authenticator,
   BaseService,
   UserOptions,
   constructServiceUrl,
@@ -39,6 +38,7 @@ import {
   transformStreamToObjectStream,
   transformStreamToStringStream,
 } from '../lib/common';
+import { RequestTokenResponse } from '../auth/utils/authenticators';
 /**
  * SDK entrypoint for IBM watsonx.ai product
  *
@@ -6288,7 +6288,7 @@ namespace WatsonxAiMlVml_v1 {
   }
 
   export interface TokenAuthenticationOptions {
-    requestToken?: () => Promise<string>;
+    requestToken?: () => Promise<RequestTokenResponse>;
   }
 
   /** An operation response. */

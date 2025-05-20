@@ -21,8 +21,14 @@ import {
 } from 'ibm-cloud-sdk-core';
 import { BaseOptions } from 'ibm-cloud-sdk-core/es/auth/authenticators/token-request-based-authenticator-immutable';
 
+export interface RequestTokenResponse {
+  result: {
+    access_token: string;
+  };
+}
+
 export class RequestFunctionJWTTokenManager extends JwtTokenManager {
-  constructor(options: JwtTokenManagerOptions, requestToken: () => Promise<any>) {
+  constructor(options: JwtTokenManagerOptions, requestToken: () => Promise<RequestTokenResponse>) {
     super(options);
     super.requestToken = requestToken;
   }
@@ -33,7 +39,7 @@ export class JWTRequestBaseAuthenticator extends TokenRequestBasedAuthenticator 
 
   protected tokenManager: RequestFunctionJWTTokenManager;
 
-  constructor(options: BaseOptions, requestToken: () => Promise<any>) {
+  constructor(options: BaseOptions, requestToken: () => Promise<RequestTokenResponse>) {
     super(options);
     this.tokenManager = new RequestFunctionJWTTokenManager(options, requestToken);
   }

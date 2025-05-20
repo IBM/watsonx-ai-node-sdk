@@ -25,7 +25,7 @@ import {
   NoAuthAuthenticator,
   readExternalSources,
 } from 'ibm-cloud-sdk-core';
-import { JWTRequestBaseAuthenticator } from './authenticators';
+import { JWTRequestBaseAuthenticator, RequestTokenResponse } from './authenticators';
 
 /**
  * Look for external configuration of authenticator.
@@ -36,12 +36,12 @@ import { JWTRequestBaseAuthenticator } from './authenticators';
  * 3. VCAP Services (Cloud Foundry)
  *
  * @param {string} serviceName - the service name prefix.
- * @param {() => Promise<string>} requestToken - function for requesting JWToken.
+ * @param {() => Promise<RequestTokenResponse>} requestToken - function for requesting JWToken.
  *
  */
 export function getAuthenticatorFromEnvironment(
   serviceName: string,
-  requestToken?: () => Promise<string>
+  requestToken?: () => Promise<RequestTokenResponse>
 ): Authenticator {
   if (!serviceName) {
     throw new Error('Service name is required.');
@@ -108,7 +108,6 @@ export function getAuthenticatorFromEnvironment(
       authenticator = new IamAuthenticator(credentials);
       break;
     case JWTRequestBaseAuthenticator.AUTHTYPE_ZEN:
-      console.log(!!requestToken);
       if (requestToken) {
         authenticator = new JWTRequestBaseAuthenticator(credentials, requestToken);
       } else
