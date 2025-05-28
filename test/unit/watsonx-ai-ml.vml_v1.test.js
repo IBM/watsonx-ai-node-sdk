@@ -25,6 +25,7 @@ const get_authenticator_from_environment = require('../../dist/auth/utils/get-au
 
 const { NoAuthAuthenticator } = sdkCorePackage;
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
+const { checkAxiosOptions } = require('./utils/checks');
 
 const {
   getOptions,
@@ -34,10 +35,6 @@ const {
   checkForSuccessfulExecution,
 } = unitTestUtils;
 
-function checkAxiosOptions(createRequestMock, signal) {
-  const { axiosOptions } = createRequestMock.mock.calls[0][0].defaultOptions;
-  expect(axiosOptions.signal).toEqual(signal);
-}
 const watsonxAiMlServiceOptions = {
   authenticator: new NoAuthAuthenticator(),
   url: 'https://us-south.ml.cloud.ibm.com',

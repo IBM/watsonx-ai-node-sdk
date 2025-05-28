@@ -18,29 +18,6 @@ const jwt = require('jsonwebtoken');
 
 const SECRET_KEY = 'your-very-secure-secret-key';
 
-class MockingRequest {
-  constructor(moduleInstance, functionName) {
-    this.createRequestMock = null;
-    this.moduleInstance = moduleInstance;
-    this.functionName = functionName;
-  }
-
-  mock(response) {
-    if (response)
-      this.createRequestMock = jest
-        .spyOn(this.moduleInstance, this.functionName)
-        .mockImplementation(async () => response);
-    else this.createRequestMock = jest.spyOn(this.moduleInstance, this.functionName);
-  }
-
-  unmock() {
-    if (this.createRequestMock) {
-      this.createRequestMock.mockRestore();
-    }
-    this.createRequestMock = null;
-  }
-}
-
 const generateJWT = (payload, validationTime) =>
   jwt.sign(payload, SECRET_KEY, { expiresIn: validationTime });
 
@@ -50,4 +27,4 @@ const requestAdminToken = async (time = '1m') => ({
   },
 });
 
-module.exports = { generateJWT, requestAdminToken, MockingRequest };
+module.exports = { generateJWT, requestAdminToken };

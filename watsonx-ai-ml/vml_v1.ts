@@ -73,6 +73,8 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
   static wxServiceUrl: string;
 
+  static serviceUrl: string;
+
   /**
    * Constructs a service URL by formatting the parameterized service URL.
    *
@@ -144,6 +146,8 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
   wxServiceUrl: string;
 
+  serviceUrl: string;
+
   /**
    * Construct a WatsonxAiMlVml_v1 object.
    *
@@ -179,10 +183,14 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
     if (options.platformUrl) {
       this.wxServiceUrl = options.platformUrl.concat('/wx');
+      this.serviceUrl = options.platformUrl;
     } else if (Object.keys(PLATFORM_URLS_MAP).includes(this.baseOptions.serviceUrl)) {
       this.wxServiceUrl = PLATFORM_URLS_MAP[this.baseOptions.serviceUrl as PlatformUrlKeys];
+      [this.serviceUrl] =
+        PLATFORM_URLS_MAP[this.baseOptions.serviceUrl as PlatformUrlKeys].split('/wx');
     } else {
       this.wxServiceUrl = this.baseOptions.serviceUrl.concat('/wx');
+      this.serviceUrl = this.baseOptions.serviceUrl;
     }
 
     this.version = options.version;
@@ -1520,7 +1528,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       },
       defaultOptions: {
         ...this.baseOptions,
-        serviceUrl: this.wxServiceUrl.split('/wx')[0],
+        serviceUrl: this.serviceUrl,
         headers: {
           ...sdkHeaders,
           'Accept': 'application/json',
@@ -6274,6 +6282,386 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
     return this.createRequest(parameters);
   }
+
+  /*************************
+   * Spaces
+   ************************/
+
+  /**
+   * Create a new space.
+   *
+   * Creates a new space to scope other assets.
+   * Authorized user must have the following roles (see https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-iams):
+   * - Platform management role: Administrator
+   * - Service access role: Manager
+   *
+   * On Public Cloud, user is required to provide Cloud Object Storage instance details in the 'storage' property.
+   * On private CPD installations, the default storage is used instead.
+   *
+   * @param {CreateSpaceRequest} params - The parameters to send to the service.
+   * @param {string} params.name - Name of space.
+   * @param {string} [params.description] - Description of space.
+   * @param {CreateSpaceStorage} [params.storage] - Cloud Object Storage instance is required for spaces created on Public Cloud.
+   * On private CPD installations, the default storage is used instead. This flag is not supported on CPD.
+   * @param {CreateSpaceCompute[]} [params.compute] - This flag is not supported on CPD.
+   * @param {string[]} [params.tags] - User-defined tags associated with a space.
+   * @param {string} [params.generator] - A consistent label used to identify a client that created a space.
+   * A generator must be comprised of the following characters - alphanumeric, dash, underscore, space.
+   * @param {CreateSpaceStage} [params.stage] - Space production and stage name.
+   * @param {string} [params.type] - Space type.
+   * @param {CreateSpaceSettings} [params.settings] - Space settings.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<CloudantV1.Response<WatsonxAiMlVml_v1.SpaceResource>>}
+   */
+
+  public createSpace(
+    params: WatsonxAiMlVml_v1.CreateSpaceParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SpaceResource>> {
+    const _params = { ...params };
+    const _requiredParams = this.wxServiceUrl.includes('.cloud.ibm.com')
+      ? ['name', 'storage']
+      : ['name'];
+    const _validParams = [
+      'name',
+      'description',
+      'storage',
+      'compute',
+      'tags',
+      'generator',
+      'stage',
+      'type',
+      'settings',
+      'headers',
+      'signal',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const path = {
+      name: _params.name,
+    };
+
+    const body = {
+      'name': _params.name,
+      'description': _params.description,
+      'storage': _params.storage,
+      'compute': _params.compute,
+      'tags': _params.tags,
+      'generator': _params.generator,
+      'stage': _params.stage,
+      'type': _params.type,
+      'settings': _params.settings,
+    };
+
+    const sdkHeaders = getSdkHeaders(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME, 'v2', 'createSpace');
+
+    const parameters = {
+      options: {
+        url: '/v2/spaces',
+        method: 'POST',
+        body,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        serviceUrl: this.serviceUrl,
+        headers: {
+          ...sdkHeaders,
+          ...this.baseOptions.headers,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Retrieve the space.
+   *
+   * Retrieves the space with the specified identifier.
+   *
+   * @param {GetSpaceParams} [params] - The parameters to send to the service.
+   * @param {string} params.spaceId - The space identification.
+   * @param {string} [params.include] - A list of comma-separated space sections to include in the query results.
+   * Example: '?include=members'.
+   * Available fields:
+   * * members (returns up to 100 members)
+   * * nothing (does not return space entity and metadata)
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.Space>>}
+   */
+
+  public getSpace(
+    params?: WatsonxAiMlVml_v1.GetSpaceParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SpaceResource>> {
+    const _params = { ...params };
+    const _requiredParams = ['spaceId'];
+    const _validParams = ['spaceId', 'include', 'headers', 'signal'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      include: _params.include,
+    };
+
+    const path = {
+      'space_id': _params.spaceId,
+    };
+
+    const sdkHeaders = getSdkHeaders(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME, 'v2', 'getSpace');
+
+    const parameters = {
+      options: {
+        url: `/v2/spaces/{space_id}`,
+        method: 'GET',
+        path,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        serviceUrl: this.serviceUrl,
+        headers: {
+          ...sdkHeaders,
+          ...this.baseOptions.headers,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Delete the space.
+   *
+   * Deletes the space with the specified identifier.
+   *
+   * @param {DeleteSpaceParams} params - The parameters to send to the service.
+   * @param {string} params.spaceId - The space identification.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
+   */
+  public deleteSpace(
+    params?: WatsonxAiMlVml_v1.DeleteSpaceParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
+    const _params = { ...params };
+    const _requiredParams = ['spaceId'];
+    const _validParams = ['spaceId', 'headers', 'signal'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const path = {
+      space_id: _params.spaceId,
+    };
+
+    const sdkHeaders = getSdkHeaders(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME, 'v2', 'deleteSpace');
+
+    const parameters = {
+      options: {
+        url: `/v2/spaces/{space_id}`,
+        method: 'DELETE',
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        serviceUrl: this.serviceUrl,
+        headers: {
+          ...sdkHeaders,
+          ...this.baseOptions.headers,
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  // Assisted by watsonx Code Assistant
+
+  /**
+   * Update the space.
+   *
+   * Partially update this space.
+   * Allowed paths are:
+   *  - /name
+   *  - /description
+   *  - /compute
+   *  - /stage/name
+   *  - /type
+   *  - /settings/folders/enabled
+   *  - /settings/access_restrictions/reporting/authorized
+   *
+   * @param {WatsonxAiMlVml_v1.SpacePatchParams} params - The parameters to send to the service.
+   * @param {string} [param.spaceId] - The space identification.
+   * @param {WatsonxAiMlVml_v1.JsonPatchOperation} [params.jsonPatch] - The patch operation.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.Space>>}
+   */
+
+  public updateSpace(
+    params: WatsonxAiMlVml_v1.SpacePatchParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SpaceResource>> {
+    const _params = { ...params };
+    const _requiredParams = ['spaceId', 'jsonPatch'];
+    const _validParams = ['spaceId', 'jsonPatch', 'headers', 'signal'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const path = {
+      space_id: _params.spaceId,
+    };
+
+    const body = _params.jsonPatch;
+
+    const sdkHeaders = getSdkHeaders(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME, 'v2', 'updateSpace');
+
+    const parameters = {
+      options: {
+        url: `/v2/spaces/{space_id}`,
+        method: 'PATCH',
+        path,
+        body,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        serviceUrl: this.serviceUrl,
+        headers: {
+          ...sdkHeaders,
+          ...this.baseOptions.headers,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json-patch+json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Retrieve the spaces.
+   *
+   * Retrieves the space list.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} [params.start] - Token representing first resource.
+   * @param {number} [params.limit] - The number of resources returned. Default value is 100. Max value is 200.
+   * @param {boolean} [params.totalCount] - Include details about total number of resources. This flag is not supported on CPD 3.0.1.
+   * @param {string} [params.id] - Comma-separated list of ids to be returned. This flag is not supported on CPD 3.0.1.
+   * @param {string} [params.tags] - A list of comma-separated, user-defined tags to use to filter the query results.
+   * @param {string} [params.include] - A list of comma-separated space sections to include in the query results. Example: '?include=members'.
+   * Available fields:
+   * * members (returns up to 100 members)
+   * * nothing (does not return space entity and metadata)
+   * @param {string} [params.member] - Filters the result list to only include spaces where the user with a matching user id is a member.
+   * @param {string} [params.roles] - Must be used in conjunction with the member query parameter. Filters the result set to include only spaces where the specified member has one of the roles specified.
+   * Values:
+   * * admin
+   * * editor
+   * * viewer
+   * @param {string} [params.bssAccountId] - Filtering by bss_account_id is allowed only for accredited services.
+   * @param {string} [params.name] - Filters the result list to only include space with specified name.
+   * @param {string} [params.subName] - Filters the result list to only include spaces which name contains specified case-insensitive substring.
+   * @param {string} [params.compute.crn] - Filters the result list to only include spaces with specified compute.crn.
+   * @param {string} [params.type] - Filters the result list to only include space with specified type.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SpaceResources>>}
+   *
+   * @category Spaces
+   */
+
+  public listSpaces(
+    params?: WatsonxAiMlVml_v1.ListSpacesParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SpaceResources>> {
+    const _params = { ...params };
+    const _requiredParams: string[] = [];
+    const _validParams = [
+      'start',
+      'limit',
+      'totalCount',
+      'id',
+      'tags',
+      'include',
+      'member',
+      'roles',
+      'bssAccountId',
+      'name',
+      'subName',
+      'computeCrn',
+      'type',
+      'headers',
+      'signal',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'start': _params.start,
+      'limit': _params.limit,
+      'total_count': _params.totalCount,
+      'id': _params.id,
+      'tags': _params.tags,
+      'include': _params.include,
+      'member': _params.member,
+      'roles': _params.roles,
+      'bss_account_id': _params.bssAccountId,
+      'name': _params.name,
+      'sub_name': _params.subName,
+      'compute.crn': _params.computeCrn,
+      'type': _params.type,
+    };
+
+    const sdkHeaders = getSdkHeaders(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME, 'v2', 'listSpaces');
+
+    const parameters = {
+      options: {
+        url: '/v2/spaces',
+        method: 'GET',
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        serviceUrl: this.serviceUrl,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
 }
 
 /*************************
@@ -7786,6 +8174,84 @@ namespace WatsonxAiMlVml_v1 {
     /** Tool name. */
     toolId: string;
     wxUtilityAgentToolsRunRequest: WxUtilityAgentToolsRunRequest;
+  }
+
+  export interface ListSpacesParams extends DefaultParams {
+    start?: string;
+    limit?: number;
+    totalCount?: boolean;
+    id?: string;
+    tags?: string;
+    include?: string;
+    member?: string;
+    roles?: string;
+    bssAccountId?: string;
+    name?: string;
+    subName?: string;
+    computeCrn?: string;
+    type?: string;
+  }
+
+  export interface CreateSpaceParams extends DefaultParams {
+    name: string;
+    description?: string;
+    storage?: SpaceStorage;
+    compute?: SpaceCompute[];
+    tags?: string[];
+    generator?: string;
+    stage?: SpaceStage;
+    type?: string;
+    settings?: SpaceSettings;
+  }
+
+  export interface SpaceStorage {
+    resource_crn: string;
+    delegated?: boolean;
+    plan_id?: string;
+  }
+
+  export interface SpaceCompute {
+    name: string;
+    crn: string;
+  }
+
+  export interface SpaceStage {
+    production?: boolean;
+    name?: string;
+  }
+
+  export interface SpaceSettings {
+    folders?: {
+      enabled?: boolean;
+    };
+    access_restrictions?: {
+      reporting?: {
+        authorized?: boolean;
+      };
+    };
+  }
+
+  export interface SpaceMember {
+    role: string;
+    id: string;
+    state: string;
+    type: string;
+  }
+
+  export interface GetSpaceParams extends DefaultParams {
+    spaceId: string;
+    include?: string;
+  }
+
+  export interface DeleteSpaceParams extends DefaultParams {
+    spaceId: string;
+  }
+
+  export type SpacePatchOperation = 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test';
+
+  export interface SpacePatchParams extends DefaultParams {
+    spaceId: string;
+    jsonPatch: JsonPatchOperation;
   }
 
   /*************************
@@ -11146,6 +11612,56 @@ namespace WatsonxAiMlVml_v1 {
     }
   }
 
+  export interface ErrorResponse {
+    code: string;
+    message: string;
+    paramteters?: string[];
+    more_info?: string;
+  }
+
+  export interface SpaceResource {
+    metadata: {
+      id: string;
+      url: string;
+      creator_id: string;
+      created_at: string;
+      updated_at: string;
+    };
+    entity: {
+      name: string;
+      scope: {
+        bss_account_id: string;
+      };
+      status: {
+        state: string;
+        failure?: {
+          trace: string;
+          errors: ErrorResponse[];
+        };
+      };
+      stage: SpaceStage;
+      type: string;
+      settings: SpaceSettings;
+      description?: string;
+      storage?: SpaceStorage;
+      compute?: SpaceCompute[];
+      members?: SpaceMember[];
+      tags?: string[];
+      generator?: string;
+    };
+  }
+  export interface SpaceResources {
+    total_count?: number;
+    limit: number;
+    first: {
+      href: string;
+    };
+    next?: {
+      href: string;
+    };
+    resources: SpaceResource[];
+  }
+
   /*************************
    * pager classes
    ************************/
@@ -11705,6 +12221,79 @@ namespace WatsonxAiMlVml_v1 {
      */
     public async getAll(): Promise<WatsonxAiMlVml_v1.CatalogSearchResponseAsset[]> {
       const results: CatalogSearchResponseAsset[] = [];
+      while (this.hasNext()) {
+        const nextPage = await this.getNext();
+        results.push(...nextPage);
+      }
+      return results;
+    }
+  }
+
+  /**
+   * ListSpacesPager can be used to simplify the use of listSpaces().
+   */
+  export class ListSpacesPager {
+    protected _hasNext: boolean;
+
+    protected client: WatsonxAiMlVml_v1;
+
+    protected params: WatsonxAiMlVml_v1.ListSpacesParams;
+
+    /**
+     * Construct a ListPromptsPager object.
+     *
+     * @param {WatsonxAiMlVml_v1}  client - The service client instance used to invoke listPrompts()
+     * @param {WatsonxAiMlVml_v1.ListSpacesParams} [params] - The parameters to be passed to listPrompts()
+     * @constructor
+     */
+    constructor(client: WatsonxAiMlVml_v1, params?: WatsonxAiMlVml_v1.PromptListParams) {
+      this._hasNext = true;
+      this.client = client;
+      this.params = params || {};
+    }
+
+    /**
+     * Returns true if there are potentially more results to be retrieved by invoking getNext().
+     * @returns {boolean}
+     */
+    public hasNext(): boolean {
+      return this._hasNext;
+    }
+
+    /**
+     * Returns the next page of results by invoking listSpaces().
+     * @returns {Promise<WatsonxAiMlVml_v1.SpaceResource[]>}
+     */
+    public async getNext(): Promise<WatsonxAiMlVml_v1.SpaceResource[]> {
+      if (!this.hasNext()) {
+        throw new Error('No more results available');
+      }
+
+      const response = await this.client.listSpaces(this.params);
+
+      const {
+        result: { next, resources },
+      } = response;
+
+      if (!next) {
+        this._hasNext = false;
+      } else {
+        const urlObject = new URL(next.href);
+        const searchParams = new URLSearchParams(urlObject.searchParams);
+        const startParam = searchParams.get('start');
+        if (startParam) this.params = { ...this.params, start: startParam };
+        else throw new Error("'start' param is not present in provided url");
+      }
+
+      return resources;
+    }
+
+    /**
+     * Returns all results by invoking listPrompts() repeatedly until all pages of results have been retrieved.
+     * @returns {Promise<WatsonxAiMlVml_v1.SpaceResource[]>}
+     */
+    public async getAll(): Promise<WatsonxAiMlVml_v1.SpaceResource[]> {
+      const results: SpaceResource[] = [];
       while (this.hasNext()) {
         const nextPage = await this.getNext();
         results.push(...nextPage);

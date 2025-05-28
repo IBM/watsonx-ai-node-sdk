@@ -1509,7 +1509,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   describe('Toolkits', () => {
     test('listUtilityAgentTools()', async () => {
       const res = await watsonxAiMlService.listUtilityAgentTools();
-      console.log(res.result);
+      console.log(res.result.resources[0].input_schema);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1532,7 +1532,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       // WxUtilityAgentToolsRunRequestUtilityAgentToolUnstructuredInput
       const wxUtilityAgentToolsRunRequestModel = {
         tool_name: 'GoogleSearch',
-        input: 'What was the weather in Toronto on January 13th 2025?',
+        input: { q: 'What was the weather in Toronto on January 13th 2025?' },
         config: { maxResults: 3 },
       };
 
@@ -1552,7 +1552,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       // WxUtilityAgentToolsRunRequestUtilityAgentToolUnstructuredInput
       const wxUtilityAgentToolsRunRequestModel = {
         tool_name: 'GoogleSearch',
-        input: 'What is a project?',
+        input: { q: 'What is a project?' },
         config: {
           projectId,
         },

@@ -16,4 +16,33 @@
 
 const wait = (timeout) => new Promise((resolve) => setTimeout(resolve, timeout));
 
-module.exports = { wait };
+class MockingRequest {
+  constructor(moduleInstance, functionName) {
+    this.functionMock = null;
+    this.moduleInstance = moduleInstance;
+    this.functionName = functionName;
+  }
+
+  mock(response) {
+    if (response)
+      this.functionMock = jest
+        .spyOn(this.moduleInstance, this.functionName)
+        .mockImplementation(async () => response);
+    else this.functionMock = jest.spyOn(this.moduleInstance, this.functionName);
+  }
+
+  unmock() {
+    if (this.functionMock) {
+      this.functionMock.mockRestore();
+      this.functionMock = null;
+    }
+  }
+
+  clearMock() {
+    if (this.functionMock) {
+      this.functionMock.mockClear();
+    }
+  }
+}
+
+module.exports = { wait, MockingRequest };

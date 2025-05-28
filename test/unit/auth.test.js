@@ -17,7 +17,7 @@
 /* eslint-disable no-await-in-loop */
 const WatsonxAIMLv1 = require('../../dist/watsonx-ai-ml/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
-const { MockingRequest } = require('../utils/auth.js');
+const { MockingRequest } = require('../utils/utils.js');
 const auth = require('../utils/auth.js');
 const { wait } = require('../utils/utils.js');
 
@@ -57,9 +57,15 @@ const requestTokenMocker = new MockingRequest(auth, 'requestAdminToken');
 
 describe('Zen authentication', () => {
   describe('Positive tests', () => {
-    test('Multiple calls with valid token', async () => {
+    let requestTokenMock;
+    beforeEach(() => {
       requestTokenMocker.mock();
-
+      requestTokenMock = requestTokenMocker.functionMock;
+    });
+    afterEach(() => {
+      requestTokenMocker.clearMock();
+    });
+    test('Multiple calls with valid token', async () => {
       const instance = WatsonxAIMLv1.newInstance({
         version: '2024-05-31',
         serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
@@ -67,17 +73,15 @@ describe('Zen authentication', () => {
       });
 
       expect(instance).toBeDefined();
-      expect(auth.requestAdminToken).toHaveBeenCalledTimes(0);
+      expect(requestTokenMock).toHaveBeenCalledTimes(0);
 
       const chatFirstCall = instance.textChat(textChatParams);
       expect(chatFirstCall).toBeInstanceOf(Promise);
-      expect(auth.requestAdminToken).toHaveBeenCalledTimes(1);
+      expect(requestTokenMock).toHaveBeenCalledTimes(1);
 
       const chatSecondCall = instance.textChat(textChatParams);
       expect(chatSecondCall).toBeInstanceOf(Promise);
-      expect(auth.requestAdminToken).toHaveBeenCalledTimes(1);
-
-      requestTokenMocker.unmock();
+      expect(requestTokenMock).toHaveBeenCalledTimes(1);
     });
 
     test('Multiple calls each after token has expired', async () => {
@@ -90,16 +94,14 @@ describe('Zen authentication', () => {
       });
 
       expect(instance).toBeDefined();
-      expect(auth.requestAdminToken).toHaveBeenCalledTimes(0);
+      expect(requestTokenMock).toHaveBeenCalledTimes(0);
 
       for (let i = 1; i <= 3; i += 1) {
         const chatFirstCall = instance.textChat(textChatParams);
         expect(chatFirstCall).toBeInstanceOf(Promise);
-        expect(auth.requestAdminToken).toHaveBeenCalledTimes(i);
+        expect(requestTokenMock).toHaveBeenCalledTimes(i);
         await wait(tokenValidationTime + 10);
       }
-
-      requestTokenMocker.unmock();
     });
   });
   describe('Negative tests', () => {
@@ -109,6 +111,7 @@ describe('Zen authentication', () => {
           access_token: 'NotAJWT.not_a_token.def_not_a_token',
         },
       });
+      const requestTokenMock = requestTokenMocker.functionMock;
 
       const instance = WatsonxAIMLv1.newInstance({
         version: '2024-05-31',
@@ -117,12 +120,12 @@ describe('Zen authentication', () => {
       });
 
       expect(instance).toBeDefined();
-      expect(auth.requestAdminToken).toHaveBeenCalledTimes(0);
+      expect(requestTokenMock).toHaveBeenCalledTimes(0);
 
       const chatCall = instance.textChat(textChatParams);
       expect(chatCall).toBeInstanceOf(Promise);
       await expect(chatCall).rejects.toThrow('Access token received is not a valid JWT');
-      expect(auth.requestAdminToken).toHaveBeenCalledTimes(1);
+      expect(requestTokenMock).toHaveBeenCalledTimes(1);
 
       requestTokenMocker.unmock();
     });
