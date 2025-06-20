@@ -20,16 +20,18 @@
 
 const { Readable, addAbortSignal } = require('node:stream');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
+const path = require('path');
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
 const testHelper = require('../resources/test-helper.js');
 const { Stream } = require('../../dist/lib/common.js');
+const { chatModel } = require('./config.js');
 
 // testcase timeout value (200s).
 const timeout = 200000;
 
 // Location of our config file.
-const configFile = 'credentials/watsonx_ai_ml_vml_v1.env';
+const configFile = path.resolve(__dirname, '../../credentials/watsonx_ai_ml_vml_v1.env');
 
 const describe = authHelper.prepareTests(configFile);
 authHelper.loadEnv();
@@ -54,7 +56,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   jest.setTimeout(timeout);
 
   // Service instance
-  let watsonxAiMlService;
+  let watsonxAIService;
   // Generate and log the time series data
   const timeSeriesData = testHelper.generateTimeSeries();
   const timeSeriesModelId = 'ibm/granite-ttm-512-96-r2';
@@ -65,17 +67,17 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   };
 
   beforeAll(async () => {
-    watsonxAiMlService = WatsonxAiMlVml_v1.newInstance({
+    watsonxAIService = WatsonxAiMlVml_v1.newInstance({
       serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
       version: '2024-03-14',
     });
 
-    expect(watsonxAiMlService).not.toBeNull();
+    expect(watsonxAIService).not.toBeNull();
 
     const config = readExternalSources(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME);
     expect(config).not.toBeNull();
 
-    watsonxAiMlService.enableRetries();
+    watsonxAIService.enableRetries();
   });
 
   describe('List resources', () => {
@@ -86,7 +88,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         techPreview: false,
       };
 
-      const res = await watsonxAiMlService.listFoundationModelSpecs(params);
+      const res = await watsonxAIService.listFoundationModelSpecs(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -102,7 +104,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const allResults = [];
 
       // Test getNext().
-      let pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
+      let pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAIService, params);
       while (pager.hasNext()) {
         const nextPage = await pager.getNext();
         expect(nextPage).not.toBeNull();
@@ -110,11 +112,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
 
       // Test getAll().
-      pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
+      pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAIService, params);
       const allItems = await pager.getAll();
       expect(allItems).not.toBeNull();
       expect(allItems).toHaveLength(allResults.length);
-      console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
     });
 
     test('listFoundationModelTasks()', async () => {
@@ -122,7 +123,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         limit: 50,
       };
 
-      const res = await watsonxAiMlService.listFoundationModelTasks(params);
+      const res = await watsonxAIService.listFoundationModelTasks(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -136,7 +137,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const allResults = [];
 
       // Test getNext().
-      let pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAiMlService, params);
+      let pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAIService, params);
       while (pager.hasNext()) {
         const nextPage = await pager.getNext();
         expect(nextPage).not.toBeNull();
@@ -144,11 +145,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
 
       // Test getAll().
-      pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAiMlService, params);
+      pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAIService, params);
       const allItems = await pager.getAll();
       expect(allItems).not.toBeNull();
       expect(allItems).toHaveLength(allResults.length);
-      console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
     });
   });
 
@@ -249,13 +249,13 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const params = {
         input:
           'Generate a marketing email advertising a new sale with the following characteristics:\n\nCompany: Swimwear Unlimited\n\nOffer Keywords: {Select customers only, mid-summer fun, swimwear sale}\n\nOffer End Date: July 15\n\nAdvertisement Tone: Exciting!\n\nInclude no URLs.\n\nInclude no telephone numbers.\n',
-        modelId: 'google/flan-t5-xl',
+        modelId: chatModel,
         projectId,
         parameters: textGenRequestParametersModel,
         moderations: moderationsModel,
       };
 
-      const res = await watsonxAiMlService.generateText(params);
+      const res = await watsonxAIService.generateText(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -353,10 +353,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         foo: moderationPropertiesModel,
       };
 
-      const res = await watsonxAiMlService.generateTextStream({
+      const res = await watsonxAIService.generateTextStream({
         input:
           'Generate a marketing email advertising a new sale with the following characteristics:\n\nCompany: Swimwear Unlimited\n\nOffer Keywords: {Select customers only, mid-summer fun, swimwear sale}\n\nOffer End Date: July 15\n\nAdvertisement Tone: Exciting!\n\nInclude no URLs.\n\nInclude no telephone numbers.\n',
-        modelId: 'google/flan-t5-xl',
+        modelId: chatModel,
         projectId,
         parameters: textGenRequestParametersModel,
       });
@@ -374,13 +374,13 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       };
 
       const params = {
-        modelId: 'google/flan-t5-xl',
+        modelId: chatModel,
         input: 'Write a tagline for an alumni association: Together we',
         projectId,
         parameters: textTokenizeParametersModel,
       };
 
-      const res = await watsonxAiMlService.tokenizeText(params);
+      const res = await watsonxAIService.tokenizeText(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -409,7 +409,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         parameters: embeddingParametersModel,
       };
 
-      const res = await watsonxAiMlService.embedText(params);
+      const res = await watsonxAIService.embedText(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -418,14 +418,14 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
   describe('Chat', () => {
     test('textChat', async () => {
-      const res = await watsonxAiMlService.textChat({
+      const res = await watsonxAIService.textChat({
         messages: [
           {
             role: 'system',
             content: 'You are a helpful assistant.',
           },
         ],
-        modelId: 'mistralai/mistral-large',
+        modelId: chatModel,
         projectId,
       });
 
@@ -435,14 +435,14 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     });
 
     test('textChatStream', async () => {
-      const res = await watsonxAiMlService.textChatStream({
+      const res = await watsonxAIService.textChatStream({
         messages: [
           {
             role: 'system',
             content: 'You are a helpful assistant.',
           },
         ],
-        modelId: 'mistralai/mistral-large',
+        modelId: chatModel,
         projectId,
       });
 
@@ -451,7 +451,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     });
 
     test('textChatStream as string', async () => {
-      const stream = await watsonxAiMlService.textChatStream({
+      const stream = await watsonxAIService.textChatStream({
         messages: [
           {
             role: 'system',
@@ -462,7 +462,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
             content: 'What is your name?',
           },
         ],
-        modelId: 'mistralai/mistral-large',
+        modelId: chatModel,
         projectId,
       });
       for await (const chunk of stream) {
@@ -472,14 +472,14 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     });
 
     test('textChatStream as object', async () => {
-      const stream = await watsonxAiMlService.textChatStream({
+      const stream = await watsonxAIService.textChatStream({
         messages: [
           {
             role: 'user',
             content: 'What is your name?',
           },
         ],
-        modelId: 'mistralai/mistral-large',
+        modelId: chatModel,
         projectId,
         returnObject: true,
       });
@@ -491,21 +491,20 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
     test('textChatStream aborting', async () => {
       const abortStreaming = async () => {
-        const stream = await watsonxAiMlService.textChatStream({
+        const stream = await watsonxAIService.textChatStream({
           messages: [
             {
               role: 'user',
               content: 'What is your name?',
             },
           ],
-          modelId: 'mistralai/mistral-large',
+          modelId: chatModel,
           projectId,
         });
         const controller = new AbortController();
         const readable = Readable.from(stream);
         addAbortSignal(controller.signal, readable);
         for await (const chunk of readable) {
-          console.log(chunk);
           controller.abort();
         }
       };
@@ -514,7 +513,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
     test('textChatStream build in aborting', async () => {
       const abortStreaming = async () => {
-        const stream = await watsonxAiMlService.textChatStream({
+        const stream = await watsonxAIService.textChatStream({
           messages: [
             {
               role: 'system',
@@ -525,11 +524,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
               content: 'What is your name?',
             },
           ],
-          modelId: 'mistralai/mistral-large',
+          modelId: chatModel,
           projectId,
         });
         for await (const chunk of stream) {
-          console.log(chunk);
           stream.controller.abort();
         }
       };
@@ -537,14 +535,14 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     });
 
     test('textChatStream aborting chunk count', async () => {
-      const stream = await watsonxAiMlService.textChatStream({
+      const stream = await watsonxAIService.textChatStream({
         messages: [
           {
             role: 'user',
             content: 'What is your name?',
           },
         ],
-        modelId: 'mistralai/mistral-large',
+        modelId: chatModel,
         projectId,
       });
       let i = 0;
@@ -555,25 +553,24 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const rdb = addAbortSignal(controller.signal, readable);
       try {
         for await (const chunk of rdb) {
-          console.log(chunk);
           chunks.push(chunk);
           i += 1;
           if (i === n) controller.abort();
         }
       } catch (e) {
-        console.log(e);
+        expect(e.message).toBe('The operation was aborted');
       }
       expect(chunks).toHaveLength(n);
     });
     test('textChatStream build-in aborting chunk count', async () => {
-      const stream = await watsonxAiMlService.textChatStream({
+      const stream = await watsonxAIService.textChatStream({
         messages: [
           {
             role: 'user',
             content: 'What is your name?',
           },
         ],
-        modelId: 'mistralai/mistral-large',
+        modelId: chatModel,
         projectId,
       });
       let i = 0;
@@ -581,25 +578,21 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const chunks = [];
       try {
         for await (const chunk of stream) {
-          console.log(chunk);
           chunks.push(chunk);
           i += 1;
           if (i === n) stream.controller.abort();
         }
       } catch (e) {
-        console.log(e);
+        expect(e.message).toBe('The operation was aborted');
       }
       expect(chunks).toHaveLength(n);
     });
 
-    test('textChatStream with returnObject returning correct object with different models', async () => {
-      const models = [
-        'mistralai/mistral-large',
-        'ibm/granite-3-8b-instruct',
-        'meta-llama/llama-3-1-70b-instruct',
-      ];
-      const streamObject = async (model) => {
-        const stream = await watsonxAiMlService.textChatStream({
+    const models = ['mistralai/mistral-large', 'ibm/granite-3-8b-instruct', chatModel];
+    test.each(models)(
+      'textChatStream with returnObject returning correct object with %s',
+      async (model) => {
+        const stream = await watsonxAIService.textChatStream({
           messages: [
             {
               role: 'user',
@@ -615,9 +608,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           expect(chunk.event).toBeDefined();
           expect(chunk.data).toBeDefined();
         }
-      };
-      await Promise.all(models.map((model) => streamObject(model)));
-    });
+      }
+    );
   });
 
   describe('Time series', () => {
@@ -635,7 +627,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         parameters: tsForecastParametersModel,
       };
 
-      const res = await watsonxAiMlService.timeSeriesForecast(params);
+      const res = await watsonxAIService.timeSeriesForecast(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -650,7 +642,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       };
 
-      const res = await watsonxAiMlService.timeSeriesForecast(params);
+      const res = await watsonxAIService.timeSeriesForecast(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -673,10 +665,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res.headers).toBeDefined();
     };
     test('textChat with callbacks', async () => {
-      const res = await watsonxAiMlService.textChat(
+      const res = await watsonxAIService.textChat(
         {
           messages: [{ role: 'user', content: 'Hello. How are you?' }],
-          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          modelId: chatModel,
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
@@ -687,10 +679,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res).toBeDefined();
     });
     test('textChatSteam with callbacks', async () => {
-      const res = await watsonxAiMlService.textChatStream(
+      const res = await watsonxAIService.textChatStream(
         {
           messages: [{ role: 'user', content: 'Hello. How are you?' }],
-          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          modelId: chatModel,
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
@@ -701,10 +693,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res).toBeDefined();
     });
     test('generateText with callbacks', async () => {
-      const res = await watsonxAiMlService.generateText(
+      const res = await watsonxAIService.generateText(
         {
           input: 'Hello. How are you? Tell me a lot',
-          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          modelId: chatModel,
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
@@ -715,10 +707,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res).toBeDefined();
     });
     test('generateTextStream with callbacks', async () => {
-      const res = await watsonxAiMlService.generateTextStream(
+      const res = await watsonxAIService.generateTextStream(
         {
           input: 'Hello. How are you? Tell me a lot',
-          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          modelId: chatModel,
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
@@ -729,7 +721,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res).toBeDefined();
     });
     test('embedText with callbacks', async () => {
-      const res = await watsonxAiMlService.embedText(
+      const res = await watsonxAIService.embedText(
         {
           inputs: ['Hello. How are you?', 'Hello world'],
           modelId: 'ibm/slate-125m-english-rtrvr',
@@ -743,10 +735,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res).toBeDefined();
     });
     test('generateText with single requestCallback callback', async () => {
-      const res = await watsonxAiMlService.generateText(
+      const res = await watsonxAIService.generateText(
         {
           input: 'Hello. How are you?',
-          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          modelId: chatModel,
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
@@ -756,10 +748,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res).toBeDefined();
     });
     test('generateText with single responseCallback callback', async () => {
-      const res = await watsonxAiMlService.generateText(
+      const res = await watsonxAIService.generateText(
         {
           input: 'Hello. How are you?',
-          modelId: 'meta-llama/llama-3-1-70b-instruct',
+          modelId: chatModel,
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
@@ -775,18 +767,18 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       {
         params: {
           input: 'Hi. I will abort this request anyway',
-          modelId: 'google/flan-t5-xl',
+          modelId: chatModel,
           projectId,
         },
-        res: (args) => watsonxAiMlService.generateText(args),
+        res: (args) => watsonxAIService.generateText(args),
       },
       {
         params: {
           input: 'Hi. I will abort this request anyway',
-          modelId: 'google/flan-t5-xl',
+          modelId: chatModel,
           projectId,
         },
-        res: (args) => watsonxAiMlService.generateTextStream(args),
+        res: (args) => watsonxAIService.generateTextStream(args),
       },
       {
         params: {
@@ -794,21 +786,21 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           filters: 'modelid_ibm/granite-13b-instruct-v2',
           techPreview: false,
         },
-        res: (args) => watsonxAiMlService.listFoundationModelSpecs(args),
+        res: (args) => watsonxAIService.listFoundationModelSpecs(args),
       },
       {
         params: {
           limit: 50,
         },
-        res: (args) => watsonxAiMlService.listFoundationModelTasks(args),
+        res: (args) => watsonxAIService.listFoundationModelTasks(args),
       },
       {
         params: {
-          modelId: 'google/flan-t5-xl',
+          modelId: chatModel,
           input: 'Hi. I will abort this request anyway',
           projectId,
         },
-        res: (args) => watsonxAiMlService.tokenizeText(args),
+        res: (args) => watsonxAIService.tokenizeText(args),
       },
       {
         params: {
@@ -816,7 +808,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           inputs: ['Hi. I will abort this request anyway'],
           projectId,
         },
-        res: (args) => watsonxAiMlService.embedText(args),
+        res: (args) => watsonxAIService.embedText(args),
       },
       {
         params: {
@@ -828,7 +820,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
             prediction_length: 38,
           },
         },
-        res: (args) => watsonxAiMlService.timeSeriesForecast(args),
+        res: (args) => watsonxAIService.timeSeriesForecast(args),
       },
       {
         params: {
@@ -838,10 +830,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
               content: 'Hi. I will abort this request anyway',
             },
           ],
-          modelId: 'mistralai/mistral-large',
+          modelId: chatModel,
           projectId,
         },
-        res: (args) => watsonxAiMlService.textChat(args),
+        res: (args) => watsonxAIService.textChat(args),
       },
       {
         params: {
@@ -851,10 +843,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
               content: 'Hi. I will abort this request anyway',
             },
           ],
-          modelId: 'mistralai/mistral-large',
+          modelId: chatModel,
           projectId,
         },
-        res: (args) => watsonxAiMlService.textChatStream(args),
+        res: (args) => watsonxAIService.textChatStream(args),
       },
     ];
     for (const { res, params } of testArray) {

@@ -43,7 +43,7 @@ describe('Regression tests regarding langchain llms', () => {
             model,
           });
           const results = await watsonxRerank.compressDocuments(docs, query);
-          console.log(results);
+
           results.forEach((result) => {
             expect(typeof result.metadata.relevanceScore).toBe('number');
             expect(typeof result.pageContent).toBe('string');
@@ -57,7 +57,7 @@ describe('Regression tests regarding langchain llms', () => {
             model,
           });
           const results = await watsonxRerank.rerank(docs, query);
-          console.log(results);
+
           results.forEach((result) => {
             expect(typeof result.relevanceScore).toBe('number');
             expect(typeof result.index).toBe('number');
@@ -73,7 +73,7 @@ describe('Regression tests regarding langchain llms', () => {
             model,
           });
           const results = await watsonxRerank.compressDocuments(docs, query);
-          console.log(results);
+
           results.forEach((result) => {
             expect(typeof result.metadata.relevanceScore).toBe('number');
             expect(typeof result.pageContent).toBe('string');
@@ -87,7 +87,7 @@ describe('Regression tests regarding langchain llms', () => {
             model,
           });
           const results = await watsonxRerank.rerank(docs, query);
-          console.log(results);
+
           results.forEach((result) => {
             expect(typeof result.relevanceScore).toBe('number');
             expect(typeof result.index).toBe('number');

@@ -46,7 +46,7 @@ module.exports.prepareTests = (filename) => {
     describeToUse.skip = describeToUse;
   }
 
-  return describeToUse;
+  return describe;
 };
 
 module.exports.getDescribe = () => describeToUse;

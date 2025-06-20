@@ -21,6 +21,7 @@ import {
 } from 'ibm-cloud-sdk-core';
 import { BaseOptions } from 'ibm-cloud-sdk-core/es/auth/authenticators/token-request-based-authenticator-immutable';
 
+const AWS_AUTHENTICATION_PATH = '/api/2.0/apikeys/token';
 export interface RequestTokenResponse {
   result: {
     access_token: string;
@@ -34,6 +35,33 @@ export class RequestFunctionJWTTokenManager extends JwtTokenManager {
   }
 }
 
+export class AWSTokenManager extends JwtTokenManager {
+  private apikey: string;
+
+  constructor(options: JwtTokenManagerOptions) {
+    super(options);
+    this.apikey = options.apikey;
+    this.tokenName = 'token';
+  }
+
+  protected async requestToken(): Promise<any> {
+    const parameters = {
+      options: {
+        url: this.url + AWS_AUTHENTICATION_PATH,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: {
+          apikey: this.apikey,
+        },
+        rejectUnauthorized: !this.disableSslVerification,
+      },
+    };
+    return this.requestWrapperInstance.sendRequest(parameters);
+  }
+}
+
 export class JWTRequestBaseAuthenticator extends TokenRequestBasedAuthenticator {
   static AUTHTYPE_ZEN = 'zen';
 
@@ -42,5 +70,16 @@ export class JWTRequestBaseAuthenticator extends TokenRequestBasedAuthenticator 
   constructor(options: BaseOptions, requestToken: () => Promise<RequestTokenResponse>) {
     super(options);
     this.tokenManager = new RequestFunctionJWTTokenManager(options, requestToken);
+  }
+}
+
+export class AWSAuthenticator extends TokenRequestBasedAuthenticator {
+  static AUTHTYPE_AWS = 'aws';
+
+  protected tokenManager: AWSTokenManager;
+
+  constructor(options: BaseOptions) {
+    super(options);
+    this.tokenManager = new AWSTokenManager(options);
   }
 }

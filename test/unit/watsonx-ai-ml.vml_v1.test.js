@@ -35,7 +35,7 @@ const {
   checkForSuccessfulExecution,
 } = unitTestUtils;
 
-const watsonxAiMlServiceOptions = {
+const watsonxAIServiceOptions = {
   authenticator: new NoAuthAuthenticator(),
   url: 'https://us-south.ml.cloud.ibm.com',
   version: '2023-07-07',
@@ -47,12 +47,12 @@ const stream = new StreamTransform({
   },
 });
 
-const watsonxAiMlService = new WatsonxAiMlVml_v1(watsonxAiMlServiceOptions);
+const watsonxAIService = new WatsonxAiMlVml_v1(watsonxAIServiceOptions);
 
 let createRequestMock = null;
 function mock_createRequest() {
   if (!createRequestMock) {
-    createRequestMock = jest.spyOn(watsonxAiMlService, 'createRequest');
+    createRequestMock = jest.spyOn(watsonxAIService, 'createRequest');
     createRequestMock.mockImplementation(() => Promise.resolve());
   }
 }
@@ -149,9 +149,9 @@ describe('WatsonxAiMlVml_v1', () => {
   describe('service-level tests', () => {
     describe('positive tests', () => {
       test('construct service with global params', () => {
-        const serviceObj = new WatsonxAiMlVml_v1(watsonxAiMlServiceOptions);
+        const serviceObj = new WatsonxAiMlVml_v1(watsonxAIServiceOptions);
         expect(serviceObj).not.toBeNull();
-        expect(serviceObj.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(serviceObj.version).toEqual(watsonxAIServiceOptions.version);
       });
     });
   });
@@ -247,7 +247,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const createDeploymentResult = watsonxAiMlService.createDeployment(createDeploymentParams);
+        const createDeploymentResult = watsonxAIService.createDeployment(createDeploymentParams);
 
         // all methods should return a Promise
         expectToBePromise(createDeploymentResult);
@@ -274,7 +274,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.hardware_request).toEqual(hardwareRequest);
         expect(mockRequestOptions.body.asset).toEqual(asset);
         expect(mockRequestOptions.body.base_model_id).toEqual(baseModelId);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -283,12 +283,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __createDeploymentTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __createDeploymentTest();
       });
 
@@ -307,7 +307,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createDeployment(createDeploymentParams);
+        watsonxAIService.createDeployment(createDeploymentParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -316,7 +316,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createDeployment({});
+          await watsonxAIService.createDeployment({});
         } catch (e) {
           err = e;
         }
@@ -327,7 +327,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createDeployment();
+          await watsonxAIService.createDeployment();
         } catch (e) {
           err = e;
         }
@@ -366,7 +366,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const listDeploymentsResult = watsonxAiMlService.listDeployments(listDeploymentsParams);
+        const listDeploymentsResult = watsonxAIService.listDeployments(listDeploymentsParams);
 
         // all methods should return a Promise
         expectToBePromise(listDeploymentsResult);
@@ -381,7 +381,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.serving_name).toEqual(servingName);
@@ -400,12 +400,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __listDeploymentsTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __listDeploymentsTest();
       });
 
@@ -420,13 +420,13 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listDeployments(listDeploymentsParams);
+        watsonxAIService.listDeployments(listDeploymentsParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listDeployments({});
+        watsonxAIService.listDeployments({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
@@ -447,7 +447,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getDeploymentResult = watsonxAiMlService.getDeployment(getDeploymentParams);
+        const getDeploymentResult = watsonxAIService.getDeployment(getDeploymentParams);
 
         // all methods should return a Promise
         expectToBePromise(getDeploymentResult);
@@ -462,7 +462,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.deployment_id).toEqual(deploymentId);
@@ -474,12 +474,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getDeploymentTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getDeploymentTest();
       });
 
@@ -496,7 +496,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getDeployment(getDeploymentParams);
+        watsonxAIService.getDeployment(getDeploymentParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -505,7 +505,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getDeployment({});
+          await watsonxAIService.getDeployment({});
         } catch (e) {
           err = e;
         }
@@ -516,7 +516,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getDeployment();
+          await watsonxAIService.getDeployment();
         } catch (e) {
           err = e;
         }
@@ -553,7 +553,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const updateDeploymentResult = watsonxAiMlService.updateDeployment(updateDeploymentParams);
+        const updateDeploymentResult = watsonxAIService.updateDeployment(updateDeploymentParams);
 
         // all methods should return a Promise
         expectToBePromise(updateDeploymentResult);
@@ -569,7 +569,7 @@ describe('WatsonxAiMlVml_v1', () => {
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body).toEqual(jsonPatch);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.deployment_id).toEqual(deploymentId);
@@ -581,12 +581,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __updateDeploymentTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __updateDeploymentTest();
       });
 
@@ -605,7 +605,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.updateDeployment(updateDeploymentParams);
+        watsonxAIService.updateDeployment(updateDeploymentParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -614,7 +614,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.updateDeployment({});
+          await watsonxAIService.updateDeployment({});
         } catch (e) {
           err = e;
         }
@@ -625,7 +625,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.updateDeployment();
+          await watsonxAIService.updateDeployment();
         } catch (e) {
           err = e;
         }
@@ -650,7 +650,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const deleteDeploymentResult = watsonxAiMlService.deleteDeployment(deleteDeploymentParams);
+        const deleteDeploymentResult = watsonxAIService.deleteDeployment(deleteDeploymentParams);
 
         // all methods should return a Promise
         expectToBePromise(deleteDeploymentResult);
@@ -665,7 +665,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.deployment_id).toEqual(deploymentId);
@@ -677,12 +677,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __deleteDeploymentTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __deleteDeploymentTest();
       });
 
@@ -699,7 +699,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deleteDeployment(deleteDeploymentParams);
+        watsonxAIService.deleteDeployment(deleteDeploymentParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -708,7 +708,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteDeployment({});
+          await watsonxAIService.deleteDeployment({});
         } catch (e) {
           err = e;
         }
@@ -719,7 +719,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteDeployment();
+          await watsonxAIService.deleteDeployment();
         } catch (e) {
           err = e;
         }
@@ -790,7 +790,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const textExtractionResult = watsonxAiMlService.createTextExtraction(textExtractionParams);
+        const textExtractionResult = watsonxAIService.createTextExtraction(textExtractionParams);
 
         // all methods should return a Promise
         expectToBePromise(textExtractionResult);
@@ -813,7 +813,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.custom).toEqual(custom);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -822,12 +822,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __textExtractionTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __textExtractionTest();
       });
 
@@ -846,7 +846,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createTextExtraction(textExtractionParams);
+        watsonxAIService.createTextExtraction(textExtractionParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -855,7 +855,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createTextExtraction({});
+          await watsonxAIService.createTextExtraction({});
         } catch (e) {
           err = e;
         }
@@ -866,7 +866,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createTextExtraction();
+          await watsonxAIService.createTextExtraction();
         } catch (e) {
           err = e;
         }
@@ -894,7 +894,7 @@ describe('WatsonxAiMlVml_v1', () => {
         };
 
         const listTextExtractionsResult =
-          watsonxAiMlService.listTextExtractions(listTextExtractionsParams);
+          watsonxAIService.listTextExtractions(listTextExtractionsParams);
 
         // all methods should return a Promise
         expectToBePromise(listTextExtractionsResult);
@@ -909,7 +909,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.start).toEqual(start);
@@ -922,12 +922,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __listTextExtractionsTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __listTextExtractionsTest();
       });
 
@@ -942,19 +942,19 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listTextExtractions(listTextExtractionsParams);
+        watsonxAIService.listTextExtractions(listTextExtractionsParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listTextExtractions({});
+        watsonxAIService.listTextExtractions({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
 
     describe('TextExtractionsPager tests', () => {
-      const serviceUrl = watsonxAiMlServiceOptions.url;
+      const serviceUrl = watsonxAIServiceOptions.url;
       const path = '/ml/v1/text/extractions';
       const mockPagerResponse1 =
         '{"next":{"href":"https://myhost.com/somePath?start=1"},"total_count":2,"limit":1,"resources":[{"metadata":{"id":"id","created_at":"2019-01-01T12:00:00.000Z","space_id":"3fc54cf1-252f-424b-b52d-5cdd9814987f","project_id":"12ac4cf1-252f-424b-b52d-5cdd9814987f"},"entity":{"document_reference":{"type":"connection_asset","connection":{"id":"id"},"location":{"file_name":"file_name","bucket":"bucket"}},"results_reference":{"type":"connection_asset","connection":{"id":"id"},"location":{"file_name":"file_name","bucket":"bucket"}},"steps":{"ocr":{"languages_list":["languages_list"]},"tables_processing":{"enabled":true}},"assembly_json":{"anyKey":"anyValue"},"assembly_md":{"anyKey":"anyValue"},"custom":{"anyKey":"anyValue"},"results":{"status":"submitted","running_at":"2019-01-01T12:00:00.000Z","completed_at":"2019-01-01T12:00:00.000Z","number_pages_processed":22,"total_pages":11,"error":{"code":"code","message":"message","more_info":"more_info"}}}}]}';
@@ -982,7 +982,7 @@ describe('WatsonxAiMlVml_v1', () => {
           limit: 50,
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -998,7 +998,7 @@ describe('WatsonxAiMlVml_v1', () => {
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
           limit: 50,
         };
-        const pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -1021,8 +1021,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const textExtractionGetResult =
-          watsonxAiMlService.getTextExtraction(textExtractionGetParams);
+        const textExtractionGetResult = watsonxAIService.getTextExtraction(textExtractionGetParams);
 
         // all methods should return a Promise
         expectToBePromise(textExtractionGetResult);
@@ -1037,7 +1036,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.id).toEqual(id);
@@ -1049,12 +1048,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __textExtractionGetTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __textExtractionGetTest();
       });
 
@@ -1071,7 +1070,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getTextExtraction(textExtractionGetParams);
+        watsonxAIService.getTextExtraction(textExtractionGetParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -1080,7 +1079,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getTextExtraction({});
+          await watsonxAIService.getTextExtraction({});
         } catch (e) {
           err = e;
         }
@@ -1091,7 +1090,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getTextExtraction();
+          await watsonxAIService.getTextExtraction();
         } catch (e) {
           err = e;
         }
@@ -1118,7 +1117,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const textExtractionDeleteResult = watsonxAiMlService.deleteTextExtraction(
+        const textExtractionDeleteResult = watsonxAIService.deleteTextExtraction(
           textExtractionDeleteParams
         );
 
@@ -1135,7 +1134,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
@@ -1148,12 +1147,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __textExtractionDeleteTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __textExtractionDeleteTest();
       });
 
@@ -1170,7 +1169,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deleteTextExtraction(textExtractionDeleteParams);
+        watsonxAIService.deleteTextExtraction(textExtractionDeleteParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -1179,7 +1178,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteTextExtraction({});
+          await watsonxAIService.deleteTextExtraction({});
         } catch (e) {
           err = e;
         }
@@ -1190,7 +1189,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteTextExtraction();
+          await watsonxAIService.deleteTextExtraction();
         } catch (e) {
           err = e;
         }
@@ -1310,7 +1309,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const deploymentGenerateTextResult = watsonxAiMlService.deploymentGenerateText(
+        const deploymentGenerateTextResult = watsonxAIService.deploymentGenerateText(
           deploymentGenerateTextParams
         );
 
@@ -1334,7 +1333,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.moderations).toEqual(moderations);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.path.id_or_name).toEqual(idOrName);
       }
 
@@ -1344,12 +1343,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __deploymentGenerateTextTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __deploymentGenerateTextTest();
       });
 
@@ -1366,7 +1365,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deploymentGenerateText(deploymentGenerateTextParams);
+        watsonxAIService.deploymentGenerateText(deploymentGenerateTextParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -1375,7 +1374,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentGenerateText({});
+          await watsonxAIService.deploymentGenerateText({});
         } catch (e) {
           err = e;
         }
@@ -1386,7 +1385,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentGenerateText();
+          await watsonxAIService.deploymentGenerateText();
         } catch (e) {
           err = e;
         }
@@ -1507,7 +1506,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
-        const deploymentGenerateTextStreamResult = watsonxAiMlService.deploymentGenerateTextStream(
+        const deploymentGenerateTextStreamResult = watsonxAIService.deploymentGenerateTextStream(
           deploymentGenerateTextStreamParams
         );
 
@@ -1531,7 +1530,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.moderations).toEqual(moderations);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.path.id_or_name).toEqual(idOrName);
       }
 
@@ -1543,14 +1542,14 @@ describe('WatsonxAiMlVml_v1', () => {
         createRequestMock.mockClear();
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
 
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __deploymentGenerateTextStreamTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
 
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __deploymentGenerateTextStreamTest();
       });
 
@@ -1567,7 +1566,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deploymentGenerateTextStream(deploymentGenerateTextStreamParams);
+        watsonxAIService.deploymentGenerateTextStream(deploymentGenerateTextStreamParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -1576,7 +1575,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentGenerateTextStream({});
+          await watsonxAIService.deploymentGenerateTextStream({});
         } catch (e) {
           err = e;
         }
@@ -1587,7 +1586,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentGenerateTextStream();
+          await watsonxAIService.deploymentGenerateTextStream();
         } catch (e) {
           err = e;
         }
@@ -1636,7 +1635,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
         const deploymentsTextChatResult =
-          watsonxAiMlService.deploymentsTextChat(deploymentsTextChatParams);
+          watsonxAIService.deploymentsTextChat(deploymentsTextChatParams);
 
         // all methods should return a Promise
         expectToBePromise(deploymentsTextChatResult);
@@ -1653,7 +1652,7 @@ describe('WatsonxAiMlVml_v1', () => {
         checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.messages).toEqual(messages);
         expect(mockRequestOptions.body.context).toEqual(context);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.path.id_or_name).toEqual(idOrName);
       }
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -1662,12 +1661,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __deploymentsTextChatTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __deploymentsTextChatTest();
       });
 
@@ -1686,7 +1685,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deploymentsTextChat(deploymentsTextChatParams);
+        watsonxAIService.deploymentsTextChat(deploymentsTextChatParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -1694,7 +1693,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsTextChat({});
+          await watsonxAIService.deploymentsTextChat({});
         } catch (e) {
           err = e;
         }
@@ -1705,7 +1704,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsTextChat();
+          await watsonxAIService.deploymentsTextChat();
         } catch (e) {
           err = e;
         }
@@ -1753,7 +1752,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const deploymentsTextChatStreamResult = watsonxAiMlService.deploymentsTextChatStream(
+        const deploymentsTextChatStreamResult = watsonxAIService.deploymentsTextChatStream(
           deploymentsTextChatStreamParams
         );
 
@@ -1776,7 +1775,7 @@ describe('WatsonxAiMlVml_v1', () => {
         checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.messages).toEqual(messages);
         expect(mockRequestOptions.body.context).toEqual(context);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.path.id_or_name).toEqual(idOrName);
       }
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -1785,12 +1784,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __deploymentsTextChatStreamTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __deploymentsTextChatStreamTest();
       });
 
@@ -1809,7 +1808,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deploymentsTextChatStream(deploymentsTextChatStreamParams);
+        watsonxAIService.deploymentsTextChatStream(deploymentsTextChatStreamParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -1818,7 +1817,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsTextChatStream({});
+          await watsonxAIService.deploymentsTextChatStream({});
         } catch (e) {
           err = e;
         }
@@ -1829,7 +1828,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deploymentsTextChatStream();
+          await watsonxAIService.deploymentsTextChatStream();
         } catch (e) {
           err = e;
         }
@@ -1856,7 +1855,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const listFoundationModelSpecsResult = watsonxAiMlService.listFoundationModelSpecs(
+        const listFoundationModelSpecsResult = watsonxAIService.listFoundationModelSpecs(
           listFoundationModelSpecsParams
         );
 
@@ -1873,7 +1872,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
         expect(mockRequestOptions.qs.filters).toEqual(filters);
@@ -1886,12 +1885,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __listFoundationModelSpecsTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __listFoundationModelSpecsTest();
       });
 
@@ -1906,19 +1905,19 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listFoundationModelSpecs(listFoundationModelSpecsParams);
+        watsonxAIService.listFoundationModelSpecs(listFoundationModelSpecsParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listFoundationModelSpecs({});
+        watsonxAIService.listFoundationModelSpecs({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
 
     describe('FoundationModelSpecsPager tests', () => {
-      const serviceUrl = watsonxAiMlServiceOptions.url;
+      const serviceUrl = watsonxAIServiceOptions.url;
       const path = '/ml/v1/foundation_model_specs';
       const mockPagerResponse1 =
         '{"next":{"href":"https://myhost.com/somePath?start=1"},"total_count":2,"limit":1,"resources":[{"model_id":"google/flan-ul2","label":"flan-ul2 (20B)","provider":"Hugging Face","tuned_by":"tuned_by","short_description":"An encoder decoder model based on the T5 architecture and instruction-tuned using the Fine-tuned LAnguage Net.","long_description":"flan-ul2 (20B) is an encoder decoder model based on the T5 architecture and instruction-tuned using the Fine-tuned LAnguage Net (FLAN).","limits":{"lite":{"call_time":"3S","max_input_tokens":200,"max_output_tokens":1000}},"task_ids":["task_ids"],"tasks":[{"id":"summarization","ratings":{"cost":2,"quality":3},"benchmarks":[{"type":"academic","description":"MultiLingual Summarization dataset with 1.5M+ article/summary pairs across five languages. Evaluated using rougeL with 5 shots.","language":"German","dataset":{"name":"mlsum.de"},"prompt":{"number_of_shots":5},"metrics":[{"name":"rougeL","value":0.5197}]}],"tags":["tags"]}],"input_tier":"class_1","output_tier":"class_1","source":"Hugging Face","min_shot_size":10,"number_params":"20b","model_limits":{"max_sequence_length":4096,"training_data_max_records":1024},"lifecycle":[{"id":"available","label":"label","start_date":"2023-07-23","alternative_model_ids":["alternative_model_ids"],"url":"url"}],"training_parameters":{"init_method":{"supported":["supported"],"default":"random"},"init_text":{"default":"text"},"num_virtual_tokens":{"supported":[9],"default":100},"num_epochs":{"default":20,"min":1,"max":50},"verbalizer":{"default":"Input: {{input}} Output:"},"batch_size":{"default":16,"min":1,"max":16},"max_input_tokens":{"default":256,"min":1,"max":1024},"max_output_tokens":{"default":128,"min":1,"max":256},"torch_dtype":{"default":"bfloat16"},"accumulate_steps":{"default":128,"min":1,"max":128},"learning_rate":{"default":0.3,"min":0.01,"max":0.5}},"versions":[{"version":"1.1.0","available_date":"2023-08-23"}],"tech_preview":false}]}';
@@ -1946,7 +1945,7 @@ describe('WatsonxAiMlVml_v1', () => {
           techPreview: false,
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -1962,7 +1961,7 @@ describe('WatsonxAiMlVml_v1', () => {
           filters: 'modelid_ibm/granite-13b-instruct-v2',
           techPreview: false,
         };
-        const pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -1983,7 +1982,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const listFoundationModelTasksResult = watsonxAiMlService.listFoundationModelTasks(
+        const listFoundationModelTasksResult = watsonxAIService.listFoundationModelTasks(
           listFoundationModelTasksParams
         );
 
@@ -2000,7 +1999,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
       }
@@ -2011,12 +2010,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __listFoundationModelTasksTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __listFoundationModelTasksTest();
       });
 
@@ -2031,19 +2030,19 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listFoundationModelTasks(listFoundationModelTasksParams);
+        watsonxAIService.listFoundationModelTasks(listFoundationModelTasksParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listFoundationModelTasks({});
+        watsonxAIService.listFoundationModelTasks({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
 
     describe('FoundationModelTasksPager tests', () => {
-      const serviceUrl = watsonxAiMlServiceOptions.url;
+      const serviceUrl = watsonxAIServiceOptions.url;
       const path = '/ml/v1/foundation_model_tasks';
       const mockPagerResponse1 =
         '{"next":{"href":"https://myhost.com/somePath?start=1"},"total_count":2,"limit":1,"resources":[{"task_id":"summarization","label":"Summarization","description":"Models that are able to summarize documents based on some criteria.","rank":1}]}';
@@ -2069,7 +2068,7 @@ describe('WatsonxAiMlVml_v1', () => {
           limit: 50,
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -2083,7 +2082,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const params = {
           limit: 50,
         };
-        const pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -2204,7 +2203,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const createPromptResult = watsonxAiMlService.createPrompt(createPromptParams);
+        const createPromptResult = watsonxAIService.createPrompt(createPromptParams);
 
         // all methods should return a Promise
         expectToBePromise(createPromptResult);
@@ -2238,12 +2237,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __createPromptTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __createPromptTest();
       });
 
@@ -2262,7 +2261,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createPrompt(createPromptParams);
+        watsonxAIService.createPrompt(createPromptParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -2271,7 +2270,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createPrompt({});
+          await watsonxAIService.createPrompt({});
         } catch (e) {
           err = e;
         }
@@ -2282,7 +2281,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createPrompt();
+          await watsonxAIService.createPrompt();
         } catch (e) {
           err = e;
         }
@@ -2309,7 +2308,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getPromptResult = watsonxAiMlService.getPrompt(getPromptParams);
+        const getPromptResult = watsonxAIService.getPrompt(getPromptParams);
 
         // all methods should return a Promise
         expectToBePromise(getPromptResult);
@@ -2336,12 +2335,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getPromptTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getPromptTest();
       });
 
@@ -2358,7 +2357,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getPrompt(getPromptParams);
+        watsonxAIService.getPrompt(getPromptParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -2367,7 +2366,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPrompt({});
+          await watsonxAIService.getPrompt({});
         } catch (e) {
           err = e;
         }
@@ -2378,7 +2377,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPrompt();
+          await watsonxAIService.getPrompt();
         } catch (e) {
           err = e;
         }
@@ -2469,7 +2468,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const updatePromptResult = watsonxAiMlService.updatePrompt(updatePromptParams);
+        const updatePromptResult = watsonxAIService.updatePrompt(updatePromptParams);
 
         // all methods should return a Promise
         expectToBePromise(updatePromptResult);
@@ -2504,12 +2503,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __updatePromptTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __updatePromptTest();
       });
 
@@ -2530,7 +2529,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.updatePrompt(updatePromptParams);
+        watsonxAIService.updatePrompt(updatePromptParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -2539,7 +2538,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.updatePrompt({});
+          await watsonxAIService.updatePrompt({});
         } catch (e) {
           err = e;
         }
@@ -2550,7 +2549,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.updatePrompt();
+          await watsonxAIService.updatePrompt();
         } catch (e) {
           err = e;
         }
@@ -2575,7 +2574,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const deletePromptResult = watsonxAiMlService.deletePrompt(deletePromptParams);
+        const deletePromptResult = watsonxAIService.deletePrompt(deletePromptParams);
 
         // all methods should return a Promise
         expectToBePromise(deletePromptResult);
@@ -2601,12 +2600,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __deletePromptTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __deletePromptTest();
       });
 
@@ -2623,7 +2622,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deletePrompt(deletePromptParams);
+        watsonxAIService.deletePrompt(deletePromptParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -2632,7 +2631,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deletePrompt({});
+          await watsonxAIService.deletePrompt({});
         } catch (e) {
           err = e;
         }
@@ -2643,7 +2642,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deletePrompt();
+          await watsonxAIService.deletePrompt();
         } catch (e) {
           err = e;
         }
@@ -2686,7 +2685,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const fineTuningListResult = watsonxAiMlService.listPrompts(fineTuningListParams);
+        const fineTuningListResult = watsonxAIService.listPrompts(fineTuningListParams);
 
         // all methods should return a Promise
         expectToBePromise(fineTuningListResult);
@@ -2719,12 +2718,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         listPrompts();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         listPrompts();
       });
 
@@ -2739,13 +2738,13 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listPrompts(fineTuningListParams);
+        watsonxAIService.listPrompts(fineTuningListParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listFineTunings({});
+        watsonxAIService.listFineTunings({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
@@ -2815,7 +2814,7 @@ describe('WatsonxAiMlVml_v1', () => {
           limit: 2,
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -2831,7 +2830,7 @@ describe('WatsonxAiMlVml_v1', () => {
           spaceId: '12ac4cf1-252f-424b-b52d-5cdd9814987f',
           limit: 2,
         };
-        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -2862,7 +2861,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const updatePromptLockResult = watsonxAiMlService.updatePromptLock(updatePromptLockParams);
+        const updatePromptLockResult = watsonxAIService.updatePromptLock(updatePromptLockParams);
 
         // all methods should return a Promise
         expectToBePromise(updatePromptLockResult);
@@ -2892,12 +2891,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __updatePromptLockTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __updatePromptLockTest();
       });
 
@@ -2916,7 +2915,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.updatePromptLock(updatePromptLockParams);
+        watsonxAIService.updatePromptLock(updatePromptLockParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -2925,7 +2924,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.updatePromptLock({});
+          await watsonxAIService.updatePromptLock({});
         } catch (e) {
           err = e;
         }
@@ -2936,7 +2935,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.updatePromptLock();
+          await watsonxAIService.updatePromptLock();
         } catch (e) {
           err = e;
         }
@@ -2961,7 +2960,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getPromptLockResult = watsonxAiMlService.getPromptLock(getPromptLockParams);
+        const getPromptLockResult = watsonxAIService.getPromptLock(getPromptLockParams);
 
         // all methods should return a Promise
         expectToBePromise(getPromptLockResult);
@@ -2987,12 +2986,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getPromptLockTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getPromptLockTest();
       });
 
@@ -3009,7 +3008,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getPromptLock(getPromptLockParams);
+        watsonxAIService.getPromptLock(getPromptLockParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3018,7 +3017,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptLock({});
+          await watsonxAIService.getPromptLock({});
         } catch (e) {
           err = e;
         }
@@ -3029,7 +3028,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptLock();
+          await watsonxAIService.getPromptLock();
         } catch (e) {
           err = e;
         }
@@ -3058,7 +3057,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getPromptInputResult = watsonxAiMlService.getPromptInput(getPromptInputParams);
+        const getPromptInputResult = watsonxAIService.getPromptInput(getPromptInputParams);
 
         // all methods should return a Promise
         expectToBePromise(getPromptInputResult);
@@ -3086,12 +3085,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getPromptInputTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getPromptInputTest();
       });
 
@@ -3108,7 +3107,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getPromptInput(getPromptInputParams);
+        watsonxAIService.getPromptInput(getPromptInputParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3117,7 +3116,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptInput({});
+          await watsonxAIService.getPromptInput({});
         } catch (e) {
           err = e;
         }
@@ -3128,7 +3127,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptInput();
+          await watsonxAIService.getPromptInput();
         } catch (e) {
           err = e;
         }
@@ -3165,7 +3164,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const createPromptChatItemResult = watsonxAiMlService.createPromptChatItem(
+        const createPromptChatItemResult = watsonxAIService.createPromptChatItem(
           createPromptChatItemParams
         );
 
@@ -3194,12 +3193,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __createPromptChatItemTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __createPromptChatItemTest();
       });
 
@@ -3218,7 +3217,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createPromptChatItem(createPromptChatItemParams);
+        watsonxAIService.createPromptChatItem(createPromptChatItemParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3227,7 +3226,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createPromptChatItem({});
+          await watsonxAIService.createPromptChatItem({});
         } catch (e) {
           err = e;
         }
@@ -3238,7 +3237,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createPromptChatItem();
+          await watsonxAIService.createPromptChatItem();
         } catch (e) {
           err = e;
         }
@@ -3338,7 +3337,7 @@ describe('WatsonxAiMlVml_v1', () => {
         };
 
         const createPromptSessionResult =
-          watsonxAiMlService.createPromptSession(createPromptSessionParams);
+          watsonxAIService.createPromptSession(createPromptSessionParams);
 
         // all methods should return a Promise
         expectToBePromise(createPromptSessionResult);
@@ -3371,12 +3370,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __createPromptSessionTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __createPromptSessionTest();
       });
 
@@ -3393,7 +3392,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createPromptSession(createPromptSessionParams);
+        watsonxAIService.createPromptSession(createPromptSessionParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3402,7 +3401,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createPromptSession({});
+          await watsonxAIService.createPromptSession({});
         } catch (e) {
           err = e;
         }
@@ -3413,7 +3412,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createPromptSession();
+          await watsonxAIService.createPromptSession();
         } catch (e) {
           err = e;
         }
@@ -3438,7 +3437,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getPromptSessionResult = watsonxAiMlService.getPromptSession(getPromptSessionParams);
+        const getPromptSessionResult = watsonxAIService.getPromptSession(getPromptSessionParams);
 
         // all methods should return a Promise
         expectToBePromise(getPromptSessionResult);
@@ -3464,12 +3463,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getPromptSessionTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getPromptSessionTest();
       });
 
@@ -3486,7 +3485,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getPromptSession(getPromptSessionParams);
+        watsonxAIService.getPromptSession(getPromptSessionParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3495,7 +3494,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptSession({});
+          await watsonxAIService.getPromptSession({});
         } catch (e) {
           err = e;
         }
@@ -3506,7 +3505,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptSession();
+          await watsonxAIService.getPromptSession();
         } catch (e) {
           err = e;
         }
@@ -3534,7 +3533,7 @@ describe('WatsonxAiMlVml_v1', () => {
         };
 
         const updatePromptSessionResult =
-          watsonxAiMlService.updatePromptSession(updatePromptSessionParams);
+          watsonxAIService.updatePromptSession(updatePromptSessionParams);
 
         // all methods should return a Promise
         expectToBePromise(updatePromptSessionResult);
@@ -3561,12 +3560,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __updatePromptSessionTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __updatePromptSessionTest();
       });
 
@@ -3583,7 +3582,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.updatePromptSession(updatePromptSessionParams);
+        watsonxAIService.updatePromptSession(updatePromptSessionParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3592,7 +3591,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.updatePromptSession({});
+          await watsonxAIService.updatePromptSession({});
         } catch (e) {
           err = e;
         }
@@ -3603,7 +3602,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.updatePromptSession();
+          await watsonxAIService.updatePromptSession();
         } catch (e) {
           err = e;
         }
@@ -3627,7 +3626,7 @@ describe('WatsonxAiMlVml_v1', () => {
         };
 
         const deletePromptSessionResult =
-          watsonxAiMlService.deletePromptSession(deletePromptSessionParams);
+          watsonxAIService.deletePromptSession(deletePromptSessionParams);
 
         // all methods should return a Promise
         expectToBePromise(deletePromptSessionResult);
@@ -3652,12 +3651,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __deletePromptSessionTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __deletePromptSessionTest();
       });
 
@@ -3674,7 +3673,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deletePromptSession(deletePromptSessionParams);
+        watsonxAIService.deletePromptSession(deletePromptSessionParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3683,7 +3682,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deletePromptSession({});
+          await watsonxAIService.deletePromptSession({});
         } catch (e) {
           err = e;
         }
@@ -3694,7 +3693,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deletePromptSession();
+          await watsonxAIService.deletePromptSession();
         } catch (e) {
           err = e;
         }
@@ -3774,7 +3773,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const createPromptSessionEntryResult = watsonxAiMlService.createPromptSessionEntry(
+        const createPromptSessionEntryResult = watsonxAIService.createPromptSessionEntry(
           createPromptSessionEntryParams
         );
 
@@ -3809,12 +3808,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __createPromptSessionEntryTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __createPromptSessionEntryTest();
       });
 
@@ -3837,7 +3836,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createPromptSessionEntry(createPromptSessionEntryParams);
+        watsonxAIService.createPromptSessionEntry(createPromptSessionEntryParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3846,7 +3845,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createPromptSessionEntry({});
+          await watsonxAIService.createPromptSessionEntry({});
         } catch (e) {
           err = e;
         }
@@ -3857,7 +3856,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createPromptSessionEntry();
+          await watsonxAIService.createPromptSessionEntry();
         } catch (e) {
           err = e;
         }
@@ -3884,7 +3883,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const listPromptSessionEntriesResult = watsonxAiMlService.listPromptSessionEntries(
+        const listPromptSessionEntriesResult = watsonxAIService.listPromptSessionEntries(
           listPromptSessionEntriesParams
         );
 
@@ -3913,12 +3912,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __listPromptSessionEntriesTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __listPromptSessionEntriesTest();
       });
 
@@ -3935,7 +3934,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listPromptSessionEntries(listPromptSessionEntriesParams);
+        watsonxAIService.listPromptSessionEntries(listPromptSessionEntriesParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -3944,7 +3943,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.listPromptSessionEntries({});
+          await watsonxAIService.listPromptSessionEntries({});
         } catch (e) {
           err = e;
         }
@@ -3955,7 +3954,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.listPromptSessionEntries();
+          await watsonxAIService.listPromptSessionEntries();
         } catch (e) {
           err = e;
         }
@@ -3993,9 +3992,7 @@ describe('WatsonxAiMlVml_v1', () => {
         };
 
         const createPromptSessionEntryChatItemResult =
-          watsonxAiMlService.createPromptSessionEntryChatItem(
-            createPromptSessionEntryChatItemParams
-          );
+          watsonxAIService.createPromptSessionEntryChatItem(createPromptSessionEntryChatItemParams);
 
         // all methods should return a Promise
         expectToBePromise(createPromptSessionEntryChatItemResult);
@@ -4026,12 +4023,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __createPromptSessionEntryChatItemTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __createPromptSessionEntryChatItemTest();
       });
 
@@ -4052,7 +4049,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createPromptSessionEntryChatItem(createPromptSessionEntryChatItemParams);
+        watsonxAIService.createPromptSessionEntryChatItem(createPromptSessionEntryChatItemParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4061,7 +4058,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createPromptSessionEntryChatItem({});
+          await watsonxAIService.createPromptSessionEntryChatItem({});
         } catch (e) {
           err = e;
         }
@@ -4072,7 +4069,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createPromptSessionEntryChatItem();
+          await watsonxAIService.createPromptSessionEntryChatItem();
         } catch (e) {
           err = e;
         }
@@ -4103,7 +4100,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const updatePromptSessionLockResult = watsonxAiMlService.updatePromptSessionLock(
+        const updatePromptSessionLockResult = watsonxAIService.updatePromptSessionLock(
           updatePromptSessionLockParams
         );
 
@@ -4134,12 +4131,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __updatePromptSessionLockTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __updatePromptSessionLockTest();
       });
 
@@ -4158,7 +4155,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.updatePromptSessionLock(updatePromptSessionLockParams);
+        watsonxAIService.updatePromptSessionLock(updatePromptSessionLockParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4167,7 +4164,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.updatePromptSessionLock({});
+          await watsonxAIService.updatePromptSessionLock({});
         } catch (e) {
           err = e;
         }
@@ -4178,7 +4175,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.updatePromptSessionLock();
+          await watsonxAIService.updatePromptSessionLock();
         } catch (e) {
           err = e;
         }
@@ -4201,7 +4198,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getPromptSessionLockResult = watsonxAiMlService.getPromptSessionLock(
+        const getPromptSessionLockResult = watsonxAIService.getPromptSessionLock(
           getPromptSessionLockParams
         );
 
@@ -4228,12 +4225,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getPromptSessionLockTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getPromptSessionLockTest();
       });
 
@@ -4250,7 +4247,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getPromptSessionLock(getPromptSessionLockParams);
+        watsonxAIService.getPromptSessionLock(getPromptSessionLockParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4259,7 +4256,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptSessionLock({});
+          await watsonxAIService.getPromptSessionLock({});
         } catch (e) {
           err = e;
         }
@@ -4270,7 +4267,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptSessionLock();
+          await watsonxAIService.getPromptSessionLock();
         } catch (e) {
           err = e;
         }
@@ -4295,7 +4292,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getPromptSessionEntryResult = watsonxAiMlService.getPromptSessionEntry(
+        const getPromptSessionEntryResult = watsonxAIService.getPromptSessionEntry(
           getPromptSessionEntryParams
         );
 
@@ -4327,12 +4324,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getPromptSessionEntryTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getPromptSessionEntryTest();
       });
 
@@ -4351,7 +4348,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getPromptSessionEntry(getPromptSessionEntryParams);
+        watsonxAIService.getPromptSessionEntry(getPromptSessionEntryParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4360,7 +4357,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptSessionEntry({});
+          await watsonxAIService.getPromptSessionEntry({});
         } catch (e) {
           err = e;
         }
@@ -4371,7 +4368,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getPromptSessionEntry();
+          await watsonxAIService.getPromptSessionEntry();
         } catch (e) {
           err = e;
         }
@@ -4396,7 +4393,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const deletePromptSessionEntryResult = watsonxAiMlService.deletePromptSessionEntry(
+        const deletePromptSessionEntryResult = watsonxAIService.deletePromptSessionEntry(
           deletePromptSessionEntryParams
         );
 
@@ -4428,12 +4425,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __deletePromptSessionEntryTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __deletePromptSessionEntryTest();
       });
 
@@ -4452,7 +4449,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deletePromptSessionEntry(deletePromptSessionEntryParams);
+        watsonxAIService.deletePromptSessionEntry(deletePromptSessionEntryParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4461,7 +4458,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deletePromptSessionEntry({});
+          await watsonxAIService.deletePromptSessionEntry({});
         } catch (e) {
           err = e;
         }
@@ -4472,7 +4469,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deletePromptSessionEntry();
+          await watsonxAIService.deletePromptSessionEntry();
         } catch (e) {
           err = e;
         }
@@ -4584,7 +4581,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const textChatResult = watsonxAiMlService.textChat(textChatParams);
+        const textChatResult = watsonxAIService.textChat(textChatParams);
 
         // all methods should return a Promise
         expectToBePromise(textChatResult);
@@ -4619,7 +4616,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.temperature).toEqual(temperature);
         expect(mockRequestOptions.body.top_p).toEqual(topP);
         expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -4628,12 +4625,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __textChatTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __textChatTest();
       });
 
@@ -4652,7 +4649,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.textChat(textChatParams);
+        watsonxAIService.textChat(textChatParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4661,7 +4658,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.textChat({});
+          await watsonxAIService.textChat({});
         } catch (e) {
           err = e;
         }
@@ -4672,7 +4669,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.textChat();
+          await watsonxAIService.textChat();
         } catch (e) {
           err = e;
         }
@@ -4784,7 +4781,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
-        const textChatStreamResult = watsonxAiMlService.textChatStream(textChatStreamParams);
+        const textChatStreamResult = watsonxAIService.textChatStream(textChatStreamParams);
 
         // all methods should return a Promise
         expectToBePromise(textChatStreamResult);
@@ -4819,7 +4816,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.temperature).toEqual(temperature);
         expect(mockRequestOptions.body.top_p).toEqual(topP);
         expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -4828,12 +4825,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __textChatStreamTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __textChatStreamTest();
       });
 
@@ -4852,7 +4849,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.textChatStream(textChatStreamParams);
+        watsonxAIService.textChatStream(textChatStreamParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4861,7 +4858,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.textChatStream({});
+          await watsonxAIService.textChatStream({});
         } catch (e) {
           err = e;
         }
@@ -4872,7 +4869,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.textChatStream();
+          await watsonxAIService.textChatStream();
         } catch (e) {
           err = e;
         }
@@ -4914,7 +4911,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const embedTextResult = watsonxAiMlService.embedText(embedTextParams);
+        const embedTextResult = watsonxAIService.embedText(embedTextParams);
 
         // all methods should return a Promise
         expectToBePromise(embedTextResult);
@@ -4934,7 +4931,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -4943,12 +4940,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __embedTextTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __embedTextTest();
       });
 
@@ -4967,7 +4964,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.embedText(embedTextParams);
+        watsonxAIService.embedText(embedTextParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -4976,7 +4973,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.embedText({});
+          await watsonxAIService.embedText({});
         } catch (e) {
           err = e;
         }
@@ -4987,7 +4984,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.embedText();
+          await watsonxAIService.embedText();
         } catch (e) {
           err = e;
         }
@@ -5110,7 +5107,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const generateTextResult = watsonxAiMlService.generateText(generateTextParams);
+        const generateTextResult = watsonxAIService.generateText(generateTextParams);
 
         // all methods should return a Promise
         expectToBePromise(generateTextResult);
@@ -5131,7 +5128,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.moderations).toEqual(moderations);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -5140,12 +5137,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __generateTextTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __generateTextTest();
       });
 
@@ -5165,7 +5162,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.generateText(generateTextParams);
+        watsonxAIService.generateText(generateTextParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -5174,7 +5171,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.generateText({});
+          await watsonxAIService.generateText({});
         } catch (e) {
           err = e;
         }
@@ -5185,7 +5182,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.generateText();
+          await watsonxAIService.generateText();
         } catch (e) {
           err = e;
         }
@@ -5309,7 +5306,7 @@ describe('WatsonxAiMlVml_v1', () => {
         };
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
         const generateTextStreamResult =
-          watsonxAiMlService.generateTextStream(generateTextStreamParams);
+          watsonxAIService.generateTextStream(generateTextStreamParams);
 
         // all methods should return a Promise
         expectToBePromise(generateTextStreamResult);
@@ -5330,7 +5327,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.moderations).toEqual(moderations);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -5339,13 +5336,13 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
         __generateTextStreamTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
         __generateTextStreamTest();
       });
@@ -5366,7 +5363,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
-        watsonxAiMlService.generateTextStream(generateTextStreamParams);
+        watsonxAIService.generateTextStream(generateTextStreamParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -5375,7 +5372,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.generateTextStream({});
+          await watsonxAIService.generateTextStream({});
         } catch (e) {
           err = e;
         }
@@ -5386,7 +5383,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.generateTextStream();
+          await watsonxAIService.generateTextStream();
         } catch (e) {
           err = e;
         }
@@ -5422,7 +5419,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const tokenizeTextResult = watsonxAiMlService.tokenizeText(tokenizeTextParams);
+        const tokenizeTextResult = watsonxAIService.tokenizeText(tokenizeTextParams);
 
         // all methods should return a Promise
         expectToBePromise(tokenizeTextResult);
@@ -5442,7 +5439,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -5451,12 +5448,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __tokenizeTextTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __tokenizeTextTest();
       });
 
@@ -5475,7 +5472,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.tokenizeText(tokenizeTextParams);
+        watsonxAIService.tokenizeText(tokenizeTextParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -5484,7 +5481,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.tokenizeText({});
+          await watsonxAIService.tokenizeText({});
         } catch (e) {
           err = e;
         }
@@ -5495,7 +5492,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.tokenizeText();
+          await watsonxAIService.tokenizeText();
         } catch (e) {
           err = e;
         }
@@ -5545,7 +5542,7 @@ describe('WatsonxAiMlVml_v1', () => {
         };
 
         const timeSeriesForecastResult =
-          watsonxAiMlService.timeSeriesForecast(timeSeriesForecastParams);
+          watsonxAIService.timeSeriesForecast(timeSeriesForecastParams);
 
         // all methods should return a Promise
         expectToBePromise(timeSeriesForecastResult);
@@ -5566,7 +5563,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -5575,12 +5572,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __timeSeriesForecastTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __timeSeriesForecastTest();
       });
 
@@ -5605,7 +5602,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.timeSeriesForecast(timeSeriesForecastParams);
+        watsonxAIService.timeSeriesForecast(timeSeriesForecastParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -5614,7 +5611,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.timeSeriesForecast({});
+          await watsonxAIService.timeSeriesForecast({});
         } catch (e) {
           err = e;
         }
@@ -5625,7 +5622,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.timeSeriesForecast();
+          await watsonxAIService.timeSeriesForecast();
         } catch (e) {
           err = e;
         }
@@ -5717,7 +5714,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const createTrainingResult = watsonxAiMlService.createTraining(createTrainingParams);
+        const createTrainingResult = watsonxAIService.createTraining(createTrainingParams);
 
         // all methods should return a Promise
         expectToBePromise(createTrainingResult);
@@ -5742,7 +5739,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.training_data_references).toEqual(trainingDataReferences);
         expect(mockRequestOptions.body.custom).toEqual(custom);
         expect(mockRequestOptions.body.auto_update_model).toEqual(autoUpdateModel);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -5751,12 +5748,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __createTrainingTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __createTrainingTest();
       });
 
@@ -5775,7 +5772,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createTraining(createTrainingParams);
+        watsonxAIService.createTraining(createTrainingParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -5784,7 +5781,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createTraining({});
+          await watsonxAIService.createTraining({});
         } catch (e) {
           err = e;
         }
@@ -5795,7 +5792,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createTraining();
+          await watsonxAIService.createTraining();
         } catch (e) {
           err = e;
         }
@@ -5828,7 +5825,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const listTrainingsResult = watsonxAiMlService.listTrainings(listTrainingsParams);
+        const listTrainingsResult = watsonxAIService.listTrainings(listTrainingsParams);
 
         // all methods should return a Promise
         expectToBePromise(listTrainingsResult);
@@ -5843,7 +5840,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
         expect(mockRequestOptions.qs.total_count).toEqual(totalCount);
@@ -5859,12 +5856,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __listTrainingsTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __listTrainingsTest();
       });
 
@@ -5879,19 +5876,19 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listTrainings(listTrainingsParams);
+        watsonxAIService.listTrainings(listTrainingsParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listTrainings({});
+        watsonxAIService.listTrainings({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
 
     describe('TrainingsListPager tests', () => {
-      const serviceUrl = watsonxAiMlServiceOptions.url;
+      const serviceUrl = watsonxAIServiceOptions.url;
       const path = '/ml/v4/trainings';
       const mockPagerResponse1 =
         '{"next":{"href":"https://myhost.com/somePath?start=1"},"total_count":2,"limit":1,"resources":[{"metadata":{"id":"id","created_at":"2019-01-01T12:00:00.000Z","rev":"rev","owner":"owner","modified_at":"2019-01-01T12:00:00.000Z","parent_id":"parent_id","name":"name","description":"description","tags":["tags"],"commit_info":{"committed_at":"2019-01-01T12:00:00.000Z","commit_message":"commit_message"},"space_id":"3fc54cf1-252f-424b-b52d-5cdd9814987f","project_id":"12ac4cf1-252f-424b-b52d-5cdd9814987f"},"entity":{"prompt_tuning":{"base_model":{"model_id":"google/flan-t5-xl"},"task_id":"summarization","tuning_type":"prompt_tuning","num_epochs":30,"learning_rate":0.4,"accumulate_steps":32,"verbalizer":"rte { 0 : entailment, 1 : not entailment } {{input}}","batch_size":10,"max_input_tokens":100,"max_output_tokens":100,"init_method":"text","init_text":"init_text"},"training_data_references":[{"id":"8d3682dd-2858-43c9-bfd7-12a79abcfb0c","type":"connection_asset","connection":{},"location":{"mapKey":"inner"},"schema":{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}}],"custom":{"anyKey":"anyValue"},"auto_update_model":true,"results_reference":{"id":"id","type":"connection_asset","connection":{},"location":{"mapKey":"inner"}},"status":{"running_at":"2017-01-30T10:11:12.000Z","completed_at":"2017-01-30T10:11:12.000Z","state":"queued","message":{"level":"info","text":"The deployment is successful"},"metrics":[{"timestamp":"2023-09-22T02:52:03.324Z","iteration":0,"ml_metrics":{"mapKey":5},"context":{"deployment_id":"deployment_id","prompt_tuning":{"metrics_location":"metrics_location"}}}],"failure":{"trace":"3fd543d2-36e0-4f83-9be3-5c6dd498af4f","errors":[{"code":"missing_field","message":"The \'name\' field is required.","more_info":"https://cloud.ibm.com/apidocs/machine-learning#models-get","target":{"type":"field","name":"name"}}]}}}}]}';
@@ -5922,7 +5919,7 @@ describe('WatsonxAiMlVml_v1', () => {
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -5941,7 +5938,7 @@ describe('WatsonxAiMlVml_v1', () => {
           spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
         };
-        const pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -5964,7 +5961,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getTrainingResult = watsonxAiMlService.getTraining(getTrainingParams);
+        const getTrainingResult = watsonxAIService.getTraining(getTrainingParams);
 
         // all methods should return a Promise
         expectToBePromise(getTrainingResult);
@@ -5979,7 +5976,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.training_id).toEqual(trainingId);
@@ -5991,12 +5988,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getTrainingTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getTrainingTest();
       });
 
@@ -6013,7 +6010,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getTraining(getTrainingParams);
+        watsonxAIService.getTraining(getTrainingParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -6022,7 +6019,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getTraining({});
+          await watsonxAIService.getTraining({});
         } catch (e) {
           err = e;
         }
@@ -6033,7 +6030,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getTraining();
+          await watsonxAIService.getTraining();
         } catch (e) {
           err = e;
         }
@@ -6060,7 +6057,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const deleteTrainingResult = watsonxAiMlService.deleteTraining(deleteTrainingParams);
+        const deleteTrainingResult = watsonxAIService.deleteTraining(deleteTrainingParams);
 
         // all methods should return a Promise
         expectToBePromise(deleteTrainingResult);
@@ -6075,7 +6072,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
@@ -6088,12 +6085,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __deleteTrainingTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __deleteTrainingTest();
       });
 
@@ -6110,7 +6107,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deleteTraining(deleteTrainingParams);
+        watsonxAIService.deleteTraining(deleteTrainingParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -6119,7 +6116,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteTraining({});
+          await watsonxAIService.deleteTraining({});
         } catch (e) {
           err = e;
         }
@@ -6130,7 +6127,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteTraining();
+          await watsonxAIService.deleteTraining();
         } catch (e) {
           err = e;
         }
@@ -6223,7 +6220,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const createFineTuningResult = watsonxAiMlService.createFineTuning(createFineTuningParams);
+        const createFineTuningResult = watsonxAIService.createFineTuning(createFineTuningParams);
 
         // all methods should return a Promise
         expectToBePromise(createFineTuningResult);
@@ -6250,7 +6247,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.type).toEqual(type);
         expect(mockRequestOptions.body.test_data_references).toEqual(testDataReferences);
         expect(mockRequestOptions.body.custom).toEqual(custom);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -6259,12 +6256,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __createFineTuningTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __createFineTuningTest();
       });
 
@@ -6285,7 +6282,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createFineTuning(createFineTuningParams);
+        watsonxAIService.createFineTuning(createFineTuningParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -6293,7 +6290,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createFineTuning({});
+          await watsonxAIService.createFineTuning({});
         } catch (e) {
           err = e;
         }
@@ -6302,7 +6299,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createFineTuning();
+          await watsonxAIService.createFineTuning();
         } catch (e) {
           err = e;
         }
@@ -6336,7 +6333,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const fineTuningListResult = watsonxAiMlService.listFineTunings(fineTuningListParams);
+        const fineTuningListResult = watsonxAIService.listFineTunings(fineTuningListParams);
 
         // all methods should return a Promise
         expectToBePromise(fineTuningListResult);
@@ -6351,7 +6348,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
         expect(mockRequestOptions.qs.total_count).toEqual(totalCount);
@@ -6368,12 +6365,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __fineTuningListTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __fineTuningListTest();
       });
 
@@ -6388,19 +6385,19 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listFineTunings(fineTuningListParams);
+        watsonxAIService.listFineTunings(fineTuningListParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listFineTunings({});
+        watsonxAIService.listFineTunings({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
 
     describe('FineTuningListPager tests', () => {
-      const serviceUrl = watsonxAiMlServiceOptions.url;
+      const serviceUrl = watsonxAIServiceOptions.url;
       const path = '/ml/v1/fine_tunings';
       const mockPagerResponse1 = {
         'next': { 'href': 'https://myhost.com/somePath?start=1' },
@@ -6651,7 +6648,7 @@ describe('WatsonxAiMlVml_v1', () => {
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -6671,7 +6668,7 @@ describe('WatsonxAiMlVml_v1', () => {
           spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
         };
-        const pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -6694,7 +6691,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getFineTuningResult = watsonxAiMlService.getFineTuning(getFineTuningParams);
+        const getFineTuningResult = watsonxAIService.getFineTuning(getFineTuningParams);
 
         // all methods should return a Promise
         expectToBePromise(getFineTuningResult);
@@ -6709,7 +6706,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.id).toEqual(id);
@@ -6721,12 +6718,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getFineTuningTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getFineTuningTest();
       });
 
@@ -6743,7 +6740,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getFineTuning(getFineTuningParams);
+        watsonxAIService.getFineTuning(getFineTuningParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -6751,7 +6748,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getFineTuning({});
+          await watsonxAIService.getFineTuning({});
         } catch (e) {
           err = e;
         }
@@ -6760,7 +6757,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getFineTuning();
+          await watsonxAIService.getFineTuning();
         } catch (e) {
           err = e;
         }
@@ -6786,7 +6783,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const deleteFineTuningResult = watsonxAiMlService.deleteFineTuning(deleteFineTuningParams);
+        const deleteFineTuningResult = watsonxAIService.deleteFineTuning(deleteFineTuningParams);
 
         // all methods should return a Promise
         expectToBePromise(deleteFineTuningResult);
@@ -6801,7 +6798,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
@@ -6814,12 +6811,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __deleteFineTuningTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __deleteFineTuningTest();
       });
 
@@ -6836,7 +6833,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deleteFineTuning(deleteFineTuningParams);
+        watsonxAIService.deleteFineTuning(deleteFineTuningParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -6844,7 +6841,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteFineTuning({});
+          await watsonxAIService.deleteFineTuning({});
         } catch (e) {
           err = e;
         }
@@ -6853,7 +6850,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteFineTuning();
+          await watsonxAIService.deleteFineTuning();
         } catch (e) {
           err = e;
         }
@@ -6897,7 +6894,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const createDocumentExtractionResult = watsonxAiMlService.createDocumentExtraction(
+        const createDocumentExtractionResult = watsonxAIService.createDocumentExtraction(
           createDocumentExtractionParams
         );
 
@@ -6920,7 +6917,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.tags).toEqual(tags);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -6929,12 +6926,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __createDocumentExtractionTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __createDocumentExtractionTest();
       });
 
@@ -6955,7 +6952,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createDocumentExtraction(createDocumentExtractionParams);
+        watsonxAIService.createDocumentExtraction(createDocumentExtractionParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -6964,7 +6961,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createDocumentExtraction({});
+          await watsonxAIService.createDocumentExtraction({});
         } catch (e) {
           err = e;
         }
@@ -6975,7 +6972,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createDocumentExtraction();
+          await watsonxAIService.createDocumentExtraction();
         } catch (e) {
           err = e;
         }
@@ -6998,7 +6995,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const listDocumentExtractionsResult = watsonxAiMlService.listDocumentExtractions(
+        const listDocumentExtractionsResult = watsonxAIService.listDocumentExtractions(
           listDocumentExtractionsParams
         );
 
@@ -7015,7 +7012,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
       }
@@ -7026,12 +7023,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __listDocumentExtractionsTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __listDocumentExtractionsTest();
       });
 
@@ -7046,13 +7043,13 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listDocumentExtractions(listDocumentExtractionsParams);
+        watsonxAIService.listDocumentExtractions(listDocumentExtractionsParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listDocumentExtractions({});
+        watsonxAIService.listDocumentExtractions({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
@@ -7073,7 +7070,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getDocumentExtractionResult = watsonxAiMlService.getDocumentExtraction(
+        const getDocumentExtractionResult = watsonxAIService.getDocumentExtraction(
           getDocumentExtractionParams
         );
 
@@ -7089,7 +7086,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.path.id).toEqual(id);
@@ -7101,12 +7098,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getDocumentExtractionTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getDocumentExtractionTest();
       });
 
@@ -7123,7 +7120,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getDocumentExtraction(getDocumentExtractionParams);
+        watsonxAIService.getDocumentExtraction(getDocumentExtractionParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -7132,7 +7129,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getDocumentExtraction({});
+          await watsonxAIService.getDocumentExtraction({});
         } catch (e) {
           err = e;
         }
@@ -7143,7 +7140,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getDocumentExtraction();
+          await watsonxAIService.getDocumentExtraction();
         } catch (e) {
           err = e;
         }
@@ -7170,7 +7167,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const cancelDocumentExtractionsResult = watsonxAiMlService.cancelDocumentExtractions(
+        const cancelDocumentExtractionsResult = watsonxAIService.cancelDocumentExtractions(
           cancelDocumentExtractionsParams
         );
 
@@ -7187,7 +7184,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
@@ -7200,12 +7197,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __cancelDocumentExtractionsTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __cancelDocumentExtractionsTest();
       });
 
@@ -7222,7 +7219,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.cancelDocumentExtractions(cancelDocumentExtractionsParams);
+        watsonxAIService.cancelDocumentExtractions(cancelDocumentExtractionsParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -7231,7 +7228,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.cancelDocumentExtractions({});
+          await watsonxAIService.cancelDocumentExtractions({});
         } catch (e) {
           err = e;
         }
@@ -7242,7 +7239,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.cancelDocumentExtractions();
+          await watsonxAIService.cancelDocumentExtractions();
         } catch (e) {
           err = e;
         }
@@ -7293,8 +7290,9 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const createSyntheticDataGenerationResult =
-          watsonxAiMlService.createSyntheticDataGeneration(createSyntheticDataGenerationParams);
+        const createSyntheticDataGenerationResult = watsonxAIService.createSyntheticDataGeneration(
+          createSyntheticDataGenerationParams
+        );
 
         // all methods should return a Promise
         expectToBePromise(createSyntheticDataGenerationResult);
@@ -7314,7 +7312,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.data_reference).toEqual(dataReference);
         expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -7323,12 +7321,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __createSyntheticDataGenerationTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __createSyntheticDataGenerationTest();
       });
 
@@ -7345,7 +7343,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createSyntheticDataGeneration(createSyntheticDataGenerationParams);
+        watsonxAIService.createSyntheticDataGeneration(createSyntheticDataGenerationParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -7354,7 +7352,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createSyntheticDataGeneration({});
+          await watsonxAIService.createSyntheticDataGeneration({});
         } catch (e) {
           err = e;
         }
@@ -7365,7 +7363,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createSyntheticDataGeneration();
+          await watsonxAIService.createSyntheticDataGeneration();
         } catch (e) {
           err = e;
         }
@@ -7388,7 +7386,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const listSyntheticDataGenerationsResult = watsonxAiMlService.listSyntheticDataGenerations(
+        const listSyntheticDataGenerationsResult = watsonxAIService.listSyntheticDataGenerations(
           listSyntheticDataGenerationsParams
         );
 
@@ -7405,7 +7403,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
       }
@@ -7416,12 +7414,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __listSyntheticDataGenerationsTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __listSyntheticDataGenerationsTest();
       });
 
@@ -7436,13 +7434,13 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listSyntheticDataGenerations(listSyntheticDataGenerationsParams);
+        watsonxAIService.listSyntheticDataGenerations(listSyntheticDataGenerationsParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listSyntheticDataGenerations({});
+        watsonxAIService.listSyntheticDataGenerations({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
@@ -7463,7 +7461,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getSyntheticDataGenerationResult = watsonxAiMlService.getSyntheticDataGeneration(
+        const getSyntheticDataGenerationResult = watsonxAIService.getSyntheticDataGeneration(
           getSyntheticDataGenerationParams
         );
 
@@ -7480,7 +7478,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.path.id).toEqual(id);
@@ -7492,12 +7490,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getSyntheticDataGenerationTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getSyntheticDataGenerationTest();
       });
 
@@ -7514,7 +7512,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getSyntheticDataGeneration(getSyntheticDataGenerationParams);
+        watsonxAIService.getSyntheticDataGeneration(getSyntheticDataGenerationParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -7523,7 +7521,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getSyntheticDataGeneration({});
+          await watsonxAIService.getSyntheticDataGeneration({});
         } catch (e) {
           err = e;
         }
@@ -7534,7 +7532,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getSyntheticDataGeneration();
+          await watsonxAIService.getSyntheticDataGeneration();
         } catch (e) {
           err = e;
         }
@@ -7561,8 +7559,9 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const cancelSyntheticDataGenerationResult =
-          watsonxAiMlService.cancelSyntheticDataGeneration(cancelSyntheticDataGenerationParams);
+        const cancelSyntheticDataGenerationResult = watsonxAIService.cancelSyntheticDataGeneration(
+          cancelSyntheticDataGenerationParams
+        );
 
         // all methods should return a Promise
         expectToBePromise(cancelSyntheticDataGenerationResult);
@@ -7577,7 +7576,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
@@ -7590,12 +7589,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __cancelSyntheticDataGenerationTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __cancelSyntheticDataGenerationTest();
       });
 
@@ -7612,7 +7611,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.cancelSyntheticDataGeneration(cancelSyntheticDataGenerationParams);
+        watsonxAIService.cancelSyntheticDataGeneration(cancelSyntheticDataGenerationParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -7621,7 +7620,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.cancelSyntheticDataGeneration({});
+          await watsonxAIService.cancelSyntheticDataGeneration({});
         } catch (e) {
           err = e;
         }
@@ -7632,7 +7631,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.cancelSyntheticDataGeneration();
+          await watsonxAIService.cancelSyntheticDataGeneration();
         } catch (e) {
           err = e;
         }
@@ -7676,7 +7675,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const createTaxonomyResult = watsonxAiMlService.createTaxonomy(createTaxonomyParams);
+        const createTaxonomyResult = watsonxAIService.createTaxonomy(createTaxonomyParams);
 
         // all methods should return a Promise
         expectToBePromise(createTaxonomyResult);
@@ -7696,7 +7695,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.data_reference).toEqual(dataReference);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -7705,12 +7704,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __createTaxonomyTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __createTaxonomyTest();
       });
 
@@ -7727,7 +7726,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createTaxonomy(createTaxonomyParams);
+        watsonxAIService.createTaxonomy(createTaxonomyParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -7736,7 +7735,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createTaxonomy({});
+          await watsonxAIService.createTaxonomy({});
         } catch (e) {
           err = e;
         }
@@ -7747,7 +7746,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createTaxonomy();
+          await watsonxAIService.createTaxonomy();
         } catch (e) {
           err = e;
         }
@@ -7770,7 +7769,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const listTaxonomiesResult = watsonxAiMlService.listTaxonomies(listTaxonomiesParams);
+        const listTaxonomiesResult = watsonxAIService.listTaxonomies(listTaxonomiesParams);
 
         // all methods should return a Promise
         expectToBePromise(listTaxonomiesResult);
@@ -7785,7 +7784,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
       }
@@ -7796,12 +7795,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __listTaxonomiesTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __listTaxonomiesTest();
       });
 
@@ -7816,13 +7815,13 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listTaxonomies(listTaxonomiesParams);
+        watsonxAIService.listTaxonomies(listTaxonomiesParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listTaxonomies({});
+        watsonxAIService.listTaxonomies({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
@@ -7843,7 +7842,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const getTaxonomyResult = watsonxAiMlService.getTaxonomy(getTaxonomyParams);
+        const getTaxonomyResult = watsonxAIService.getTaxonomy(getTaxonomyParams);
 
         // all methods should return a Promise
         expectToBePromise(getTaxonomyResult);
@@ -7858,7 +7857,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.path.id).toEqual(id);
@@ -7870,12 +7869,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getTaxonomyTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getTaxonomyTest();
       });
 
@@ -7892,7 +7891,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getTaxonomy(getTaxonomyParams);
+        watsonxAIService.getTaxonomy(getTaxonomyParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -7901,7 +7900,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getTaxonomy({});
+          await watsonxAIService.getTaxonomy({});
         } catch (e) {
           err = e;
         }
@@ -7912,7 +7911,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getTaxonomy();
+          await watsonxAIService.getTaxonomy();
         } catch (e) {
           err = e;
         }
@@ -7939,7 +7938,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const deleteTaxonomyResult = watsonxAiMlService.deleteTaxonomy(deleteTaxonomyParams);
+        const deleteTaxonomyResult = watsonxAIService.deleteTaxonomy(deleteTaxonomyParams);
 
         // all methods should return a Promise
         expectToBePromise(deleteTaxonomyResult);
@@ -7954,7 +7953,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
@@ -7967,12 +7966,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __deleteTaxonomyTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __deleteTaxonomyTest();
       });
 
@@ -7989,7 +7988,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deleteTaxonomy(deleteTaxonomyParams);
+        watsonxAIService.deleteTaxonomy(deleteTaxonomyParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -7998,7 +7997,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteTaxonomy({});
+          await watsonxAIService.deleteTaxonomy({});
         } catch (e) {
           err = e;
         }
@@ -8009,7 +8008,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteTaxonomy();
+          await watsonxAIService.deleteTaxonomy();
         } catch (e) {
           err = e;
         }
@@ -8513,7 +8512,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const modelsCreateResult = watsonxAiMlService.createModel(modelsCreateParams);
+        const modelsCreateResult = watsonxAIService.createModel(modelsCreateParams);
 
         // all methods should return a Promise
         expectToBePromise(modelsCreateResult);
@@ -8556,7 +8555,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.data_preprocessing).toEqual(dataPreprocessing);
         expect(mockRequestOptions.body.training).toEqual(training);
         expect(mockRequestOptions.body.content_location).toEqual(contentLocation);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
       test('should pass the right params to createRequest with enable and disable retries', () => {
@@ -8565,12 +8564,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __modelsCreateTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __modelsCreateTest();
       });
 
@@ -8589,7 +8588,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.createModel(modelsCreateParams);
+        watsonxAIService.createModel(modelsCreateParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -8598,7 +8597,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.createModel({});
+          await watsonxAIService.createModel({});
         } catch (e) {
           err = e;
         }
@@ -8609,7 +8608,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.createModel();
+          await watsonxAIService.createModel();
         } catch (e) {
           err = e;
         }
@@ -8640,7 +8639,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const modelsListResult = watsonxAiMlService.listModels(modelsListParams);
+        const modelsListResult = watsonxAIService.listModels(modelsListParams);
 
         // all methods should return a Promise
         expectToBePromise(modelsListResult);
@@ -8655,7 +8654,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.start).toEqual(start);
@@ -8670,12 +8669,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __modelsListTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __modelsListTest();
       });
 
@@ -8690,19 +8689,19 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listModels(modelsListParams);
+        watsonxAIService.listModels(modelsListParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listModels({});
+        watsonxAIService.listModels({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
 
     describe('ModelsListPager tests', () => {
-      const serviceUrl = watsonxAiMlServiceOptions.url;
+      const serviceUrl = watsonxAIServiceOptions.url;
       const path = '/ml/v4/models';
       const mockPagerResponse1 =
         '{"next":{"href":"https://myhost.com/somePath?start=1"},"total_count":2,"limit":1,"resources":[{"metadata":{"id":"id","created_at":"2019-01-01T12:00:00.000Z","rev":"rev","owner":"owner","modified_at":"2019-01-01T12:00:00.000Z","parent_id":"parent_id","name":"name","description":"description","tags":["tags"],"commit_info":{"committed_at":"2019-01-01T12:00:00.000Z","commit_message":"commit_message"},"space_id":"3fc54cf1-252f-424b-b52d-5cdd9814987f","project_id":"12ac4cf1-252f-424b-b52d-5cdd9814987f"},"entity":{"type":"tensorflow_1.5","software_spec":{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab","rev":"2","name":"name"},"pipeline":{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab","rev":"2"},"model_definition":{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab"},"hyper_parameters":{"anyKey":"anyValue"},"domain":"domain","training_data_references":[{"id":"8d3682dd-2858-43c9-bfd7-12a79abcfb0c","type":"connection_asset","connection":{},"location":{"mapKey":"inner"},"schema":{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}}],"test_data_references":[{"id":"8d3682dd-2858-43c9-bfd7-12a79abcfb0c","type":"connection_asset","connection":{},"location":{"mapKey":"inner"},"schema":{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}}],"schemas":{"input":[{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}],"output":[{"id":"t1","name":"Tasks","fields":[{"anyKey":"anyValue"}],"type":"struct"}]},"label_column":"label_column","transformed_label_column":"transformed_label_column","size":{"in_memory":9,"content":7},"metrics":[{"timestamp":"2018-12-01T10:11:12.000Z","iteration":2,"ml_metrics":{"mapKey":5},"ts_metrics":{"training":{"neg_symmetric_mean_absolute_percentage_error":-38.35790647931252}},"tsad_metrics":{"iterations":[{"average_precision":{"localized_extreme":0.5294117647058824,"level_shift":1,"variance":0.5471792823589406,"trend":0.8183221870721871},"roc_auc":{"anyKey":"anyValue"},"f1":{"anyKey":"anyValue"},"precision":{"anyKey":"anyValue"},"recall":{"anyKey":"anyValue"}}],"agg":{"average_precision":{"level_shift":{"mean":1,"range":[5]},"localized_extreme":{"mean":1,"range":[5]},"trend":{"mean":1,"range":[5]},"variance":{"mean":1,"range":[5]}},"f1":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}},"precision":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}},"recall":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}},"roc_auc":{"level_shift":{"anyKey":"anyValue"},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"mean":1,"range":[5]}}},"supporting_rank":{"average_precision":{"level_shift":{"p1":2,"p2":2,"p3":2,"p4":5,"p5":5,"p6":6},"localized_extreme":{"anyKey":"anyValue"},"trend":{"anyKey":"anyValue"},"variance":{"anyKey":"anyValue"}},"f1":{"anyKey":"anyValue"},"roc_auc":{"anyKey":"anyValue"},"precision":{"anyKey":"anyValue"},"recall":{"anyKey":"anyValue"}},"aggregated_score":[{"p1":14.5,"p2":12,"p3":12,"p4":10,"p5":6,"p6":5}]},"ml_federated_metrics":{"mapKey":{"remote_training_systems":[{"id":"id","local":5,"fused":5}],"global":6}},"context":{"deployment_id":"deployment_id","intermediate_model":{"name":"my_pipeline","process":"process","location":{"pipeline":"pipeline","pipeline_model":"pipeline_model","model":"model"},"notebook_location":"notebook_location","sdk_notebook_location":"sdk_notebook_location","pipeline_nodes":["pipeline_nodes"],"composition_steps":["composition_steps"],"duration":8,"model_asset":"model_asset"},"phase":"phase","step":{"id":"id","name":"name","started_at":"2019-01-01T12:00:00.000Z","completed_at":"2019-01-01T12:00:00.000Z","hyper_parameters":{"anyKey":"anyValue"},"data_allocation":15,"estimator":"estimator","transformer":"transformer","score":5},"classes":["anyValue"],"binary_classification":{"confusion_matrices":[{"true_class":"true_class","tp":2,"tn":2,"fp":2,"fn":2}],"roc_curves":[{"true_class":"true_class","tpr":[3],"fpr":[3],"thresholds":[10]}]},"multi_class_classification":{"one_vs_all":[{"class":"class","confusion_matrix_location":"data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/confusion_matrix.json","confusion_matrix":{"true_class":"true_class","tp":2,"tn":2,"fp":2,"fn":2},"roc_curve_location":"data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/roc_curve.json","roc_curve":{"true_class":"true_class","tpr":[3],"fpr":[3],"thresholds":[10]}}],"one_vs_all_location":"data/7d9ac934-9073-4ffd-846c-7b1f912b1ab2/data/autoai/pre_hpo_d_output/Pipeline1/one_vs_all.json"},"features_importance":[{"computation_type":"computation_type","features":{"mapKey":5},"min_max_normalization":true}],"schema":"schema","estimators":["estimators"],"incremental_training":{"iteration":10,"total_iterations":30,"measures_location":"/path_to_csv","train_batch_samples_count":10786,"holdout_samples_count":6784,"early_stop_triggered":true},"prediction_type":"regression"}}],"custom":{"anyKey":"anyValue"},"user_defined_objects":{"mapKey":"inner"},"hybrid_pipeline_software_specs":[{"id":"4cedab6d-e8e4-4214-b81a-2ddb122db2ab","rev":"2","name":"name"}],"model_version":{"number":"1.0.0","tag":"xgb classifier","description":"Providing an update to the version."},"training_id":"b8e64f4b-ead1-47f3-abf6-8247b2826763","data_preprocessing":[{"stage":"sampling","input":{"rows":50000,"columns":81},"output":{"rows":1463,"columns":81},"props":{"anyKey":"anyValue"}}],"training":{"id":"b8e64f4b-ead1-47f3-abf6-8247b2826763","base_model":{"model_id":"google/flan-t5-xl"},"task_id":"summarization","verbalizer":"{{input}}"},"content_import_state":"completed"},"system":{"warnings":[{"message":"The framework TF 1.1 is deprecated.","id":"2fc54cf1-252f-424b-b52d-5cdd98149871","more_info":"more_info","additional_properties":{"anyKey":"anyValue"}}]}}]}';
@@ -8732,7 +8731,7 @@ describe('WatsonxAiMlVml_v1', () => {
           search: 'testString',
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -8750,7 +8749,7 @@ describe('WatsonxAiMlVml_v1', () => {
           tagValue: 'tf2.0 or tf2.1',
           search: 'testString',
         };
-        const pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -8775,7 +8774,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const modelsGetResult = watsonxAiMlService.getModel(modelsGetParams);
+        const modelsGetResult = watsonxAIService.getModel(modelsGetParams);
 
         // all methods should return a Promise
         expectToBePromise(modelsGetResult);
@@ -8790,7 +8789,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.rev).toEqual(rev);
@@ -8803,12 +8802,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __modelsGetTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __modelsGetTest();
       });
 
@@ -8825,7 +8824,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getModel(modelsGetParams);
+        watsonxAIService.getModel(modelsGetParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -8834,7 +8833,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getModel({});
+          await watsonxAIService.getModel({});
         } catch (e) {
           err = e;
         }
@@ -8845,7 +8844,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getModel();
+          await watsonxAIService.getModel();
         } catch (e) {
           err = e;
         }
@@ -8870,7 +8869,7 @@ describe('WatsonxAiMlVml_v1', () => {
           signal,
         };
 
-        const modelsDeleteResult = watsonxAiMlService.deleteModel(modelsDeleteParams);
+        const modelsDeleteResult = watsonxAIService.deleteModel(modelsDeleteParams);
 
         // all methods should return a Promise
         expectToBePromise(modelsDeleteResult);
@@ -8885,7 +8884,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
-        expect(mockRequestOptions.qs.version).toEqual(watsonxAiMlServiceOptions.version);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.model_id).toEqual(modelId);
@@ -8897,12 +8896,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __modelsDeleteTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __modelsDeleteTest();
       });
 
@@ -8919,7 +8918,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.deleteModel(modelsDeleteParams);
+        watsonxAIService.deleteModel(modelsDeleteParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -8928,7 +8927,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteModel({});
+          await watsonxAIService.deleteModel({});
         } catch (e) {
           err = e;
         }
@@ -8939,7 +8938,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.deleteModel();
+          await watsonxAIService.deleteModel();
         } catch (e) {
           err = e;
         }
@@ -8954,7 +8953,7 @@ describe('WatsonxAiMlVml_v1', () => {
         // Construct the params object for operation listUtilityAgentTools
         const getUtilityAgentToolsParams = {};
 
-        const getUtilityAgentToolsResult = watsonxAiMlService.listUtilityAgentTools(
+        const getUtilityAgentToolsResult = watsonxAIService.listUtilityAgentTools(
           getUtilityAgentToolsParams
         );
 
@@ -8978,12 +8977,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getUtilityAgentToolsTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getUtilityAgentToolsTest();
       });
 
@@ -8998,13 +8997,13 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.listUtilityAgentTools(getUtilityAgentToolsParams);
+        watsonxAIService.listUtilityAgentTools(getUtilityAgentToolsParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listUtilityAgentTools({});
+        watsonxAIService.listUtilityAgentTools({});
         checkForSuccessfulExecution(createRequestMock);
       });
     });
@@ -9020,7 +9019,7 @@ describe('WatsonxAiMlVml_v1', () => {
         };
 
         const getUtilityAgentToolResult =
-          watsonxAiMlService.getUtilityAgentTool(getUtilityAgentToolParams);
+          watsonxAIService.getUtilityAgentTool(getUtilityAgentToolParams);
 
         // all methods should return a Promise
         expectToBePromise(getUtilityAgentToolResult);
@@ -9043,12 +9042,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __getUtilityAgentToolTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __getUtilityAgentToolTest();
       });
 
@@ -9065,7 +9064,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.getUtilityAgentTool(getUtilityAgentToolParams);
+        watsonxAIService.getUtilityAgentTool(getUtilityAgentToolParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -9074,7 +9073,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.getUtilityAgentTool({});
+          await watsonxAIService.getUtilityAgentTool({});
         } catch (e) {
           err = e;
         }
@@ -9085,7 +9084,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.getUtilityAgentTool();
+          await watsonxAIService.getUtilityAgentTool();
         } catch (e) {
           err = e;
         }
@@ -9113,7 +9112,7 @@ describe('WatsonxAiMlVml_v1', () => {
           wxUtilityAgentToolsRunRequest,
         };
 
-        const postUtilityAgentToolsRunResult = watsonxAiMlService.runUtilityAgentTool(
+        const postUtilityAgentToolsRunResult = watsonxAIService.runUtilityAgentTool(
           postUtilityAgentToolsRunParams
         );
 
@@ -9138,12 +9137,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __postUtilityAgentToolsRunTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __postUtilityAgentToolsRunTest();
       });
 
@@ -9160,7 +9159,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.runUtilityAgentTool(postUtilityAgentToolsRunParams);
+        watsonxAIService.runUtilityAgentTool(postUtilityAgentToolsRunParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -9169,7 +9168,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.runUtilityAgentTool({});
+          await watsonxAIService.runUtilityAgentTool({});
         } catch (e) {
           err = e;
         }
@@ -9180,7 +9179,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.runUtilityAgentTool();
+          await watsonxAIService.runUtilityAgentTool();
         } catch (e) {
           err = e;
         }
@@ -9213,7 +9212,7 @@ describe('WatsonxAiMlVml_v1', () => {
           wxUtilityAgentToolsRunRequest,
         };
 
-        const postUtilityAgentToolsRunByNameResult = watsonxAiMlService.runUtilityAgentToolByName(
+        const postUtilityAgentToolsRunByNameResult = watsonxAIService.runUtilityAgentToolByName(
           postUtilityAgentToolsRunByNameParams
         );
 
@@ -9239,12 +9238,12 @@ describe('WatsonxAiMlVml_v1', () => {
 
         // enable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         __postUtilityAgentToolsRunByNameTest();
 
         // disable retries and test again
         createRequestMock.mockClear();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         __postUtilityAgentToolsRunByNameTest();
       });
 
@@ -9263,7 +9262,7 @@ describe('WatsonxAiMlVml_v1', () => {
           },
         };
 
-        watsonxAiMlService.runUtilityAgentToolByName(postUtilityAgentToolsRunByNameParams);
+        watsonxAIService.runUtilityAgentToolByName(postUtilityAgentToolsRunByNameParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
@@ -9272,7 +9271,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should enforce required parameters', async () => {
         let err;
         try {
-          await watsonxAiMlService.runUtilityAgentToolByName({});
+          await watsonxAIService.runUtilityAgentToolByName({});
         } catch (e) {
           err = e;
         }
@@ -9283,12 +9282,125 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
-          await watsonxAiMlService.runUtilityAgentToolByName();
+          await watsonxAIService.runUtilityAgentToolByName();
         } catch (e) {
           err = e;
         }
 
         expect(err.message).toMatch(/Missing required parameters/);
+      });
+    });
+  });
+
+  describe('deploymentsTimeSeriesForecast', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // TSForecastInputSchema
+      const tsForecastInputSchemaModel = {
+        timestamp_column: 'date',
+        id_columns: ['ID1'],
+        freq: '1h',
+        target_columns: ['testString'],
+      };
+
+      // DeploymentTSForecastParameters
+      const deploymentTsForecastParametersModel = {
+        prediction_length: 38,
+        inference_batch_size: 38,
+      };
+
+      const idOrName = 'testString';
+      const data = {
+        date: ['2020-01-01T00:00:00', '2020-01-01T01:00:00', '2020-01-05T01:00:00'],
+        ID1: ['D1', 'D1', 'D1'],
+        TARGET1: [1.46, 2.34, 4.55],
+      };
+      const schema = tsForecastInputSchemaModel;
+      const parameters = deploymentTsForecastParametersModel;
+      const futureData = { anyKey: 'anyValue' };
+      const deploymentsTimeSeriesForecastParams = {
+        idOrName,
+        data,
+        schema,
+        parameters,
+        futureData,
+      };
+
+      function deploymentsTimeSeriesForecastTest() {
+        const deploymentsTimeSeriesForecastResult = watsonxAIService.deploymentsTimeSeriesForecast(
+          deploymentsTimeSeriesForecastParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(deploymentsTimeSeriesForecastResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(
+          mockRequestOptions,
+          '/ml/v1/deployments/{id_or_name}/time_series/forecast',
+          'POST'
+        );
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'application/json';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.data).toEqual(data);
+        expect(mockRequestOptions.body.schema).toEqual(schema);
+        expect(mockRequestOptions.body.parameters).toEqual(parameters);
+        expect(mockRequestOptions.body.future_data).toEqual(futureData);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
+        expect(mockRequestOptions.path.id_or_name).toEqual(idOrName);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        deploymentsTimeSeriesForecastTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.enableRetries();
+        deploymentsTimeSeriesForecastTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.disableRetries();
+        deploymentsTimeSeriesForecastTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const overrideDeploymentsTimeSeriesForecastParams = {
+          idOrName,
+          data,
+          schema,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAIService.deploymentsTimeSeriesForecast(overrideDeploymentsTimeSeriesForecastParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        await expect(watsonxAIService.deploymentsTimeSeriesForecast({})).rejects.toThrow(
+          /Missing required parameters/
+        );
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        await expect(watsonxAIService.deploymentsTimeSeriesForecast()).rejects.toThrow(
+          /Missing required parameters/
+        );
       });
     });
   });

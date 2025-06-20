@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es2022",
-    "module": "es2022",
-    "moduleResolution": "node",
+    "target": "esnext",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "strict": true,
     "resolveJsonModule": true,
     "lib": ["es6", "es5", "es2015", "dom", "scripthost"],
@@ -15,9 +15,10 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "paths": {
-      "@ibm-cloud/watsonx-ai": ["../../watsonx-ai-ml"]
+      "@ibm-cloud/watsonx-ai": ["../watsonx-ai-ml"]
     },
+    "isolatedModules": true,
     "allowJs": true
   },
-  "include": ["src/sdk/**/*", "src/external/**/*", "src/test/**/*", "eslint.config.js"]
+  "include": ["src/sdk/**/*", "src/external/**/*", "test/**/*", "eslint.config.js"]
 }

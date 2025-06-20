@@ -33,14 +33,14 @@ const {
   checkForSuccessfulExecution,
 } = unitTestUtils;
 
-const watsonxAiMlServiceOptions = {
+const watsonxAIServiceOptions = {
   authenticator: new NoAuthAuthenticator(),
   url: 'https://api.dataplatform.cloud.ibm.com',
   version: '2023-07-07',
 };
 
-const watsonxAiMlService = new WatsonxAiMlVml_v1(watsonxAiMlServiceOptions);
-const createRequestMocker = new MockingRequest(watsonxAiMlService, 'createRequest');
+const watsonxAIService = new WatsonxAiMlVml_v1(watsonxAIServiceOptions);
+const createRequestMocker = new MockingRequest(watsonxAIService, 'createRequest');
 
 describe('Data & AI Common Core methods', () => {
   let createRequestMock;
@@ -96,7 +96,7 @@ describe('Data & AI Common Core methods', () => {
 
     describe('positive tests', () => {
       function createSpaceTest() {
-        const createSpaceResult = watsonxAiMlService.createSpace(createSpaceParams);
+        const createSpaceResult = watsonxAIService.createSpace(createSpaceParams);
 
         // all methods should return a Promise
         expectToBePromise(createSpaceResult);
@@ -163,12 +163,12 @@ describe('Data & AI Common Core methods', () => {
 
         // enable retries and test again
         createRequestMocker.clearMock();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         createSpaceTest();
 
         // disable retries and test again
         createRequestMocker.clearMock();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         createSpaceTest();
       });
 
@@ -191,22 +191,20 @@ describe('Data & AI Common Core methods', () => {
           },
         };
 
-        watsonxAiMlService.createSpace(createSpacePriorParams);
+        watsonxAIService.createSpace(createSpacePriorParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
 
     describe('negative tests', () => {
       test('should enforce required parameters', async () => {
-        await expect(watsonxAiMlService.createSpace({})).rejects.toThrow(
+        await expect(watsonxAIService.createSpace({})).rejects.toThrow(
           /Missing required parameters/
         );
       });
 
       test('should reject promise when required params are not given', async () => {
-        await expect(watsonxAiMlService.createSpace()).rejects.toThrow(
-          /Missing required parameters/
-        );
+        await expect(watsonxAIService.createSpace()).rejects.toThrow(/Missing required parameters/);
       });
     });
   });
@@ -233,7 +231,7 @@ describe('Data & AI Common Core methods', () => {
           signal,
         };
 
-        const listSpaceResult = watsonxAiMlService.listSpaces(listSpacesParams);
+        const listSpaceResult = watsonxAIService.listSpaces(listSpacesParams);
 
         // all methods should return a Promise
         expectToBePromise(listSpaceResult);
@@ -270,12 +268,12 @@ describe('Data & AI Common Core methods', () => {
 
         // enable retries and test again
         createRequestMocker.clearMock();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         listSpaceTest();
 
         // disable retries and test again
         createRequestMocker.clearMock();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         listSpaceTest();
       });
 
@@ -290,19 +288,19 @@ describe('Data & AI Common Core methods', () => {
           },
         };
 
-        watsonxAiMlService.listSpaces(listSpacesParams);
+        watsonxAIService.listSpaces(listSpacesParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
 
       test('should not have any problems when no parameters are passed in', () => {
         // invoke the method with no parameters
-        watsonxAiMlService.listSpaces();
+        watsonxAIService.listSpaces();
         checkForSuccessfulExecution(createRequestMock);
       });
     });
 
     describe('ListSpacesPager tests', () => {
-      const serviceUrl = watsonxAiMlServiceOptions.url;
+      const serviceUrl = watsonxAIServiceOptions.url;
       const path = '/v2/spaces';
       const spaceInfo = {
         metadata: {
@@ -373,10 +371,10 @@ describe('Data & AI Common Core methods', () => {
 
       const mockPagerResponse1 = {
         'first': {
-          href: `${watsonxAiMlServiceOptions.url}/v2/spaces`,
+          href: `${watsonxAIServiceOptions.url}/v2/spaces`,
         },
         'next': {
-          href: `${watsonxAiMlServiceOptions.url}/v2/spaces?start=00e5cdaa-8c76-4b0b-af34-a502921a56d0`,
+          href: `${watsonxAIServiceOptions.url}/v2/spaces?start=00e5cdaa-8c76-4b0b-af34-a502921a56d0`,
         },
         'total_count': 2,
         'limit': 1,
@@ -410,7 +408,7 @@ describe('Data & AI Common Core methods', () => {
           limit: 2,
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.ListSpacesPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.ListSpacesPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -424,7 +422,7 @@ describe('Data & AI Common Core methods', () => {
         const params = {
           limit: 1,
         };
-        const pager = new WatsonxAiMlVml_v1.ListSpacesPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.ListSpacesPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -441,7 +439,7 @@ describe('Data & AI Common Core methods', () => {
           signal,
         };
 
-        const getSpaceResult = watsonxAiMlService.getSpace(getSpaceParams);
+        const getSpaceResult = watsonxAIService.getSpace(getSpaceParams);
 
         // all methods should return a Promise
         expectToBePromise(getSpaceResult);
@@ -465,12 +463,12 @@ describe('Data & AI Common Core methods', () => {
 
         // enable retries and test again
         createRequestMocker.clearMock();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         getSpaceTest();
 
         // disable retries and test again
         createRequestMocker.clearMock();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         getSpaceTest();
       });
 
@@ -486,20 +484,18 @@ describe('Data & AI Common Core methods', () => {
           },
         };
 
-        watsonxAiMlService.getSpace(getSpaceParams);
+        watsonxAIService.getSpace(getSpaceParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
 
     describe('negative tests', () => {
       test('should enforce required parameters', async () => {
-        await expect(watsonxAiMlService.getSpace({})).rejects.toThrow(
-          /Missing required parameters/
-        );
+        await expect(watsonxAIService.getSpace({})).rejects.toThrow(/Missing required parameters/);
       });
 
       test('should reject promise when required params are not given', async () => {
-        await expect(watsonxAiMlService.getSpace()).rejects.toThrow(/Missing required parameters/);
+        await expect(watsonxAIService.getSpace()).rejects.toThrow(/Missing required parameters/);
       });
     });
   });
@@ -514,7 +510,7 @@ describe('Data & AI Common Core methods', () => {
           signal,
         };
 
-        const deleteSpaceResult = watsonxAiMlService.deleteSpace(deleteSpaceParams);
+        const deleteSpaceResult = watsonxAIService.deleteSpace(deleteSpaceParams);
 
         // all methods should return a Promise
         expectToBePromise(deleteSpaceResult);
@@ -538,12 +534,12 @@ describe('Data & AI Common Core methods', () => {
 
         // enable retries and test again
         createRequestMocker.clearMock();
-        watsonxAiMlService.enableRetries();
+        watsonxAIService.enableRetries();
         deleteSpaceTest();
 
         // disable retries and test again
         createRequestMocker.clearMock();
-        watsonxAiMlService.disableRetries();
+        watsonxAIService.disableRetries();
         deleteSpaceTest();
       });
 
@@ -559,22 +555,20 @@ describe('Data & AI Common Core methods', () => {
           },
         };
 
-        watsonxAiMlService.deleteSpace(deleteSpaceParams);
+        watsonxAIService.deleteSpace(deleteSpaceParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
 
     describe('negative tests', () => {
       test('should enforce required parameters', async () => {
-        await expect(watsonxAiMlService.deleteSpace({})).rejects.toThrow(
+        await expect(watsonxAIService.deleteSpace({})).rejects.toThrow(
           /Missing required parameters/
         );
       });
 
       test('should reject promise when required params are not given', async () => {
-        await expect(watsonxAiMlService.deleteSpace()).rejects.toThrow(
-          /Missing required parameters/
-        );
+        await expect(watsonxAIService.deleteSpace()).rejects.toThrow(/Missing required parameters/);
       });
     });
   });

@@ -1,4 +1,4 @@
-import WatsonxAiMlVml_v1 from '@ibm-cloud/watsonx-ai/dist/watsonx-ai-ml/vml_v1';
+import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';
 
 interface IInstructLabJobStatus {
@@ -14,7 +14,7 @@ interface IInstructLabJobStatus {
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 
 const checkIfJobFinshed = async <T>(
-  getter: () => Promise<WatsonxAiMlVml_v1.Response<IInstructLabJobStatus>> & T,
+  getter: () => Promise<WatsonXAI.Response<IInstructLabJobStatus>> & T,
   retries = 5,
   delay = 120000
 ) => {
@@ -35,7 +35,7 @@ const checkIfJobFinshed = async <T>(
   throw new Error('Failed to get a valid response after maximum retries');
 };
 
-const watsonxAiMlService = WatsonxAiMlVml_v1.newInstance({
+const watsonxAIService = WatsonXAI.newInstance({
   serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
   platformUrl: process.env.WATSONX_AI_PLATFORM_URL,
   version: '2023-07-07',
@@ -65,14 +65,14 @@ const documentExtractionParams = {
   projectId: process.env.WATSONX_AI_PROJECT_ID,
 };
 
-const documentExtractionRes = await watsonxAiMlService.createDocumentExtraction(
+const documentExtractionRes = await watsonxAIService.createDocumentExtraction(
   documentExtractionParams
 );
 const docExtId = documentExtractionRes.result.metadata?.id;
 if (!docExtId) throw new Error('No docExtId provided');
 
 const docExtGetter = () =>
-  watsonxAiMlService.getDocumentExtraction({
+  watsonxAIService.getDocumentExtraction({
     id: docExtId,
     projectId,
   });
@@ -88,12 +88,12 @@ const params = {
   dataReference: objectLocationModel,
 };
 
-const taxonomyRes = await watsonxAiMlService.createTaxonomy(params);
+const taxonomyRes = await watsonxAIService.createTaxonomy(params);
 const taxId = taxonomyRes.result.metadata?.id;
 if (!taxId) throw new Error('No taxId provided');
 
 const taxonomyGetter = () =>
-  watsonxAiMlService.getTaxonomy({
+  watsonxAIService.getTaxonomy({
     id: taxId,
     projectId,
   });
@@ -112,12 +112,12 @@ const sdgParams = {
   resultsReference: objectLocationModel,
 };
 
-const sdgRes = await watsonxAiMlService.createSyntheticDataGeneration(sdgParams);
+const sdgRes = await watsonxAIService.createSyntheticDataGeneration(sdgParams);
 const sdgId = sdgRes.result.metadata?.id;
 if (!sdgId) throw new Error('No sdgId provided');
 
 const sdgGetter = () =>
-  watsonxAiMlService.getSyntheticDataGeneration({
+  watsonxAIService.getSyntheticDataGeneration({
     id: sdgId,
     projectId,
   });
@@ -143,6 +143,6 @@ const fineTuningParams = {
   custom: { name: 'model', size: 2 },
 };
 
-const res = await watsonxAiMlService.createFineTuning(fineTuningParams);
+const res = await watsonxAIService.createFineTuning(fineTuningParams);
 const fineTunId = res.result.metadata?.id;
 console.log(fineTunId);

@@ -25,7 +25,11 @@ import {
   NoAuthAuthenticator,
   readExternalSources,
 } from 'ibm-cloud-sdk-core';
-import { JWTRequestBaseAuthenticator, RequestTokenResponse } from './authenticators';
+import {
+  AWSAuthenticator,
+  JWTRequestBaseAuthenticator,
+  RequestTokenResponse,
+} from './authenticators';
 
 /**
  * Look for external configuration of authenticator.
@@ -39,10 +43,15 @@ import { JWTRequestBaseAuthenticator, RequestTokenResponse } from './authenticat
  * @param {() => Promise<RequestTokenResponse>} requestToken - function for requesting JWToken.
  *
  */
-export function getAuthenticatorFromEnvironment(
-  serviceName: string,
-  requestToken?: () => Promise<RequestTokenResponse>
-): Authenticator {
+export function getAuthenticatorFromEnvironment({
+  serviceName,
+  serviceUrl,
+  requestToken,
+}: {
+  serviceName: string;
+  serviceUrl?: string;
+  requestToken?: () => Promise<RequestTokenResponse>;
+}): Authenticator {
   if (!serviceName) {
     throw new Error('Service name is required.');
   }
@@ -97,7 +106,7 @@ export function getAuthenticatorFromEnvironment(
     case Authenticator.AUTHTYPE_BASIC:
       authenticator = new BasicAuthenticator(credentials);
       break;
-    case Authenticator.AUTHTYPE_BEARERTOKEN:
+    case Authenticator.AUTHTYPE_BEARERTOKEN.toLowerCase():
       authenticator = new BearerTokenAuthenticator(credentials);
       break;
     case Authenticator.AUTHTYPE_CP4D:
@@ -114,6 +123,15 @@ export function getAuthenticatorFromEnvironment(
         throw new Error(
           'requestToken function not provided. This function is necessary for zen authentication.'
         );
+      break;
+    case AWSAuthenticator.AUTHTYPE_AWS:
+      if (!credentials.url && serviceUrl) {
+        credentials.url =
+          serviceUrl.includes('test') || serviceUrl.includes('dev')
+            ? 'https://account-iam.platform.test.saas.ibm.com'
+            : 'https://account-iam.platform.saas.ibm.com';
+      }
+      authenticator = new AWSAuthenticator(credentials);
       break;
     default:
       throw new Error(`Invalid value for AUTH_TYPE: ${authType}`);

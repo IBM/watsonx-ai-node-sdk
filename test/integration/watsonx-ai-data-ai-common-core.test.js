@@ -5,6 +5,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 
+const path = require('path');
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
 
@@ -12,7 +13,7 @@ const authHelper = require('../resources/auth-helper.js');
 const timeout = 200000;
 
 // Location of our config file.
-const configFile = 'credentials/watsonx_ai_ml_vml_v1.env';
+const configFile = path.resolve(__dirname, '../../credentials/watsonx_ai_ml_vml_v1.env');
 const describe = authHelper.prepareTests(configFile);
 const version = '2023-07-07';
 
@@ -41,10 +42,10 @@ const watsonxInstance = WatsonxAiMlVml_v1.newInstance({
 });
 
 const deleteSpaceAfterTests = async (spaceId) => {
-  const res = await watsonxInstance.deleteSpace({
-    spaceId,
-  });
   try {
+    const res = await watsonxInstance.deleteSpace({
+      spaceId,
+    });
     expect(res.status).toBe(202);
   } catch (e) {
     console.error(e);
@@ -56,9 +57,6 @@ describe('Repository methods tests', () => {
   jest.setTimeout(timeout);
 
   describe('Space', () => {
-    const timestamp = Date.now();
-    let name = `test-node-js-${timestamp}`;
-
     describe('Creation', () => {
       let createdSpaceId;
 
@@ -67,6 +65,8 @@ describe('Repository methods tests', () => {
       });
 
       test('createSpace()', async () => {
+        const timestamp = Date.now();
+        const name = `test-node-js-${timestamp}`;
         const res = await watsonxInstance.createSpace({
           name,
           storage: {
@@ -85,6 +85,8 @@ describe('Repository methods tests', () => {
 
     describe('Operations on existing space', () => {
       let createdSpaceId;
+      const timestamp = Date.now();
+      let name = `test-node-js-${timestamp}`;
 
       beforeAll(async () => {
         const res = await watsonxInstance.createSpace({

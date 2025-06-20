@@ -137,10 +137,6 @@ describe('Regression tests regarding langchain llms', () => {
               topK: 1,
               topP: 1,
               repetitionPenalty: 1.1,
-              lengthPenalty: {
-                decay_factor: 10,
-                start_index: 5,
-              },
               randomSeed: 12345,
               decodingMethod: 'sample',
             });
@@ -193,10 +189,6 @@ describe('Regression tests regarding langchain llms', () => {
               topK: 1,
               topP: 1,
               repetitionPenalty: 1.1,
-              lengthPenalty: {
-                decay_factor: 10,
-                start_index: 5,
-              },
               randomSeed: 12345,
               decodingMethod: 'sample',
             });
@@ -261,10 +253,6 @@ describe('Regression tests regarding langchain llms', () => {
               topK: 1,
               topP: 1,
               repetitionPenalty: 1.1,
-              lengthPenalty: {
-                decay_factor: 10,
-                start_index: 5,
-              },
               randomSeed: 12345,
               decodingMethod: 'sample',
             });

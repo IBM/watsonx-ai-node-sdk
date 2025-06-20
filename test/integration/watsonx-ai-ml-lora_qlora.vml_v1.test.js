@@ -4,9 +4,9 @@
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
-
 const https = require('https');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
+const path = require('path');
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
 
@@ -14,7 +14,8 @@ const authHelper = require('../resources/auth-helper.js');
 const timeout = 200000;
 const model = 'meta-llama/llama-3-1-8b';
 // Location of our config file.
-const configFile = 'credentials/watsonx_ai_ml_vml_v1.env';
+const configFile = path.resolve(__dirname, '../../credentials/watsonx_ai_ml_vml_v1.env');
+
 const describe = authHelper.prepareTests(configFile);
 
 authHelper.loadEnv();
@@ -75,38 +76,35 @@ describe('Ilab tests', () => {
   jest.setTimeout(timeout);
 
   // Service instance
-  let watsonxAiMlService;
+  let watsonxAIService;
   beforeAll(async () => {
-    watsonxAiMlService = WatsonxAiMlVml_v1.newInstance({
+    watsonxAIService = WatsonxAiMlVml_v1.newInstance({
       serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
       platformUrl: process.env.WATSONX_AI_PLATFORM_URL,
       version: '2023-07-07',
     });
 
-    expect(watsonxAiMlService).not.toBeNull();
+    expect(watsonxAIService).not.toBeNull();
 
     const config = readExternalSources(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME);
     expect(config).not.toBeNull();
-    watsonxAiMlService.enableRetries();
+    watsonxAIService.enableRetries();
   });
 
   test('Delete all fine tunings', async () => {
-    await deleteAllFineTunings(watsonxAiMlService);
+    await deleteAllFineTunings(watsonxAIService);
   });
 
   test('Delete all deployments', async () => {
-    await deleteAllDeployments(watsonxAiMlService);
+    await deleteAllDeployments(watsonxAIService);
   });
 
   test('createFineTuning()', async () => {
-    // Request models needed by this operation.
-
-    // ObjectLocation
     const objectLocationModel = {
       'location': {
-        'path': 'fine_tuning/results',
+        'path': 'default_tuning_output',
       },
-      'type': 'fs',
+      'type': 'container',
     };
 
     const trainingDataReferences = {
@@ -158,7 +156,7 @@ describe('Ilab tests', () => {
       parameters: fineTuningParametersModel,
     };
 
-    const res = await watsonxAiMlService.createFineTuning(params);
+    const res = await watsonxAIService.createFineTuning(params);
     fineTuningId = res.result.metadata.id;
     expect(res).toBeDefined();
     expect(res.status).toBe(201);
@@ -167,7 +165,7 @@ describe('Ilab tests', () => {
 
   test('Check fine tuning', async () => {
     const getter = () =>
-      watsonxAiMlService.getFineTuning({
+      watsonxAIService.getFineTuning({
         id: fineTuningId,
         projectId,
       });
@@ -189,7 +187,7 @@ describe('Ilab tests', () => {
       },
     };
 
-    const response = await watsonxAiMlService.createModel(data);
+    const response = await watsonxAIService.createModel(data);
 
     console.log(response.result);
     storedModelId = response.result.metadata.id;
@@ -219,13 +217,13 @@ describe('Ilab tests', () => {
         'num_nodes': 1,
       },
     };
-    const res = await watsonxAiMlService.createDeployment(params);
+    const res = await watsonxAIService.createDeployment(params);
     deployedId = res.result.metadata.id;
   });
 
   test('Check deployment', async () => {
     const getter = () =>
-      watsonxAiMlService.getDeployment({
+      watsonxAIService.getDeployment({
         projectId,
         deploymentId: deployedId,
       });
@@ -254,7 +252,7 @@ describe('Ilab tests', () => {
       baseDeploymentId: deployedId,
     };
 
-    const res = await watsonxAiMlService.createDeployment(params);
+    const res = await watsonxAIService.createDeployment(params);
     console.log(res);
     loraAdapterId = res.result.metadata.id;
     expect(res).toBeDefined();
@@ -264,7 +262,7 @@ describe('Ilab tests', () => {
 
   test('Check LORA deployment', async () => {
     const getter = () =>
-      watsonxAiMlService.getDeployment({
+      watsonxAIService.getDeployment({
         projectId,
         deploymentId: loraAdapterId,
       });
@@ -273,7 +271,7 @@ describe('Ilab tests', () => {
   }, 6000000);
 
   test('Infere adapter', async () => {
-    const res = await watsonxAiMlService.deploymentGenerateText({
+    const res = await watsonxAIService.deploymentGenerateText({
       idOrName: loraAdapterId,
       input: "Can't find my code",
     });

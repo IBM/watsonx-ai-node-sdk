@@ -13,8 +13,6 @@ import {
 } from '@ibm-cloud/watsonx-ai';
 
 import '../utils/config.ts';
-import { TextChatMessages } from '@ibm-cloud/watsonx-ai/dist/watsonx-ai-ml/vml_v1';
-import { tool } from '@langchain/core/tools';
 
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
@@ -34,7 +32,7 @@ const twoToolAgent = async (input: string) => {
   const chatTools = tools.map((item) => convertUtilityToolToWatsonxTool(item));
   console.log(chatTools.map((item) => item.function?.parameters));
 
-  const messages: TextChatMessages[] = [{ role: 'user', content: input }];
+  const messages: WatsonXAI.TextChatMessages[] = [{ role: 'user', content: input }];
   const textUtilityChat = await watsonxAIService.textChat({
     messages,
     tools: chatTools,

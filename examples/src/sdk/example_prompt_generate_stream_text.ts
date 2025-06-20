@@ -24,7 +24,7 @@ const watsonxAIService = WatsonXAI.newInstance({
 
 // Define parameters for text generation
 const textGenRequestParametersModel = {
-  max_new_tokens: 100,
+  max_new_tokens: 50,
 };
 
 // Define parameters for created prompt structure

@@ -20,15 +20,16 @@
 
 const { Readable, addAbortSignal } = require('node:stream');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
+const path = require('path');
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
 const { Stream } = require('../../dist/lib/common.js');
-
+const { chatModel } = require('./config.js');
 // testcase timeout value (200s).
 const timeout = 200000;
 
 // Location of our config file.
-const configFile = 'credentials/watsonx_ai_ml_vml_v1.env';
+const configFile = path.resolve(__dirname, '../../credentials/watsonx_ai_ml_vml_v1.env');
 const describe = authHelper.prepareTests(configFile);
 // Limit for all listing methods to avoid too heavy memory and time consumption
 const limit = 5;
@@ -51,7 +52,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   jest.setTimeout(timeout);
 
   // Service instance
-  let watsonxAiMlService;
+  let watsonxAIService;
   let trainingId;
   let deploymentId;
   let promptId;
@@ -63,21 +64,38 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   let textExtId;
 
   beforeAll(async () => {
-    watsonxAiMlService = WatsonxAiMlVml_v1.newInstance({
+    watsonxAIService = WatsonxAiMlVml_v1.newInstance({
       serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
       platformUrl: process.env.WATSONX_AI_PLATFORM_URL,
       version: '2023-07-07',
     });
 
-    expect(watsonxAiMlService).not.toBeNull();
+    expect(watsonxAIService).not.toBeNull();
 
     const config = readExternalSources(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME);
     expect(config).not.toBeNull();
 
-    watsonxAiMlService.enableRetries();
+    watsonxAIService.enableRetries();
   });
 
   describe('Prompt tuning flow. (Training -> Training deployment -> Inference on deployed model', () => {
+    afterAll(async () => {
+      if (trainingId)
+        await watsonxAIService.deleteTraining({
+          trainingId,
+          projectId,
+        });
+      if (deployedModelId)
+        await watsonxAIService.deleteModel({
+          modelId: deployedModelId,
+          projectId,
+        });
+      if (deploymentId)
+        await watsonxAIService.deleteDeployment({
+          deploymentId,
+          projectId,
+        });
+    });
     describe('Training', () => {
       test('createTraining()', async () => {
         // Request models needed by this operation.
@@ -132,7 +150,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           autoUpdateModel: true,
         };
 
-        const res = await watsonxAiMlService.createTraining(params);
+        const res = await watsonxAIService.createTraining(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(201);
         expect(res.result).toBeDefined();
@@ -148,7 +166,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.listTrainings(params);
+        const res = await watsonxAIService.listTrainings(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -165,7 +183,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         const allResults = [];
 
         // Test getNext().
-        let pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAiMlService, params);
+        let pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -173,11 +191,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         }
 
         // Test getAll().
-        pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAiMlService, params);
+        pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAIService, params);
         const allItems = await pager.getAll();
         expect(allItems).not.toBeNull();
         expect(allItems).toHaveLength(allResults.length);
-        console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
       });
 
       test('getTraining', async () => {
@@ -186,7 +203,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.getTraining(params);
+        const res = await watsonxAIService.getTraining(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -202,7 +219,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
         const retryAsyncCall = async (args = [], retries = 5, delay = 150000) => {
           for (let i = 0; i < retries; i += 1) {
-            const result = await watsonxAiMlService.getTraining(args);
+            const result = await watsonxAIService.getTraining(args);
             if (result.result.entity.model_id !== undefined) {
               return result.result.entity.model_id;
             }
@@ -251,7 +268,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           asset: relModel,
         };
 
-        const res = await watsonxAiMlService.createDeployment(params);
+        const res = await watsonxAIService.createDeployment(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(202);
         expect(res.result).toBeDefined();
@@ -264,7 +281,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           conflict: false,
         };
 
-        const res = await watsonxAiMlService.listDeployments(params);
+        const res = await watsonxAIService.listDeployments(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -276,7 +293,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.getDeployment(params);
+        const res = await watsonxAIService.getDeployment(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -299,7 +316,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.updateDeployment(params);
+        const res = await watsonxAIService.updateDeployment(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -313,7 +330,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           deploymentId,
           projectId,
         };
-        await checkIfDeploymentIsReady(watsonxAiMlService, getParams);
+        await checkIfDeploymentIsReady(watsonxAIService, getParams);
         // TextGenLengthPenalty
         const textGenLengthPenaltyModel = {
           decay_factor: 2.5,
@@ -411,7 +428,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           moderations: moderationsModel,
         };
 
-        const res = await watsonxAiMlService.deploymentGenerateText(params);
+        const res = await watsonxAIService.deploymentGenerateText(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -423,7 +440,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           deploymentId,
           projectId,
         };
-        await checkIfDeploymentIsReady(watsonxAiMlService, getParams);
+        await checkIfDeploymentIsReady(watsonxAIService, getParams);
 
         // TextGenLengthPenalty
         const textGenLengthPenaltyModel = {
@@ -522,36 +539,24 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           moderations: moderationsModel,
         };
 
-        const res = await watsonxAiMlService.deploymentGenerateTextStream(params);
+        const res = await watsonxAIService.deploymentGenerateTextStream(params);
         expect(res).toBeDefined();
         expect(res).toBeInstanceOf(Stream);
       });
     });
 
     describe('Delete resources', () => {
-      test('deleteTraining', async () => {
-        const params = {
-          trainingId,
-          projectId,
-          hardDelete: true,
-        };
-
-        const res = await watsonxAiMlService.deleteTraining(params);
-        expect(res).toBeDefined();
-        expect(res.status).toBe(204);
-        expect(res.result).toBeDefined();
-      });
-
       test('deleteTrainedModel', async () => {
         const params = {
           modelId: deployedModelId,
           projectId,
         };
 
-        const res = await watsonxAiMlService.deleteModel(params);
+        const res = await watsonxAIService.deleteModel(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(204);
         expect(res.result).toBeDefined();
+        deployedModelId = null;
       });
 
       test('deleteDeployment', async () => {
@@ -560,15 +565,48 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.deleteDeployment(params);
+        const res = await watsonxAIService.deleteDeployment(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(204);
         expect(res.result).toBeDefined();
+        deploymentId = null;
+      });
+      test('deleteTraining', async () => {
+        const params = {
+          trainingId,
+          projectId,
+          hardDelete: true,
+        };
+
+        const res = await watsonxAIService.deleteTraining(params);
+        expect(res).toBeDefined();
+        expect(res.status).toBe(204);
+        expect(res.result).toBeDefined();
+        trainingId = null;
       });
     });
   });
 
   describe('Prompt deployment flow. (Creating prompt template -> Deploying prompt template -> Inference on deployed prompt teplate (chat)', () => {
+    afterAll(async () => {
+      if (promptDeploymentId)
+        await watsonxAIService.deleteDeployment({
+          deploymentId: promptDeploymentId,
+          projectId,
+        });
+      if (promptId) {
+        await watsonxAIService.updatePromptLock({
+          promptId,
+          locked: false,
+          projectId,
+          force: true,
+        });
+        await watsonxAIService.deletePrompt({
+          promptId,
+          projectId,
+        });
+      }
+    });
     describe('Prompt', () => {
       test('postPrompt', async () => {
         // Request models needed by this operation.
@@ -630,7 +668,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         // PromptWithExternal
         const promptWithExternalModel = {
           input: [['testString', '']],
-          model_id: 'meta-llama/llama-3-1-70b-instruct',
+          model_id: chatModel,
           data: promptDataModel,
         };
 
@@ -649,8 +687,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.createPrompt(params);
-        console.log(res);
+        const res = await watsonxAIService.createPrompt(params);
+
         promptId = res.result.id;
         expect(res).toBeDefined();
         expect(res.status).toBe(201);
@@ -664,7 +702,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           restrictModelParameters: 'true',
         };
 
-        const res = await watsonxAiMlService.getPrompt(params);
+        const res = await watsonxAIService.getPrompt(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -704,7 +742,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         // Prompt
         const promptModel = {
           input: [['testString', '']],
-          model_id: 'meta-llama/llama-3-1-70b-instruct',
+          model_id: chatModel,
           // model_parameters: promptModelParametersModel,
           data: promptDataModel,
           // system_prompt: 'testString',
@@ -719,7 +757,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.updatePrompt(params);
+        const res = await watsonxAIService.updatePrompt(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -731,7 +769,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           'limit': 1,
         };
 
-        const { result } = await watsonxAiMlService.listPrompts(params);
+        const { result } = await watsonxAIService.listPrompts(params);
 
         expect(result.results).toBeInstanceOf(Array);
         expect(result.results).toHaveLength(1);
@@ -746,7 +784,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         const allResults = [];
 
         // Test getNext()
-        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -762,7 +800,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         };
 
         // Test getAll()
-        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAiMlService, params);
+        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults.length).toBeGreaterThanOrEqual(1);
       });
@@ -775,7 +813,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           force: true,
         };
 
-        const res = await watsonxAiMlService.updatePromptLock(params);
+        const res = await watsonxAIService.updatePromptLock(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -787,7 +825,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.getPromptLock(params);
+        const res = await watsonxAIService.getPromptLock(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -799,7 +837,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.getPromptInput(params);
+        const res = await watsonxAIService.getPromptInput(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -831,7 +869,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.createPromptChatItem(params);
+        const res = await watsonxAIService.createPromptChatItem(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(201);
         expect(res.result).toBeDefined();
@@ -865,7 +903,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         const params = {
           name: 'text_classification',
           online: onlineDeploymentModel,
-          baseModelId: 'meta-llama/llama-3-1-70b-instruct',
+          baseModelId: chatModel,
           promptTemplate,
           projectId,
           description: 'testString',
@@ -874,7 +912,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           hardwareRequest: hardwareRequestModel,
         };
 
-        const res = await watsonxAiMlService.createDeployment(params);
+        const res = await watsonxAIService.createDeployment(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(202);
         expect(res.result).toBeDefined();
@@ -886,7 +924,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           deploymentId: promptDeploymentId,
           projectId,
         };
-        const res = await checkIfDeploymentIsReady(watsonxAiMlService, params);
+        const res = await checkIfDeploymentIsReady(watsonxAIService, params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -906,7 +944,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           messages: [deploymentTextChatMessagesModel],
         };
 
-        const res = await watsonxAiMlService.deploymentsTextChat(params);
+        const res = await watsonxAIService.deploymentsTextChat(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(200);
         expect(res.result).toBeDefined();
@@ -924,8 +962,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           messages: [deploymentTextChatMessagesModel],
         };
 
-        const res = await watsonxAiMlService.deploymentsTextChatStream(params);
-        console.log(res);
+        const res = await watsonxAIService.deploymentsTextChatStream(params);
+
         expect(res).toBeInstanceOf(Stream);
         expect(res).toBeDefined();
       });
@@ -942,7 +980,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           messages: [deploymentTextChatMessagesModel],
         };
 
-        const stream = await watsonxAiMlService.deploymentsTextChatStream(params);
+        const stream = await watsonxAIService.deploymentsTextChatStream(params);
         for await (const chunk of stream) {
           expect(typeof chunk === 'string').toBe(true);
           break;
@@ -962,7 +1000,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           returnObject: true,
         };
 
-        const stream = await watsonxAiMlService.deploymentsTextChatStream(params);
+        const stream = await watsonxAIService.deploymentsTextChatStream(params);
         for await (const chunk of stream) {
           expect(typeof chunk.id === 'number').toBe(true);
           break;
@@ -971,7 +1009,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
       test('textChatStream aborting', async () => {
         const abortStreaming = async () => {
-          const stream = await watsonxAiMlService.deploymentsTextChatStream({
+          const stream = await watsonxAIService.deploymentsTextChatStream({
             messages: [
               {
                 role: 'user',
@@ -984,7 +1022,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           const readable = Readable.from(stream);
           addAbortSignal(controller.signal, readable);
           for await (const chunk of readable) {
-            console.log(chunk);
             controller.abort();
           }
         };
@@ -994,7 +1031,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
       test('deploymentTextChatStream build in aborting', async () => {
         const abortStreaming = async () => {
-          const stream = await watsonxAiMlService.deploymentsTextChatStream({
+          const stream = await watsonxAIService.deploymentsTextChatStream({
             messages: [
               {
                 role: 'user',
@@ -1004,7 +1041,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
             idOrName: promptDeploymentId,
           });
           for await (const chunk of stream) {
-            console.log(chunk);
             stream.controller.abort();
           }
         };
@@ -1019,10 +1055,11 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.deleteDeployment(params);
+        const res = await watsonxAIService.deleteDeployment(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(204);
         expect(res.result).toBeDefined();
+        promptDeploymentId = null;
       });
 
       test('deletePrompt', async () => {
@@ -1031,10 +1068,11 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId,
         };
 
-        const res = await watsonxAiMlService.deletePrompt(params);
+        const res = await watsonxAIService.deletePrompt(params);
         expect(res).toBeDefined();
         expect(res.status).toBe(204);
         expect(res.result).toBeDefined();
+        promptId = null;
       });
     });
   });
@@ -1094,9 +1132,9 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       };
 
-      const res = await watsonxAiMlService.createPromptSession(params);
+      const res = await watsonxAIService.createPromptSession(params);
       sessionId = res.result.id;
-      console.log(res.result);
+
       expect(res).toBeDefined();
       expect(res.status).toBe(201);
       expect(res.result).toBeDefined();
@@ -1109,7 +1147,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         prefetch: true,
       };
 
-      const res = await watsonxAiMlService.getPromptSession(params);
+      const res = await watsonxAIService.getPromptSession(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1123,7 +1161,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       };
 
-      const res = await watsonxAiMlService.updatePromptSession(params);
+      const res = await watsonxAIService.updatePromptSession(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1182,9 +1220,9 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       };
 
-      const res = await watsonxAiMlService.createPromptSessionEntry(params);
+      const res = await watsonxAIService.createPromptSessionEntry(params);
       entryId = res.result.id;
-      console.log(res);
+
       expect(res).toBeDefined();
       expect(res.status).toBe(201);
       expect(res.result).toBeDefined();
@@ -1197,8 +1235,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       };
 
-      const res = await watsonxAiMlService.getPromptSessionEntry(params);
-      console.log(res);
+      const res = await watsonxAIService.getPromptSessionEntry(params);
+
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1210,8 +1248,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       };
 
-      const res = await watsonxAiMlService.listPromptSessionEntries(params);
-      console.log(res);
+      const res = await watsonxAIService.listPromptSessionEntries(params);
+
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1242,7 +1280,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       };
 
-      const res = await watsonxAiMlService.createPromptSessionEntryChatItem(params);
+      const res = await watsonxAIService.createPromptSessionEntryChatItem(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(201);
       expect(res.result).toBeDefined();
@@ -1256,7 +1294,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         force: true,
       };
 
-      const res = await watsonxAiMlService.updatePromptSessionLock(params);
+      const res = await watsonxAIService.updatePromptSessionLock(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1268,7 +1306,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       };
 
-      const res = await watsonxAiMlService.getPromptSessionLock(params);
+      const res = await watsonxAIService.getPromptSessionLock(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1280,7 +1318,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       };
 
-      const res = await watsonxAiMlService.deletePromptSession(params);
+      const res = await watsonxAIService.deletePromptSession(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(204);
       expect(res.result).toBeDefined();
@@ -1299,7 +1337,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         },
       };
 
-      const res = await watsonxAiMlService.createModel(params);
+      const res = await watsonxAIService.createModel(params);
       modelId = res.result.metadata.id;
       expect(res).toBeDefined();
       expect(res.status).toBe(201);
@@ -1312,8 +1350,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         limit: 50,
       };
 
-      const res = await watsonxAiMlService.listModels(params);
-      console.log(res.result.resources);
+      const res = await watsonxAIService.listModels(params);
+
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1330,7 +1368,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const allResults = [];
 
       // Test getNext().
-      let pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAiMlService, params);
+      let pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAIService, params);
       while (pager.hasNext()) {
         const nextPage = await pager.getNext();
         expect(nextPage).not.toBeNull();
@@ -1338,11 +1376,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
 
       // Test getAll().
-      pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAiMlService, params);
+      pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAIService, params);
       const allItems = await pager.getAll();
       expect(allItems).not.toBeNull();
       expect(allItems).toHaveLength(allResults.length);
-      console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
     });
 
     test('getModel()', async () => {
@@ -1351,8 +1388,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       };
 
-      const res = await watsonxAiMlService.getModel(params);
-      console.log(res);
+      const res = await watsonxAIService.getModel(params);
+
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1364,7 +1401,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       };
 
-      const res = await watsonxAiMlService.deleteModel(params);
+      const res = await watsonxAIService.deleteModel(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(204);
       expect(res.result).toBeDefined();
@@ -1428,7 +1465,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         assemblyMd: {},
       };
 
-      const res = await watsonxAiMlService.createTextExtraction(params);
+      const res = await watsonxAIService.createTextExtraction(params);
       textExtId = res.result.metadata.id;
       expect(res).toBeDefined();
       expect(res.status).toBe(201);
@@ -1441,7 +1478,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         limit: 50,
       };
 
-      const res = await watsonxAiMlService.listTextExtractions(params);
+      const res = await watsonxAIService.listTextExtractions(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1456,7 +1493,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const allResults = [];
 
       // Test getNext().
-      let pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAiMlService, params);
+      let pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAIService, params);
       while (pager.hasNext()) {
         const nextPage = await pager.getNext();
         expect(nextPage).not.toBeNull();
@@ -1464,11 +1501,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
 
       // Test getAll().
-      pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAiMlService, params);
+      pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAIService, params);
       const allItems = await pager.getAll();
       expect(allItems).not.toBeNull();
       expect(allItems).toHaveLength(allResults.length);
-      console.log(`Retrieved a total of ${allResults.length} items(s) with pagination.`);
     });
 
     test('getTextExtraction()', async () => {
@@ -1479,7 +1515,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
       const checkIfExtractionIsReady = async (parameters, n = 5, delay = 10000) => {
         for (let i = 0; i <= n; i += 1) {
-          const res = await watsonxAiMlService.getTextExtraction(parameters);
+          const res = await watsonxAIService.getTextExtraction(parameters);
           if (res.result.entity.results.status === 'completed') return res;
           if (res.result.entity.results.status === 'failed')
             throw new Error(res.result.entity.results.error.message);
@@ -1499,7 +1535,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
         hardDelete: true,
       };
-      const res = await watsonxAiMlService.deleteTextExtraction(params);
+      const res = await watsonxAIService.deleteTextExtraction(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(204);
       expect(res.result).toBeDefined();
@@ -1508,8 +1544,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
   describe('Toolkits', () => {
     test('listUtilityAgentTools()', async () => {
-      const res = await watsonxAiMlService.listUtilityAgentTools();
-      console.log(res.result.resources[0].input_schema);
+      const res = await watsonxAIService.listUtilityAgentTools();
+
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1520,7 +1556,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         toolId: 'WebCrawler',
       };
 
-      const res = await watsonxAiMlService.getUtilityAgentTool(params);
+      const res = await watsonxAIService.getUtilityAgentTool(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1540,7 +1576,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         wxUtilityAgentToolsRunRequest: wxUtilityAgentToolsRunRequestModel,
       };
 
-      const res = await watsonxAiMlService.runUtilityAgentTool(params);
+      const res = await watsonxAIService.runUtilityAgentTool(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1563,7 +1599,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         wxUtilityAgentToolsRunRequest: wxUtilityAgentToolsRunRequestModel,
       };
 
-      const res = await watsonxAiMlService.runUtilityAgentToolByName(params);
+      const res = await watsonxAIService.runUtilityAgentToolByName(params);
       expect(res).toBeDefined();
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();

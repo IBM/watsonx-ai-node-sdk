@@ -17,6 +17,7 @@
     /* Specify library files to be included in the compilation:  */
     "declaration": true, /* Generates corresponding '.d.ts' file. */
     "sourceMap": true, /* Generates corresponding '.map' file. */
+    "declarationMap": true,
     /* Strict Type-Checking Options */
     "alwaysStrict": true, /* Parse in strict mode and emit "use strict" for each source file. */
     /* Module Resolution Options */
@@ -24,7 +25,11 @@
     "types": [
       "node"
     ], /* Type declaration files to be included in compilation. */
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "@ibm-cloud/watsonx-ai": ["./index.ts"],
+      "@ibm-cloud/watsonx-ai/authentication": ["./auth/index.ts"]
+    }
   },
   "exclude": ["./test/langchain", "./dist/**/*", "./examples/**/*"]
 }

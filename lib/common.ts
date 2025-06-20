@@ -145,7 +145,7 @@ export async function transformStreamToObjectStream<T>(apiResponse: any) {
   const controller = new AbortController();
   const combinedStream = pipeline(readableStream, transformStream, (err) => {
     if (err && err.name === 'AbortError') {
-      console.log('Stream pipeline aborted');
+      console.warn('Stream pipeline aborted');
     } else if (err) {
       console.error('Stream pipeline error:', err);
     }
@@ -178,7 +178,7 @@ export async function transformStreamToStringStream<T>(apiResponse: any) {
   const controller = new AbortController();
   const combinedStream = pipeline(readableStream, transformStream, (err) => {
     if (err && err.name === 'AbortError') {
-      console.log('Stream pipeline aborted');
+      console.warn('Stream pipeline aborted');
     } else if (err) {
       console.error('Stream pipeline error:', err);
     }

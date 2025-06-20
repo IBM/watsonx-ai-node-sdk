@@ -46,7 +46,7 @@ import { RequestTokenResponse } from '../auth/utils/authenticators';
  */
 
 const PLATFORM_URLS_MAP = {
-  'https://ca-tor.ml.cloud.ibm.com': 'https://api.ca-tor.dai.cloud.ibm.com',
+  'https://ca-tor.ml.cloud.ibm.com': 'https://api.ca-tor.dai.cloud.ibm.com/wx',
   'https://jp-tok.ml.cloud.ibm.com': 'https://api.jp-tok.dataplatform.cloud.ibm.com/wx',
   'https://eu-gb.ml.cloud.ibm.com': 'https://api.eu-gb.dataplatform.cloud.ibm.com/wx',
   'https://eu-de.ml.cloud.ibm.com': 'https://api.eu-de.dataplatform.cloud.ibm.com/wx',
@@ -56,6 +56,7 @@ const PLATFORM_URLS_MAP = {
   'https://private.eu-gb.ml.cloud.ibm.com': 'https://api.eu-gb.dataplatform.cloud.ibm.com/wx',
   'https://private.eu-de.ml.cloud.ibm.com': 'https://api.eu-de.dataplatform.cloud.ibm.com/wx',
   'https://private.us-south.ml.cloud.ibm.com': 'https://api.dataplatform.cloud.ibm.com/wx',
+  'https://ap-south-1.aws.wxai.ibm.com': 'https://api.ap-south-1.aws.data.ibm.com/wx',
 };
 
 class WatsonxAiMlVml_v1 extends BaseService {
@@ -123,10 +124,12 @@ class WatsonxAiMlVml_v1 extends BaseService {
       options.serviceName = this.DEFAULT_SERVICE_NAME;
     }
     if (!options.authenticator) {
-      options.authenticator = getAuthenticatorFromEnvironment(
-        options.serviceName,
-        options.requestToken
-      );
+      const { serviceName, requestToken, serviceUrl } = options;
+      options.authenticator = getAuthenticatorFromEnvironment({
+        serviceName,
+        requestToken,
+        serviceUrl,
+      });
     }
     if (!options.platformUrl) {
       options.platformUrl = readExternalSources(options.serviceName).platformUrl;
@@ -772,7 +775,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * }
    * Here is one of the possibilities to read streaming output:
    *
-   * const stream = await watsonxAiMlService.generateTextStream(parameters);
+   * const stream = await watsonxAIServiceenerateTextStream(parameters);
    * for await (const line of stream) {
    *   console.log(line);
    * }
@@ -1126,6 +1129,100 @@ class WatsonxAiMlVml_v1 extends BaseService {
         >(apiResponse)
       : transformStreamToStringStream<string>(apiResponse);
     return stream;
+  }
+
+  /**
+   * Time series forecast.
+   *
+   * Generate forecasts, or predictions for future time points, given historical time series data.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.idOrName - The `id_or_name` can be either the `deployment_id` that identifies the deployment
+   * or a `serving_name` that allows a predefined URL to be used to post a prediction.
+   *
+   * The WML instance that is associated with the deployment will be used for limits and billing (if a paid plan).
+   * @param {JsonObject} params.data - A payload of data matching `schema`. We assume the following about your data:
+   *   * All timeseries are of equal length and are uniform in nature (the time difference between two successive rows
+   * is constant). This implies that there are no missing rows of data;
+   *   * The data meet the minimum model-dependent historical context length which
+   *   can be any number of rows per timeseries;
+   *
+   * Note that the example payloads shown are for illustration purposes only. An actual payload would necessary be much
+   * larger to meet minimum model-specific context lengths.
+   * @param {TSForecastInputSchema} params.schema - Contains metadata about your timeseries data input.
+   * @param {DeploymentTSForecastParameters} [params.parameters] - The parameters for the forecast request.
+   * @param {JsonObject} [params.futureData] - Exogenous or supporting features that extend into the forecasting horizon
+   * (e.g., a weather forecast or calendar of special promotions) which are known in advance. `future_data` would be in
+   * the same format as `data` except  that all timestamps would be in the forecast horizon and it would not include
+   * previously specified
+   * `target_columns`.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TSForecastResponse>>}
+   */
+  public deploymentsTimeSeriesForecast(
+    params: WatsonxAiMlVml_v1.DeploymentsTimeSeriesForecastParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TSForecastResponse>> {
+    const _params = { ...params };
+    const _requiredParams = ['idOrName', 'data', 'schema'];
+    const _validParams = [
+      'idOrName',
+      'data',
+      'schema',
+      'parameters',
+      'futureData',
+      'signal',
+      'headers',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'data': _params.data,
+      'schema': _params.schema,
+      'parameters': _params.parameters,
+      'future_data': _params.futureData,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const path = {
+      'id_or_name': _params.idOrName,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'deploymentsTimeSeriesForecast'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/deployments/{id_or_name}/time_series/forecast',
+        method: 'POST',
+        body,
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        serviceUrl: this.serviceUrl,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
   }
 
   /*************************
@@ -3004,7 +3101,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * }
    * Here is one of the possibilities to read streaming output:
    *
-   * const stream = await watsonxAiMlService.generateTextStream(parameters);
+   * const stream = await watsonxAIServiceenerateTextStream(parameters);
    * for await (const line of stream) {
    *   console.log(line);
    * }.
@@ -3719,7 +3816,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
    *
    * Here is one of the possibilities to read streaming output:
    *
-   * const stream = await watsonxAiMlService.generateTextStream(parameters);
+   * const stream = await watsonxAIServiceenerateTextStream(parameters);
    * for await (const line of stream) {
    *   console.log(line);
    * }
@@ -3959,11 +4056,6 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
    * be given.
    * @param {TSForecastParameters} [params.parameters] - The parameters for the forecast request.
-   * @param {JsonObject} [params.futureData] - Exogenous or supporting features that extend into the forecasting horizon
-   * (e.g., a weather forecast or calendar of special promotions) which are known in advance. `future_data` would be in
-   * the same format as `data` except  that all timestamps would be in the forecast horizon and it would not include
-   * previously specified
-   * `target_columns`.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TSForecastResponse>>}
    */
@@ -6930,6 +7022,36 @@ namespace WatsonxAiMlVml_v1 {
     returnObject?: boolean;
   }
 
+  /** Parameters for the `deploymentsTimeSeriesForecast` operation. */
+  export interface DeploymentsTimeSeriesForecastParams extends DefaultParams {
+    /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
+     *  allows a predefined URL to be used to post a prediction.
+     *
+     *  The WML instance that is associated with the deployment will be used for limits and billing (if a paid plan).
+     */
+    idOrName: string;
+    /** A payload of data matching `schema`. We assume the following about your data:
+     *    * All timeseries are of equal length and are uniform in nature (the time difference between two successive
+     *  rows is constant). This implies that there are no missing rows of data;
+     *    * The data meet the minimum model-dependent historical context length which
+     *    can be any number of rows per timeseries;
+     *
+     *  Note that the example payloads shown are for illustration purposes only. An actual payload would necessary be
+     *  much larger to meet minimum model-specific context lengths.
+     */
+    data: JsonObject;
+    /** Contains metadata about your timeseries data input. */
+    schema: TSForecastInputSchema;
+    /** The parameters for the forecast request. */
+    parameters?: DeploymentTSForecastParameters;
+    /** Exogenous or supporting features that extend into the forecasting horizon (e.g., a weather forecast or
+     *  calendar of special promotions) which are known in advance. `future_data` would be in the same format as `data`
+     *  except  that all timestamps would be in the forecast horizon and it would not include previously specified
+     *  `target_columns`.
+     */
+    futureData?: JsonObject;
+  }
+
   /** Parameters for the `listFoundationModelSpecs` operation. */
   export interface ListFoundationModelSpecsParams extends DefaultParams {
     /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
@@ -8609,6 +8731,21 @@ namespace WatsonxAiMlVml_v1 {
         GREEDY = 'greedy',
       }
     }
+  }
+
+  /**
+   * The parameters for the forecast request.
+   */
+  export interface DeploymentTSForecastParameters {
+    /** The prediction length for the forecast. The service will return this many periods beyond the last timestamp
+     *  in the inference data payload. If specified, `prediction_length` must be an integer >=1 and no more than the
+     *  model default prediction length. When omitted the model default prediction_length will be used.
+     */
+    prediction_length?: number;
+    /** The batch size used during inference. When multiple time series are present, the inference will be conducted
+     *  in batches. If not specified, the model default batch size will be used.
+     */
+    inference_batch_size?: number;
   }
 
   /** The embedding values for a text string. The `input` field is only set if the corresponding `return_option` is set. */

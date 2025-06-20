@@ -6,14 +6,14 @@
 /* eslint-disable no-restricted-syntax */
 
 const { readExternalSources } = require('ibm-cloud-sdk-core');
+const path = require('path');
 const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
-
 // testcase timeout value (200s).
 const timeout = 200000;
 
 // Location of our config file.
-const configFile = 'credentials/watsonx_ai_ml_vml_v1.env';
+const configFile = path.resolve(__dirname, '../../credentials/watsonx_ai_ml_vml_v1.env');
 const describe = authHelper.prepareTests(configFile);
 
 authHelper.loadEnv();
@@ -35,25 +35,25 @@ describe('Ilab tests', () => {
   jest.setTimeout(timeout);
 
   // Service instance
-  let watsonxAiMlService;
+  let watsonxAIService;
   let taxonomyId;
   let syntheticDataId;
   let documentExtractionId;
   let fineTuningId;
 
   test('Initialize service', async () => {
-    watsonxAiMlService = WatsonxAiMlVml_v1.newInstance({
+    watsonxAIService = WatsonxAiMlVml_v1.newInstance({
       serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
       platformUrl: process.env.WATSONX_AI_PLATFORM_URL,
       version: '2023-07-07',
     });
 
-    expect(watsonxAiMlService).not.toBeNull();
+    expect(watsonxAIService).not.toBeNull();
 
     const config = readExternalSources(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME);
     expect(config).not.toBeNull();
 
-    watsonxAiMlService.enableRetries();
+    watsonxAIService.enableRetries();
   });
 
   test.skip('createTaxonomy()', async () => {
@@ -75,7 +75,7 @@ describe('Ilab tests', () => {
       dataReference: objectLocationModel,
     };
 
-    const res = await watsonxAiMlService.createTaxonomy(params);
+    const res = await watsonxAIService.createTaxonomy(params);
     taxonomyId = res.result.metadata.id;
     expect(res).toBeDefined();
     expect(res.status).toBe(201);
@@ -87,7 +87,7 @@ describe('Ilab tests', () => {
       projectId,
     };
 
-    const res = await watsonxAiMlService.listTaxonomies(params);
+    const res = await watsonxAIService.listTaxonomies(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
@@ -99,7 +99,7 @@ describe('Ilab tests', () => {
       projectId,
     };
 
-    const res = await watsonxAiMlService.getTaxonomy(params);
+    const res = await watsonxAIService.getTaxonomy(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
@@ -112,7 +112,7 @@ describe('Ilab tests', () => {
       hardDelete: true,
     };
 
-    const res = await watsonxAiMlService.deleteTaxonomy(params);
+    const res = await watsonxAIService.deleteTaxonomy(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(204);
     expect(res.result).toBeDefined();
@@ -148,7 +148,7 @@ describe('Ilab tests', () => {
       resultsReference: objectLocationModel,
     };
 
-    const res = await watsonxAiMlService.createSyntheticDataGeneration(params);
+    const res = await watsonxAIService.createSyntheticDataGeneration(params);
     syntheticDataId = res.result.metadata.id;
     expect(res).toBeDefined();
     expect(res.status).toBe(201);
@@ -160,7 +160,7 @@ describe('Ilab tests', () => {
       projectId,
     };
 
-    const res = await watsonxAiMlService.listSyntheticDataGenerations(params);
+    const res = await watsonxAIService.listSyntheticDataGenerations(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
@@ -172,7 +172,7 @@ describe('Ilab tests', () => {
       id: syntheticDataId,
     };
 
-    const res = await watsonxAiMlService.getSyntheticDataGeneration(params);
+    const res = await watsonxAIService.getSyntheticDataGeneration(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
@@ -185,18 +185,18 @@ describe('Ilab tests', () => {
       hardDelete: true,
     };
 
-    const res = await watsonxAiMlService.cancelSyntheticDataGeneration(params);
+    const res = await watsonxAIService.cancelSyntheticDataGeneration(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(204);
     expect(res.result).toBeDefined();
   });
 
   test.skip('createDocumentExtraction()', async () => {
-    const path = 'experienced.pdf';
+    const filePath = 'experienced.pdf';
     const dataConnectionReferenceModel = {
       type: 'container',
       location: {
-        path,
+        path: filePath,
       },
     };
     // ObjectLocationGithub
@@ -217,7 +217,7 @@ describe('Ilab tests', () => {
       projectId: process.env.WATSONX_AI_PROJECT_ID,
     };
 
-    const res = await watsonxAiMlService.createDocumentExtraction(params);
+    const res = await watsonxAIService.createDocumentExtraction(params);
     documentExtractionId = res.result.metadata.id;
     expect(res).toBeDefined();
     expect(res.status).toBe(201);
@@ -229,7 +229,7 @@ describe('Ilab tests', () => {
       projectId: process.env.WATSONX_AI_PROJECT_ID,
     };
 
-    const res = await watsonxAiMlService.listDocumentExtractions(params);
+    const res = await watsonxAIService.listDocumentExtractions(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
@@ -240,7 +240,7 @@ describe('Ilab tests', () => {
       id: documentExtractionId,
       projectId: process.env.WATSONX_AI_PROJECT_ID,
     };
-    const res = await watsonxAiMlService.getDocumentExtraction(params);
+    const res = await watsonxAIService.getDocumentExtraction(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
     expect(res.result).toBeDefined();
@@ -252,7 +252,7 @@ describe('Ilab tests', () => {
       projectId: process.env.WATSONX_AI_PROJECT_ID,
     };
 
-    const res = await watsonxAiMlService.cancelDocumentExtractions(params);
+    const res = await watsonxAIService.cancelDocumentExtractions(params);
     expect(res).toBeDefined();
     expect(res.status).toBe(204);
     expect(res.result).toBeDefined();
@@ -286,7 +286,7 @@ describe('Ilab tests', () => {
       custom: { name: 'model', size: 2 },
     };
 
-    const res = await watsonxAiMlService.createFineTuning(params);
+    const res = await watsonxAIService.createFineTuning(params);
     fineTuningId = res.result.metadata.id;
     expect(res).toBeDefined();
     expect(res.status).toBe(201);
@@ -299,7 +299,7 @@ describe('Ilab tests', () => {
       type: 'ilab',
       projectId: process.env.WATSONX_AI_PROJECT_ID,
     };
-    const res = await watsonxAiMlService.listFineTunings(params);
+    const res = await watsonxAIService.listFineTunings(params);
 
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
@@ -318,7 +318,7 @@ describe('Ilab tests', () => {
     const allResults = [];
 
     // Test getNext().
-    let pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAiMlService, params);
+    let pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAIService, params);
     while (pager.hasNext()) {
       const nextPage = await pager.getNext();
       expect(nextPage).not.toBeNull();
@@ -326,7 +326,7 @@ describe('Ilab tests', () => {
     }
 
     // Test getAll().
-    pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAiMlService, params);
+    pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAIService, params);
     const allItems = await pager.getAll();
     expect(allItems).not.toBeNull();
     expect(allItems).toHaveLength(allResults.length);
@@ -338,7 +338,7 @@ describe('Ilab tests', () => {
       id: fineTuningId,
       projectId: process.env.WATSONX_AI_PROJECT_ID,
     };
-    const res = await watsonxAiMlService.getFineTuning(params);
+    const res = await watsonxAIService.getFineTuning(params);
 
     expect(res).toBeDefined();
     expect(res.status).toBe(200);
@@ -352,7 +352,7 @@ describe('Ilab tests', () => {
       hardDelete: true,
     };
 
-    const res = await watsonxAiMlService.deleteFineTuning(params);
+    const res = await watsonxAIService.deleteFineTuning(params);
 
     expect(res).toBeDefined();
     expect(res.status).toBe(204);
@@ -365,11 +365,11 @@ describe('Ilab tests', () => {
     let docExtId;
     let fineTunId;
     test('Ilab flow', async () => {
-      const path = 'experienced.pdf';
+      const filePath = 'experienced.pdf';
       const dataConnectionReferenceModel = {
         type: 'container',
         location: {
-          path,
+          path: filePath,
         },
       };
       // ObjectLocationGithub
@@ -390,12 +390,12 @@ describe('Ilab tests', () => {
         projectId: process.env.WATSONX_AI_PROJECT_ID,
       };
 
-      const documentExtractionRes = await watsonxAiMlService.createDocumentExtraction(
+      const documentExtractionRes = await watsonxAIService.createDocumentExtraction(
         documentExtractionParams
       );
       docExtId = documentExtractionRes.result.metadata.id;
       const docExtGetter = () =>
-        watsonxAiMlService.getDocumentExtraction({
+        watsonxAIService.getDocumentExtraction({
           id: docExtId,
           projectId,
         });
@@ -410,11 +410,11 @@ describe('Ilab tests', () => {
         dataReference: objectLocationModel,
       };
 
-      const taxonomyRes = await watsonxAiMlService.createTaxonomy(params);
+      const taxonomyRes = await watsonxAIService.createTaxonomy(params);
       taxId = taxonomyRes.result.metadata.id;
 
       const taxonomyGetter = () =>
-        watsonxAiMlService.getTaxonomy({
+        watsonxAIService.getTaxonomy({
           id: taxId,
           projectId,
         });
@@ -433,11 +433,11 @@ describe('Ilab tests', () => {
         resultsReference: objectLocationModel,
       };
 
-      const sdgRes = await watsonxAiMlService.createSyntheticDataGeneration(sdgParams);
+      const sdgRes = await watsonxAIService.createSyntheticDataGeneration(sdgParams);
       sdgId = sdgRes.result.metadata.id;
 
       const sdgGetter = () =>
-        watsonxAiMlService.getSyntheticDataGeneration({
+        watsonxAIService.getSyntheticDataGeneration({
           id: sdgId,
           projectId,
         });
@@ -460,7 +460,7 @@ describe('Ilab tests', () => {
         custom: { name: 'model', size: 2 },
       };
 
-      const res = await watsonxAiMlService.createFineTuning(fineTuningParams);
+      const res = await watsonxAIService.createFineTuning(fineTuningParams);
       fineTunId = res.result.metadata.id;
       console.log(fineTunId);
       expect(res).toBeDefined();
@@ -470,7 +470,7 @@ describe('Ilab tests', () => {
 
     afterAll(async () => {
       try {
-        await watsonxAiMlService.deleteTaxonomy({
+        await watsonxAIService.deleteTaxonomy({
           id: taxId,
           projectId: process.env.WATSONX_AI_PROJECT_ID,
           hardDelete: true,
@@ -479,7 +479,7 @@ describe('Ilab tests', () => {
         console.log(e);
       }
       try {
-        await watsonxAiMlService.cancelDocumentExtractions({
+        await watsonxAIService.cancelDocumentExtractions({
           id: docExtId,
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         });
@@ -487,7 +487,7 @@ describe('Ilab tests', () => {
         console.log(e);
       }
       try {
-        await watsonxAiMlService.deleteFineTuning({
+        await watsonxAIService.deleteFineTuning({
           id: fineTunId,
           projectId,
           hardDelete: true,
@@ -496,7 +496,7 @@ describe('Ilab tests', () => {
         console.log(e);
       }
       try {
-        await watsonxAiMlService.cancelSyntheticDataGeneration({
+        await watsonxAIService.cancelSyntheticDataGeneration({
           id: sdgId,
           projectId: process.env.WATSONX_AI_PROJECT_ID,
           hardDelete: true,

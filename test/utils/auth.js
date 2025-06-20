@@ -21,9 +21,9 @@ const SECRET_KEY = 'your-very-secure-secret-key';
 const generateJWT = (payload, validationTime) =>
   jwt.sign(payload, SECRET_KEY, { expiresIn: validationTime });
 
-const requestAdminToken = async (time = '1m') => ({
+const requestAdminToken = async ({ time = '1m', tokenName = 'access_token' } = {}) => ({
   result: {
-    access_token: generateJWT({ userId: 1, role: 'admin' }, time),
+    [tokenName]: generateJWT({ userId: 1, role: 'admin' }, time),
   },
 });
 

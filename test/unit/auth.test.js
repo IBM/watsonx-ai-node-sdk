@@ -18,10 +18,11 @@
 const WatsonxAIMLv1 = require('../../dist/watsonx-ai-ml/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
 const { MockingRequest } = require('../utils/utils.js');
+const { JWTRequestBaseAuthenticator } = require('../../dist/auth/utils/authenticators.js');
 const auth = require('../utils/auth.js');
+const authenticators = require('../../dist/auth/index.js');
 const { wait } = require('../utils/utils.js');
 
-process.env.WATSONX_AI_AUTH_TYPE = 'zen';
 jest.mock('axios', () => {
   const axios = jest.createMockFromModule('axios');
   const mockAxiosInstance = jest.fn();
@@ -37,13 +38,11 @@ jest.mock('axios', () => {
   return axios;
 });
 
-authHelper.loadEnv();
-
 const textChatMessagesModel = {
   role: 'user',
   content: 'You are a helpful assistant.',
 };
-
+const version = '2024-05-31';
 const modelId = 'meta-llama/llama-3-8b-instruct';
 const messages = [textChatMessagesModel];
 const projectId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
@@ -53,104 +52,363 @@ const textChatParams = {
   projectId,
 };
 
-const requestTokenMocker = new MockingRequest(auth, 'requestAdminToken');
-
-describe('Zen authentication', () => {
-  describe('Positive tests', () => {
+describe('Authentication unit tests', () => {
+  describe('Zen authentication', () => {
+    const requestTokenMocker = new MockingRequest(auth, 'requestAdminToken');
     let requestTokenMock;
-    beforeEach(() => {
-      requestTokenMocker.mock();
-      requestTokenMock = requestTokenMocker.functionMock;
+    const serviceUrl = 'https://cpd.cp.fyre.ibm.com';
+    beforeAll(() => {
+      process.env.WATSONX_AI_AUTH_TYPE = 'zen';
     });
-    afterEach(() => {
-      requestTokenMocker.clearMock();
+    afterAll(() => {
+      delete process.env.WATSONX_AI_AUTH_TYPE;
     });
-    test('Multiple calls with valid token', async () => {
-      const instance = WatsonxAIMLv1.newInstance({
-        version: '2024-05-31',
-        serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
-        requestToken: auth.requestAdminToken,
+
+    describe('Positive tests', () => {
+      beforeEach(async () => {
+        requestTokenMocker.mock();
+        requestTokenMock = requestTokenMocker.functionMock;
       });
-
-      expect(instance).toBeDefined();
-      expect(requestTokenMock).toHaveBeenCalledTimes(0);
-
-      const chatFirstCall = instance.textChat(textChatParams);
-      expect(chatFirstCall).toBeInstanceOf(Promise);
-      expect(requestTokenMock).toHaveBeenCalledTimes(1);
-
-      const chatSecondCall = instance.textChat(textChatParams);
-      expect(chatSecondCall).toBeInstanceOf(Promise);
-      expect(requestTokenMock).toHaveBeenCalledTimes(1);
-    });
-
-    test('Multiple calls each after token has expired', async () => {
-      const tokenValidationTime = 10; // in miliseconds
-      requestTokenMocker.mock();
-      const instance = WatsonxAIMLv1.newInstance({
-        version: '2024-05-31',
-        serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
-        requestToken: () => auth.requestAdminToken(`${tokenValidationTime}ms`),
+      afterEach(() => {
+        requestTokenMocker.clearMock();
       });
-
-      expect(instance).toBeDefined();
-      expect(requestTokenMock).toHaveBeenCalledTimes(0);
-
-      for (let i = 1; i <= 3; i += 1) {
-        const chatFirstCall = instance.textChat(textChatParams);
-        expect(chatFirstCall).toBeInstanceOf(Promise);
-        expect(requestTokenMock).toHaveBeenCalledTimes(i);
-        await wait(tokenValidationTime + 10);
-      }
-    });
-  });
-  describe('Negative tests', () => {
-    test('Invalid token', async () => {
-      requestTokenMocker.mock({
-        result: {
-          access_token: 'NotAJWT.not_a_token.def_not_a_token',
-        },
-      });
-      const requestTokenMock = requestTokenMocker.functionMock;
-
-      const instance = WatsonxAIMLv1.newInstance({
-        version: '2024-05-31',
-        serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
-        requestToken: auth.requestAdminToken,
-      });
-
-      expect(instance).toBeDefined();
-      expect(requestTokenMock).toHaveBeenCalledTimes(0);
-
-      const chatCall = instance.textChat(textChatParams);
-      expect(chatCall).toBeInstanceOf(Promise);
-      await expect(chatCall).rejects.toThrow('Access token received is not a valid JWT');
-      expect(requestTokenMock).toHaveBeenCalledTimes(1);
-
-      requestTokenMocker.unmock();
-    });
-
-    test('No requestToken function', async () => {
-      const initInstance = () =>
-        WatsonxAIMLv1.newInstance({
-          version: '2024-05-31',
-          serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
-        });
-      expect(initInstance).toThrow(
-        'requestToken function not provided. This function is necessary for zen authentication.'
-      );
-    });
-
-    test('Wrong auth type', async () => {
-      process.env.WATSONX_AI_AUTH_TYPE = 'iam';
-      const initInstance = () =>
-        WatsonxAIMLv1.newInstance({
-          version: '2024-05-31',
-          serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
+      test('Multiple requests with valid token', async () => {
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
           requestToken: auth.requestAdminToken,
         });
-      expect(initInstance).toThrow('requestToken function is only valid for zen authentication');
-      process.env.WATSONX_AI_AUTH_TYPE = 'zen';
+
+        expect(instance).toBeDefined();
+        expect(instance.getAuthenticator()).toBeInstanceOf(JWTRequestBaseAuthenticator);
+
+        const chatFirstCall = instance.textChat(textChatParams);
+        expect(chatFirstCall).toBeInstanceOf(Promise);
+        expect(requestTokenMock).toHaveBeenCalledTimes(1);
+
+        const chatSecondCall = instance.textChat(textChatParams);
+        expect(chatSecondCall).toBeInstanceOf(Promise);
+        expect(requestTokenMock).toHaveBeenCalledTimes(1);
+      });
+
+      test('Multiple requests each after token has expired', async () => {
+        const tokenValidationTime = 10; // in miliseconds
+        requestTokenMocker.mock();
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+          requestToken: () => auth.requestAdminToken({ time: `${tokenValidationTime}ms` }),
+        });
+
+        expect(instance).toBeDefined();
+
+        for (let i = 1; i <= 3; i += 1) {
+          const chatFirstCall = instance.textChat(textChatParams);
+          expect(chatFirstCall).toBeInstanceOf(Promise);
+          expect(requestTokenMock).toHaveBeenCalledTimes(i);
+          await wait(tokenValidationTime + 10); // adding extra 10ms to catch token expiration
+        }
+      });
+    });
+    describe('Negative tests', () => {
+      test('Request with invalid token', async () => {
+        requestTokenMocker.mock({
+          result: {
+            access_token: 'NotAJWT.not_a_token.def_not_a_token',
+          },
+        });
+
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+          requestToken: auth.requestAdminToken,
+        });
+
+        expect(instance).toBeDefined();
+
+        const chatCall = instance.textChat(textChatParams);
+        expect(chatCall).toBeInstanceOf(Promise);
+        await expect(chatCall).rejects.toThrow('Access token received is not a valid JWT');
+        expect(requestTokenMock).toHaveBeenCalledTimes(1);
+
+        requestTokenMocker.unmock();
+      });
+
+      test('Instance creation without requestToken function', async () => {
+        const initInstance = () =>
+          WatsonxAIMLv1.newInstance({
+            version,
+            serviceUrl,
+          });
+        expect(initInstance).toThrow(
+          'requestToken function not provided. This function is necessary for zen authentication.'
+        );
+      });
+
+      test('Instance creation with with resuestToken function and wrong auth type', async () => {
+        const oldAuthType = process.env.WATSONX_AI_AUTH_TYPE;
+        process.env.WATSONX_AI_AUTH_TYPE = 'iam';
+        const initInstance = () =>
+          WatsonxAIMLv1.newInstance({
+            version,
+            serviceUrl,
+            requestToken: auth.requestAdminToken,
+          });
+        expect(initInstance).toThrow('requestToken function is only valid for zen authentication');
+        process.env.WATSONX_AI_AUTH_TYPE = oldAuthType;
+      });
+    });
+  });
+  describe('IAM cloud authentication', () => {
+    const serviceUrl = 'https://us-south.ml.cloud.ibm.com';
+
+    beforeAll(() => {
+      process.env.WATSONX_AI_AUTH_TYPE = 'iam';
+      process.env.WATSONX_AI_APIKEY = 'testString';
+    });
+
+    afterAll(() => {
+      delete process.env.WATSONX_AI_AUTH_TYPE;
+      delete process.env.WATSONX_AI_APIKEY;
+    });
+    const iamRequestTokenMocker = new MockingRequest(
+      authenticators.IamTokenManager.prototype,
+      'requestToken'
+    );
+
+    describe('Positive tests', () => {
+      let iamRequestTokenMock;
+
+      beforeEach(async () => {
+        const tokenResponse = await auth.requestAdminToken();
+        iamRequestTokenMocker.mock(tokenResponse);
+        iamRequestTokenMock = iamRequestTokenMocker.functionMock;
+      });
+
+      afterEach(() => {
+        iamRequestTokenMocker.clearMock();
+      });
+
+      test('Request with valid token', async () => {
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+        });
+        expect(instance.getAuthenticator()).toBeInstanceOf(authenticators.IamAuthenticator);
+        const chatFirstCall = instance.textChat(textChatParams);
+        expect(chatFirstCall).toBeInstanceOf(Promise);
+        expect(iamRequestTokenMock).toHaveBeenCalledTimes(1);
+      });
+    });
+    describe('Negative tests', () => {
+      afterEach(() => {
+        process.env.WATSONX_AI_APIKEY = 'testString';
+      });
+      test('Request with invalid token', async () => {
+        iamRequestTokenMocker.mock({
+          result: {
+            access_token: 'NotAJWT.not_a_token.def_not_a_token',
+          },
+        });
+        const iamRequestTokenMock = iamRequestTokenMocker.functionMock;
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+        });
+
+        expect(instance).toBeDefined();
+
+        const chatCall = instance.textChat(textChatParams);
+        expect(chatCall).toBeInstanceOf(Promise);
+        await expect(chatCall).rejects.toThrow('Access token received is not a valid JWT');
+        expect(iamRequestTokenMock).toHaveBeenCalledTimes(1);
+
+        iamRequestTokenMocker.unmock();
+      });
+      test('Instance creation with no apikey', async () => {
+        delete process.env.WATSONX_AI_APIKEY;
+        expect(() =>
+          WatsonxAIMLv1.newInstance({
+            version,
+            serviceUrl,
+          })
+        ).toThrow('Missing required parameters: apikey');
+      });
+    });
+  });
+  describe('IBM watsonx.ai software authentication', () => {
+    const serviceUrl = 'https://cpd.cp.fyre.ibm.com';
+
+    beforeAll(() => {
+      process.env.WATSONX_AI_AUTH_TYPE = 'cp4d';
+      process.env.WATSONX_AI_USERNAME = 'testUsername';
+      process.env.WATSONX_AI_PASSWORD = 'testPassword';
+      process.env.WATSONX_AI_URL = serviceUrl;
+    });
+
+    afterAll(() => {
+      delete process.env.WATSONX_AI_AUTH_TYPE;
+      delete process.env.WATSONX_AI_USERNAME;
+      delete process.env.WATSONX_AI_PASSWORD;
+      delete process.env.WATSONX_AI_URL;
+    });
+
+    const cp4dRequestTokenMocker = new MockingRequest(
+      authenticators.Cp4dTokenManager.prototype,
+      'requestToken'
+    );
+
+    describe('Positive tests', () => {
+      let iamRequestTokenMock;
+
+      beforeEach(async () => {
+        const tokenResponse = await auth.requestAdminToken({ tokenName: 'token' });
+        cp4dRequestTokenMocker.mock(tokenResponse);
+        iamRequestTokenMock = cp4dRequestTokenMocker.functionMock;
+      });
+
+      afterEach(() => {
+        cp4dRequestTokenMocker.clearMock();
+      });
+
+      test('Request with valid token', async () => {
+        process.env.WATSONX_AI_PASSWORD = 'testPassword';
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+        });
+        expect(instance.getAuthenticator()).toBeInstanceOf(
+          authenticators.CloudPakForDataAuthenticator
+        );
+        const chatFirstCall = instance.textChat(textChatParams);
+        expect(chatFirstCall).toBeInstanceOf(Promise);
+        expect(iamRequestTokenMock).toHaveBeenCalledTimes(1);
+        delete process.env.WATSONX_AI_PASSWORD;
+      });
+      test('Instance creation and request with apikey instead of password', async () => {
+        process.env.WATSONX_AI_APIKEY = 'testApikey';
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+        });
+
+        const chatFirstCall = instance.textChat(textChatParams);
+        expect(chatFirstCall).toBeInstanceOf(Promise);
+        expect(iamRequestTokenMock).toHaveBeenCalledTimes(1);
+        delete process.env.WATSONX_AI_APIKEY;
+      });
+    });
+    describe('Negative tests', () => {
+      test('Request with invalid token', async () => {
+        process.env.WATSONX_AI_PASSWORD = 'testPassword';
+
+        cp4dRequestTokenMocker.mock({
+          result: {
+            token: 'NotAJWT.not_a_token.def_not_a_token',
+          },
+        });
+        const cp4dRequestTokenMock = cp4dRequestTokenMocker.functionMock;
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+        });
+
+        expect(instance).toBeDefined();
+
+        const chatCall = instance.textChat(textChatParams);
+        expect(chatCall).toBeInstanceOf(Promise);
+        await expect(chatCall).rejects.toThrow('Access token received is not a valid JWT');
+        expect(cp4dRequestTokenMock).toHaveBeenCalledTimes(1);
+
+        cp4dRequestTokenMocker.unmock();
+      });
+
+      test('Instance creation with no password and no apikey', async () => {
+        delete process.env.WATSONX_AI_PASSWORD;
+
+        expect(() =>
+          WatsonxAIMLv1.newInstance({
+            version,
+            serviceUrl,
+          })
+        ).toThrow('Exactly one of `apikey` or `password` must be specified.');
+      });
+      test('Instance creation with both apikey and password', async () => {
+        process.env.WATSONX_AI_APIKEY = 'testApikey';
+        process.env.WATSONX_AI_PASSWORD = 'testPassword';
+        expect(() =>
+          WatsonxAIMLv1.newInstance({
+            version,
+            serviceUrl,
+          })
+        ).toThrow('Exactly one of `apikey` or `password` must be specified.');
+        delete process.env.WATSONX_AI_APIKEY;
+        delete process.env.WATSONX_AI_PASSWORD;
+      });
+    });
+  });
+  describe('Bearer token authentication', () => {
+    const serviceUrl = 'https://us-south.ml.cloud.ibm.com';
+
+    beforeAll(() => {
+      process.env.WATSONX_AI_AUTH_TYPE = 'bearertoken';
+      process.env.WATSONX_AI_BEARER_TOKEN = 'fakeToken';
+    });
+
+    afterAll(() => {
+      delete process.env.WATSONX_AI_AUTH_TYPE;
+      delete process.env.WATSONX_AI_BEARER_TOKEN;
+    });
+
+    describe('Positive tests', () => {
+      test('Request with valid token', async () => {
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+        });
+
+        const chatFirstCall = instance.textChat(textChatParams);
+        expect(chatFirstCall).toBeInstanceOf(Promise);
+        expect(instance.getAuthenticator()).toBeInstanceOf(authenticators.BearerTokenAuthenticator);
+      });
+    });
+  });
+  describe('AWS authentication', () => {
+    const serviceUrl = 'https://ap-south-1.aws.wxai.ibm.com';
+    const requestTokenMocker = new MockingRequest(
+      authenticators.AWSTokenManager.prototype,
+      'requestToken'
+    );
+    let requestTokenMock;
+    beforeAll(() => {
+      process.env.WATSONX_AI_AUTH_TYPE = 'AWS';
+      process.env.WATSONX_AI_APIKEY = 'fakeAPIKey';
+    });
+
+    afterAll(() => {
+      delete process.env.WATSONX_AI_AUTH_TYPE;
+      delete process.env.WATSONX_AI_APIKEY;
+    });
+
+    describe('Positive tests', () => {
+      beforeEach(async () => {
+        const tokenResponse = await auth.requestAdminToken({ tokenName: 'token' });
+        requestTokenMocker.mock(tokenResponse);
+        requestTokenMock = requestTokenMocker.functionMock;
+      });
+      afterEach(() => {
+        requestTokenMocker.clearMock();
+      });
+      test('Request with valid token', async () => {
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+        });
+
+        const chatFirstCall = instance.textChat(textChatParams);
+        expect(chatFirstCall).toBeInstanceOf(Promise);
+        expect(instance.getAuthenticator()).toBeInstanceOf(authenticators.AWSAuthenticator);
+      });
     });
   });
 });
