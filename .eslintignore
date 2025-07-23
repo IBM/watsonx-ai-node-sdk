@@ -5,6 +5,7 @@ coverage/
 dist/
 node_modules/
 examples/
+test/langchain/
 
 test/resources/auth.js
 # ignore emitted js

@@ -3004,6 +3004,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'logprobs',
       'topLogprobs',
       'maxTokens',
+      'maxCompletionTokens',
       'n',
       'presencePenalty',
       'responseFormat',
@@ -3032,6 +3033,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'logprobs': _params.logprobs,
       'top_logprobs': _params.topLogprobs,
       'max_tokens': _params.maxTokens,
+      'max_completion_tokens': _params.maxCompletionTokens,
       'n': _params.n,
       'presence_penalty': _params.presencePenalty,
       'response_format': _params.responseFormat,
@@ -3204,6 +3206,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'logprobs',
       'topLogprobs',
       'maxTokens',
+      'maxCompletionTokens',
       'n',
       'presencePenalty',
       'responseFormat',
@@ -3234,6 +3237,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'logprobs': _params.logprobs,
       'top_logprobs': _params.topLogprobs,
       'max_tokens': _params.maxTokens,
+      'max_completion_tokens': _params.maxCompletionTokens,
       'n': _params.n,
       'presence_penalty': _params.presencePenalty,
       'response_format': _params.responseFormat,
@@ -7439,6 +7443,16 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
   }
 
+  /** Constants for the `textChat` operation. */
+  export namespace TextChatConstants {
+    /** Using `none` means the model will not call any tool and instead generates a message. **The following options (`auto` and `required`) are not yet supported.** Using `auto` means the model can pick between generating a message or calling one or more tools. Using `required` means the model must call one or more tools. Only one of `tool_choice_option` or `tool_choice` must be present. */
+    export enum ToolChoiceOption {
+      NONE = 'none',
+      AUTO = 'auto',
+      REQUIRED = 'required',
+    }
+  }
+
   /** Parameters for the `textChat` operation. */
   export interface TextChatParams extends DefaultParams {
     /** The model to use for the chat completion.
@@ -7487,10 +7501,17 @@ namespace WatsonxAiMlVml_v1 {
      *  associated log probability. The option `logprobs` must be set to `true` if this parameter is used.
      */
     topLogprobs?: number;
-    /** The maximum number of tokens that can be generated in the chat completion. The total length of input tokens
-     *  and generated tokens is limited by the model's context length.
+    /** The maximum number of tokens that can be generated in the chat completion.
+     * The total length of input tokens and generated tokens is limited by the model's context length.
+     * Set to 0 for the model's configured max generated tokens.
+     * This value is now deprecated in favor of maxCompletionTokens.
+     * If specified together with maxCompletionTokens, maxTokens will be ignored.
      */
     maxTokens?: number;
+    /** The maximum number of tokens that can be generated in the chat completion. The total length of input tokens
+     * and generated tokens is limited by the model's context length. Set to 0 for the model's configured max generated tokens.
+     */
+    maxCompletionTokens?: number;
     /** How many chat completion choices to generate for each input message. Note that you will be charged based on
      *  the number of generated tokens across all of the choices. Keep n as 1 to minimize costs.
      */
@@ -7527,105 +7548,8 @@ namespace WatsonxAiMlVml_v1 {
      */
     timeLimit?: number;
   }
-
-  /** Constants for the `textChat` operation. */
-  export namespace TextChatConstants {
-    /** Using `none` means the model will not call any tool and instead generates a message. **The following options (`auto` and `required`) are not yet supported.** Using `auto` means the model can pick between generating a message or calling one or more tools. Using `required` means the model must call one or more tools. Only one of `tool_choice_option` or `tool_choice` must be present. */
-    export enum ToolChoiceOption {
-      NONE = 'none',
-      AUTO = 'auto',
-      REQUIRED = 'required',
-    }
-  }
-
   /** Parameters for the `textChatStream` operation. */
-  export interface TextChatStreamParams extends DefaultParams {
-    /** The model to use for the chat completion.
-     *
-     *  Please refer to the [list of
-     *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
-     */
-    modelId: string;
-    /** The messages for this chat session. */
-    messages: TextChatMessages[];
-    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
-    spaceId?: string;
-    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
-    projectId?: string;
-    /** Tool functions that can be called with the response. */
-    tools?: TextChatParameterTools[];
-    /** Using `none` means the model will not call any tool and instead generates a message.
-     *
-     *  **The following options (`auto` and `required`) are not yet supported.**
-     *
-     *  Using `auto` means the model can pick between generating a message or calling one or more tools. Using
-     *  `required` means the model must call one or more tools.
-     *
-     *  Only one of `tool_choice_option` or `tool_choice` must be present.
-     */
-    toolChoiceOption?: TextChatStreamConstants.ToolChoiceOption | string;
-    /** Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}` forces the
-     *  model to call that tool.
-     *
-     *  Only one of `tool_choice_option` or `tool_choice` must be present.
-     */
-    toolChoice?: TextChatToolChoiceTool;
-    /** Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the
-     *  model's likelihood to repeat the same line verbatim.
-     */
-    frequencyPenalty?: number;
-    /** Increasing or decreasing probability of tokens being selected during generation; a positive bias makes a
-     *  token more likely to appear, while a negative bias makes it less likely.
-     */
-    logitBias?: JsonObject;
-    /** Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of
-     *  each output token returned in the content of message.
-     */
-    logprobs?: boolean;
-    /** An integer specifying the number of most likely tokens to return at each token position, each with an
-     *  associated log probability. The option `logprobs` must be set to `true` if this parameter is used.
-     */
-    topLogprobs?: number;
-    /** The maximum number of tokens that can be generated in the chat completion. The total length of input tokens
-     *  and generated tokens is limited by the model's context length.
-     */
-    maxTokens?: number;
-    /** How many chat completion choices to generate for each input message. Note that you will be charged based on
-     *  the number of generated tokens across all of the choices. Keep n as 1 to minimize costs.
-     */
-    n?: number;
-    /** Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's
-     *  likelihood to talk about new topics.
-     */
-    presencePenalty?: number;
-    /** The chat response format parameters. */
-    responseFormat?: TextChatResponseFormat;
-    /** Random number generator seed to use in sampling mode for experimental repeatability. */
-    seed?: number;
-    /** Stop sequences are one or more strings which will cause the text generation to stop if/when they are
-     *  produced as part of the output. Stop sequences encountered prior to the minimum number of tokens being generated
-     *  will be ignored.
-     */
-    stop?: string[];
-    /** What sampling temperature to use,. Higher values like 0.8 will make the output more random, while lower
-     *  values like 0.2 will make it more focused and deterministic.
-     *
-     *  We generally recommend altering this or `top_p` but not both.
-     */
-    temperature?: number;
-    /** An alternative to sampling with temperature, called nucleus sampling, where the model considers the results
-     *  of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass
-     *  are considered.
-     *
-     *  We generally recommend altering this or `temperature` but not both.
-     */
-    topP?: number;
-    /** Time limit in milliseconds - if not completed within this time, generation will stop. The text generated so
-     *  far will be returned along with the `TIME_LIMIT`` stop reason. Depending on the users plan, and on the model
-     *  being used, there may be an enforced maximum time limit.
-     */
-    timeLimit?: number;
-
+  export interface TextChatStreamParams extends TextChatParams {
     /* whether to return stream of objects if true or stream of strings if false or undefined */
     returnObject?: boolean;
   }

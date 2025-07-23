@@ -434,6 +434,28 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res.result).toBeDefined();
     });
 
+    test('textChat favor maxCompletionTokens', async () => {
+      const res = await watsonxAIService.textChat({
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant.',
+          },
+          {
+            role: 'user',
+            content: 'Tell me about AI, please!',
+          },
+        ],
+        modelId: chatModel,
+        projectId,
+        maxTokens: 5,
+        maxCompletionTokens: 10,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.result.usage.completion_tokens).toBe(10);
+    });
+
     test('textChatStream', async () => {
       const res = await watsonxAIService.textChatStream({
         messages: [
@@ -448,6 +470,33 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
       expect(res).toBeDefined();
       expect(res).toBeInstanceOf(Stream);
+    });
+
+    test('textChatStream favor maxCompletionTokens', async () => {
+      const res = await watsonxAIService.textChatStream({
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant.',
+          },
+          {
+            role: 'user',
+            content: 'Tell me about AI, please!',
+          },
+        ],
+        modelId: chatModel,
+        projectId,
+        maxTokens: 10,
+        maxCompletionTokens: 5,
+        returnObject: true,
+      });
+
+      expect(res).toBeInstanceOf(Stream);
+      let lastChunk;
+      for await (const chunk of res) {
+        lastChunk = chunk;
+      }
+      expect(lastChunk.data.usage.completion_tokens).toBe(5);
     });
 
     test('textChatStream as string', async () => {

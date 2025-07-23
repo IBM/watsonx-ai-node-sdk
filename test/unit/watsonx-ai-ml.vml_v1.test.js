@@ -4548,6 +4548,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const logprobs = false;
         const topLogprobs = 0;
         const maxTokens = 100;
+        const maxCompletionTokens = 100;
         const n = 1;
         const presencePenalty = 0;
         const responseFormat = textChatResponseFormatModel;
@@ -4570,6 +4571,7 @@ describe('WatsonxAiMlVml_v1', () => {
           logprobs,
           topLogprobs,
           maxTokens,
+          maxCompletionTokens,
           n,
           presencePenalty,
           responseFormat,
@@ -4608,6 +4610,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.logprobs).toEqual(logprobs);
         expect(mockRequestOptions.body.top_logprobs).toEqual(topLogprobs);
         expect(mockRequestOptions.body.max_tokens).toEqual(maxTokens);
+        expect(mockRequestOptions.body.max_completion_tokens).toEqual(maxCompletionTokens);
         expect(mockRequestOptions.body.n).toEqual(n);
         expect(mockRequestOptions.body.presence_penalty).toEqual(presencePenalty);
         expect(mockRequestOptions.body.response_format).toEqual(responseFormat);
@@ -4748,6 +4751,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const logprobs = false;
         const topLogprobs = 0;
         const maxTokens = 1024;
+        const maxCompletionTokens = 1024;
         const n = 1;
         const presencePenalty = 0;
         const responseFormat = textChatResponseFormatModel;
@@ -4770,6 +4774,7 @@ describe('WatsonxAiMlVml_v1', () => {
           logprobs,
           topLogprobs,
           maxTokens,
+          maxCompletionTokens,
           n,
           presencePenalty,
           responseFormat,
@@ -4808,6 +4813,7 @@ describe('WatsonxAiMlVml_v1', () => {
         expect(mockRequestOptions.body.logprobs).toEqual(logprobs);
         expect(mockRequestOptions.body.top_logprobs).toEqual(topLogprobs);
         expect(mockRequestOptions.body.max_tokens).toEqual(maxTokens);
+        expect(mockRequestOptions.body.max_completion_tokens).toEqual(maxCompletionTokens);
         expect(mockRequestOptions.body.n).toEqual(n);
         expect(mockRequestOptions.body.presence_penalty).toEqual(presencePenalty);
         expect(mockRequestOptions.body.response_format).toEqual(responseFormat);
