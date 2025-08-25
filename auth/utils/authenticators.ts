@@ -19,6 +19,7 @@ import {
   JwtTokenManagerOptions,
   TokenRequestBasedAuthenticator,
 } from 'ibm-cloud-sdk-core';
+import { Agent } from 'https';
 import { BaseOptions } from 'ibm-cloud-sdk-core/es/auth/authenticators/token-request-based-authenticator-immutable';
 
 const AWS_AUTHENTICATION_PATH = '/api/2.0/apikeys/token';
@@ -38,10 +39,13 @@ export class RequestFunctionJWTTokenManager extends JwtTokenManager {
 export class AWSTokenManager extends JwtTokenManager {
   private apikey: string;
 
+  private httpsAgent?: Agent;
+
   constructor(options: JwtTokenManagerOptions) {
     super(options);
     this.apikey = options.apikey;
     this.tokenName = 'token';
+    this.httpsAgent = options.httpsAgent;
   }
 
   protected async requestToken(): Promise<any> {
@@ -56,6 +60,9 @@ export class AWSTokenManager extends JwtTokenManager {
           apikey: this.apikey,
         },
         rejectUnauthorized: !this.disableSslVerification,
+        axiosOptions: {
+          httpsAgent: this.httpsAgent,
+        },
       },
     };
     return this.requestWrapperInstance.sendRequest(parameters);

@@ -14,6 +14,7 @@ cat >> "${CONFIG_FILE_NAME}" <<EOF
 TRAINING_ASSET_ID=$(get_env training-asset-id)
 WATSONX_AI_COS_ID=$(get_env watsonx-ai-cos-id)
 WATSONX_AI_COS_CRN_ID=$(get_env watsonx-ai-cos-crn-id)
+WATSONX_AI_SECRETS_MANAGER_CRN_ID=$(get_env watsonx-ai-secrets-manager-crn-id)
 WATSONX_AI_PLATFORM_URL=$(get_env watsonx-ai-platform-url)
 WATSONX_AI_SPACE_ID=$(get_env watsonx-ai-space-id)
 MILVUS_URL=$(get_env milvus-url)

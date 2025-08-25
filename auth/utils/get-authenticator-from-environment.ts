@@ -25,6 +25,7 @@ import {
   NoAuthAuthenticator,
   readExternalSources,
 } from 'ibm-cloud-sdk-core';
+import { Agent } from 'https';
 import {
   AWSAuthenticator,
   JWTRequestBaseAuthenticator,
@@ -47,10 +48,12 @@ export function getAuthenticatorFromEnvironment({
   serviceName,
   serviceUrl,
   requestToken,
+  httpsAgent,
 }: {
   serviceName: string;
   serviceUrl?: string;
   requestToken?: () => Promise<RequestTokenResponse>;
+  httpsAgent?: Agent | undefined;
 }): Authenticator {
   if (!serviceName) {
     throw new Error('Service name is required.');
@@ -131,6 +134,7 @@ export function getAuthenticatorFromEnvironment({
             ? 'https://account-iam.platform.test.saas.ibm.com'
             : 'https://account-iam.platform.saas.ibm.com';
       }
+      credentials.httpsAgent = httpsAgent;
       authenticator = new AWSAuthenticator(credentials);
       break;
     default:

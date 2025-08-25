@@ -22,6 +22,8 @@
 /* eslint-disable no-await-in-loop */
 
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
+import { Agent } from 'https';
+import fs from 'fs';
 import {
   BaseService,
   UserOptions,
@@ -39,6 +41,7 @@ import {
   transformStreamToStringStream,
 } from '../lib/common';
 import { RequestTokenResponse } from '../auth/utils/authenticators';
+
 /**
  * SDK entrypoint for IBM watsonx.ai product
  *
@@ -75,6 +78,8 @@ class WatsonxAiMlVml_v1 extends BaseService {
   static wxServiceUrl: string;
 
   static serviceUrl: string;
+
+  httpsAgentMap: WatsonxAiMlVml_v1.HttpsAgentMap = { service: undefined, dataplatform: undefined };
 
   /**
    * Constructs a service URL by formatting the parameterized service URL.
@@ -116,19 +121,40 @@ class WatsonxAiMlVml_v1 extends BaseService {
    */
 
   public static newInstance(
-    options: UserOptions & WatsonxAiMlVml_v1.TokenAuthenticationOptions
+    options: UserOptions &
+      WatsonxAiMlVml_v1.TokenAuthenticationOptions &
+      WatsonxAiMlVml_v1.Certificates
   ): WatsonxAiMlVml_v1 {
     options = options || {};
 
     if (!options.serviceName) {
       options.serviceName = this.DEFAULT_SERVICE_NAME;
     }
+    let httpsAgentAuth: Agent | undefined;
+
+    if (typeof options.caCert === 'string') {
+      const certFile = fs.readFileSync(options.caCert);
+
+      httpsAgentAuth = new Agent({
+        ca: certFile,
+      });
+
+      options.httpsAgent = httpsAgentAuth;
+    } else if (options.caCert?.auth?.path) {
+      const certFile = fs.readFileSync(options.caCert.auth.path);
+
+      httpsAgentAuth = new Agent({
+        ca: certFile,
+      });
+    }
+
     if (!options.authenticator) {
       const { serviceName, requestToken, serviceUrl } = options;
       options.authenticator = getAuthenticatorFromEnvironment({
         serviceName,
         requestToken,
         serviceUrl,
+        httpsAgent: httpsAgentAuth,
       });
     }
     if (!options.platformUrl) {
@@ -142,6 +168,14 @@ class WatsonxAiMlVml_v1 extends BaseService {
       service.setServiceUrl(options.serviceUrl);
     }
     return service;
+  }
+
+  protected createRequest(parameters: Record<string, any>) {
+    const apiType = parameters.defaultOptions.serviceUrl.includes('api')
+      ? 'dataplatform'
+      : 'service';
+    parameters.defaultOptions.axiosOptions.httpsAgent = this.httpsAgentMap[apiType];
+    return super.createRequest(parameters);
   }
 
   /** The version date for the API of the form `YYYY-MM-DD`. */
@@ -158,7 +192,8 @@ class WatsonxAiMlVml_v1 extends BaseService {
    * @param {string} options.version - The version date for the API of the form `YYYY-MM-DD`.
    * @param {string} [options.serviceUrl] - The base URL for the service
    * @param {OutgoingHttpHeaders} [options.headers] - Default headers that shall be included with every request to the service.
-   * @param {Authenticator} options.authenticator - The Authenticator object used to authenticate requests to the service
+   * @param {Authenticator} [options.authenticator] - The Authenticator object used to authenticate requests to the service
+   * @param {string | Certificates} [options.caCert] - Path to a SSL certificate that should be used in each request or an object of mapped paths that should be used for different endpoints
    * @constructor
    * @returns {WatsonxAiMlVml_v1}
    */
@@ -178,6 +213,21 @@ class WatsonxAiMlVml_v1 extends BaseService {
       this.setServiceUrl(options.serviceUrl);
     } else {
       this.setServiceUrl(WatsonxAiMlVml_v1.DEFAULT_SERVICE_URL);
+    }
+
+    if (options.caCert?.service?.path) {
+      const certFile = fs.readFileSync(options.caCert.service.path);
+
+      this.httpsAgentMap.service = new Agent({
+        ca: certFile,
+      });
+    }
+    if (options.caCert?.dataplatform?.path) {
+      const certFile = fs.readFileSync(options.caCert.dataplatform.path);
+
+      this.httpsAgentMap.dataplatform = new Agent({
+        ca: certFile,
+      });
     }
 
     if (!this.baseOptions.serviceUrl)
@@ -6773,6 +6823,19 @@ namespace WatsonxAiMlVml_v1 {
 
   export interface TokenAuthenticationOptions {
     requestToken?: () => Promise<RequestTokenResponse>;
+  }
+
+  export interface Certificates {
+    caCert?: { auth?: Certificate; service?: Certificate; dataplatform?: Certificate } | string;
+  }
+
+  export interface Certificate {
+    path: string;
+  }
+
+  export interface HttpsAgentMap {
+    service?: Agent;
+    dataplatform?: Agent;
   }
 
   /** An operation response. */
