@@ -31,6 +31,7 @@ import {
   JWTRequestBaseAuthenticator,
   RequestTokenResponse,
 } from './authenticators';
+import { AUTH_AWS_URLS } from './urls';
 
 /**
  * Look for external configuration of authenticator.
@@ -129,10 +130,13 @@ export function getAuthenticatorFromEnvironment({
       break;
     case AWSAuthenticator.AUTHTYPE_AWS:
       if (!credentials.url && serviceUrl) {
-        credentials.url =
-          serviceUrl.includes('test') || serviceUrl.includes('dev')
-            ? 'https://account-iam.platform.test.saas.ibm.com'
-            : 'https://account-iam.platform.saas.ibm.com';
+        const tokenURL = AUTH_AWS_URLS[serviceUrl];
+        if (!tokenURL) {
+          throw new Error(
+            `No token URL is found for serviceUrl: ${serviceUrl}. Check your serviceUrl and try again.`
+          );
+        }
+        credentials.url = tokenURL;
       }
       credentials.httpsAgent = httpsAgent;
       authenticator = new AWSAuthenticator(credentials);

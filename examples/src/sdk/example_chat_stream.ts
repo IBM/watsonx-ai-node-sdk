@@ -12,6 +12,7 @@
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';
 
+const modelName = 'mistralai/mistral-medium-2505';
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
 
@@ -44,7 +45,7 @@ const messages = [
   },
 ];
 const chatStream = await watsonxAIService.textChatStream({
-  modelId: 'mistralai/mistral-large',
+  modelId: modelName,
   projectId,
   messages,
   ...modelParameters,
@@ -61,7 +62,7 @@ for await (const chunk of chatStream) {
 }
 
 const chatStreamObjects = await watsonxAIService.textChatStream({
-  modelId: 'mistralai/mistral-large',
+  modelId: modelName,
   projectId,
   spaceId,
   messages,

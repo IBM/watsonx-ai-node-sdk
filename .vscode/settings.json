@@ -3,13 +3,11 @@
   "jest.virtualFolders": [
     {
       "name": "unit-tests",
-      "rootPath": "test/unit",
-      "jestCommandLine": "jest -c jest.unit.config.js"
+      "jestCommandLine": "jest -c test/unit/jest.unit.config.js"
     },
     {
       "name": "integration-tests",
-      "rootPath": "test/integration",
-      "jestCommandLine": "jest -c jest.int.config.js"
+      "jestCommandLine": "jest -c test/integration/jest.int.config.js"
     },
     { "name": "example-tests", "rootPath": "examples/test" },
     {

@@ -9,11 +9,11 @@ class SilentConsoleEnvironment extends NodeEnvironment {
 
   async setup() {
     await super.setup();
+    this.originalLog = this.global.console.log;
 
     if (this.logPassedTests) return;
 
     this.logBuffer = [];
-    this.originalLog = this.global.console.log;
 
     this.global.console.log = (...args) => {
       this.logBuffer.push(args);

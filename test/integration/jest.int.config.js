@@ -2,5 +2,6 @@ const global = require('../../jest.global.config');
 
 module.exports = {
   ...global,
-  testMatch: ['**/*.test.js'],
+  rootDir: '../../',
+  testMatch: ['<rootDir>/test/integration/**/*.test.js'],
 };

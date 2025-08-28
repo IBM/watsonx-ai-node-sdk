@@ -46,7 +46,7 @@ module.exports.prepareTests = (filename) => {
     describeToUse.skip = describeToUse;
   }
 
-  return describe;
+  return describeToUse;
 };
 
 module.exports.getDescribe = () => describeToUse;
@@ -66,4 +66,12 @@ module.exports.loadConfig = () => {
     return dotenv.parse(fs.readFileSync(configFilename));
   }
   return {};
+};
+
+module.exports.checkCPD = () => {
+  if (process.env.WATSONX_AI_SERVICE_URL.includes('cloud.ibm.com')) {
+    describeToUse = describe.skip.bind(describe);
+    describeToUse.skip = describeToUse;
+  }
+  return describeToUse;
 };

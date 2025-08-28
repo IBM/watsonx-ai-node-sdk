@@ -636,8 +636,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
       expect(chunks).toHaveLength(n);
     });
-
-    const models = ['mistralai/mistral-large', 'ibm/granite-3-8b-instruct', chatModel];
+    const modelName = 'mistralai/mistral-medium-2505';
+    const models = [modelName, 'ibm/granite-3-8b-instruct', chatModel];
     test.each(models)(
       'textChatStream with returnObject returning correct object with %s',
       async (model) => {

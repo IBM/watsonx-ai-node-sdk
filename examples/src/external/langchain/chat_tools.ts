@@ -3,6 +3,7 @@ import { HumanMessage } from '@langchain/core/messages';
 import { conversationPrinter } from './utils.ts';
 import '../../utils/config.ts';
 
+const modelName = 'mistralai/mistral-medium-2505';
 const tools = [
   {
     type: 'function',
@@ -27,7 +28,7 @@ const modelWithTools = new ChatWatsonx({
   watsonxAIApikey: process.env.WATSONX_AI_APIKEY,
   watsonxAIAuthType: 'iam',
   version: '2024-05-31',
-  model: 'mistralai/mistral-large',
+  model: modelName,
 }).bindTools(tools);
 
 console.log(
@@ -75,7 +76,7 @@ const modelWithCalcTools = new ChatWatsonx({
   watsonxAIApikey: process.env.WATSONX_AI_APIKEY,
   watsonxAIAuthType: 'iam',
   version: '2024-05-31',
-  model: 'mistralai/mistral-large',
+  model: modelName,
 }).bindTools([...toolsCalc, ...tools]);
 console.log(
   '\n------------------------------ CHAT TOOLS #2 - multiple tool ------------------------------\n'

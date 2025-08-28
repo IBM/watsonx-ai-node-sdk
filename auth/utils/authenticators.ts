@@ -23,6 +23,7 @@ import { Agent } from 'https';
 import { BaseOptions } from 'ibm-cloud-sdk-core/es/auth/authenticators/token-request-based-authenticator-immutable';
 
 const AWS_AUTHENTICATION_PATH = '/api/2.0/apikeys/token';
+
 export interface RequestTokenResponse {
   result: {
     access_token: string;
@@ -49,9 +50,10 @@ export class AWSTokenManager extends JwtTokenManager {
   }
 
   protected async requestToken(): Promise<any> {
+    const authPath = new URL(this.url).pathname === '/' ? AWS_AUTHENTICATION_PATH : '';
     const parameters = {
       options: {
-        url: this.url + AWS_AUTHENTICATION_PATH,
+        url: this.url + authPath,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -15,6 +15,8 @@
  */
 
 /* eslint-disable no-await-in-loop */
+const path = require('path');
+const { Agent } = require('https');
 const WatsonxAIMLv1 = require('../../dist/watsonx-ai-ml/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
 const { MockingRequest } = require('../utils/utils.js');
@@ -50,6 +52,17 @@ const textChatParams = {
   modelId,
   messages,
   projectId,
+};
+const sendRequestCalledWith = {
+  'body': {
+    'apikey': undefined,
+  },
+  'headers': {
+    'Content-Type': 'application/json',
+  },
+  'method': 'POST',
+  'url':
+    'https://account-iam.awsg.usge1.private.platform.prep.ibmforusgov.com/api/2.0/apikeys/token',
 };
 
 describe('Authentication unit tests', () => {
@@ -381,7 +394,7 @@ describe('Authentication unit tests', () => {
     );
     let requestTokenMock;
     beforeAll(() => {
-      process.env.WATSONX_AI_AUTH_TYPE = 'AWS';
+      process.env.WATSONX_AI_AUTH_TYPE = 'aws';
       process.env.WATSONX_AI_APIKEY = 'fakeAPIKey';
     });
 
@@ -397,7 +410,7 @@ describe('Authentication unit tests', () => {
         requestTokenMock = requestTokenMocker.functionMock;
       });
       afterEach(() => {
-        requestTokenMocker.clearMock();
+        requestTokenMocker.unmock();
       });
       test('Request with valid token', async () => {
         const instance = WatsonxAIMLv1.newInstance({
@@ -408,6 +421,113 @@ describe('Authentication unit tests', () => {
         const chatFirstCall = instance.textChat(textChatParams);
         expect(chatFirstCall).toBeInstanceOf(Promise);
         expect(instance.getAuthenticator()).toBeInstanceOf(authenticators.AWSAuthenticator);
+      });
+    });
+  });
+});
+
+describe('Authentication with cert', () => {
+  describe('AWS cert authentication', () => {
+    const serviceUrl = 'https://wxai.prep.ibmforusgov.com';
+    beforeAll(() => {
+      process.env.WATSONX_AI_AUTH_TYPE = 'aws';
+    });
+    afterAll(() => {
+      delete process.env.WATSONX_AI_AUTH_TYPE;
+    });
+
+    describe('Positive tests', () => {
+      test('AWS authentication without cert', async () => {
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+        });
+        const tokenResponse = await auth.requestAdminToken({ tokenName: 'token' });
+        const sendRequestMocker = new MockingRequest(
+          instance.authenticator.tokenManager.requestWrapperInstance,
+          'sendRequest'
+        );
+        sendRequestMocker.mock(tokenResponse);
+        const sendRequestMock = sendRequestMocker.functionMock;
+
+        await instance.textChat(textChatParams);
+        expect(instance).toBeDefined();
+        expect(sendRequestMock).toHaveBeenCalledWith({
+          options: {
+            'axiosOptions': {
+              'httpsAgent': undefined,
+            },
+            'rejectUnauthorized': true,
+            ...sendRequestCalledWith,
+          },
+        });
+        sendRequestMocker.clearMock();
+      });
+
+      test('AWS authentication with cert', async () => {
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+          caCert: path.join(__dirname, './cert/FakeCert.pem'),
+        });
+        const tokenResponse = await auth.requestAdminToken({ tokenName: 'token' });
+        const sendRequestMocker = new MockingRequest(
+          instance.authenticator.tokenManager.requestWrapperInstance,
+          'sendRequest'
+        );
+        sendRequestMocker.mock(tokenResponse);
+        const sendRequestMock = sendRequestMocker.functionMock;
+
+        await instance.textChat(textChatParams);
+        expect(instance).toBeDefined();
+        expect(sendRequestMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            options: expect.objectContaining({
+              axiosOptions: expect.objectContaining({
+                httpsAgent: expect.any(Agent),
+              }),
+              rejectUnauthorized: true,
+              ...sendRequestCalledWith,
+            }),
+          })
+        );
+        sendRequestMocker.clearMock();
+      });
+
+      test('Pass auth url as env variable', async () => {
+        process.env.WATSONX_AI_AUTH_URL = 'https://test.ibm.com/test/auth/url';
+        const instance = WatsonxAIMLv1.newInstance({
+          version,
+          serviceUrl,
+        });
+        const tokenResponse = await auth.requestAdminToken({ tokenName: 'token' });
+        const sendRequestMocker = new MockingRequest(
+          instance.authenticator.tokenManager.requestWrapperInstance,
+          'sendRequest'
+        );
+        sendRequestMocker.mock(tokenResponse);
+        const sendRequestMock = sendRequestMocker.functionMock;
+
+        await instance.textChat(textChatParams);
+        expect(instance).toBeDefined();
+        expect(sendRequestMock).toHaveBeenCalledWith({
+          'options': {
+            'axiosOptions': {
+              'httpsAgent': undefined,
+            },
+            'body': {
+              'apikey': undefined,
+            },
+            'headers': {
+              'Content-Type': 'application/json',
+            },
+            'method': 'POST',
+            'rejectUnauthorized': true,
+            'url': 'https://test.ibm.com/test/auth/url',
+          },
+        });
+        delete process.env.WATSONX_AI_AUTH_URL;
+        sendRequestMocker.clearMock();
       });
     });
   });

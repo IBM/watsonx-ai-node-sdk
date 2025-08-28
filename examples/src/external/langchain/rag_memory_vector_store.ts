@@ -9,6 +9,7 @@ import { MemoryVectorStore } from 'langchain/vectorstores/memory';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
 
+const modelName = 'mistralai/mistral-medium-2505';
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
@@ -54,7 +55,7 @@ const llm = new ChatWatsonx({
   watsonxAIApikey: process.env.WATSONX_AI_APIKEY,
   watsonxAIAuthType: 'iam',
   version: '2024-05-31',
-  model: 'mistralai/mistral-large',
+  model: modelName,
   maxRetries: 0,
 });
 const prompt = await pull<ChatPromptTemplate>('rlm/rag-prompt');

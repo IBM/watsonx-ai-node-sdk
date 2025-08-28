@@ -19,6 +19,7 @@
 const nock = require('nock');
 const sdkCorePackage = require('ibm-cloud-sdk-core');
 const unitTestUtils = require('@ibm-cloud/sdk-test-utilities');
+const FormData = require('form-data');
 const { StreamTransform } = require('../../dist/lib/common');
 // need to import the whole package to mock getAuthenticatorFromEnvironment
 const get_authenticator_from_environment = require('../../dist/auth/utils/get-authenticator-from-environment');
@@ -9392,6 +9393,80 @@ describe('WatsonxAiMlVml_v1', () => {
         };
 
         watsonxAIService.deploymentsTimeSeriesForecast(overrideDeploymentsTimeSeriesForecastParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        await expect(watsonxAIService.deploymentsTimeSeriesForecast({})).rejects.toThrow(
+          /Missing required parameters/
+        );
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        await expect(watsonxAIService.deploymentsTimeSeriesForecast()).rejects.toThrow(
+          /Missing required parameters/
+        );
+      });
+    });
+  });
+
+  describe('transcribeAudio', () => {
+    describe('positive tests', () => {
+      function deploymentsTimeSeriesForecastTest() {
+        const transcribeAudioParams = {
+          model: 'test/model',
+          projectId: 'd514c8ef-423f-429c-8947-fa900dee338a',
+          file: 'path/to/file',
+          language: 'fr',
+        };
+        const transcribeAudioPromiseResult =
+          watsonxAIService.transcribeAudio(transcribeAudioParams);
+
+        expectToBePromise(transcribeAudioPromiseResult);
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/audio/transcriptions', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = 'multipart/form-data';
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body).toBeInstanceOf(FormData);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        deploymentsTimeSeriesForecastTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.enableRetries();
+        deploymentsTimeSeriesForecastTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.disableRetries();
+        deploymentsTimeSeriesForecastTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const overrideTranscribeAudioParams = {
+          model: 'test/model',
+          projectId: 'd514c8ef-423f-429c-8947-fa900dee338a',
+          file: 'path/to/file',
+          language: 'fr',
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAIService.transcribeAudio(overrideTranscribeAudioParams);
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });

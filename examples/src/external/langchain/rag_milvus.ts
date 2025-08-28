@@ -10,6 +10,8 @@ import { DataType } from '@zilliz/milvus2-sdk-node';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
 
+const modelName = 'mistralai/mistral-medium-2505';
+const embeddingsModelName = 'ibm/slate-30m-english-rtrvr-v2';
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
@@ -25,7 +27,7 @@ const embeddings = new WatsonxEmbeddings({
   watsonxAIAuthType: 'iam',
   version: '2024-05-31',
   maxRetries: 0,
-  model: 'ibm/slate-30m-english-rtrvr-v2',
+  model: embeddingsModelName,
 });
 
 const loader = new CheerioWebBaseLoader(
@@ -90,7 +92,7 @@ const llm = new ChatWatsonx({
   watsonxAIApikey: process.env.WATSONX_AI_APIKEY,
   watsonxAIAuthType: 'iam',
   version: '2024-05-31',
-  model: 'mistralai/mistral-large',
+  model: modelName,
   maxRetries: 0,
 });
 const prompt = await pull<ChatPromptTemplate>('rlm/rag-prompt');

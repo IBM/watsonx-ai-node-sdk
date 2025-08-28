@@ -10,6 +10,7 @@
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';
 
+const modelName = 'mistralai/mistral-medium-2505';
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
 
@@ -37,7 +38,7 @@ const promptData = {
 const promptContentParams = {
   data: promptData,
   input: [['{input}', '']],
-  model_id: 'mistralai/mistral-large',
+  model_id: modelName,
   model_parameters: textGenRequestParametersModel,
 };
 

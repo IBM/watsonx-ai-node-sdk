@@ -19,8 +19,8 @@ const watsonxAIService = WatsonXAI.newInstance({
 });
 
 // Specify two models
-const model1 = 'google/flan-ul2';
-const model2 = 'meta-llama/llama-3-3-70b-instruct';
+const modelName = 'mistralai/mistral-medium-2505';
+const modelName2 = 'meta-llama/llama-3-3-70b-instruct';
 
 // Specify input data
 const input =
@@ -29,7 +29,7 @@ const input =
 // Tokenize input data on 1st model
 const textTokenzationParameters1 = {
   input,
-  modelId: model1,
+  modelId: modelName,
   projectId,
   spaceId,
   parameters: {
@@ -46,7 +46,7 @@ console.log(tokens1);
 // Tokenize input data on 2nd model
 const textTokenzationParameters2 = {
   input,
-  modelId: model2,
+  modelId: modelName2,
   projectId,
   spaceId,
   parameters: {

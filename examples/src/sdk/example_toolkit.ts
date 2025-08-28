@@ -11,9 +11,9 @@ import {
   convertWatsonxToolCallToUtilityToolCall,
   WatsonXAI,
 } from '@ibm-cloud/watsonx-ai';
-
 import '../utils/config.ts';
 
+const modelName = 'mistralai/mistral-medium-2505';
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 
@@ -37,7 +37,7 @@ const twoToolAgent = async (input: string) => {
     messages,
     tools: chatTools,
     projectId,
-    modelId: 'mistralai/mistral-large',
+    modelId: modelName,
   });
 
   if (textUtilityChat.result.choices?.[0]?.message) {
@@ -67,7 +67,7 @@ const twoToolAgent = async (input: string) => {
     messages,
     tools: chatTools,
     projectId,
-    modelId: 'mistralai/mistral-large',
+    modelId: modelName,
   });
   console.log(messages);
   console.log(textChat.result.choices?.[0].message?.content);

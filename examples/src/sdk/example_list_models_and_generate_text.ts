@@ -9,6 +9,7 @@
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';
 
+const modelName = 'mistralai/mistral-medium-2505';
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
 
@@ -40,7 +41,7 @@ console.log(modelList);
 // Infer one of available models
 const genParams = {
   input: 'Generate a short greeting for project kick-off meeting.',
-  modelId: 'google/flan-ul2',
+  modelId: modelName,
   projectId,
   spaceId,
   parameters: textGenRequestParametersModel,

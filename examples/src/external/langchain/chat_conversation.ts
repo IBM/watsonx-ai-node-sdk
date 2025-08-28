@@ -3,12 +3,12 @@ import { AIMessage, HumanMessage, SystemMessage } from '@langchain/core/messages
 import { conversationPrinter } from './utils.ts';
 import '../../utils/config.ts';
 
+const modelName = 'mistralai/mistral-medium-2505';
 const model = new ChatWatsonx({
   projectId: process.env.WATSONX_AI_PROJECT_ID,
   serviceUrl: process.env.WATSONX_AI_SERVICE_URL as string,
-
   version: '2024-05-31',
-  model: 'mistralai/mistral-large',
+  model: modelName,
   maxTokens: 1000,
 });
 console.log(

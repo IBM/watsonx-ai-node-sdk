@@ -9,13 +9,14 @@ import { DuckDuckGoSearch } from '@langchain/community/tools/duckduckgo_search';
 import { conversationPrinter } from './utils.ts';
 import '../../utils/config.ts';
 
+const modelName = 'mistralai/mistral-medium-2505';
 const model = new ChatWatsonx({
   projectId: process.env.WATSONX_AI_PROJECT_ID,
   serviceUrl: process.env.WATSONX_AI_SERVICE_URL as string,
   watsonxAIApikey: process.env.WATSONX_AI_APIKEY,
   watsonxAIAuthType: 'iam',
   version: '2024-05-31',
-  model: 'mistralai/mistral-large',
+  model: modelName,
 });
 const storage = [
   { id: 1, name: 'Apple', category: 'fruit' },
@@ -95,7 +96,7 @@ const agentModel = new ChatWatsonx({
   watsonxAIApikey: process.env.WATSONX_AI_APIKEY,
   watsonxAIAuthType: 'iam',
   version: '2024-05-31',
-  model: 'mistralai/mistral-large',
+  model: modelName,
   maxTokens: 1000,
 });
 

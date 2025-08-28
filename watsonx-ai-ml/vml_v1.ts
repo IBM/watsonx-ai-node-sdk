@@ -33,6 +33,7 @@ import {
   validateParams,
 } from 'ibm-cloud-sdk-core';
 import { BaseServiceOptions } from 'ibm-cloud-sdk-core/es/lib/base-service';
+import FormData from 'form-data';
 import { getAuthenticatorFromEnvironment } from '../auth/utils/get-authenticator-from-environment';
 import {
   getSdkHeaders,
@@ -60,6 +61,10 @@ const PLATFORM_URLS_MAP = {
   'https://private.eu-de.ml.cloud.ibm.com': 'https://api.eu-de.dataplatform.cloud.ibm.com/wx',
   'https://private.us-south.ml.cloud.ibm.com': 'https://api.dataplatform.cloud.ibm.com/wx',
   'https://ap-south-1.aws.wxai.ibm.com': 'https://api.ap-south-1.aws.data.ibm.com/wx',
+  'https://wxai.prep.ibmforusgov.com': 'https://api.dai.prep.ibmforusgov.com/wx',
+  'https://private.wxai.prep.ibmforusgov.com': 'https://api.dai.prep.ibmforusgov.com/wx',
+  'https://wxai.ibmforusgov.com': 'https://api.dai.ibmforusgov.com/wx',
+  'https://private.wxai.ibmforusgov.com': 'https://api.dai.ibmforusgov.com/wx',
 };
 
 class WatsonxAiMlVml_v1 extends BaseService {
@@ -6808,6 +6813,84 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
     return this.createRequest(parameters);
   }
+
+  /**
+   * Transcribes an audio file using the Watson AI ML VML service.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.model - The model to use for audio transcriptions.
+   * @param {string | ReadStream} params.file - The path to a mp3 or wav audio file to transcribe or a ReadStream object containing a file stream: `fs.createReadStream(path)`.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
+   * to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
+   * be given.
+   * @param {string} [params.language] - Optional target language to which to transcribe; for example, fr for French. Default is English.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @param {string} [params.signal] - A list of comma-separated, user-defined tags to use to filter the query results.
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>} - A promise that resolves with the transcription response.
+   * @throws {Error} Will throw an error if required or invalid parameters are provided.
+   */
+  public transcribeAudio(
+    params: WatsonxAiMlVml_v1.TranscribeAudioParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.AudioTranscriptionResult>> {
+    const _params = { ...params };
+    const _requiredParams = ['model', 'file'];
+    const _validParams = ['model', 'file', 'projectId', 'spaceId', 'language', 'headers', 'signal'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+    const { file } = _params;
+
+    const form = new FormData();
+    form.append('model', _params.model);
+
+    if (_params.language) form.append('language', _params.language);
+
+    if (typeof file === 'string') {
+      const files = fs.createReadStream(file);
+      form.append('file', files);
+    } else form.append('file', file);
+
+    if (_params.projectId) {
+      form.append('project_id', _params.projectId);
+    } else if (_params.spaceId) {
+      form.append('space_id', _params.spaceId);
+    } else throw new Error('Either projectId or spaceId need to be provided');
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'transcribeAudio'
+    );
+
+    const query = {
+      'version': this.version,
+    };
+    const parameters = {
+      options: {
+        url: '/ml/v1/audio/transcriptions',
+        method: 'POST',
+        body: form,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data',
+          ...form.getHeaders(),
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
 }
 
 /*************************
@@ -8361,6 +8444,20 @@ namespace WatsonxAiMlVml_v1 {
   export interface SpacePatchParams extends DefaultParams {
     spaceId: string;
     jsonPatch: JsonPatchOperation;
+  }
+
+  /** Parameters for `transcribeAudio` method */
+  export interface TranscribeAudioParams extends DefaultParams {
+    /** The model to use for audio transcriptions. */
+    model: string;
+    /** The path to a mp3 or wav audio file to transcribe. */
+    file: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** Optional target language to which to transcribe; for example, fr for French. Default is English. */
+    language?: string;
   }
 
   /*************************
@@ -11603,6 +11700,17 @@ namespace WatsonxAiMlVml_v1 {
         URL = 'url',
       }
     }
+  }
+
+  export interface AudioTranscriptionResult {
+    /** The model used for audio transcriptions. */
+    model: string;
+    /** The transcribed text. */
+    text: string;
+    /** The time when the response was created in ISO 8601 format. Example: 2020-05-02T16:27:51Z */
+    created_at: string;
+    /** Number of estimated tokens from returned text. */
+    token_count: number;
   }
 
   /**
