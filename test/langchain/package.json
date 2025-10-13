@@ -4,13 +4,13 @@
   "description": "Regresion tests for langchain/community/ibm",
   "type": "module",
   "scripts": {
-    "test": "jest",
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest",
     "test-install": "yalc add @ibm-cloud/watsonx-ai && npm install && npm install @langchain/community@latest",
     "test-regression": "npm run test-install && tsc --noEmit && npm test"
   },
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
-    "@langchain/community": "^0.3.46",
+    "@langchain/community": "^0.3.57",
     "@langchain/core": "^0.3.19",
     "zod": "^3.24.2"
   },

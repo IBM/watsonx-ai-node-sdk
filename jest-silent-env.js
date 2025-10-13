@@ -31,7 +31,7 @@ class SilentConsoleEnvironment extends NodeEnvironment {
   }
 
   async handleTestEvent(event) {
-    if (event.name !== 'test_done') return;
+    if (event.name !== 'test_done' || this.logPassedTests) return;
 
     const shouldLog = event.test.errors.length > 0;
 

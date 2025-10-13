@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 
 import { ChatWatsonx } from '@langchain/community/chat_models/ibm';
 import { ToolCall } from '@langchain/core/messages/tool';

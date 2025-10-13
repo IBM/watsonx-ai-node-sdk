@@ -3,10 +3,9 @@
 
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 
 const path = require('path');
-const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
+const { WatsonXAI } = require('../../dist/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
 
 // testcase timeout value (200s).
@@ -35,7 +34,7 @@ const checkIfJobFinshed = async (getter, retries = 10, delay = 10000) => {
   throw new Error('Failed to get a valid response after maximum retries');
 };
 
-const watsonxInstance = WatsonxAiMlVml_v1.newInstance({
+const watsonxInstance = WatsonXAI.newInstance({
   serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
   platformUrl: process.env.WATSONX_AI_PLATFORM_URL,
   version,
@@ -148,7 +147,7 @@ describe('Repository methods tests', () => {
         const params = {
           limit: 1,
         };
-        const pager = new WatsonxAiMlVml_v1.ListSpacesPager(watsonxInstance, params);
+        const pager = new WatsonXAI.ListSpacesPager(watsonxInstance, params);
         const result = await pager.getNext();
 
         expect(result).toBeInstanceOf(Array);
@@ -159,7 +158,7 @@ describe('Repository methods tests', () => {
         const params = {
           limit: 50,
         };
-        const pager = new WatsonxAiMlVml_v1.ListSpacesPager(watsonxInstance, params);
+        const pager = new WatsonXAI.ListSpacesPager(watsonxInstance, params);
         const result = await pager.getAll();
         expect(result).toBeInstanceOf(Array);
         expect(result.length).toBeGreaterThanOrEqual(1);

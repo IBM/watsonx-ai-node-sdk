@@ -16,12 +16,11 @@
 
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 
 const { Readable, addAbortSignal } = require('node:stream');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
 const path = require('path');
-const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
+const { WatsonXAI } = require('../../dist/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
 const { Stream } = require('../../dist/lib/common.js');
 const { chatModel } = require('./config.js');
@@ -64,7 +63,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   let textExtId;
 
   beforeAll(async () => {
-    watsonxAIService = WatsonxAiMlVml_v1.newInstance({
+    watsonxAIService = WatsonXAI.newInstance({
       serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
       platformUrl: process.env.WATSONX_AI_PLATFORM_URL,
       version: '2023-07-07',
@@ -72,7 +71,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
 
     expect(watsonxAIService).not.toBeNull();
 
-    const config = readExternalSources(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME);
+    const config = readExternalSources(WatsonXAI.DEFAULT_SERVICE_NAME);
     expect(config).not.toBeNull();
 
     watsonxAIService.enableRetries();
@@ -275,7 +274,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         const allResults = [];
 
         // Test getNext()
-        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAIService, params);
+        const pager = new WatsonXAI.ListPromptsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -291,7 +290,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         };
 
         // Test getAll()
-        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAIService, params);
+        const pager = new WatsonXAI.ListPromptsPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults.length).toBeGreaterThanOrEqual(1);
       });
@@ -820,7 +819,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     test('createModel()', async () => {
       const params = {
         name: 'my-flan-t5-xl',
-        type: 'curated_foundation_model_1.0',
+        type: 'custom_foundation_model_1.0',
         projectId,
         softwareSpec: { name: 'watsonx-cfm-caikit-1.1' },
         foundationModel: {
@@ -859,7 +858,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const allResults = [];
 
       // Test getNext().
-      let pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAIService, params);
+      let pager = new WatsonXAI.ModelsListPager(watsonxAIService, params);
       while (pager.hasNext()) {
         const nextPage = await pager.getNext();
         expect(nextPage).not.toBeNull();
@@ -867,7 +866,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
 
       // Test getAll().
-      pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAIService, params);
+      pager = new WatsonXAI.ModelsListPager(watsonxAIService, params);
       const allItems = await pager.getAll();
       expect(allItems).not.toBeNull();
       expect(allItems).toHaveLength(allResults.length);
@@ -984,7 +983,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const allResults = [];
 
       // Test getNext().
-      let pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAIService, params);
+      let pager = new WatsonXAI.TextExtractionsPager(watsonxAIService, params);
       while (pager.hasNext()) {
         const nextPage = await pager.getNext();
         expect(nextPage).not.toBeNull();
@@ -992,7 +991,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
 
       // Test getAll().
-      pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAIService, params);
+      pager = new WatsonXAI.TextExtractionsPager(watsonxAIService, params);
       const allItems = await pager.getAll();
       expect(allItems).not.toBeNull();
       expect(allItems).toHaveLength(allResults.length);

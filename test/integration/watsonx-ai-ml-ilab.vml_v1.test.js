@@ -3,11 +3,10 @@
 
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 
 const { readExternalSources } = require('ibm-cloud-sdk-core');
 const path = require('path');
-const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
+const { WatsonXAI } = require('../../dist/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
 // testcase timeout value (200s).
 const timeout = 200000;
@@ -42,7 +41,7 @@ describe('Ilab tests', () => {
   let fineTuningId;
 
   test('Initialize service', async () => {
-    watsonxAIService = WatsonxAiMlVml_v1.newInstance({
+    watsonxAIService = WatsonXAI.newInstance({
       serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
       platformUrl: process.env.WATSONX_AI_PLATFORM_URL,
       version: '2023-07-07',
@@ -50,7 +49,7 @@ describe('Ilab tests', () => {
 
     expect(watsonxAIService).not.toBeNull();
 
-    const config = readExternalSources(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME);
+    const config = readExternalSources(WatsonXAI.DEFAULT_SERVICE_NAME);
     expect(config).not.toBeNull();
 
     watsonxAIService.enableRetries();
@@ -318,7 +317,7 @@ describe('Ilab tests', () => {
     const allResults = [];
 
     // Test getNext().
-    let pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAIService, params);
+    let pager = new WatsonXAI.FineTuningListPager(watsonxAIService, params);
     while (pager.hasNext()) {
       const nextPage = await pager.getNext();
       expect(nextPage).not.toBeNull();
@@ -326,7 +325,7 @@ describe('Ilab tests', () => {
     }
 
     // Test getAll().
-    pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAIService, params);
+    pager = new WatsonXAI.FineTuningListPager(watsonxAIService, params);
     const allItems = await pager.getAll();
     expect(allItems).not.toBeNull();
     expect(allItems).toHaveLength(allResults.length);

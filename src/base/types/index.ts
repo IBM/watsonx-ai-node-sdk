@@ -1,5 +1,5 @@
 /**
- * © Copyright IBM Corporation 2024. All Rights Reserved.
+ * (C) Copyright IBM Corp. 2025.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * @module watsonx-ai
- */
-
-import helpers from './helpers/converters';
-
-export import WatsonXAI = require('./watsonx-ai-ml/vml_v1');
-const { convertUtilityToolToWatsonxTool, convertWatsonxToolCallToUtilityToolCall } = helpers;
-export { convertUtilityToolToWatsonxTool, convertWatsonxToolCallToUtilityToolCall };
+export * from './base';

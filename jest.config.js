@@ -2,7 +2,7 @@ const global = require('./jest.global.config.js');
 
 module.exports = {
   ...global,
-  roots: ['<rootDir>/watsonx-ai-ml', '<rootDir>/test'],
+  roots: ['<rootDir>/test'],
   testMatch: ['**/?(*.)+(spec|test).[jt]s'],
   testPathIgnorePatterns: [
     '<rootDir>/test/langchain/',

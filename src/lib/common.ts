@@ -16,10 +16,10 @@
 
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-restricted-syntax */
-import os = require('os');
+import os from 'os';
 import { addAbortSignal, pipeline, Readable as Rdb, Transform, TransformCallback } from 'stream';
 
-const pkg = require('../package.json');
+import { VERSION } from '../version';
 
 export type SdkHeaders = {
   'User-Agent': string;
@@ -43,12 +43,12 @@ export type SdkHeaders = {
  * as the analytics data collector uses this to gather usage data.
  */
 export function getSdkHeaders(
-  serviceName: string,
-  serviceVersion: string,
-  operationId: string
+  serviceName?: string,
+  serviceVersion?: string,
+  operationId?: string
 ): SdkHeaders | {} {
   const sdkName = 'autogen-node-sdk';
-  const sdkVersion = pkg.version;
+  const sdkVersion = VERSION;
   const osName = os.platform();
   const osVersion = os.release();
   const nodeVersion = process.version;
@@ -64,14 +64,30 @@ const stringToObj = (chunk: string[]) => {
   const obj: Record<string, any> = {};
   chunk.forEach((line) => {
     const index = line.indexOf(': ');
+    if (index === -1) return;
     const key = line.substring(0, index);
     const value = line.substring(index + 2);
-    if (key === 'id') {
-      obj[key] = Number(value);
-    } else if (key === 'event') {
-      obj[key] = String(value);
-    } else if (key === 'data') {
-      obj[key] = JSON.parse(`${value}`);
+    switch (key) {
+      case 'id':
+        obj[key] = Number(value);
+        break;
+      case 'event':
+        obj[key] = String(value);
+        break;
+      case 'data':
+        if (value === '[DONE]') return;
+        try {
+          obj[key] = JSON.parse(value);
+        } catch (e) {
+          console.error(
+            "There is invalid JSON in your stream under 'data' field and it was not parsed into an object.",
+            `${key}: ${value}`
+          );
+          console.error(e);
+        }
+        break;
+      default:
+        break;
     }
   });
 
@@ -89,22 +105,16 @@ export class StreamTransform extends Transform {
 export class ObjectTransformStream extends StreamTransform {
   _transform(chunk: any, _encoding: string, callback: TransformCallback): void {
     this.buffer += chunk.toString();
-    const parts = this.buffer.split('\n');
-    if (parts.indexOf('') !== parts.length - 2 && parts.indexOf('') !== -1) {
-      while (parts.length > 0 && parts.indexOf('') !== -1 && parts.length > 3) {
-        const newObj = parts.splice(0, parts.indexOf('') + 1);
-        const obj = stringToObj(newObj);
-        if (obj) this.push(obj);
-      }
-      if (parts.indexOf('') === -1) this.buffer = parts.join('\n');
-      else this.buffer = '';
-    } else if (parts[parts.length - 1] !== '') {
-      this.buffer = parts.join('\n');
-    } else {
-      const obj = stringToObj(parts);
-      this.buffer = '';
+
+    const events = this.buffer.split('\n\n');
+    this.buffer = events.pop() ?? '';
+
+    for (const event of events) {
+      const lines = event.split('\n');
+      const obj = stringToObj(lines);
       if (obj) this.push(obj);
     }
+
     callback();
   }
 
@@ -139,20 +149,30 @@ export class Stream<T> implements AsyncIterable<T> {
   }
 }
 
-export async function transformStreamToObjectStream<T>(apiResponse: any) {
+const handlePipelineError = (e: any) => {
+  if (e?.name === 'AbortError') {
+    console.warn('Stream pipeline aborted');
+  } else if (e) {
+    console.error('Stream pipeline error');
+  }
+};
+
+function transformStreamWithPipeline<T>(
+  apiResponse: Record<'result', Iterable<any> | AsyncIterable<any>>,
+  transformStream: StreamTransform
+) {
   const readableStream = Rdb.from(apiResponse.result);
-  const transformStream = new ObjectTransformStream();
   const controller = new AbortController();
-  const combinedStream = pipeline(readableStream, transformStream, (err) => {
-    if (err && err.name === 'AbortError') {
-      console.warn('Stream pipeline aborted');
-    } else if (err) {
-      console.error('Stream pipeline error:', err);
-    }
-  });
+  const combinedStream = pipeline(readableStream, transformStream, handlePipelineError);
   const abortableStream = addAbortSignal(controller.signal, combinedStream);
   const res = Stream.createStream<T>(abortableStream, controller);
   return res;
+}
+
+export async function transformStreamToObjectStream<T>(apiResponse: any) {
+  const transformStream = new ObjectTransformStream();
+
+  return transformStreamWithPipeline<T>(apiResponse, transformStream);
 }
 
 export class LineTransformStream extends StreamTransform {
@@ -173,17 +193,7 @@ export class LineTransformStream extends StreamTransform {
 }
 
 export async function transformStreamToStringStream<T>(apiResponse: any) {
-  const readableStream = Rdb.from(apiResponse.result);
   const transformStream = new LineTransformStream();
-  const controller = new AbortController();
-  const combinedStream = pipeline(readableStream, transformStream, (err) => {
-    if (err && err.name === 'AbortError') {
-      console.warn('Stream pipeline aborted');
-    } else if (err) {
-      console.error('Stream pipeline error:', err);
-    }
-  });
-  const abortableStream = addAbortSignal(controller.signal, combinedStream);
-  const res = Stream.createStream<T>(abortableStream, controller);
-  return res;
+
+  return transformStreamWithPipeline<T>(apiResponse, transformStream);
 }

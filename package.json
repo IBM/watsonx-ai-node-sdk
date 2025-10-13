@@ -1,6 +1,6 @@
 {
   "name": "@ibm-cloud/watsonx-ai",
-  "version": "1.6.13",
+  "version": "1.7.0",
   "description": "IBM watsonx.ai Node.js SDK",
   "repository": {
     "type": "git",
@@ -18,16 +18,17 @@
     "eslint:check": "eslint . --cache",
     "lint": "npm run eslint:check",
     "lint-fix": "npm run eslint:fix",
-    "build": "tsc && cp package.json dist/",
-    "prepublishOnly": "npm run build",
+    "format": "prettier --config .prettierrc.js --write \"watsonx-ai-ml\" \"helpers\" \"auth\" \"test\"",
+    "build": "./scripts/build",
+    "prepublishOnly": "echo 'to publish, run `npm run build && (cd dist; npm publish)`' && exit 1",
     "postversion": "publisher --no-checks --dry-run",
-    "local-publish": "command -v yalc >/dev/null 2>&1 || npm install -g yalc && yalc publish",
+    "local-publish": "npm run build && command -v yalc >/dev/null 2>&1 || npm install -g yalc && (cd dist/ && yalc publish)",
     "install-package-regression": "npm run local-publish && cd ./test/langchain && npm run test-install",
     "install-package-examples": "npm run local-publish && cd ./examples && npm run test-install",
     "jest": "jest --verbose",
     "test": "npm run build && npm run lint && jest",
     "test-all": "npm run build && npm run lint && jest test/",
-    "test-unit": "npm run build && jest test/unit/",
+    "test-unit": "npm run build && npm run lint && jest test/unit/",
     "test-integration": "npm run build && jest test/integration/",
     "test-examples": "npm run local-publish && cd ./examples && npm run test-all",
     "test-examples-sdk": "npm run local-publish && cd ./examples && npm run test-sdk",
@@ -59,12 +60,13 @@
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.24.0",
     "dotenv": "^8.2.0",
-    "eslint": "^7.26.0",
+    "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-airbnb-typescript": "^12.3.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.23.2",
-    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-jest": "^24.7.0",
+    "eslint-plugin-jest-formatting": "^3.1.0",
     "eslint-plugin-jsdoc": "^34.6.3",
     "eslint-plugin-node": "^9.0.0",
     "eslint-plugin-prettier": "^3.0.1",
@@ -73,6 +75,7 @@
     "jsonwebtoken": "^9.0.2",
     "nock": "^13.2.4",
     "prettier": "^2.3.0",
+    "tsc-multi": "^1.1.0",
     "typedoc": "^0.25.13",
     "typescript": "^4.9.5"
   },
@@ -84,25 +87,67 @@
     "helpers": "helpers"
   },
   "files": [
-    "dist/**"
+    "**/*"
   ],
+  "main": "./index.js",
+  "module": "./index.mjs",
+  "types": "./index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
-    "./authentication": "./dist/auth/index.js",
-    "./dist/*": "./dist/*"
-  },
-  "typesVersions": {
-    "*": {
-      "authentication": [
-        "dist/auth/index.d.ts"
-      ],
-      "dist/*": [
-        "dist/*"
-      ],
-      "*": [
-        "dist/*"
-      ]
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts",
+      "default": "./index.mjs"
+    },
+    "./vml_v1.mjs": {
+      "default": "./vml_v1.mjs",
+      "types": "./vml_v1.d.mts"
+    },
+    "./vml_v1.js": {
+      "default": "./vml_v1.js",
+      "types": "./vml_v1.d.ts"
+    },
+    "./dist/watsonx-ai-ml/vml_v1.js": {
+      "types": "./vml_v1.d.js",
+      "default": "./vml_v1.js"
+    },
+    "./gateway": {
+      "import": "./gateway/index.mjs",
+      "require": "./gateway/index.js",
+      "types": "./gateway/index.d.ts"
+    },
+    "./gateway/*.mjs": {
+      "default": "./gateway/index.mjs",
+      "types": "./gateway/index.d.mts"
+    },
+    "./gateway/*.js": {
+      "default": "./gateway/index.js",
+      "types": "./gateway/index.d.ts"
+    },
+    "./base": {
+      "import": "./base/index.mjs",
+      "require": "./base/index.js",
+      "types": "./base/index.d.ts"
+    },
+    "./base/*.mjs": {
+      "default": "./base/index.mjs",
+      "types": "./base/index.d.mts"
+    },
+    "./base/*.js": {
+      "default": "./base/index.js",
+      "types": "./base/index.d.ts"
+    },
+    "./authentication": {
+      "import": "./authentication/index.mjs",
+      "require": "./authentication/index.js",
+      "types": "./authentication/index.d.ts"
+    },
+    "./authentication/*.mjs": {
+      "default": "./authentication/index.mjs",
+      "types": "./authentication/index.d.mts"
+    },
+    "./authentication/*.js": {
+      "default": "./authentication/index.js",
+      "types": "./authentication/index.d.ts"
     }
-  },
-  "main": "dist/index.js"
+  }
 }

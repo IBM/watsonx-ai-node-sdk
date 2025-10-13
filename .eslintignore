@@ -8,6 +8,7 @@ examples/
 test/langchain
 
 test/resources/auth.js
+test/langchain
 # ignore emitted js
 **/*v*.js
 !test/**/*.js

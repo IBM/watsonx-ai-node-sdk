@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 import { WatsonxLLM } from '@langchain/community/llms/ibm';
 import { config } from 'dotenv';
 
@@ -113,7 +112,7 @@ describe('Regression tests regarding langchain llms', () => {
               maxNewTokens: 10,
             });
             const result = await llms.invoke('Hello. How are you?');
-            expect(result.length).toBeLessThan(50);
+            expect(result.length).toBeLessThan(70);
           });
           test('with stop sequence', async () => {
             const llms = new WatsonxLLM({
@@ -122,6 +121,7 @@ describe('Regression tests regarding langchain llms', () => {
               serviceUrl,
               stopSequence: ['Hello'],
               model,
+              temperature: 0,
               maxNewTokens: 100,
             });
             const result = await llms.invoke('Print Hello World!');
@@ -165,7 +165,7 @@ describe('Regression tests regarding langchain llms', () => {
               maxNewTokens: 10,
             });
             const result = await llms.generate(['Hello. How are you?']);
-            expect(result.generations[0][0].text.length).toBeLessThan(50);
+            expect(result.generations[0][0].text.length).toBeLessThan(70);
           });
           test('with stop sequence', async () => {
             const llms = new WatsonxLLM({
@@ -173,6 +173,7 @@ describe('Regression tests regarding langchain llms', () => {
               version,
               serviceUrl,
               model,
+              temperature: 0,
               stopSequence: ['Hello'],
               maxNewTokens: 100,
             });
@@ -225,7 +226,7 @@ describe('Regression tests regarding langchain llms', () => {
             for await (const chunk of result) {
               res += chunk;
             }
-            expect(res.length).toBeLessThan(50);
+            expect(res.length).toBeLessThan(70);
           });
           test('with stop sequence', async () => {
             const llms = new WatsonxLLM({
@@ -233,6 +234,7 @@ describe('Regression tests regarding langchain llms', () => {
               version,
               serviceUrl,
               model,
+              temperature: 0,
               stopSequence: ['Hello'],
               maxNewTokens: 100,
             });

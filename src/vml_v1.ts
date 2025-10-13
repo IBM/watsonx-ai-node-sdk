@@ -20,6 +20,7 @@
 
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-await-in-loop */
+/* eslint-disable import/first */
 
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
 import { Agent } from 'https';
@@ -34,14 +35,14 @@ import {
 } from 'ibm-cloud-sdk-core';
 import { BaseServiceOptions } from 'ibm-cloud-sdk-core/es/lib/base-service';
 import FormData from 'form-data';
-import { getAuthenticatorFromEnvironment } from '../auth/utils/get-authenticator-from-environment';
+import { getAuthenticatorFromEnvironment } from './authentication/utils/get-authenticator-from-environment';
 import {
   getSdkHeaders,
   Stream,
   transformStreamToObjectStream,
   transformStreamToStringStream,
-} from '../lib/common';
-import { RequestTokenResponse } from '../auth/utils/authenticators';
+} from './lib/common';
+import { RequestTokenResponse } from './authentication/utils/authenticators';
 
 /**
  * SDK entrypoint for IBM watsonx.ai product
@@ -1642,6 +1643,7 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'bookmark',
       'sort',
       'include',
+      'skip',
       'headers',
       'signal',
     ];
@@ -6646,8 +6648,6 @@ class WatsonxAiMlVml_v1 extends BaseService {
     return this.createRequest(parameters);
   }
 
-  // Assisted by watsonx Code Assistant
-
   /**
    * Update the space.
    *
@@ -6944,7 +6944,7 @@ namespace WatsonxAiMlVml_v1 {
    * request interfaces
    ************************/
 
-  interface DefaultParams {
+  export interface DefaultParams {
     signal?: AbortSignal;
     headers?: OutgoingHttpHeaders;
   }
@@ -12571,4 +12571,344 @@ namespace WatsonxAiMlVml_v1 {
   }
 }
 
-export = WatsonxAiMlVml_v1;
+export { WatsonxAiMlVml_v1 as WatsonXAI };
+export default WatsonxAiMlVml_v1;
+// Reimports to perserve backwards compatibility and importing interfaces/namespaces as single items
+export import PostPromptConstants = WatsonxAiMlVml_v1.PostPromptConstants;
+export import PatchPromptConstants = WatsonxAiMlVml_v1.PatchPromptConstants;
+export import PutPromptLockConstants = WatsonxAiMlVml_v1.PutPromptLockConstants;
+export import PostPromptSessionEntryConstants = WatsonxAiMlVml_v1.PostPromptSessionEntryConstants;
+export import PutPromptSessionLockConstants = WatsonxAiMlVml_v1.PutPromptSessionLockConstants;
+export import TextChatConstants = WatsonxAiMlVml_v1.TextChatConstants;
+export import TextChatStreamConstants = WatsonxAiMlVml_v1.TextChatStreamConstants;
+export import TrainingsListConstants = WatsonxAiMlVml_v1.TrainingsListConstants;
+export import CreateFineTuningConstants = WatsonxAiMlVml_v1.CreateFineTuningConstants;
+export import Options = WatsonxAiMlVml_v1.Options;
+export import TokenAuthenticationOptions = WatsonxAiMlVml_v1.TokenAuthenticationOptions;
+export import Certificates = WatsonxAiMlVml_v1.Certificates;
+export import Certificate = WatsonxAiMlVml_v1.Certificate;
+export import HttpsAgentMap = WatsonxAiMlVml_v1.HttpsAgentMap;
+export import Response = WatsonxAiMlVml_v1.Response;
+export import Callback = WatsonxAiMlVml_v1.Callback;
+export import EmptyObject = WatsonxAiMlVml_v1.EmptyObject;
+export import JsonObject = WatsonxAiMlVml_v1.JsonObject;
+export import DefaultParams = WatsonxAiMlVml_v1.DefaultParams;
+export import CreateDeploymentParams = WatsonxAiMlVml_v1.CreateDeploymentParams;
+export import ListDeploymentsParams = WatsonxAiMlVml_v1.ListDeploymentsParams;
+export import DeploymentsGetParams = WatsonxAiMlVml_v1.DeploymentsGetParams;
+export import DeploymentsUpdateParams = WatsonxAiMlVml_v1.DeploymentsUpdateParams;
+export import DeploymentsDeleteParams = WatsonxAiMlVml_v1.DeploymentsDeleteParams;
+export import DeploymentsTextGenerationParams = WatsonxAiMlVml_v1.DeploymentsTextGenerationParams;
+export import DeploymentsTextGenerationStreamParams = WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams;
+export import DeploymentsTextChatParams = WatsonxAiMlVml_v1.DeploymentsTextChatParams;
+export import DeploymentsTextChatStreamParams = WatsonxAiMlVml_v1.DeploymentsTextChatStreamParams;
+export import DeploymentsTimeSeriesForecastParams = WatsonxAiMlVml_v1.DeploymentsTimeSeriesForecastParams;
+export import ListFoundationModelSpecsParams = WatsonxAiMlVml_v1.ListFoundationModelSpecsParams;
+export import ListFoundationModelTasksParams = WatsonxAiMlVml_v1.ListFoundationModelTasksParams;
+export import PostPromptParams = WatsonxAiMlVml_v1.PostPromptParams;
+export import GetPromptParams = WatsonxAiMlVml_v1.GetPromptParams;
+export import CatalogSearch = WatsonxAiMlVml_v1.CatalogSearch;
+export import PromptListParams = WatsonxAiMlVml_v1.PromptListParams;
+export import PatchPromptParams = WatsonxAiMlVml_v1.PatchPromptParams;
+export import DeletePromptParams = WatsonxAiMlVml_v1.DeletePromptParams;
+export import PutPromptLockParams = WatsonxAiMlVml_v1.PutPromptLockParams;
+export import GetPromptLockParams = WatsonxAiMlVml_v1.GetPromptLockParams;
+export import GetPromptInputParams = WatsonxAiMlVml_v1.GetPromptInputParams;
+export import PostPromptChatItemParams = WatsonxAiMlVml_v1.PostPromptChatItemParams;
+export import PostPromptSessionParams = WatsonxAiMlVml_v1.PostPromptSessionParams;
+export import GetPromptSessionParams = WatsonxAiMlVml_v1.GetPromptSessionParams;
+export import PatchPromptSessionParams = WatsonxAiMlVml_v1.PatchPromptSessionParams;
+export import DeletePromptSessionParams = WatsonxAiMlVml_v1.DeletePromptSessionParams;
+export import PostPromptSessionEntryParams = WatsonxAiMlVml_v1.PostPromptSessionEntryParams;
+export import GetPromptSessionEntriesParams = WatsonxAiMlVml_v1.GetPromptSessionEntriesParams;
+export import PostPromptSessionEntryChatItemParams = WatsonxAiMlVml_v1.PostPromptSessionEntryChatItemParams;
+export import PutPromptSessionLockParams = WatsonxAiMlVml_v1.PutPromptSessionLockParams;
+export import GetPromptSessionLockParams = WatsonxAiMlVml_v1.GetPromptSessionLockParams;
+export import GetPromptSessionEntryParams = WatsonxAiMlVml_v1.GetPromptSessionEntryParams;
+export import DeletePromptSessionEntryParams = WatsonxAiMlVml_v1.DeletePromptSessionEntryParams;
+export import TextChatParams = WatsonxAiMlVml_v1.TextChatParams;
+export import TextChatStreamParams = WatsonxAiMlVml_v1.TextChatStreamParams;
+export import TextEmbeddingsParams = WatsonxAiMlVml_v1.TextEmbeddingsParams;
+export import TextExtractionParams = WatsonxAiMlVml_v1.TextExtractionParams;
+export import ListTextExtractionsParams = WatsonxAiMlVml_v1.ListTextExtractionsParams;
+export import TextExtractionGetParams = WatsonxAiMlVml_v1.TextExtractionGetParams;
+export import TextExtractionDeleteParams = WatsonxAiMlVml_v1.TextExtractionDeleteParams;
+export import TextGenerationParams = WatsonxAiMlVml_v1.TextGenerationParams;
+export import TextGenerationStreamParams = WatsonxAiMlVml_v1.TextGenerationStreamParams;
+export import TextTokenizationParams = WatsonxAiMlVml_v1.TextTokenizationParams;
+export import TrainingsCreateParams = WatsonxAiMlVml_v1.TrainingsCreateParams;
+export import TrainingsListParams = WatsonxAiMlVml_v1.TrainingsListParams;
+export import TrainingsGetParams = WatsonxAiMlVml_v1.TrainingsGetParams;
+export import TrainingsDeleteParams = WatsonxAiMlVml_v1.TrainingsDeleteParams;
+export import TextRerankParams = WatsonxAiMlVml_v1.TextRerankParams;
+export import TimeSeriesForecastParams = WatsonxAiMlVml_v1.TimeSeriesForecastParams;
+export import CreateFineTuningParams = WatsonxAiMlVml_v1.CreateFineTuningParams;
+export import FineTuningListParams = WatsonxAiMlVml_v1.FineTuningListParams;
+export import GetFineTuningParams = WatsonxAiMlVml_v1.GetFineTuningParams;
+export import DeleteFineTuningParams = WatsonxAiMlVml_v1.DeleteFineTuningParams;
+export import CreateDocumentExtractionParams = WatsonxAiMlVml_v1.CreateDocumentExtractionParams;
+export import ListDocumentExtractionsParams = WatsonxAiMlVml_v1.ListDocumentExtractionsParams;
+export import GetDocumentExtractionParams = WatsonxAiMlVml_v1.GetDocumentExtractionParams;
+export import CancelDocumentExtractionsParams = WatsonxAiMlVml_v1.CancelDocumentExtractionsParams;
+export import CreateSyntheticDataGenerationParams = WatsonxAiMlVml_v1.CreateSyntheticDataGenerationParams;
+export import ListSyntheticDataGenerationsParams = WatsonxAiMlVml_v1.ListSyntheticDataGenerationsParams;
+export import GetSyntheticDataGenerationParams = WatsonxAiMlVml_v1.GetSyntheticDataGenerationParams;
+export import CancelSyntheticDataGenerationParams = WatsonxAiMlVml_v1.CancelSyntheticDataGenerationParams;
+export import CreateTaxonomyParams = WatsonxAiMlVml_v1.CreateTaxonomyParams;
+export import ListTaxonomiesParams = WatsonxAiMlVml_v1.ListTaxonomiesParams;
+export import GetTaxonomyParams = WatsonxAiMlVml_v1.GetTaxonomyParams;
+export import DeleteTaxonomyParams = WatsonxAiMlVml_v1.DeleteTaxonomyParams;
+export import ModelsCreateParams = WatsonxAiMlVml_v1.ModelsCreateParams;
+export import ModelsListParams = WatsonxAiMlVml_v1.ModelsListParams;
+export import ModelsGetParams = WatsonxAiMlVml_v1.ModelsGetParams;
+export import ModelsUpdateParams = WatsonxAiMlVml_v1.ModelsUpdateParams;
+export import ModelsDeleteParams = WatsonxAiMlVml_v1.ModelsDeleteParams;
+export import GetUtilityAgentToolsParams = WatsonxAiMlVml_v1.GetUtilityAgentToolsParams;
+export import GetUtilityAgentToolParams = WatsonxAiMlVml_v1.GetUtilityAgentToolParams;
+export import PostUtilityAgentToolsRunParams = WatsonxAiMlVml_v1.PostUtilityAgentToolsRunParams;
+export import PostUtilityAgentToolsRunByNameParams = WatsonxAiMlVml_v1.PostUtilityAgentToolsRunByNameParams;
+export import ListSpacesParams = WatsonxAiMlVml_v1.ListSpacesParams;
+export import CreateSpaceParams = WatsonxAiMlVml_v1.CreateSpaceParams;
+export import SpaceStorage = WatsonxAiMlVml_v1.SpaceStorage;
+export import SpaceCompute = WatsonxAiMlVml_v1.SpaceCompute;
+export import SpaceStage = WatsonxAiMlVml_v1.SpaceStage;
+export import SpaceSettings = WatsonxAiMlVml_v1.SpaceSettings;
+export import SpaceMember = WatsonxAiMlVml_v1.SpaceMember;
+export import GetSpaceParams = WatsonxAiMlVml_v1.GetSpaceParams;
+export import DeleteSpaceParams = WatsonxAiMlVml_v1.DeleteSpaceParams;
+export import SpacePatchOperation = WatsonxAiMlVml_v1.SpacePatchOperation;
+export import SpacePatchParams = WatsonxAiMlVml_v1.SpacePatchParams;
+export import TranscribeAudioParams = WatsonxAiMlVml_v1.TranscribeAudioParams;
+export import ApiError = WatsonxAiMlVml_v1.ApiError;
+export import ApiErrorResponse = WatsonxAiMlVml_v1.ApiErrorResponse;
+export import ApiErrorTarget = WatsonxAiMlVml_v1.ApiErrorTarget;
+export import BaseModel = WatsonxAiMlVml_v1.BaseModel;
+export import ConsumptionsLimit = WatsonxAiMlVml_v1.ConsumptionsLimit;
+export import DataConnection = WatsonxAiMlVml_v1.DataConnection;
+export import CosDataConnection = WatsonxAiMlVml_v1.CosDataConnection;
+export import CosDataLocation = WatsonxAiMlVml_v1.CosDataLocation;
+export import DataConnectionReference = WatsonxAiMlVml_v1.DataConnectionReference;
+export import DataSchema = WatsonxAiMlVml_v1.DataSchema;
+export import DeploymentEntity = WatsonxAiMlVml_v1.DeploymentEntity;
+export import DeploymentResource = WatsonxAiMlVml_v1.DeploymentResource;
+export import DeploymentResourceCollection = WatsonxAiMlVml_v1.DeploymentResourceCollection;
+export import DeploymentResourcePatch = WatsonxAiMlVml_v1.DeploymentResourcePatch;
+export import DeploymentStatus = WatsonxAiMlVml_v1.DeploymentStatus;
+export import DeploymentSystem = WatsonxAiMlVml_v1.DeploymentSystem;
+export import DeploymentSystemDetails = WatsonxAiMlVml_v1.DeploymentSystemDetails;
+export import DeploymentTextChatMessages = WatsonxAiMlVml_v1.DeploymentTextChatMessages;
+export import DeploymentTextGenProperties = WatsonxAiMlVml_v1.DeploymentTextGenProperties;
+export import DeploymentTSForecastParameters = WatsonxAiMlVml_v1.DeploymentTSForecastParameters;
+export import Embedding = WatsonxAiMlVml_v1.Embedding;
+export import EmbeddingParameters = WatsonxAiMlVml_v1.EmbeddingParameters;
+export import EmbeddingReturnOptions = WatsonxAiMlVml_v1.EmbeddingReturnOptions;
+export import EmbeddingsResponse = WatsonxAiMlVml_v1.EmbeddingsResponse;
+export import ExternalInformationExternalModel = WatsonxAiMlVml_v1.ExternalInformationExternalModel;
+export import ExternalInformationExternalPrompt = WatsonxAiMlVml_v1.ExternalInformationExternalPrompt;
+export import ExternalPromptAdditionalInformationItem = WatsonxAiMlVml_v1.ExternalPromptAdditionalInformationItem;
+export import FoundationModel = WatsonxAiMlVml_v1.FoundationModel;
+export import FoundationModelLimits = WatsonxAiMlVml_v1.FoundationModelLimits;
+export import FoundationModelTask = WatsonxAiMlVml_v1.FoundationModelTask;
+export import FoundationModelTasks = WatsonxAiMlVml_v1.FoundationModelTasks;
+export import FoundationModelVersion = WatsonxAiMlVml_v1.FoundationModelVersion;
+export import FoundationModels = WatsonxAiMlVml_v1.FoundationModels;
+export import GetPromptInputResponse = WatsonxAiMlVml_v1.GetPromptInputResponse;
+export import HardwareRequest = WatsonxAiMlVml_v1.HardwareRequest;
+export import HardwareSpec = WatsonxAiMlVml_v1.HardwareSpec;
+export import Inference = WatsonxAiMlVml_v1.Inference;
+export import JsonPatchOperation = WatsonxAiMlVml_v1.JsonPatchOperation;
+export import LifeCycleState = WatsonxAiMlVml_v1.LifeCycleState;
+export import MaskProperties = WatsonxAiMlVml_v1.MaskProperties;
+export import Message = WatsonxAiMlVml_v1.Message;
+export import MetricsContext = WatsonxAiMlVml_v1.MetricsContext;
+export import ModelLimits = WatsonxAiMlVml_v1.ModelLimits;
+export import ModelRel = WatsonxAiMlVml_v1.ModelRel;
+export import ModerationHapProperties = WatsonxAiMlVml_v1.ModerationHapProperties;
+export import ModerationPiiProperties = WatsonxAiMlVml_v1.ModerationPiiProperties;
+export import ModerationProperties = WatsonxAiMlVml_v1.ModerationProperties;
+export import ModerationResult = WatsonxAiMlVml_v1.ModerationResult;
+export import ModerationResults = WatsonxAiMlVml_v1.ModerationResults;
+export import ModerationTextRange = WatsonxAiMlVml_v1.ModerationTextRange;
+export import Moderations = WatsonxAiMlVml_v1.Moderations;
+export import ObjectLocation = WatsonxAiMlVml_v1.ObjectLocation;
+export import OnlineDeployment = WatsonxAiMlVml_v1.OnlineDeployment;
+export import OnlineDeploymentParameters = WatsonxAiMlVml_v1.OnlineDeploymentParameters;
+export import PaginationFirst = WatsonxAiMlVml_v1.PaginationFirst;
+export import PaginationNext = WatsonxAiMlVml_v1.PaginationNext;
+export import PromptModelParameters = WatsonxAiMlVml_v1.PromptModelParameters;
+export import PromptTuning = WatsonxAiMlVml_v1.PromptTuning;
+export import PromptTuningMetricsContext = WatsonxAiMlVml_v1.PromptTuningMetricsContext;
+export import PromptWithExternalModelParameters = WatsonxAiMlVml_v1.PromptWithExternalModelParameters;
+export import Rel = WatsonxAiMlVml_v1.Rel;
+export import RerankInput = WatsonxAiMlVml_v1.RerankInput;
+export import RerankParameters = WatsonxAiMlVml_v1.RerankParameters;
+export import RerankResponse = WatsonxAiMlVml_v1.RerankResponse;
+export import RerankReturnOptions = WatsonxAiMlVml_v1.RerankReturnOptions;
+export import RerankedResults = WatsonxAiMlVml_v1.RerankedResults;
+export import ResourceCommitInfo = WatsonxAiMlVml_v1.ResourceCommitInfo;
+export import ResourceMeta = WatsonxAiMlVml_v1.ResourceMeta;
+export import ReturnOptionProperties = WatsonxAiMlVml_v1.ReturnOptionProperties;
+export import SimpleRel = WatsonxAiMlVml_v1.SimpleRel;
+export import Stats = WatsonxAiMlVml_v1.Stats;
+export import SystemDetails = WatsonxAiMlVml_v1.SystemDetails;
+export import TaskBenchmark = WatsonxAiMlVml_v1.TaskBenchmark;
+export import TaskBenchmarkDataset = WatsonxAiMlVml_v1.TaskBenchmarkDataset;
+export import TaskBenchmarkMetric = WatsonxAiMlVml_v1.TaskBenchmarkMetric;
+export import TaskBenchmarkPrompt = WatsonxAiMlVml_v1.TaskBenchmarkPrompt;
+export import TaskDescription = WatsonxAiMlVml_v1.TaskDescription;
+export import TaskRating = WatsonxAiMlVml_v1.TaskRating;
+export import TextChatFunctionCall = WatsonxAiMlVml_v1.TextChatFunctionCall;
+export import TextChatMessages = WatsonxAiMlVml_v1.TextChatMessages;
+export import TextChatParameterFunction = WatsonxAiMlVml_v1.TextChatParameterFunction;
+export import TextChatParameterTools = WatsonxAiMlVml_v1.TextChatParameterTools;
+export import TextChatResponse = WatsonxAiMlVml_v1.TextChatResponse;
+export import TextChatStreamResponse = WatsonxAiMlVml_v1.TextChatStreamResponse;
+export import TextChatResponseFormat = WatsonxAiMlVml_v1.TextChatResponseFormat;
+export import TextChatResultChoice = WatsonxAiMlVml_v1.TextChatResultChoice;
+export import TextChatStreamResultChoice = WatsonxAiMlVml_v1.TextChatStreamResultChoice;
+export import TextChatResultMessage = WatsonxAiMlVml_v1.TextChatResultMessage;
+export import TextChatResultDelta = WatsonxAiMlVml_v1.TextChatResultDelta;
+export import TextChatResultChoiceStream = WatsonxAiMlVml_v1.TextChatResultChoiceStream;
+export import TextChatStreamItem = WatsonxAiMlVml_v1.TextChatStreamItem;
+export import TextChatToolCall = WatsonxAiMlVml_v1.TextChatToolCall;
+export import TextChatToolChoiceTool = WatsonxAiMlVml_v1.TextChatToolChoiceTool;
+export import TextChatToolFunction = WatsonxAiMlVml_v1.TextChatToolFunction;
+export import TextChatUsage = WatsonxAiMlVml_v1.TextChatUsage;
+export import TextChatUserContents = WatsonxAiMlVml_v1.TextChatUserContents;
+export import TextChatUserImageURL = WatsonxAiMlVml_v1.TextChatUserImageURL;
+export import TextExtractionDataReference = WatsonxAiMlVml_v1.TextExtractionDataReference;
+export import TextExtractionMetadata = WatsonxAiMlVml_v1.TextExtractionMetadata;
+export import TextExtractionResource = WatsonxAiMlVml_v1.TextExtractionResource;
+export import TextExtractionResourceEntity = WatsonxAiMlVml_v1.TextExtractionResourceEntity;
+export import TextExtractionResources = WatsonxAiMlVml_v1.TextExtractionResources;
+export import TextExtractionResponse = WatsonxAiMlVml_v1.TextExtractionResponse;
+export import TextExtractionResults = WatsonxAiMlVml_v1.TextExtractionResults;
+export import ServiceError = WatsonxAiMlVml_v1.ServiceError;
+export import TextExtractionStepOcr = WatsonxAiMlVml_v1.TextExtractionStepOcr;
+export import TextExtractionStepTablesProcessing = WatsonxAiMlVml_v1.TextExtractionStepTablesProcessing;
+export import TextExtractionSteps = WatsonxAiMlVml_v1.TextExtractionSteps;
+export import TextGenLengthPenalty = WatsonxAiMlVml_v1.TextGenLengthPenalty;
+export import TextGenParameters = WatsonxAiMlVml_v1.TextGenParameters;
+export import TextGenResponse = WatsonxAiMlVml_v1.TextGenResponse;
+export import TextGenResponseFieldsResultsItem = WatsonxAiMlVml_v1.TextGenResponseFieldsResultsItem;
+export import TextGenTokenInfo = WatsonxAiMlVml_v1.TextGenTokenInfo;
+export import TextGenTopTokenInfo = WatsonxAiMlVml_v1.TextGenTopTokenInfo;
+export import TextModeration = WatsonxAiMlVml_v1.TextModeration;
+export import TextModerationWithoutThreshold = WatsonxAiMlVml_v1.TextModerationWithoutThreshold;
+export import TextTokenizeParameters = WatsonxAiMlVml_v1.TextTokenizeParameters;
+export import TextTokenizeResponse = WatsonxAiMlVml_v1.TextTokenizeResponse;
+export import TextTokenizeResult = WatsonxAiMlVml_v1.TextTokenizeResult;
+export import TSForecastInputSchema = WatsonxAiMlVml_v1.TSForecastInputSchema;
+export import TSForecastParameters = WatsonxAiMlVml_v1.TSForecastParameters;
+export import TSForecastResponse = WatsonxAiMlVml_v1.TSForecastResponse;
+export import TrainingAccumulatedSteps = WatsonxAiMlVml_v1.TrainingAccumulatedSteps;
+export import TrainingBatchSize = WatsonxAiMlVml_v1.TrainingBatchSize;
+export import TrainingInitMethod = WatsonxAiMlVml_v1.TrainingInitMethod;
+export import TrainingInitText = WatsonxAiMlVml_v1.TrainingInitText;
+export import TrainingLearningRate = WatsonxAiMlVml_v1.TrainingLearningRate;
+export import TrainingMaxInputTokens = WatsonxAiMlVml_v1.TrainingMaxInputTokens;
+export import TrainingMaxOutputTokens = WatsonxAiMlVml_v1.TrainingMaxOutputTokens;
+export import TrainingMetric = WatsonxAiMlVml_v1.TrainingMetric;
+export import TrainingNumEpochs = WatsonxAiMlVml_v1.TrainingNumEpochs;
+export import TrainingNumVirtualTokens = WatsonxAiMlVml_v1.TrainingNumVirtualTokens;
+export import TrainingParameters = WatsonxAiMlVml_v1.TrainingParameters;
+export import TrainingResource = WatsonxAiMlVml_v1.TrainingResource;
+export import TrainingResourceCollection = WatsonxAiMlVml_v1.TrainingResourceCollection;
+export import TrainingResourceCollectionSystem = WatsonxAiMlVml_v1.TrainingResourceCollectionSystem;
+export import TrainingResourceEntity = WatsonxAiMlVml_v1.TrainingResourceEntity;
+export import TrainingStatus = WatsonxAiMlVml_v1.TrainingStatus;
+export import TrainingTorchDtype = WatsonxAiMlVml_v1.TrainingTorchDtype;
+export import TrainingVerbalizer = WatsonxAiMlVml_v1.TrainingVerbalizer;
+export import Warning = WatsonxAiMlVml_v1.Warning;
+export import WxPromptPatchModelVersion = WatsonxAiMlVml_v1.WxPromptPatchModelVersion;
+export import WxPromptPostModelVersion = WatsonxAiMlVml_v1.WxPromptPostModelVersion;
+export import WxPromptResponseModelVersion = WatsonxAiMlVml_v1.WxPromptResponseModelVersion;
+export import WxPromptSessionEntryListResultsItem = WatsonxAiMlVml_v1.WxPromptSessionEntryListResultsItem;
+export import ChatItem = WatsonxAiMlVml_v1.ChatItem;
+export import ExternalInformation = WatsonxAiMlVml_v1.ExternalInformation;
+export import Prompt = WatsonxAiMlVml_v1.Prompt;
+export import PromptData = WatsonxAiMlVml_v1.PromptData;
+export import PromptLock = WatsonxAiMlVml_v1.PromptLock;
+export import PromptWithExternal = WatsonxAiMlVml_v1.PromptWithExternal;
+export import UtilityAgentTool = WatsonxAiMlVml_v1.UtilityAgentTool;
+export import WxPromptResponse = WatsonxAiMlVml_v1.WxPromptResponse;
+export import CatalogSearchResponseAsset = WatsonxAiMlVml_v1.CatalogSearchResponseAsset;
+export import ListPromptsResponse = WatsonxAiMlVml_v1.ListPromptsResponse;
+export import WxPromptSession = WatsonxAiMlVml_v1.WxPromptSession;
+export import WxPromptSessionEntry = WatsonxAiMlVml_v1.WxPromptSessionEntry;
+export import WxPromptSessionEntryList = WatsonxAiMlVml_v1.WxPromptSessionEntryList;
+export import WxUtilityAgentToolsResponse = WatsonxAiMlVml_v1.WxUtilityAgentToolsResponse;
+export import WxUtilityAgentToolsRunRequest = WatsonxAiMlVml_v1.WxUtilityAgentToolsRunRequest;
+export import WxUtilityAgentToolsRunResponse = WatsonxAiMlVml_v1.WxUtilityAgentToolsRunResponse;
+export import TextChatMessagesTextChatMessageAssistant = WatsonxAiMlVml_v1.TextChatMessagesTextChatMessageAssistant;
+export import TextChatMessagesTextChatMessageSystem = WatsonxAiMlVml_v1.TextChatMessagesTextChatMessageSystem;
+export import TextChatMessagesTextChatMessageTool = WatsonxAiMlVml_v1.TextChatMessagesTextChatMessageTool;
+export import TextChatMessagesTextChatMessageUser = WatsonxAiMlVml_v1.TextChatMessagesTextChatMessageUser;
+export import TextChatUserContentsTextChatUserImageURLContent = WatsonxAiMlVml_v1.TextChatUserContentsTextChatUserImageURLContent;
+export import TextChatUserContentsTextChatUserTextContent = WatsonxAiMlVml_v1.TextChatUserContentsTextChatUserTextContent;
+export import RequestParameters = WatsonxAiMlVml_v1.RequestParameters;
+export import RequestParametersWithoutHeaders = WatsonxAiMlVml_v1.RequestParametersWithoutHeaders;
+export import InvokeRequestCallback = WatsonxAiMlVml_v1.InvokeRequestCallback;
+export import ReceiveResponseCallback = WatsonxAiMlVml_v1.ReceiveResponseCallback;
+export import RequestCallbacks = WatsonxAiMlVml_v1.RequestCallbacks;
+export import FineTuningEntity = WatsonxAiMlVml_v1.FineTuningEntity;
+export import FineTuningParameters = WatsonxAiMlVml_v1.FineTuningParameters;
+export import FineTuningPeftParameters = WatsonxAiMlVml_v1.FineTuningPeftParameters;
+export import FineTuningResource = WatsonxAiMlVml_v1.FineTuningResource;
+export import FineTuningResources = WatsonxAiMlVml_v1.FineTuningResources;
+export import DocumentExtractionResource = WatsonxAiMlVml_v1.DocumentExtractionResource;
+export import DocumentExtractionResources = WatsonxAiMlVml_v1.DocumentExtractionResources;
+export import DocumentExtractionResponse = WatsonxAiMlVml_v1.DocumentExtractionResponse;
+export import DocumentExtractionStatus = WatsonxAiMlVml_v1.DocumentExtractionStatus;
+export import SyntheticDataGenerationContext = WatsonxAiMlVml_v1.SyntheticDataGenerationContext;
+export import SyntheticDataGenerationDataReference = WatsonxAiMlVml_v1.SyntheticDataGenerationDataReference;
+export import SyntheticDataGenerationLocations = WatsonxAiMlVml_v1.SyntheticDataGenerationLocations;
+export import SyntheticDataGenerationMetric = WatsonxAiMlVml_v1.SyntheticDataGenerationMetric;
+export import SyntheticDataGenerationMetrics = WatsonxAiMlVml_v1.SyntheticDataGenerationMetrics;
+export import SyntheticDataGenerationResource = WatsonxAiMlVml_v1.SyntheticDataGenerationResource;
+export import SyntheticDataGenerationResources = WatsonxAiMlVml_v1.SyntheticDataGenerationResources;
+export import SyntheticDataGenerationResponse = WatsonxAiMlVml_v1.SyntheticDataGenerationResponse;
+export import SyntheticDataGenerationSample = WatsonxAiMlVml_v1.SyntheticDataGenerationSample;
+export import SyntheticDataGenerationStatus = WatsonxAiMlVml_v1.SyntheticDataGenerationStatus;
+export import TaxonomyResource = WatsonxAiMlVml_v1.TaxonomyResource;
+export import TaxonomyResources = WatsonxAiMlVml_v1.TaxonomyResources;
+export import TaxonomyResponse = WatsonxAiMlVml_v1.TaxonomyResponse;
+export import TaxonomyStatus = WatsonxAiMlVml_v1.TaxonomyStatus;
+export import SoftwareSpecRel = WatsonxAiMlVml_v1.SoftwareSpecRel;
+export import TrainingDetails = WatsonxAiMlVml_v1.TrainingDetails;
+export import DataInput = WatsonxAiMlVml_v1.DataInput;
+export import DataOutput = WatsonxAiMlVml_v1.DataOutput;
+export import Metric = WatsonxAiMlVml_v1.Metric;
+export import MetricTsMetrics = WatsonxAiMlVml_v1.MetricTsMetrics;
+export import MetricTsadMetrics = WatsonxAiMlVml_v1.MetricTsadMetrics;
+export import DataPreprocessingTransformation = WatsonxAiMlVml_v1.DataPreprocessingTransformation;
+export import ModelResourceEntity = WatsonxAiMlVml_v1.ModelResourceEntity;
+export import ModelResource = WatsonxAiMlVml_v1.ModelResource;
+export import ModelEntityModelVersion = WatsonxAiMlVml_v1.ModelEntityModelVersion;
+export import ModelEntitySchemas = WatsonxAiMlVml_v1.ModelEntitySchemas;
+export import ModelEntitySize = WatsonxAiMlVml_v1.ModelEntitySize;
+export import ContentInfo = WatsonxAiMlVml_v1.ContentInfo;
+export import ContentLocation = WatsonxAiMlVml_v1.ContentLocation;
+export import AudioTranscriptionResult = WatsonxAiMlVml_v1.AudioTranscriptionResult;
+export import ModelResources = WatsonxAiMlVml_v1.ModelResources;
+export import ModelDefinitionEntityPlatform = WatsonxAiMlVml_v1.ModelDefinitionEntityPlatform;
+export import ModelDefinitionEntityRequestPlatform = WatsonxAiMlVml_v1.ModelDefinitionEntityRequestPlatform;
+export import ModelDefinitionEntity = WatsonxAiMlVml_v1.ModelDefinitionEntity;
+export import ModelDefinitionId = WatsonxAiMlVml_v1.ModelDefinitionId;
+export import ModelDefinitionRel = WatsonxAiMlVml_v1.ModelDefinitionRel;
+export import GPU = WatsonxAiMlVml_v1.GPU;
+export import DocumentExtractionObjectLocation = WatsonxAiMlVml_v1.DocumentExtractionObjectLocation;
+export import ObjectLocationGithub = WatsonxAiMlVml_v1.ObjectLocationGithub;
+export import ErrorResponse = WatsonxAiMlVml_v1.ErrorResponse;
+export import SpaceResource = WatsonxAiMlVml_v1.SpaceResource;
+export import SpaceResources = WatsonxAiMlVml_v1.SpaceResources;
+export import FoundationModelSpecsPager = WatsonxAiMlVml_v1.FoundationModelSpecsPager;
+export import FoundationModelTasksPager = WatsonxAiMlVml_v1.FoundationModelTasksPager;
+export import TextExtractionsPager = WatsonxAiMlVml_v1.TextExtractionsPager;
+export import TrainingsListPager = WatsonxAiMlVml_v1.TrainingsListPager;
+export import FineTuningListPager = WatsonxAiMlVml_v1.FineTuningListPager;
+export import ModelsListPager = WatsonxAiMlVml_v1.ModelsListPager;
+export import ListPromptsPager = WatsonxAiMlVml_v1.ListPromptsPager;
+export import ListSpacesPager = WatsonxAiMlVml_v1.ListSpacesPager;
+export import ObjectStreamed = WatsonxAiMlVml_v1.ObjectStreamed;
+export import CallbackHandler = WatsonxAiMlVml_v1.CallbackHandler;

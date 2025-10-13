@@ -21,7 +21,7 @@ const sdkCorePackage = require('ibm-cloud-sdk-core');
 const unitTestUtils = require('@ibm-cloud/sdk-test-utilities');
 
 const { NoAuthAuthenticator } = sdkCorePackage;
-const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
+const { WatsonXAI } = require('../../dist/vml_v1');
 const { checkAxiosOptions } = require('./utils/checks');
 const { MockingRequest } = require('../utils/utils');
 
@@ -39,7 +39,7 @@ const watsonxAIServiceOptions = {
   version: '2023-07-07',
 };
 
-const watsonxAIService = new WatsonxAiMlVml_v1(watsonxAIServiceOptions);
+const watsonxAIService = new WatsonXAI(watsonxAIServiceOptions);
 const createRequestMocker = new MockingRequest(watsonxAIService, 'createRequest');
 
 describe('Data & AI Common Core methods', () => {
@@ -408,7 +408,7 @@ describe('Data & AI Common Core methods', () => {
           limit: 2,
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.ListSpacesPager(watsonxAIService, params);
+        const pager = new WatsonXAI.ListSpacesPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -422,7 +422,7 @@ describe('Data & AI Common Core methods', () => {
         const params = {
           limit: 1,
         };
-        const pager = new WatsonxAiMlVml_v1.ListSpacesPager(watsonxAIService, params);
+        const pager = new WatsonXAI.ListSpacesPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);

@@ -1,7 +1,5 @@
 ### Specific to this repository ###
 # tsc outputs
-lib/*.js
-auth/*.js
 **/*.d.ts
 **/*.js.map
 

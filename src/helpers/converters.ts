@@ -1,4 +1,4 @@
-import WatsonxAiMlVml_v1 = require('../watsonx-ai-ml/vml_v1');
+import WatsonxAiMlVml_v1 from '../vml_v1';
 
 function convertUtilityToolToWatsonxTool(
   utilityTool: WatsonxAiMlVml_v1.UtilityAgentTool
@@ -39,4 +39,4 @@ function convertWatsonxToolCallToUtilityToolCall(
     config,
   };
 }
-export = { convertUtilityToolToWatsonxTool, convertWatsonxToolCallToUtilityToolCall };
+export { convertUtilityToolToWatsonxTool, convertWatsonxToolCallToUtilityToolCall };

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -exuo pipefail
+
+NODE_PATH="dist"
+
+cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/.."
+
+node scripts/utils/check-version.cjs
+
+# Build into dist and will publish the package from there,
+# so that src/resources/foo.ts becomes <package root>/resources/foo.js
+# This way importing from `"@ibm-cloud/watsonx-ai/gateway"` works
+# even with `"moduleResolution": "node"`
+
+rm -rf ${NODE_PATH}; mkdir -p ${NODE_PATH}/dist/watsonx-ai-ml
+# Copy src to dist/src and build from dist/src into dist, so that
+# the source map for index.js.map will refer to ./src/index.ts etc
+
+for file in npm-config.env.template .releaserc .npmrc .npmignore src README.md LICENSE CONTRIBUTING.md CODE_OF_CONDUCT.md; do
+  if [ -e "${file}" ]; then cp -rp "${file}" dist; fi
+done
+
+node scripts/utils/make-dist-package-json.cjs > ${NODE_PATH}/package.json
+
+# build to .js/.mjs/.d.ts files
+./node_modules/.bin/tsc-multi
+
+cp tsconfig.dist-src.json ${NODE_PATH}/src/tsconfig.json
+
+# make sure that nothing crashes when we require the output CJS or
+# import the output ESM
+rm -rf ${NODE_PATH}/src
+# Ensuring backwards compatibility with cjs and dist
+cp ${NODE_PATH}/vml_v1.* ${NODE_PATH}/dist/watsonx-ai-ml
+
+for pkg in @ibm-cloud/watsonx-ai @ibm-cloud/watsonx-ai/gateway; do
+(cd ${NODE_PATH} && node -e "require('${pkg}')")
+(cd ${NODE_PATH} && node -e "import('${pkg}')" --input-type=module)
+done

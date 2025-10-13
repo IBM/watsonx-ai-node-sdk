@@ -22,10 +22,10 @@ const unitTestUtils = require('@ibm-cloud/sdk-test-utilities');
 const FormData = require('form-data');
 const { StreamTransform } = require('../../dist/lib/common');
 // need to import the whole package to mock getAuthenticatorFromEnvironment
-const get_authenticator_from_environment = require('../../dist/auth/utils/get-authenticator-from-environment');
+const get_authenticator_from_environment = require('../../dist/authentication/utils/get-authenticator-from-environment');
 
 const { NoAuthAuthenticator } = sdkCorePackage;
-const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
+const { WatsonXAI } = require('../../dist/vml_v1');
 const { checkAxiosOptions } = require('./utils/checks');
 
 const {
@@ -48,7 +48,7 @@ const stream = new StreamTransform({
   },
 });
 
-const watsonxAIService = new WatsonxAiMlVml_v1(watsonxAIServiceOptions);
+const watsonxAIService = new WatsonXAI(watsonxAIServiceOptions);
 
 let createRequestMock = null;
 function mock_createRequest() {
@@ -74,7 +74,7 @@ getAuthenticatorMock.mockImplementation(() => new NoAuthAuthenticator());
 // used for the service construction tests
 let requiredGlobals;
 
-describe('WatsonxAiMlVml_v1', () => {
+describe('WatsonXAI', () => {
   beforeEach(() => {
     mock_createRequest();
     // these are changed when passed into the factory/constructor, so re-init
@@ -92,13 +92,13 @@ describe('WatsonxAiMlVml_v1', () => {
 
   describe('the newInstance method', () => {
     test('should use defaults when options not provided', () => {
-      const testInstance = WatsonxAiMlVml_v1.newInstance(requiredGlobals);
+      const testInstance = WatsonXAI.newInstance(requiredGlobals);
 
       expect(getAuthenticatorMock).toHaveBeenCalled();
       expect(testInstance.baseOptions.authenticator).toBeInstanceOf(NoAuthAuthenticator);
-      expect(testInstance.baseOptions.serviceName).toBe(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME);
-      expect(testInstance.baseOptions.serviceUrl).toBe(WatsonxAiMlVml_v1.DEFAULT_SERVICE_URL);
-      expect(testInstance).toBeInstanceOf(WatsonxAiMlVml_v1);
+      expect(testInstance.baseOptions.serviceName).toBe(WatsonXAI.DEFAULT_SERVICE_NAME);
+      expect(testInstance.baseOptions.serviceUrl).toBe(WatsonXAI.DEFAULT_SERVICE_URL);
+      expect(testInstance).toBeInstanceOf(WatsonXAI);
     });
 
     test('should set serviceName, serviceUrl, and authenticator when provided', () => {
@@ -110,13 +110,13 @@ describe('WatsonxAiMlVml_v1', () => {
 
       options = Object.assign(options, requiredGlobals);
 
-      const testInstance = WatsonxAiMlVml_v1.newInstance(options);
+      const testInstance = WatsonXAI.newInstance(options);
 
       expect(getAuthenticatorMock).not.toHaveBeenCalled();
       expect(testInstance.baseOptions.authenticator).toBeInstanceOf(NoAuthAuthenticator);
       expect(testInstance.baseOptions.serviceUrl).toBe('custom.com');
       expect(testInstance.baseOptions.serviceName).toBe('my-service');
-      expect(testInstance).toBeInstanceOf(WatsonxAiMlVml_v1);
+      expect(testInstance).toBeInstanceOf(WatsonXAI);
     });
   });
 
@@ -129,7 +129,7 @@ describe('WatsonxAiMlVml_v1', () => {
 
       options = Object.assign(options, requiredGlobals);
 
-      const testInstance = new WatsonxAiMlVml_v1(options);
+      const testInstance = new WatsonXAI(options);
 
       expect(testInstance.baseOptions.serviceUrl).toBe('custom.com');
     });
@@ -141,16 +141,16 @@ describe('WatsonxAiMlVml_v1', () => {
 
       options = Object.assign(options, requiredGlobals);
 
-      const testInstance = new WatsonxAiMlVml_v1(options);
+      const testInstance = new WatsonXAI(options);
 
-      expect(testInstance.baseOptions.serviceUrl).toBe(WatsonxAiMlVml_v1.DEFAULT_SERVICE_URL);
+      expect(testInstance.baseOptions.serviceUrl).toBe(WatsonXAI.DEFAULT_SERVICE_URL);
     });
   });
 
   describe('service-level tests', () => {
     describe('positive tests', () => {
       test('construct service with global params', () => {
-        const serviceObj = new WatsonxAiMlVml_v1(watsonxAIServiceOptions);
+        const serviceObj = new WatsonXAI(watsonxAIServiceOptions);
         expect(serviceObj).not.toBeNull();
         expect(serviceObj.version).toEqual(watsonxAIServiceOptions.version);
       });
@@ -161,7 +161,7 @@ describe('WatsonxAiMlVml_v1', () => {
     describe('positive tests', () => {
       test('should use all default variable values if null is passed', () => {
         const defaultFormattedUrl = 'https://us-south.ml.cloud.ibm.com';
-        const formattedUrl = WatsonxAiMlVml_v1.constructServiceUrl(null);
+        const formattedUrl = WatsonXAI.constructServiceUrl(null);
 
         expect(formattedUrl).toStrictEqual(defaultFormattedUrl);
       });
@@ -171,7 +171,7 @@ describe('WatsonxAiMlVml_v1', () => {
       test('should fail if an invalid variable name is provided', () => {
         expect(() => {
           const providedUrlVariables = new Map([['invalid_variable_name', 'value']]);
-          WatsonxAiMlVml_v1.constructServiceUrl(providedUrlVariables);
+          WatsonXAI.constructServiceUrl(providedUrlVariables);
         }).toThrow();
       });
     });
@@ -983,7 +983,7 @@ describe('WatsonxAiMlVml_v1', () => {
           limit: 50,
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAIService, params);
+        const pager = new WatsonXAI.TextExtractionsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -999,7 +999,7 @@ describe('WatsonxAiMlVml_v1', () => {
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
           limit: 50,
         };
-        const pager = new WatsonxAiMlVml_v1.TextExtractionsPager(watsonxAIService, params);
+        const pager = new WatsonXAI.TextExtractionsPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -1946,7 +1946,7 @@ describe('WatsonxAiMlVml_v1', () => {
           techPreview: false,
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAIService, params);
+        const pager = new WatsonXAI.FoundationModelSpecsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -1962,7 +1962,7 @@ describe('WatsonxAiMlVml_v1', () => {
           filters: 'modelid_ibm/granite-13b-instruct-v2',
           techPreview: false,
         };
-        const pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAIService, params);
+        const pager = new WatsonXAI.FoundationModelSpecsPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -2069,7 +2069,7 @@ describe('WatsonxAiMlVml_v1', () => {
           limit: 50,
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAIService, params);
+        const pager = new WatsonXAI.FoundationModelTasksPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -2083,7 +2083,7 @@ describe('WatsonxAiMlVml_v1', () => {
         const params = {
           limit: 50,
         };
-        const pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAIService, params);
+        const pager = new WatsonXAI.FoundationModelTasksPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -2815,7 +2815,7 @@ describe('WatsonxAiMlVml_v1', () => {
           limit: 2,
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAIService, params);
+        const pager = new WatsonXAI.ListPromptsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -2831,7 +2831,7 @@ describe('WatsonxAiMlVml_v1', () => {
           spaceId: '12ac4cf1-252f-424b-b52d-5cdd9814987f',
           limit: 2,
         };
-        const pager = new WatsonxAiMlVml_v1.ListPromptsPager(watsonxAIService, params);
+        const pager = new WatsonXAI.ListPromptsPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -5926,7 +5926,7 @@ describe('WatsonxAiMlVml_v1', () => {
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAIService, params);
+        const pager = new WatsonXAI.TrainingsListPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -5945,7 +5945,7 @@ describe('WatsonxAiMlVml_v1', () => {
           spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
         };
-        const pager = new WatsonxAiMlVml_v1.TrainingsListPager(watsonxAIService, params);
+        const pager = new WatsonXAI.TrainingsListPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -6655,7 +6655,7 @@ describe('WatsonxAiMlVml_v1', () => {
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAIService, params);
+        const pager = new WatsonXAI.FineTuningListPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -6675,7 +6675,7 @@ describe('WatsonxAiMlVml_v1', () => {
           spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
           projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
         };
-        const pager = new WatsonxAiMlVml_v1.FineTuningListPager(watsonxAIService, params);
+        const pager = new WatsonXAI.FineTuningListPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
@@ -8738,7 +8738,7 @@ describe('WatsonxAiMlVml_v1', () => {
           search: 'testString',
         };
         const allResults = [];
-        const pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAIService, params);
+        const pager = new WatsonXAI.ModelsListPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
           expect(nextPage).not.toBeNull();
@@ -8756,7 +8756,7 @@ describe('WatsonxAiMlVml_v1', () => {
           tagValue: 'tf2.0 or tf2.1',
           search: 'testString',
         };
-        const pager = new WatsonxAiMlVml_v1.ModelsListPager(watsonxAIService, params);
+        const pager = new WatsonXAI.ModelsListPager(watsonxAIService, params);
         const allResults = await pager.getAll();
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);

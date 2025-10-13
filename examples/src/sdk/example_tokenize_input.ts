@@ -19,7 +19,7 @@ const watsonxAIService = WatsonXAI.newInstance({
 });
 
 // Specify two models
-const modelName = 'mistralai/mistral-medium-2505';
+const modelName = 'ibm/granite-3-3-8b-instruct';
 const modelName2 = 'meta-llama/llama-3-3-70b-instruct';
 
 // Specify input data

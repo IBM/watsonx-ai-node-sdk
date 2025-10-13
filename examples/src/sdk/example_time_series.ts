@@ -7,8 +7,8 @@
  */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
-import csv from 'csvtojson';
 import path from 'path';
+import Papa from 'papaparse';
 import { config } from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -39,7 +39,12 @@ const response = await fetch(
 );
 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 const data = await response.text();
-const jsonArray = await csv().fromString(data);
+
+const parsed = Papa.parse<Array<any>>(data, {
+  header: true,
+  skipEmptyLines: true,
+});
+const jsonArray = parsed.data;
 
 const arrayToObject = (array: any[]) => {
   const jsonData: Record<string, any[]> = {};

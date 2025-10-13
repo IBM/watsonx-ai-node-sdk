@@ -17,12 +17,14 @@
 /* eslint-disable no-await-in-loop */
 const path = require('path');
 const { Agent } = require('https');
-const WatsonxAIMLv1 = require('../../dist/watsonx-ai-ml/vml_v1.js');
+const { WatsonXAI } = require('../../dist/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
 const { MockingRequest } = require('../utils/utils.js');
-const { JWTRequestBaseAuthenticator } = require('../../dist/auth/utils/authenticators.js');
+const {
+  JWTRequestBaseAuthenticator,
+} = require('../../dist/authentication/utils/authenticators.js');
 const auth = require('../utils/auth.js');
-const authenticators = require('../../dist/auth/index.js');
+const authenticators = require('../../dist/authentication/index.js');
 const { wait } = require('../utils/utils.js');
 
 jest.mock('axios', () => {
@@ -86,7 +88,7 @@ describe('Authentication unit tests', () => {
         requestTokenMocker.clearMock();
       });
       test('Multiple requests with valid token', async () => {
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
           requestToken: auth.requestAdminToken,
@@ -107,7 +109,7 @@ describe('Authentication unit tests', () => {
       test('Multiple requests each after token has expired', async () => {
         const tokenValidationTime = 10; // in miliseconds
         requestTokenMocker.mock();
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
           requestToken: () => auth.requestAdminToken({ time: `${tokenValidationTime}ms` }),
@@ -131,7 +133,7 @@ describe('Authentication unit tests', () => {
           },
         });
 
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
           requestToken: auth.requestAdminToken,
@@ -149,7 +151,7 @@ describe('Authentication unit tests', () => {
 
       test('Instance creation without requestToken function', async () => {
         const initInstance = () =>
-          WatsonxAIMLv1.newInstance({
+          WatsonXAI.newInstance({
             version,
             serviceUrl,
           });
@@ -162,7 +164,7 @@ describe('Authentication unit tests', () => {
         const oldAuthType = process.env.WATSONX_AI_AUTH_TYPE;
         process.env.WATSONX_AI_AUTH_TYPE = 'iam';
         const initInstance = () =>
-          WatsonxAIMLv1.newInstance({
+          WatsonXAI.newInstance({
             version,
             serviceUrl,
             requestToken: auth.requestAdminToken,
@@ -203,7 +205,7 @@ describe('Authentication unit tests', () => {
       });
 
       test('Request with valid token', async () => {
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
         });
@@ -224,7 +226,7 @@ describe('Authentication unit tests', () => {
           },
         });
         const iamRequestTokenMock = iamRequestTokenMocker.functionMock;
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
         });
@@ -241,7 +243,7 @@ describe('Authentication unit tests', () => {
       test('Instance creation with no apikey', async () => {
         delete process.env.WATSONX_AI_APIKEY;
         expect(() =>
-          WatsonxAIMLv1.newInstance({
+          WatsonXAI.newInstance({
             version,
             serviceUrl,
           })
@@ -286,7 +288,7 @@ describe('Authentication unit tests', () => {
 
       test('Request with valid token', async () => {
         process.env.WATSONX_AI_PASSWORD = 'testPassword';
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
         });
@@ -300,7 +302,7 @@ describe('Authentication unit tests', () => {
       });
       test('Instance creation and request with apikey instead of password', async () => {
         process.env.WATSONX_AI_APIKEY = 'testApikey';
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
         });
@@ -321,7 +323,7 @@ describe('Authentication unit tests', () => {
           },
         });
         const cp4dRequestTokenMock = cp4dRequestTokenMocker.functionMock;
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
         });
@@ -340,7 +342,7 @@ describe('Authentication unit tests', () => {
         delete process.env.WATSONX_AI_PASSWORD;
 
         expect(() =>
-          WatsonxAIMLv1.newInstance({
+          WatsonXAI.newInstance({
             version,
             serviceUrl,
           })
@@ -350,7 +352,7 @@ describe('Authentication unit tests', () => {
         process.env.WATSONX_AI_APIKEY = 'testApikey';
         process.env.WATSONX_AI_PASSWORD = 'testPassword';
         expect(() =>
-          WatsonxAIMLv1.newInstance({
+          WatsonXAI.newInstance({
             version,
             serviceUrl,
           })
@@ -375,7 +377,7 @@ describe('Authentication unit tests', () => {
 
     describe('Positive tests', () => {
       test('Request with valid token', async () => {
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
         });
@@ -413,7 +415,7 @@ describe('Authentication unit tests', () => {
         requestTokenMocker.unmock();
       });
       test('Request with valid token', async () => {
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
         });
@@ -438,7 +440,7 @@ describe('Authentication with cert', () => {
 
     describe('Positive tests', () => {
       test('AWS authentication without cert', async () => {
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
         });
@@ -465,7 +467,7 @@ describe('Authentication with cert', () => {
       });
 
       test('AWS authentication with cert', async () => {
-        const instance = WatsonxAIMLv1.newInstance({
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
           caCert: path.join(__dirname, './cert/FakeCert.pem'),
@@ -495,8 +497,8 @@ describe('Authentication with cert', () => {
       });
 
       test('Pass auth url as env variable', async () => {
-        process.env.WATSONX_AI_AUTH_URL = 'https://test.ibm.com/test/auth/url';
-        const instance = WatsonxAIMLv1.newInstance({
+        process.env.WATSONX_AI_AUTH_URL = 'https://test.ibm.com/test/authentication/url';
+        const instance = WatsonXAI.newInstance({
           version,
           serviceUrl,
         });
@@ -523,7 +525,7 @@ describe('Authentication with cert', () => {
             },
             'method': 'POST',
             'rejectUnauthorized': true,
-            'url': 'https://test.ibm.com/test/auth/url',
+            'url': 'https://test.ibm.com/test/authentication/url',
           },
         });
         delete process.env.WATSONX_AI_AUTH_URL;

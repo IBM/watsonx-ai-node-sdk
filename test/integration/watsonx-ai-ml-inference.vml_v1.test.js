@@ -16,12 +16,11 @@
 
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 
 const { Readable, addAbortSignal } = require('node:stream');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
 const path = require('path');
-const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1.js');
+const { WatsonXAI } = require('../../dist/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
 const testHelper = require('../resources/test-helper.js');
 const { Stream } = require('../../dist/lib/common.js');
@@ -67,14 +66,14 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   };
 
   beforeAll(async () => {
-    watsonxAIService = WatsonxAiMlVml_v1.newInstance({
+    watsonxAIService = WatsonXAI.newInstance({
       serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
       version: '2024-03-14',
     });
 
     expect(watsonxAIService).not.toBeNull();
 
-    const config = readExternalSources(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME);
+    const config = readExternalSources(WatsonXAI.DEFAULT_SERVICE_NAME);
     expect(config).not.toBeNull();
 
     watsonxAIService.enableRetries();
@@ -104,7 +103,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const allResults = [];
 
       // Test getNext().
-      let pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAIService, params);
+      let pager = new WatsonXAI.FoundationModelSpecsPager(watsonxAIService, params);
       while (pager.hasNext()) {
         const nextPage = await pager.getNext();
         expect(nextPage).not.toBeNull();
@@ -112,7 +111,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
 
       // Test getAll().
-      pager = new WatsonxAiMlVml_v1.FoundationModelSpecsPager(watsonxAIService, params);
+      pager = new WatsonXAI.FoundationModelSpecsPager(watsonxAIService, params);
       const allItems = await pager.getAll();
       expect(allItems).not.toBeNull();
       expect(allItems).toHaveLength(allResults.length);
@@ -137,7 +136,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const allResults = [];
 
       // Test getNext().
-      let pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAIService, params);
+      let pager = new WatsonXAI.FoundationModelTasksPager(watsonxAIService, params);
       while (pager.hasNext()) {
         const nextPage = await pager.getNext();
         expect(nextPage).not.toBeNull();
@@ -145,7 +144,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
 
       // Test getAll().
-      pager = new WatsonxAiMlVml_v1.FoundationModelTasksPager(watsonxAIService, params);
+      pager = new WatsonXAI.FoundationModelTasksPager(watsonxAIService, params);
       const allItems = await pager.getAll();
       expect(allItems).not.toBeNull();
       expect(allItems).toHaveLength(allResults.length);

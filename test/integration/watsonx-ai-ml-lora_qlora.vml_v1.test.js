@@ -3,11 +3,11 @@
 
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
+
 const https = require('https');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
 const path = require('path');
-const WatsonxAiMlVml_v1 = require('../../dist/watsonx-ai-ml/vml_v1');
+const { WatsonXAI } = require('../../dist/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
 
 // testcase timeout value (200s).
@@ -78,7 +78,7 @@ describe('Ilab tests', () => {
   // Service instance
   let watsonxAIService;
   beforeAll(async () => {
-    watsonxAIService = WatsonxAiMlVml_v1.newInstance({
+    watsonxAIService = WatsonXAI.newInstance({
       serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
       platformUrl: process.env.WATSONX_AI_PLATFORM_URL,
       version: '2023-07-07',
@@ -86,7 +86,7 @@ describe('Ilab tests', () => {
 
     expect(watsonxAIService).not.toBeNull();
 
-    const config = readExternalSources(WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME);
+    const config = readExternalSources(WatsonXAI.DEFAULT_SERVICE_NAME);
     expect(config).not.toBeNull();
     watsonxAIService.enableRetries();
   });

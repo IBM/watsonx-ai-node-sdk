@@ -17,10 +17,15 @@ done | sort -nrk2 | awk '!x[$1]++' | sort -nk1 | awk '{print $3}')
 echo "${SELECTED_TAGS[@]}"
 
 # Generate docs JSON file for each selected SDK version
+TREE_CHANGE_VERSION=1.7.0
 DOC_FILES=()
 for TAG in ${SELECTED_TAGS} ; do
     git checkout "${TAG}"
-    npm run typedoc -- --json "${TAG%.*}.json" --name "${TAG%.*}.x"
+    if [[ "$(printf '%s\n%s' "$TREE_CHANGE_VERSION" "$TAG" | sort -V | head -n1)" == "$TREE_CHANGE_VERSION" ]]; then
+        npm run typedoc src/ -- --json "${TAG%.*}.json" --name "${TAG%.*}.x"
+    else
+        npm run typedoc -- --json "${TAG%.*}.json" --name "${TAG%.*}.x"
+    fi
     DOC_FILES+=("${TAG%.*}.json")
 done
 

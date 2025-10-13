@@ -26,6 +26,7 @@ module.exports = {
         'jest/no-standalone-expect': 'off',
         'jest/no-try-expect': 'off',
         'no-unused-vars': 'off',
+        'no-restricted-syntax': 'off',
       },
     },
     {
