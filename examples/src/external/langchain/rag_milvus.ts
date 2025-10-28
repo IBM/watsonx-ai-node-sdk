@@ -2,15 +2,17 @@ import { WatsonxEmbeddings } from '@langchain/community/embeddings/ibm';
 import { pull } from 'langchain/hub';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { ChatWatsonx } from '@langchain/community/chat_models/ibm';
-import { createStuffDocumentsChain } from 'langchain/chains/combine_documents';
-import { StringOutputParser } from '@langchain/core/output_parsers';
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { Document } from '@langchain/core/documents';
+import { createAgent } from 'langchain';
+import * as z from 'zod/v3';
+import { tool } from '@langchain/core/tools';
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { Milvus, MilvusLibArgs } from '@langchain/community/vectorstores/milvus';
 import { DataType } from '@zilliz/milvus2-sdk-node';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
 
-const modelName = 'mistralai/mistral-medium-2505';
+const modelName = 'ibm/granite-3-2-8b-instruct';
 const embeddingsModelName = 'ibm/slate-30m-english-rtrvr-v2';
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
@@ -69,7 +71,7 @@ const res = await milvus.client.createCollection({
   auto_id: true,
 });
 
-const documentsArray = chunkArray(chunkArray(split, 500), 10);
+const documentsArray = chunkArray(chunkArray<Document>(split, 500), 10);
 let i = 1;
 for (const documents of documentsArray) {
   console.log('Start loading batch ' + i);
@@ -95,14 +97,31 @@ const llm = new ChatWatsonx({
   model: modelName,
   maxRetries: 0,
 });
-const prompt = await pull<ChatPromptTemplate>('rlm/rag-prompt');
 
-const retriever = milvus.asRetriever();
-const ragChain = await createStuffDocumentsChain({
-  llm,
-  prompt,
-  outputParser: new StringOutputParser(),
+const retrieveSchema = z.object({ query: z.string() });
+
+const retrieve = tool(
+  async ({ query }) => {
+    const searchResult = 2;
+    const retrievedDocs = await milvus.similaritySearch(query, searchResult);
+    const serialized = retrievedDocs
+      .map((doc) => `Source: ${doc.metadata.source}\nContent: ${doc.pageContent}`)
+      .join('\n');
+    return [serialized, retrievedDocs];
+  },
+  {
+    name: 'retrieve',
+    description: 'Retrieve information related to a query.',
+    schema: retrieveSchema,
+    responseFormat: 'content_and_artifact',
+  }
+);
+
+const agent = createAgent({
+  model: llm,
+  tools: [retrieve],
 });
+
 const questions: [number, string, string][] = [
   [
     0,
@@ -111,14 +130,10 @@ const questions: [number, string, string][] = [
   ],
 ];
 for (const [index, [_qid, question, answer]] of questions.entries()) {
-  const retrievedDocs = await retriever.invoke(question);
-  const result = await ragChain.invoke({
-    question,
-    context: retrievedDocs,
-  });
+  const result = await agent.invoke({ messages: [{ role: 'user', content: question }] });
   console.log(`============================= Question #${index + 1} =============================`);
   console.log('\t' + question + '\n');
-  console.log('Model answer: ' + result + '\n');
+  console.log('Model answer: ' + result.messages.at(-1)?.content + '\n');
   console.log('Expected answer: ' + answer + '\n');
 }
 await milvus.client.dropCollection({ collection_name: collectionName });

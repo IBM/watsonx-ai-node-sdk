@@ -1,6 +1,6 @@
 {
   "name": "@ibm-cloud/watsonx-ai",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "IBM watsonx.ai Node.js SDK",
   "repository": {
     "type": "git",
@@ -75,7 +75,7 @@
     "jsonwebtoken": "^9.0.2",
     "nock": "^13.2.4",
     "prettier": "^2.3.0",
-    "tsc-multi": "^1.1.0",
+    "tsc-multi": "https://github.com/stainless-api/tsc-multi/releases/download/v1.1.9/tsc-multi.tgz",
     "typedoc": "^0.25.13",
     "typescript": "^4.9.5"
   },
@@ -94,8 +94,11 @@
   "types": "./index.d.ts",
   "exports": {
     ".": {
-      "import": "./index.js",
-      "types": "./index.d.ts",
+      "require": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
+      "types": "./index.d.mts",
       "default": "./index.mjs"
     },
     "./vml_v1.mjs": {

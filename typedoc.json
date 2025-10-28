@@ -1,12 +1,17 @@
 {
-    "theme": "default",
-    "categorizeByGroup": true,
-    "categoryOrder": ["*", "Properties", "Other"],
-    "entryPointStrategy": "expand",
-    "excludeExternals": true,
-    "tsconfig": "tsconfig.json",
-    "out": "apidocs",
-    "includeVersion": false,
-    "entryPoints": ["index.ts"],
-    "excludeInternal": true
+  "theme": "default",
+  "categorizeByGroup": true,
+  "categoryOrder": ["*", "Properties", "Other"],
+  "entryPointStrategy": "expand",
+  "excludeExternals": true,
+  "excludeInternal": true,
+  "tsconfig": "tsconfig.json",
+  "out": "apidocs",
+  "includeVersion": false,
+  "entryPoints": [
+    "src/index.ts",
+    "src/gateway/index.ts",
+    "src/base/index.ts",
+    "src/authentication/index.ts"
+  ]
 }

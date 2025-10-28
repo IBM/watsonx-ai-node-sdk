@@ -19,4 +19,4 @@
  */
 
 export { WatsonxBaseService, APIBaseService } from './base';
-export * from './types/index';
+export * from './types';

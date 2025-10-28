@@ -17,10 +17,11 @@ const describe = authHelper.prepareTests(configFile);
 authHelper.loadEnv();
 
 const version = '2024-03-14';
+const serviceUrl = process.env.WATSONX_AI_GATEWAY_URL;
 
 const client = new APIBaseService({
   version,
-  serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
+  serviceUrl,
 });
 
 describe('Completions', () => {
@@ -45,8 +46,8 @@ describe('Completions', () => {
 
     const textCompletions = new GenerateTextCompletions(client);
     const chat = new Chat(client);
-    const modelAlias = 'mistral-medium';
-    const modelName = 'mistralai/mistral-medium-2505';
+    const modelAlias = 'ibm/granite-3-2-8b-instruct';
+    const modelName = 'ibm/granite-3-2-8b-instruct';
 
     beforeAll(async () => {
       const timestamp = Date.now();

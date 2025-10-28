@@ -23,10 +23,6 @@ import { ChatCompletions, EmbeddingCompletions, GenerateTextCompletions } from '
 import { Models } from './models';
 import { Providers } from './providers';
 import { Policies } from './policies';
-import { CreateTenantParams, DeleteTenantParams } from './types/tentant/request';
-import { Tenant } from './types/tentant/response';
-import { EmptyObject } from './types';
-import { Response } from '../base';
 
 /**
  * Represents the chat functionality of the gateway.

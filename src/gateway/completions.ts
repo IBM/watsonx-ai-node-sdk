@@ -51,7 +51,7 @@ export abstract class Completions {
   abstract create(params: Record<string, any>): Promise<Record<string, any>>;
 }
 
-type ChatCompletionResult<
+export type ChatCompletionResult<
   S extends boolean | undefined,
   R extends boolean | undefined
 > = S extends true
@@ -60,7 +60,10 @@ type ChatCompletionResult<
     : Stream<ChatObjectStream>
   : Response<ChatsResponse>;
 
-type CompletionResult<S extends boolean | undefined, R extends boolean | undefined> = S extends true
+export type CompletionResult<
+  S extends boolean | undefined,
+  R extends boolean | undefined
+> = S extends true
   ? R extends false
     ? Stream<string>
     : Stream<TextCompletionStream>

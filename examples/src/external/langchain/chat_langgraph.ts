@@ -4,12 +4,12 @@ import { tool } from '@langchain/core/tools';
 import { writeFile } from 'fs/promises';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { MemorySaver } from '@langchain/langgraph';
-import { createReactAgent } from '@langchain/langgraph/prebuilt';
+import { createAgent } from 'langchain';
 import { DuckDuckGoSearch } from '@langchain/community/tools/duckduckgo_search';
 import { conversationPrinter } from './utils.ts';
 import '../../utils/config.ts';
 
-const modelName = 'mistralai/mistral-medium-2505';
+const modelName = 'ibm/granite-3-2-8b-instruct';
 const model = new ChatWatsonx({
   projectId: process.env.WATSONX_AI_PROJECT_ID,
   serviceUrl: process.env.WATSONX_AI_SERVICE_URL as string,
@@ -63,11 +63,10 @@ const settleGroceries = tool(
 
 const tools = [searchStorage, settleGroceries];
 
-const graph = createReactAgent({ llm: model, tools });
+const graph = createAgent({ model, tools });
 
-const file = await graph.getGraph().drawMermaidPng();
-const arrayBuffer = await file.arrayBuffer();
-const buffer = Buffer.from(arrayBuffer);
+const file = await graph.drawMermaidPng();
+const buffer = Buffer.from(file);
 writeFile('graph.jpg', buffer);
 
 console.log(
@@ -101,10 +100,10 @@ const agentModel = new ChatWatsonx({
 });
 
 const agentCheckpointer = new MemorySaver();
-const agent = createReactAgent({
-  llm: agentModel,
+const agent = createAgent({
+  model: agentModel,
   tools: agentTools,
-  checkpointSaver: agentCheckpointer,
+  checkpointer: agentCheckpointer,
 });
 
 const agentFinalState = await agent.invoke(

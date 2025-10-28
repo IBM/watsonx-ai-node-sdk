@@ -1,4 +1,10 @@
-import { AIMessage, HumanMessage, SystemMessage, ToolMessage } from '@langchain/core/messages';
+import {
+  AIMessage,
+  BaseMessage,
+  HumanMessage,
+  SystemMessage,
+  ToolMessage,
+} from '@langchain/core/messages';
 
 const printNested = (obj: { [key: string]: any }, indent = 1) => {
   for (const key of Object.keys(obj)) {
@@ -13,7 +19,7 @@ const printNested = (obj: { [key: string]: any }, indent = 1) => {
 };
 
 export const conversationPrinter = (
-  conversation: (AIMessage | HumanMessage | ToolMessage | SystemMessage)[]
+  conversation: (AIMessage | HumanMessage | ToolMessage | SystemMessage | BaseMessage)[]
 ) => {
   conversation.forEach((message) => {
     if (message instanceof AIMessage) {

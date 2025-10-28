@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 /* eslint-disable max-classes-per-file */
+/* eslint-disable import/extensions */
 import {
   JwtTokenManager,
   JwtTokenManagerOptions,
   TokenRequestBasedAuthenticator,
 } from 'ibm-cloud-sdk-core';
 import { Agent } from 'https';
-import { BaseOptions } from 'ibm-cloud-sdk-core/es/auth/authenticators/token-request-based-authenticator-immutable';
+import { BaseOptions } from 'ibm-cloud-sdk-core/es/auth/authenticators/token-request-based-authenticator-immutable.js';
 
 const AWS_AUTHENTICATION_PATH = '/api/2.0/apikeys/token';
 

@@ -21,6 +21,7 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable import/first */
+/* eslint-disable import/extensions */
 
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
 import { Agent } from 'https';
@@ -33,7 +34,7 @@ import {
   readExternalSources,
   validateParams,
 } from 'ibm-cloud-sdk-core';
-import { BaseServiceOptions } from 'ibm-cloud-sdk-core/es/lib/base-service';
+import { BaseServiceOptions } from 'ibm-cloud-sdk-core/es/lib/base-service.js';
 import FormData from 'form-data';
 import { getAuthenticatorFromEnvironment } from './authentication/utils/get-authenticator-from-environment';
 import {
@@ -3070,6 +3071,10 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'temperature',
       'topP',
       'timeLimit',
+      'guidedChoice',
+      'guidedRegex',
+      'guidedGrammar',
+      'guidedJSON',
       'headers',
       'signal',
     ];
@@ -3098,6 +3103,10 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'stop': _params.stop,
       'temperature': _params.temperature,
       'top_p': _params.topP,
+      'guided_choice': _params.guidedChoice,
+      'guided_regex': _params.guidedRegex,
+      'guided_grammar': _params.guidedGrammar,
+      'guided_json': _params.guidedJSON,
       'time_limit': _params.timeLimit,
     };
 
@@ -3272,6 +3281,10 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'temperature',
       'topP',
       'timeLimit',
+      'guidedChoice',
+      'guidedRegex',
+      'guidedGrammar',
+      'guidedJSON',
       'headers',
       'signal',
       'returnObject',
@@ -3303,6 +3316,10 @@ class WatsonxAiMlVml_v1 extends BaseService {
       'temperature': _params.temperature,
       'top_p': _params.topP,
       'time_limit': _params.timeLimit,
+      'guided_choice': _params.guidedChoice,
+      'guided_regex': _params.guidedRegex,
+      'guided_grammar': _params.guidedGrammar,
+      'guided_json': _params.guidedJSON,
     };
 
     const query = {
@@ -6891,6 +6908,284 @@ class WatsonxAiMlVml_v1 extends BaseService {
 
     return this.createRequest(parameters);
   }
+  /*************************
+   * Text classification
+   ************************/
+
+  /**
+   * Start a text classification request.
+   *
+   * Start a request to classify text from a document or an image (using OCR).
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {TextClassificationDataReference} params.documentReference - A reference to data.
+   * @param {TextClassificationParameters} params.parameters - The parameters for the text extraction.
+   * @param {JsonObject} [params.custom] - User defined properties specified as key-value pairs.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
+   * to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` has to
+   * be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextClassificationResponse>>}
+   */
+  public createTextClassification(
+    params: WatsonxAiMlVml_v1.TextClassificationParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextClassificationResponse>> {
+    const _params = { ...params };
+    const _requiredParams = ['documentReference', 'parameters'];
+    const _validParams = [
+      'documentReference',
+      'parameters',
+      'custom',
+      'projectId',
+      'spaceId',
+      'signal',
+      'headers',
+    ];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const body = {
+      'document_reference': _params.documentReference,
+      'parameters': _params.parameters,
+      'custom': _params.custom,
+      'project_id': _params.projectId,
+      'space_id': _params.spaceId,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'createTextClassification'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/text/classifications',
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Retrieve the text classification requests.
+   *
+   * Retrieve the list of text classification requests for the specified space or project.
+   *
+   * This operation does not save the history, any requests that were deleted or purged will not appear in this list.
+   *
+   * @param {Object} [params] - The parameters to send to the service.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {string} [params.start] - Token required for token-based pagination. This token cannot be determined by end
+   * user. It is generated by the service and it is set in the href available in the `next` field.
+   * @param {number} [params.limit] - How many resources should be returned. By default limit is 100. Max limit allowed
+   * is 200.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextClassificationResources>>}
+   */
+  public listTextClassifications(
+    params?: WatsonxAiMlVml_v1.ListTextClassificationsParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextClassificationResources>> {
+    const _params = { ...params };
+    const _requiredParams: string[] = [];
+    const _validParams = ['spaceId', 'projectId', 'start', 'limit', 'signal', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+      'start': _params.start,
+      'limit': _params.limit,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'listTextClassifications'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/text/classifications',
+        method: 'GET',
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get the results of the request.
+   *
+   * Retrieve the text classification request with the specified identifier.
+   *
+   * Note that there is a retention period of 2 days. If this retention period is exceeded then the request will be
+   * deleted and the results no longer available. In this case this operation will return `404`.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the classification request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextClassificationResponse>>}
+   */
+  public getTextClassification(
+    params: WatsonxAiMlVml_v1.TextClassificationGetParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextClassificationResponse>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'spaceId', 'projectId', 'signal', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'getTextClassification'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/text/classifications/{id}',
+        method: 'GET',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          'Accept': 'application/json',
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Delete the request.
+   *
+   * Cancel the specified text classification request and delete any associated results.
+   *
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the classification request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or `project_id` query
+   * parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id`
+   * query parameter has to be given.
+   * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job or request metadata.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>>}
+   */
+  public deleteTextClassification(
+    params: WatsonxAiMlVml_v1.TextClassificationDeleteParams
+  ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
+    const _params = { ...params };
+    const _requiredParams = ['id'];
+    const _validParams = ['id', 'spaceId', 'projectId', 'hardDelete', 'signal', 'headers'];
+    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    if (_validationErrors) {
+      return Promise.reject(_validationErrors);
+    }
+
+    const query = {
+      'version': this.version,
+      'space_id': _params.spaceId,
+      'project_id': _params.projectId,
+      'hard_delete': _params.hardDelete,
+    };
+
+    const path = {
+      'id': _params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders(
+      WatsonxAiMlVml_v1.DEFAULT_SERVICE_NAME,
+      'vml_v1',
+      'deleteTextClassification'
+    );
+
+    const parameters = {
+      options: {
+        url: '/ml/v1/text/classifications/{id}',
+        method: 'DELETE',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          ..._params.headers,
+        },
+        axiosOptions: {
+          signal: _params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
 }
 
 /*************************
@@ -7693,9 +7988,118 @@ namespace WatsonxAiMlVml_v1 {
      *  being used, there may be an enforced maximum time limit.
      */
     timeLimit?: number;
+    /** If specified, the output will be exactly one of the choices. */
+    guidedChoice?: string[];
+    /** If specified, the output will follow the regex pattern. */
+    guidedRegex?: string;
+    /** If specified, the output will follow the context free grammar. */
+    guidedGrammar?: string;
+    /** If specified, the output will follow the JSON schema. See the JSON Schema reference for
+     * documentation about the format. */
+    guidedJSON?: string;
   }
   /** Parameters for the `textChatStream` operation. */
-  export interface TextChatStreamParams extends TextChatParams {
+  export interface TextChatStreamParams extends DefaultParams {
+    /** The model to use for the chat completion.
+     *
+     *  Please refer to the [list of models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
+     */
+    modelId: string;
+    /** The messages for this chat session. */
+    messages: TextChatMessages[];
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** Tool functions that can be called with the response. */
+    tools?: TextChatParameterTools[];
+    /** Using `none` means the model will not call any tool and instead generates a message.
+     *
+     *  **The following options (`auto` and `required`) are not yet supported.**
+     *
+     *  Using `auto` means the model can pick between generating a message or calling one or more tools. Using
+     *  `required` means the model must call one or more tools.
+     *
+     *  Only one of `tool_choice_option` or `tool_choice` must be present.
+     */
+    toolChoiceOption?: TextChatStreamConstants.ToolChoiceOption | string;
+    /** Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}` forces the
+     *  model to call that tool.
+     *
+     *  Only one of `tool_choice_option` or `tool_choice` must be present.
+     */
+    toolChoice?: TextChatToolChoiceTool;
+    /** Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the
+     *  model's likelihood to repeat the same line verbatim.
+     */
+    frequencyPenalty?: number;
+    /** Increasing or decreasing probability of tokens being selected during generation; a positive bias makes a
+     *  token more likely to appear, while a negative bias makes it less likely.
+     */
+    logitBias?: JsonObject;
+    /** Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of
+     *  each output token returned in the content of message.
+     */
+    logprobs?: boolean;
+    /** An integer specifying the number of most likely tokens to return at each token position, each with an
+     *  associated log probability. The option `logprobs` must be set to `true` if this parameter is used.
+     */
+    topLogprobs?: number;
+    /** The maximum number of tokens that can be generated in the chat completion.
+     * The total length of input tokens and generated tokens is limited by the model's context length.
+     * Set to 0 for the model's configured max generated tokens.
+     * This value is now deprecated in favor of maxCompletionTokens.
+     * If specified together with maxCompletionTokens, maxTokens will be ignored.
+     */
+    maxTokens?: number;
+    /** The maximum number of tokens that can be generated in the chat completion. The total length of input tokens
+     * and generated tokens is limited by the model's context length. Set to 0 for the model's configured max generated tokens.
+     */
+    maxCompletionTokens?: number;
+    /** How many chat completion choices to generate for each input message. Note that you will be charged based on
+     *  the number of generated tokens across all of the choices. Keep n as 1 to minimize costs.
+     */
+    n?: number;
+    /** Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's
+     *  likelihood to talk about new topics.
+     */
+    presencePenalty?: number;
+    /** The chat response format parameters. */
+    responseFormat?: TextChatResponseFormat;
+    /** Random number generator seed to use in sampling mode for experimental repeatability. */
+    seed?: number;
+    /** Stop sequences are one or more strings which will cause the text generation to stop if/when they are
+     *  produced as part of the output. Stop sequences encountered prior to the minimum number of tokens being generated
+     *  will be ignored.
+     */
+    stop?: string[];
+    /** What sampling temperature to use,. Higher values like 0.8 will make the output more random, while lower
+     *  values like 0.2 will make it more focused and deterministic.
+     *
+     *  We generally recommend altering this or `top_p` but not both.
+     */
+    temperature?: number;
+    /** An alternative to sampling with temperature, called nucleus sampling, where the model considers the results
+     *  of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass
+     *  are considered.
+     *
+     *  We generally recommend altering this or `temperature` but not both.
+     */
+    topP?: number;
+    /** Time limit in milliseconds - if not completed within this time, generation will stop. The text generated so
+     *  far will be returned along with the `TIME_LIMIT`` stop reason. Depending on the users plan, and on the model
+     *  being used, there may be an enforced maximum time limit.
+     */
+    timeLimit?: number;
+    /** If specified, the output will be exactly one of the choices. */
+    guidedChoice?: string[];
+    /** If specified, the output will follow the regex pattern. */
+    guidedRegex?: string;
+    /** If specified, the output will follow the context free grammar. */
+    guidedGrammar?: string;
+    /** If specified, the output will follow the JSON schema. See the JSON Schema reference for
+     * documentation about the format. */
+    guidedJSON?: string;
     /* whether to return stream of objects if true or stream of strings if false or undefined */
     returnObject?: boolean;
   }
@@ -8458,6 +8862,56 @@ namespace WatsonxAiMlVml_v1 {
     projectId?: string;
     /** Optional target language to which to transcribe; for example, fr for French. Default is English. */
     language?: string;
+  }
+
+  /** Parameters for the `textClassification` operation. */
+  export interface TextClassificationParams extends DefaultParams {
+    /** A reference to data. */
+    documentReference: TextClassificationDataReference;
+    /** The parameters for the text extraction. */
+    parameters: TextClassificationParameters;
+    /** User defined properties specified as key-value pairs. */
+    custom?: JsonObject;
+    /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+    projectId?: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+    spaceId?: string;
+  }
+
+  /** Parameters for the `listTextClassifications` operation. */
+  export interface ListTextClassificationsParams extends DefaultParams {
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
+     *  the service and it is set in the href available in the `next` field.
+     */
+    start?: string;
+    /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
+    limit?: number;
+  }
+
+  /** Parameters for the `textClassificationGet` operation. */
+  export interface TextClassificationGetParams extends DefaultParams {
+    /** The identifier of the classification request. */
+    id: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+  }
+
+  /** Parameters for the `textClassificationDelete` operation. */
+  export interface TextClassificationDeleteParams extends DefaultParams {
+    /** The identifier of the classification request. */
+    id: string;
+    /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    spaceId?: string;
+    /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+    projectId?: string;
+    /** Set to true in order to also delete the job or request metadata. */
+    hardDelete?: boolean;
   }
 
   /*************************
@@ -11894,6 +12348,216 @@ namespace WatsonxAiMlVml_v1 {
     resources: SpaceResource[];
   }
 
+  export interface TextClassificationDataReference {
+    /** The data source type. */
+    type: TextClassificationDataReference.Constants.Type | string;
+    /** Contains a set of location fields specific to each data source. */
+    connection?: CosDataConnection;
+    /** Contains a set of fields specific to each connection. */
+    location?: CosDataLocation;
+  }
+  export namespace TextClassificationDataReference {
+    export namespace Constants {
+      /** The data source type. */
+      export enum Type {
+        CONNECTION_ASSET = 'connection_asset',
+        CONTAINER = 'container',
+      }
+    }
+  }
+
+  /**
+   * The parameters for the text extraction.
+   */
+  export interface TextClassificationParameters {
+    /** If OCR should be used when processing a document.
+     *  An empty value allows the service to select the best option for your processing mode.
+     *  - `enabled`: OCR is run on embedded images, OCR is only run if no programmatic text could be extracted from the
+     *  area.
+     *  - `disabled`: OCR is not run, no information is extracted from images or scanned documents.
+     *  - `forced`: WDU will take a picture of the page and run OCR across it, this applies to all documents even purely
+     *  programmatic ones.
+     */
+    ocr_mode?: TextClassificationParameters.Constants.OCRMode | string;
+    /** The classification mode. The value `exact` gives the exact schema name the the document is classified to.
+     *  The option `binary` only gives whether the document is classified to a known schema or not.
+     */
+    classification_mode?: TextClassificationParameters.Constants.ClassificationMode | string;
+    /** Should the service attempt to fix a rotated page or image. */
+    auto_rotation_correction?: boolean;
+    /** Set of languages to be expected in the document.
+     *  The language codes follow `ISO 639` where possible. See the
+     *  documentation for the currently supported languages.
+     */
+    languages?: string[];
+    /** Additional configuration settings for the Semantic KVP model. */
+    semantic_config?: TextClassificationSemanticConfig;
+  }
+  export namespace TextClassificationParameters {
+    export namespace Constants {
+      /** If OCR should be used when processing a document. An empty value allows the service to select the best option for your processing mode. - `enabled`: OCR is run on embedded images, OCR is only run if no programmatic text could be extracted from the area. - `disabled`: OCR is not run, no information is extracted from images or scanned documents. - `forced`: WDU will take a picture of the page and run OCR across it, this applies to all documents even purely programmatic ones. */
+      export enum OCRMode {
+        DISABLED = 'disabled',
+        ENABLED = 'enabled',
+        FORCED = 'forced',
+      }
+      /** The classification mode. The value `exact` gives the exact schema name the the document is classified to. The option `binary` only gives whether the document is classified to a known schema or not. */
+      export enum ClassificationMode {
+        EXACT = 'exact',
+        BINARY = 'binary',
+      }
+    }
+  }
+
+  /**
+   * The text classification resource.
+   */
+  export interface TextClassificationResource {
+    /** Common metadata for a resource where `project_id` or `space_id` must be present. */
+    metadata?: TextExtractionMetadata;
+    /** The document details for the text classification. */
+    entity?: TextClassificationResourceEntity;
+  }
+
+  /**
+   * The document details for the text classification.
+   */
+  export interface TextClassificationResourceEntity {
+    /** A reference to data. */
+    document_reference: TextClassificationDataReference;
+    /** The parameters for the text extraction. */
+    parameters: TextClassificationParameters;
+    /** User defined properties specified as key-value pairs. */
+    custom?: JsonObject;
+    /** The current status of the text extraction. */
+    results: TextClassificationResults;
+  }
+
+  /**
+   * A paginated list of resources.
+   */
+  export interface TextClassificationResources {
+    /** The total number of resources. Computed explicitly only when `total_count=true` query parameter is present.
+     *  This is in order to avoid performance penalties.
+     */
+    total_count?: number;
+    /** The number of items to return in each page. */
+    limit: number;
+    /** The reference to the first item in the current page. */
+    first: PaginationFirst;
+    /** A reference to the first item of the next page, if any. */
+    next?: PaginationNext;
+    /** A list of resources. */
+    resources?: TextClassificationResource[];
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
+  /**
+   * The text classification response.
+   */
+  export interface TextClassificationResponse {
+    /** Common metadata for a resource where `project_id` or `space_id` must be present. */
+    metadata?: TextExtractionMetadata;
+    /** The document details for the text classification. */
+    entity?: TextClassificationResourceEntity;
+    /** Optional details coming from the service and related to the API call or the associated resource. */
+    system?: SystemDetails;
+  }
+
+  /**
+   * The current status of the text extraction.
+   */
+  export interface TextClassificationResults {
+    /** The status of the request. */
+    status: TextClassificationResults.Constants.Status | string;
+    /** The time when the request is successfully running on the processor. */
+    running_at?: string;
+    /** The time when the request completed or failed. */
+    completed_at?: string;
+    /** A flag to indicate if the classification was found. */
+    document_classified?: boolean;
+    /** The classification of the document if found. */
+    document_type?: string;
+    /** A service error message. */
+    error?: ServiceError;
+  }
+  export namespace TextClassificationResults {
+    export namespace Constants {
+      /** The status of the request. */
+      export enum Status {
+        SUBMITTED = 'submitted',
+        UPLOADING = 'uploading',
+        RUNNING = 'running',
+        DOWNLOADING = 'downloading',
+        DOWNLOADED = 'downloaded',
+        COMPLETED = 'completed',
+        FAILED = 'failed',
+      }
+    }
+  }
+
+  /**
+   * Additional configuration settings for the Semantic KVP model.
+   */
+  export interface TextClassificationSemanticConfig {
+    /** Sets the merge strategy of the predefined and user defined input schemas. */
+    schemas_merge_strategy?:
+      | TextClassificationSemanticConfig.Constants.SchemasMergeStrategy
+      | string;
+    /** Specifies custom schemas that should be used for semantic KVP extraction, outside the predefined schemas. */
+    schemas?: TextExtractionSchema[];
+  }
+  export namespace TextClassificationSemanticConfig {
+    export namespace Constants {
+      /** Sets the merge strategy of the predefined and user defined input schemas. */
+      export enum SchemasMergeStrategy {
+        MERGE = 'merge',
+        REPLACE = 'replace',
+      }
+    }
+  }
+
+  /**
+   * A custom schemas.
+   */
+  export interface TextExtractionSchema {
+    /** Should be a short one or two word title like Passport or Bill Of Lading. */
+    document_type: string;
+    /** Should be one or two sentences to ensure the LLM gets an accurate understanding. */
+    document_description: string;
+    /** Specifies if the input image should be downscaled. Defaults to the value defined in the `semantic_config`
+     *  section.
+     */
+    target_image_width?: number;
+    /** Determines whether to use text hints when extracting values for this schema and the generic KVPs. Defaults
+     *  to the value defined in the `semantic_config` section.
+     */
+    enable_text_hints?: boolean;
+    /** Deprecated: Indicates whether to perform generic Key-Value Pair (KVP) extraction and output the generic KVPs
+     *  along with the semantic KVPs extracted with this custom schema. Defaults to the value defined in the
+     *  `semantic_config` section.
+     */
+    enable_generic_kvp?: boolean;
+    /** A mapping of fields to identify within the schema, where each key is the short-form name of the field, and
+     *  the corresponding value is an object is a schema as defined below.
+     */
+    fields?: TextExtractionSemanticKVPField;
+  }
+
+  /**
+   * A mapping of fields to identify within the schema, where each key is the short-form name of the field, and the
+   * corresponding value is an object is a schema as defined below.
+   */
+  export interface TextExtractionSemanticKVPField {
+    /** Description of the field to identify. */
+    description: string;
+    /** An example value to help inform the LLM of structure and format. */
+    example: string;
+    /** Required for inferred fields to provide the available_options list of values to return from. */
+    available_options?: string[];
+  }
+
   /*************************
    * pager classes
    ************************/
@@ -12534,6 +13198,86 @@ namespace WatsonxAiMlVml_v1 {
     }
   }
 
+  /**
+   * TextClassificationsPager can be used to simplify the use of listTextClassifications().
+   */
+  export class TextClassificationsPager {
+    protected _hasNext: boolean;
+
+    protected pageContext: any;
+
+    protected client: WatsonxAiMlVml_v1;
+
+    protected params: WatsonxAiMlVml_v1.ListTextClassificationsParams;
+
+    /**
+     * Construct a TextClassificationsPager object.
+     *
+     * @param {WatsonxAiMlVml_v1}  client - The service client instance used to invoke listTextClassifications()
+     * @param {Object} [params] - The parameters to be passed to listTextClassifications()
+     * @constructor
+     */
+    constructor(
+      client: WatsonxAiMlVml_v1,
+      params?: WatsonxAiMlVml_v1.ListTextClassificationsParams
+    ) {
+      if (params && params.start) {
+        throw new Error(`the params.start field should not be set`);
+      }
+
+      this._hasNext = true;
+      this.pageContext = { next: undefined };
+      this.client = client;
+      this.params = params || {};
+    }
+
+    /**
+     * Returns true if there are potentially more results to be retrieved by invoking getNext().
+     * @returns {boolean}
+     */
+    public hasNext(): boolean {
+      return this._hasNext;
+    }
+
+    /**
+     * Returns the next page of results by invoking listTextClassifications().
+     * @returns {Promise<WatsonxAiMlVml_v1.TextClassificationResource[]>}
+     */
+    public async getNext(): Promise<WatsonxAiMlVml_v1.TextClassificationResource[]> {
+      if (!this.hasNext()) {
+        throw new Error('No more results available');
+      }
+
+      if (this.pageContext.next) {
+        this.params.start = this.pageContext.next;
+      }
+      const response = await this.client.listTextClassifications(this.params);
+      const { result } = response;
+
+      const next = result?.next?.href ? getQueryParam(result.next.href, 'start') : null;
+
+      this.pageContext.next = next;
+      if (!next) {
+        this._hasNext = false;
+      }
+      if (!result.resources) throw new Error('No `resources` in the response.');
+      return result.resources;
+    }
+
+    /**
+     * Returns all results by invoking listTextClassifications() repeatedly until all pages of results have been retrieved.
+     * @returns {Promise<WatsonxAiMlVml_v1.TextClassificationResource[]>}
+     */
+    public async getAll(): Promise<WatsonxAiMlVml_v1.TextClassificationResource[]> {
+      const results: TextClassificationResource[] = [];
+      while (this.hasNext()) {
+        const nextPage = await this.getNext();
+        results.push(...nextPage);
+      }
+      return results;
+    }
+  }
+
   /** Chunk interface when returnObject=true in stream */
   export interface ObjectStreamed<T> {
     id: number;
@@ -12912,3 +13656,10 @@ export import ListPromptsPager = WatsonxAiMlVml_v1.ListPromptsPager;
 export import ListSpacesPager = WatsonxAiMlVml_v1.ListSpacesPager;
 export import ObjectStreamed = WatsonxAiMlVml_v1.ObjectStreamed;
 export import CallbackHandler = WatsonxAiMlVml_v1.CallbackHandler;
+export import TextClassificationParams = WatsonxAiMlVml_v1.TextClassificationParams;
+export import TextExtractionSemanticKVPField = WatsonxAiMlVml_v1.TextExtractionSemanticKVPField;
+export import ListTextClassificationsParams = WatsonxAiMlVml_v1.ListTextClassificationsParams;
+export import TextClassificationDataReference = WatsonxAiMlVml_v1.TextClassificationDataReference;
+export import TextClassificationResults = WatsonxAiMlVml_v1.TextClassificationResults;
+export import TextClassificationGetParams = WatsonxAiMlVml_v1.TextClassificationGetParams;
+export import TextClassificationDeleteParams = WatsonxAiMlVml_v1.TextClassificationDeleteParams;

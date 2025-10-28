@@ -1,4 +1,4 @@
-const examples: [string, string][] = [
+export const examples: [string, string][] = [
   ['Text generation', 'example_list_models_and_generate_text.ts'],
   ['Generate text with prompt', 'example_prompt_generate_text.ts'],
   ['Stream generated text', 'example_prompt_generate_stream_text.ts'],

@@ -1,7 +1,7 @@
 import { WatsonxRerank } from '@langchain/community/document_compressors/ibm';
-import { MemoryVectorStore } from 'langchain/vectorstores/memory';
+import { MemoryVectorStore } from '@langchain/classic/vectorstores/memory';
 import { WatsonxEmbeddings } from '@langchain/community/embeddings/ibm';
-import { CharacterTextSplitter } from 'langchain/text_splitter';
+import { CharacterTextSplitter } from '@langchain/textsplitters';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
 

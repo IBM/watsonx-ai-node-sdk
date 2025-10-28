@@ -3,7 +3,7 @@ import { HumanMessage } from '@langchain/core/messages';
 import { conversationPrinter } from './utils.ts';
 import '../../utils/config.ts';
 
-const modelName = 'mistralai/mistral-medium-2505';
+const modelName = 'ibm/granite-3-2-8b-instruct';
 const tools = [
   {
     type: 'function',

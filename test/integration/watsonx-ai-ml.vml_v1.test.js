@@ -1095,4 +1095,126 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res.result).toBeDefined();
     });
   });
+
+  describe('Text classification (WDU)', () => {
+    let textClassificationID;
+    test('createTextClassification()', async () => {
+      // Request models needed by this operation.
+
+      // CosDataConnection
+      const cosDataConnectionModel = {
+        id: process.env.WATSONX_AI_COS_ID,
+      };
+
+      // CosDataLocation
+      const cosDataLocationModel = {
+        file_name: 'experienced.pdf',
+        bucket: 'wx-nodejs-test-text-extraction',
+      };
+
+      // TextExtractionDataReference
+      const textExtractionDataReferenceModel = {
+        type: 'connection_asset',
+        connection: cosDataConnectionModel,
+        location: cosDataLocationModel,
+      };
+
+      // TextExtractionSemanticKVPField
+      const textExtractionSemanticKVPFieldModel = {
+        description: 'testString',
+        example: 'testString',
+        available_options: ['testString'],
+      };
+
+      // TextExtractionSchema
+      const textExtractionSchemaModel = {
+        document_type: 'testString',
+        document_description: 'testString',
+        target_image_width: 38,
+        enable_text_hints: true,
+        enable_generic_kvp: true,
+        fields: textExtractionSemanticKVPFieldModel,
+      };
+
+      // TextClassificationSemanticConfig
+      const textClassificationSemanticConfigModel = {
+        schemas_merge_strategy: 'merge',
+        schemas: [textExtractionSchemaModel],
+      };
+
+      // TextClassificationParameters
+      const textClassificationParametersModel = {
+        ocr_mode: 'disabled',
+        classification_mode: 'exact',
+        auto_rotation_correction: false,
+      };
+
+      const params = {
+        documentReference: textExtractionDataReferenceModel,
+        parameters: textClassificationParametersModel,
+        projectId,
+      };
+
+      const res = await watsonxAIService.createTextClassification(params);
+      expect(res.status).toBe(201);
+      expect(res.result).toBeDefined();
+      textClassificationID = res.result.metadata.id;
+    });
+
+    test('listTextClassifications()', async () => {
+      const params = {
+        projectId,
+        limit: 50,
+      };
+
+      const res = await watsonxAIService.listTextClassifications(params);
+      expect(res.status).toBe(200);
+      expect(res.result).toBeDefined();
+    });
+
+    test('listTextClassifications() via TextClassificationsPager', async () => {
+      const params = {
+        projectId,
+        limit: 50,
+      };
+
+      const allResults = [];
+
+      // Test getNext().
+      let pager = new WatsonXAI.TextClassificationsPager(watsonxAIService, params);
+      while (pager.hasNext()) {
+        const nextPage = await pager.getNext();
+        expect(nextPage).not.toBeNull();
+        allResults.push(...nextPage);
+      }
+
+      // Test getAll().
+      pager = new WatsonXAI.TextClassificationsPager(watsonxAIService, params);
+      const allItems = await pager.getAll();
+      expect(allItems.length).toBeGreaterThanOrEqual(1);
+    });
+
+    test('getTextClassification()', async () => {
+      const params = {
+        id: textClassificationID,
+        projectId,
+      };
+
+      const res = await watsonxAIService.getTextClassification(params);
+      expect(res.status).toBe(200);
+      expect(res.result).toBeDefined();
+    });
+
+    test('deleteTextClassification()', async () => {
+      const params = {
+        id: textClassificationID,
+        projectId,
+        hardDelete: true,
+      };
+
+      const res = await watsonxAIService.deleteTextClassification(params);
+      expect(res.status).toBe(204);
+      expect(res.result).toBeDefined();
+    });
+  });
 });

@@ -4558,6 +4558,21 @@ describe('WatsonXAI', () => {
         const temperature = 0;
         const topP = 1;
         const timeLimit = 1000;
+        const guidedChoice = ['positive', 'negative'];
+        const guidedRegex = '^[A-Z]{1}-\\d{2}$';
+        const guidedGrammar = 'Color -> "red" | "green" | "blue"';
+        const guidedJSON = {
+          'guided_json': {
+            'type': 'object',
+            'properties': {
+              'name': { 'type': 'string' },
+              'age': { 'type': 'integer', 'minimum': 0 },
+              'email': { 'type': 'string', 'format': 'email' },
+            },
+            'required': ['name', 'age'],
+          },
+        };
+
         const { signal } = new AbortController();
         const textChatParams = {
           modelId,
@@ -4582,6 +4597,10 @@ describe('WatsonXAI', () => {
           topP,
           timeLimit,
           signal,
+          guidedChoice,
+          guidedRegex,
+          guidedGrammar,
+          guidedJSON,
         };
 
         const textChatResult = watsonxAIService.textChat(textChatParams);
@@ -4619,6 +4638,10 @@ describe('WatsonXAI', () => {
         expect(mockRequestOptions.body.stop).toEqual(stop);
         expect(mockRequestOptions.body.temperature).toEqual(temperature);
         expect(mockRequestOptions.body.top_p).toEqual(topP);
+        expect(mockRequestOptions.body.guided_choice).toEqual(guidedChoice);
+        expect(mockRequestOptions.body.guided_regex).toEqual(guidedRegex);
+        expect(mockRequestOptions.body.guided_grammar).toEqual(guidedGrammar);
+        expect(mockRequestOptions.body.guided_json).toEqual(guidedJSON);
         expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
@@ -4761,6 +4784,20 @@ describe('WatsonXAI', () => {
         const temperature = 1;
         const topP = 1;
         const timeLimit = 600000;
+        const guidedChoice = ['positive', 'negative'];
+        const guidedRegex = '^[A-Z]{1}-\\d{2}$';
+        const guidedGrammar = 'Color -> "red" | "green" | "blue"';
+        const guidedJSON = {
+          'guided_json': {
+            'type': 'object',
+            'properties': {
+              'name': { 'type': 'string' },
+              'age': { 'type': 'integer', 'minimum': 0 },
+              'email': { 'type': 'string', 'format': 'email' },
+            },
+            'required': ['name', 'age'],
+          },
+        };
         const { signal } = new AbortController();
         const textChatStreamParams = {
           modelId,
@@ -4784,6 +4821,10 @@ describe('WatsonXAI', () => {
           temperature,
           topP,
           timeLimit,
+          guidedChoice,
+          guidedRegex,
+          guidedGrammar,
+          guidedJSON,
           signal,
         };
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
@@ -4823,6 +4864,10 @@ describe('WatsonXAI', () => {
         expect(mockRequestOptions.body.temperature).toEqual(temperature);
         expect(mockRequestOptions.body.top_p).toEqual(topP);
         expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);
+        expect(mockRequestOptions.body.guided_choice).toEqual(guidedChoice);
+        expect(mockRequestOptions.body.guided_regex).toEqual(guidedRegex);
+        expect(mockRequestOptions.body.guided_grammar).toEqual(guidedGrammar);
+        expect(mockRequestOptions.body.guided_json).toEqual(guidedJSON);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
@@ -9482,6 +9527,433 @@ describe('WatsonXAI', () => {
         await expect(watsonxAIService.deploymentsTimeSeriesForecast()).rejects.toThrow(
           /Missing required parameters/
         );
+      });
+    });
+  });
+  describe('createTextClassification', () => {
+    describe('positive tests', () => {
+      // Request models needed by this operation.
+
+      // CosDataConnection
+      const cosDataConnectionModel = {
+        id: 'testString',
+      };
+
+      // CosDataLocation
+      const cosDataLocationModel = {
+        file_name: '/results/',
+        bucket: 'testString',
+        path: 'testString',
+      };
+
+      // TextClassificationDataReference
+      const textClassificationDataReferenceModel = {
+        type: 'connection_asset',
+        connection: cosDataConnectionModel,
+        location: cosDataLocationModel,
+      };
+
+      // TextExtractionSemanticKVPField
+      const textExtractionSemanticKVPFieldModel = {
+        description: 'testString',
+        example: 'testString',
+        available_options: ['testString'],
+      };
+
+      // TextExtractionSchema
+      const textExtractionSchemaModel = {
+        document_type: 'testString',
+        document_description: 'testString',
+        target_image_width: 38,
+        enable_text_hints: true,
+        enable_generic_kvp: true,
+        fields: textExtractionSemanticKVPFieldModel,
+      };
+
+      // TextClassificationSemanticConfig
+      const textClassificationSemanticConfigModel = {
+        schemas_merge_strategy: 'merge',
+        schemas: [textExtractionSchemaModel],
+      };
+
+      // TextClassificationParameters
+      const textClassificationParametersModel = {
+        ocr_mode: 'disabled',
+        classification_mode: 'exact',
+        auto_rotation_correction: false,
+        languages: ['testString'],
+        semantic_config: textClassificationSemanticConfigModel,
+      };
+
+      function __textClassificationTest() {
+        // Construct the params object for operation createTextClassification
+        const documentReference = textClassificationDataReferenceModel;
+        const parameters = textClassificationParametersModel;
+        const custom = { name: 'model', size: 2 };
+        const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
+        const spaceId = '3fc54cf1-252f-424b-b52d-5cdd9814987f';
+        const textClassificationParams = {
+          documentReference,
+          parameters,
+          custom,
+          projectId,
+          spaceId,
+        };
+
+        const textClassificationResult =
+          watsonxAIService.createTextClassification(textClassificationParams);
+
+        // all methods should return a Promise
+        expectToBePromise(textClassificationResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/text/classifications', 'POST');
+        const expectedAccept = 'application/json';
+        const expectedContentType = expectedAccept;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.body.document_reference).toEqual(documentReference);
+        expect(mockRequestOptions.body.parameters).toEqual(parameters);
+        expect(mockRequestOptions.body.custom).toEqual(custom);
+        expect(mockRequestOptions.body.project_id).toEqual(projectId);
+        expect(mockRequestOptions.body.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __textClassificationTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.enableRetries();
+        __textClassificationTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.disableRetries();
+        __textClassificationTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const documentReference = textClassificationDataReferenceModel;
+        const parameters = textClassificationParametersModel;
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const textClassificationParams = {
+          documentReference,
+          parameters,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAIService.createTextClassification(textClassificationParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        await expect(watsonxAIService.createTextClassification({})).rejects.toThrow();
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        await expect(watsonxAIService.createTextClassification()).rejects.toThrow();
+      });
+    });
+  });
+
+  describe('listTextClassifications', () => {
+    describe('positive tests', () => {
+      function __listTextClassificationsTest() {
+        // Construct the params object for operation listTextClassifications
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const start = 'testString';
+        const limit = 50;
+        const listTextClassificationsParams = {
+          spaceId,
+          projectId,
+          start,
+          limit,
+        };
+
+        const listTextClassificationsResult = watsonxAIService.listTextClassifications(
+          listTextClassificationsParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(listTextClassificationsResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/text/classifications', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.start).toEqual(start);
+        expect(mockRequestOptions.qs.limit).toEqual(limit);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __listTextClassificationsTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.enableRetries();
+        __listTextClassificationsTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.disableRetries();
+        __listTextClassificationsTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const listTextClassificationsParams = {
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAIService.listTextClassifications(listTextClassificationsParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+
+      test('should not have any problems when no parameters are passed in', () => {
+        // invoke the method with no parameters
+        watsonxAIService.listTextClassifications({});
+        checkForSuccessfulExecution(createRequestMock);
+      });
+    });
+
+    describe('TextClassificationsPager tests', () => {
+      const serviceUrl = watsonxAIServiceOptions.url;
+      const path = '/ml/v1/text/classifications';
+      const mockPagerResponse1 =
+        '{"next":{"href":"https://myhost.com/somePath?start=1"},"total_count":2,"limit":1,"resources":[{"metadata":{"id":"id","created_at":"2019-01-01T12:00:00.000Z","space_id":"3fc54cf1-252f-424b-b52d-5cdd9814987f","project_id":"12ac4cf1-252f-424b-b52d-5cdd9814987f"},"entity":{"document_reference":{"type":"connection_asset","connection":{"id":"id"},"location":{"file_name":"/results/","bucket":"bucket","path":"path"}},"parameters":{"ocr_mode":"disabled","classification_mode":"exact","auto_rotation_correction":false,"languages":["languages"],"semantic_config":{"schemas_merge_strategy":"merge","schemas":[{"document_type":"document_type","document_description":"document_description","target_image_width":18,"enable_text_hints":false,"enable_generic_kvp":true,"fields":{"description":"description","example":"example","available_options":["available_options"]}}]}},"custom":{"anyKey":"anyValue"},"results":{"status":"submitted","running_at":"2019-01-01T12:00:00.000Z","completed_at":"2019-01-01T12:00:00.000Z","document_classified":false,"document_type":"document_type","error":{"code":"code","message":"message","more_info":"more_info"}}}}]}';
+      const mockPagerResponse2 =
+        '{"total_count":2,"limit":1,"resources":[{"metadata":{"id":"id","created_at":"2019-01-01T12:00:00.000Z","space_id":"3fc54cf1-252f-424b-b52d-5cdd9814987f","project_id":"12ac4cf1-252f-424b-b52d-5cdd9814987f"},"entity":{"document_reference":{"type":"connection_asset","connection":{"id":"id"},"location":{"file_name":"/results/","bucket":"bucket","path":"path"}},"parameters":{"ocr_mode":"disabled","classification_mode":"exact","auto_rotation_correction":false,"languages":["languages"],"semantic_config":{"schemas_merge_strategy":"merge","schemas":[{"document_type":"document_type","document_description":"document_description","target_image_width":18,"enable_text_hints":false,"enable_generic_kvp":true,"fields":{"description":"description","example":"example","available_options":["available_options"]}}]}},"custom":{"anyKey":"anyValue"},"results":{"status":"submitted","running_at":"2019-01-01T12:00:00.000Z","completed_at":"2019-01-01T12:00:00.000Z","document_classified":false,"document_type":"document_type","error":{"code":"code","message":"message","more_info":"more_info"}}}}]}';
+
+      beforeEach(() => {
+        unmock_createRequest();
+        const scope = nock(serviceUrl)
+          .get((uri) => uri.includes(path))
+          .reply(200, mockPagerResponse1)
+          .get((uri) => uri.includes(path))
+          .reply(200, mockPagerResponse2);
+      });
+
+      afterEach(() => {
+        nock.cleanAll();
+        mock_createRequest();
+      });
+
+      test('getNext()', async () => {
+        const params = {
+          spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
+          projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
+          limit: 50,
+        };
+        const allResults = [];
+        const pager = new WatsonXAI.TextClassificationsPager(watsonxAIService, params);
+        while (pager.hasNext()) {
+          const nextPage = await pager.getNext();
+          expect(nextPage).not.toBeNull();
+          allResults.push(...nextPage);
+        }
+
+        expect(allResults).toHaveLength(2);
+      });
+
+      test('getAll()', async () => {
+        const params = {
+          spaceId: '63dc4cf1-252f-424b-b52d-5cdd9814987f',
+          projectId: 'a77190a2-f52d-4f2a-be3d-7867b5f46edc',
+          limit: 50,
+        };
+        const pager = new WatsonXAI.TextClassificationsPager(watsonxAIService, params);
+        const allResults = await pager.getAll();
+
+        expect(allResults).toHaveLength(2);
+      });
+    });
+  });
+
+  describe('getTextClassification', () => {
+    describe('positive tests', () => {
+      function __getTextClassificationTest() {
+        // Construct the params object for operation getTextClassification
+        const id = 'testString';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const getTextClassificationParams = {
+          id,
+          spaceId,
+          projectId,
+        };
+
+        const getTextClassificationResult = watsonxAIService.getTextClassification(
+          getTextClassificationParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(getTextClassificationResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/text/classifications/{id}', 'GET');
+        const expectedAccept = 'application/json';
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __getTextClassificationTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.enableRetries();
+        __getTextClassificationTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.disableRetries();
+        __getTextClassificationTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const getTextClassificationParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAIService.getTextClassification(getTextClassificationParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        await expect(watsonxAIService.getTextClassification({})).rejects.toThrow();
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        await expect(watsonxAIService.getTextClassification()).rejects.toThrow();
+      });
+    });
+  });
+
+  describe('deleteTextClassification', () => {
+    describe('positive tests', () => {
+      function __deleteTextClassificationTest() {
+        // Construct the params object for operation deleteTextClassification
+        const id = 'testString';
+        const spaceId = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
+        const projectId = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
+        const hardDelete = true;
+        const deleteTextClassificationParams = {
+          id,
+          spaceId,
+          projectId,
+          hardDelete,
+        };
+
+        const deleteTextClassificationResult = watsonxAIService.deleteTextClassification(
+          deleteTextClassificationParams
+        );
+
+        // all methods should return a Promise
+        expectToBePromise(deleteTextClassificationResult);
+
+        // assert that create request was called
+        expect(createRequestMock).toHaveBeenCalledTimes(1);
+
+        const mockRequestOptions = getOptions(createRequestMock);
+
+        checkUrlAndMethod(mockRequestOptions, '/ml/v1/text/classifications/{id}', 'DELETE');
+        const expectedAccept = undefined;
+        const expectedContentType = undefined;
+        checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+        expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
+        expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
+        expect(mockRequestOptions.qs.project_id).toEqual(projectId);
+        expect(mockRequestOptions.qs.hard_delete).toEqual(hardDelete);
+        expect(mockRequestOptions.path.id).toEqual(id);
+      }
+
+      test('should pass the right params to createRequest with enable and disable retries', () => {
+        // baseline test
+        __deleteTextClassificationTest();
+
+        // enable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.enableRetries();
+        __deleteTextClassificationTest();
+
+        // disable retries and test again
+        createRequestMock.mockClear();
+        watsonxAIService.disableRetries();
+        __deleteTextClassificationTest();
+      });
+
+      test('should prioritize user-given headers', () => {
+        // parameters
+        const id = 'testString';
+        const userAccept = 'fake/accept';
+        const userContentType = 'fake/contentType';
+        const deleteTextClassificationParams = {
+          id,
+          headers: {
+            Accept: userAccept,
+            'Content-Type': userContentType,
+          },
+        };
+
+        watsonxAIService.deleteTextClassification(deleteTextClassificationParams);
+        checkMediaHeaders(createRequestMock, userAccept, userContentType);
+      });
+    });
+
+    describe('negative tests', () => {
+      test('should enforce required parameters', async () => {
+        await expect(watsonxAIService.deleteTextClassification({})).rejects.toThrow();
+      });
+
+      test('should reject promise when required params are not given', async () => {
+        await expect(watsonxAIService.deleteTextClassification()).rejects.toThrow();
       });
     });
   });

@@ -1,15 +1,13 @@
 import { WatsonxEmbeddings } from '@langchain/community/embeddings/ibm';
-import { pull } from 'langchain/hub';
-import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { ChatWatsonx } from '@langchain/community/chat_models/ibm';
-import { createStuffDocumentsChain } from 'langchain/chains/combine_documents';
-import { StringOutputParser } from '@langchain/core/output_parsers';
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-import { MemoryVectorStore } from 'langchain/vectorstores/memory';
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
+import { MemoryVectorStore } from '@langchain/classic/vectorstores/memory';
+import { createAgent, tool } from 'langchain';
+import z from 'zod/v3';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
 
-const modelName = 'mistralai/mistral-medium-2505';
+const modelName = 'ibm/granite-3-2-8b-instruct';
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
@@ -48,7 +46,6 @@ for (const documents of documentsArray) {
   i += 1;
 }
 
-const retriever = vectorStore.asRetriever();
 const llm = new ChatWatsonx({
   projectId: process.env.WATSONX_AI_PROJECT_ID,
   serviceUrl: process.env.WATSONX_AI_SERVICE_URL as string,
@@ -58,13 +55,35 @@ const llm = new ChatWatsonx({
   model: modelName,
   maxRetries: 0,
 });
-const prompt = await pull<ChatPromptTemplate>('rlm/rag-prompt');
 
-const ragChain = await createStuffDocumentsChain({
-  llm,
-  prompt,
-  outputParser: new StringOutputParser(),
+const retrieveSchema = z.object({ query: z.string() });
+
+const retrieve = tool(
+  async ({ query }) => {
+    const searchResult = 2;
+    const retrievedDocs = await vectorStore.similaritySearch(query, searchResult);
+    const serialized = retrievedDocs
+      .map((doc) => `Source: ${doc.metadata.source}\nContent: ${doc.pageContent}`)
+      .join('\n');
+    return [serialized, retrievedDocs];
+  },
+  {
+    name: 'retrieve',
+    description: 'Retrieve information related to a query.',
+    schema: retrieveSchema,
+    responseFormat: 'content_and_artifact',
+  }
+);
+const systemPrompt =
+  'You have access to a tool that retrieves context from a blog post. ' +
+  'Use the tool to help answer user queries.';
+
+const agent = createAgent({
+  model: llm,
+  tools: [retrieve],
+  systemPrompt,
 });
+
 const questions: [number, string, string][] = [
   [
     0,
@@ -73,13 +92,9 @@ const questions: [number, string, string][] = [
   ],
 ];
 for (const [index, [_qid, question, answer]] of questions.entries()) {
-  const retrievedDocs = await retriever.invoke(question);
-  const result = await ragChain.invoke({
-    question,
-    context: retrievedDocs,
-  });
+  const result = await agent.invoke({ messages: [{ role: 'user', content: question }] });
   console.log(`============================= Question #${index + 1} =============================`);
   console.log('\t' + question + '\n');
-  console.log('Model answer: ' + result + '\n');
+  console.log('Model answer: ' + result.messages.at(-1)?.content + '\n');
   console.log('Expected answer: ' + answer + '\n');
 }

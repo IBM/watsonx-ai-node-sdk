@@ -20,7 +20,7 @@ const config: Config = {
   transformIgnorePatterns: ['/node_modules/(?!(?:@ibm-cloud/watsonx-ai)/)', '/\\.yalc/'],
   extensionsToTreatAsEsm: ['.ts', '.mts'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { useESM: true }],
+    '^.+\\.tsx?$': ['@swc/jest', { module: { type: 'module' } }],
   },
 };
 

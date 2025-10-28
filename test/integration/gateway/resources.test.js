@@ -16,9 +16,9 @@ const describe = authHelper.prepareTests(configFile);
 authHelper.loadEnv();
 
 const version = '2024-03-14';
-const modelName = 'mistralai/mistral-medium-2505';
-const modelAlias = 'mistral-medium';
-const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
+const modelName = 'ibm/granite-3-2-8b-instruct';
+const modelAlias = 'ibm/granite-3-2-8b-instruct';
+const serviceUrl = process.env.WATSONX_AI_GATEWAY_URL;
 
 describe('Resources', () => {
   jest.setTimeout(timeout);

@@ -11,6 +11,7 @@ sed -i "s|<PROJECT_ID>|$(get_env watsonx-ai-project-id)|g" "${CONFIG_FILE_NAME}"
 sed -i "s|<SERVICE_URL>|$(get_env watsonx-ai-service-url)|g" "${CONFIG_FILE_NAME}"
 
 cat >> "${CONFIG_FILE_NAME}" <<EOF
+WATSONX_AI_GATEWAY_URL=$(get_env watsonx-ai-gateway-url)
 TRAINING_ASSET_ID=$(get_env training-asset-id)
 WATSONX_AI_COS_ID=$(get_env watsonx-ai-cos-id)
 WATSONX_AI_COS_CRN_ID=$(get_env watsonx-ai-cos-crn-id)

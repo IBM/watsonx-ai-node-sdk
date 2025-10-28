@@ -37,17 +37,18 @@
   },
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
-    "@langchain/community": "^0.3.57",
-    "@langchain/core": "^0.3.19",
-    "@langchain/langgraph": "^0.4.9",
+    "@langchain/community": "^1.0.0",
+    "@langchain/core": "^1.0.1",
+    "@langchain/langgraph": "^1.0.1",
     "@zilliz/milvus2-sdk-node": "^2.5.0",
     "axios": "^1.7.8",
     "cheerio": "^1.0.0",
     "dotenv": "^16.4.5",
-    "duck-duck-scrape": "^2.2.6",
-    "langchain": "^0.3.26",
+    "duck-duck-scrape": "^2.2.7",
+    "langchain": "^1.0.1",
+    "langsmith": "^0.3.74",
     "papaparse": "^5.5.3",
-    "zod": "^3.23.8"
+    "zod": "^3.25.76 || ^4"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",

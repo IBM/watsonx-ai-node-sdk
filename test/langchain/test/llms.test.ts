@@ -1,13 +1,14 @@
 /* eslint-disable no-await-in-loop */
 import { WatsonxLLM } from '@langchain/community/llms/ibm';
 import { config } from 'dotenv';
+import { models } from './config.ts';
 
 config({ path: '../../credentials/watsonx_ai_ml_vml_v1.env' });
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const spaceId = process.env.WATSONX_AI_SPACE_ID;
 const version = '2024-05-31';
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
-const model = 'mistralai/mistral-medium-2505';
+const model = models[1];
 
 describe('Regression tests regarding langchain llms', () => {
   describe('Positive tests', () => {

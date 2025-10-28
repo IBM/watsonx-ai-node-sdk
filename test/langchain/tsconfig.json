@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "target": "esnext",
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "resolveJsonModule": true,
@@ -12,10 +11,7 @@
     "esModuleInterop": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "paths": {
-      "@ibm-cloud/watsonx-ai": ["../../watsonx-ai-ml"]
-    },
-    "isolatedModules": true,
+    "isolatedModules": false,
     "allowJs": true
   }
 }

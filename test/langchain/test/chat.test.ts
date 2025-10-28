@@ -2,12 +2,12 @@
 
 import { ChatWatsonx } from '@langchain/community/chat_models/ibm';
 import { ToolCall } from '@langchain/core/messages/tool';
-import { tool } from '@langchain/core/tools';
 import { concat } from '@langchain/core/utils/stream';
-import { HumanMessage, AIMessageChunk, AIMessage } from '@langchain/core/messages';
+import { HumanMessage, AIMessageChunk, AIMessage, BaseMessage } from '@langchain/core/messages';
 import { config } from 'dotenv';
 import { z } from 'zod';
 import { models } from './config.ts';
+import { tool } from '@langchain/core/tools';
 
 config({ path: '../../credentials/watsonx_ai_ml_vml_v1.env' });
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
@@ -204,21 +204,21 @@ describe.each(models)('Regression tests regarding langchain chat for model: %s',
               serviceUrl: process.env.WATSONX_AI_SERVICE_URL ?? 'testString',
               projectId: process.env.WATSONX_AI_PROJECT_ID ?? 'testString',
             });
-            const addTool = tool(async (input) => Number(input.a) + Number(input.b), {
+            const addTool = tool(async (input) => input.a + input.b, {
               name: 'add',
               description: 'Adds a and b.',
               schema: z.object({
-                a: z.string(),
-                b: z.string(),
+                a: z.number(),
+                b: z.number(),
               }),
             });
 
-            const multiplyTool = tool(async (input) => Number(input.a) * Number(input.b), {
+            const multiplyTool = tool(async (input) => input.a * input.b, {
               name: 'multiply',
               description: 'Multiplies a and b.',
               schema: z.object({
-                a: z.string(),
-                b: z.string(),
+                a: z.number(),
+                b: z.number(),
               }),
             });
             const tools = [addTool, multiplyTool];
@@ -227,15 +227,15 @@ describe.each(models)('Regression tests regarding langchain chat for model: %s',
               multiply: multiplyTool,
             };
             const modelWithTools = service.bindTools(tools);
-            const messages = [
+            const messages: BaseMessage[] = [
               new HumanMessage(
-                'You are bad at calculations and need to use calculator at all times. What is 3 * 12? Also, what is 11 + 49?'
+                'You are bad at calculations and need to use calculator tool at all times. What is 3 * 12? Also, what is 11 + 49?'
               ),
             ];
             const res = await modelWithTools.stream(messages);
             let toolMessage: AIMessageChunk | undefined;
             for await (const chunk of res) {
-              toolMessage = toolMessage !== undefined ? concat(toolMessage, chunk) : chunk;
+              toolMessage = toolMessage !== undefined ? toolMessage?.concat(chunk) : chunk;
             }
             expect(toolMessage).toBeInstanceOf(AIMessageChunk);
             expect(toolMessage?.tool_calls).toBeDefined();

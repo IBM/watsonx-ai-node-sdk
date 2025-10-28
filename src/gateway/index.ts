@@ -19,8 +19,19 @@
 /**
  * @module gateway
  */
-export { GenerateTextCompletions, TextCompletionStream, ChatObjectStream } from './completions';
+export {
+  GenerateTextCompletions,
+  TextCompletionStream,
+  ChatObjectStream,
+  Completions,
+  ChatCompletions,
+  EmbeddingCompletions,
+  CompletionResult,
+  ChatCompletionResult,
+} from './completions';
+
 export { Gateway, Chat, Embeddings } from './gateway';
 export { Models } from './models';
 export { Providers } from './providers';
+export { Policies } from './policies';
 export * from './types/index';
