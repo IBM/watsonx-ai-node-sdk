@@ -33,4 +33,3 @@ Please make sure that your PR fulfills the following requirements:
 
 ## Other information
 <!-- Please add any additional information that would help reviewers evaluate your PR -->
-- [ ] Tests for InstructLab were run locally

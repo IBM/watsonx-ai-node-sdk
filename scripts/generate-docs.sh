@@ -22,7 +22,8 @@ DOC_FILES=()
 for TAG in ${SELECTED_TAGS} ; do
     git checkout "${TAG}"
     if [[ "$(printf '%s\n%s' "$TREE_CHANGE_VERSION" "$TAG" | sort -V | head -n1)" == "$TREE_CHANGE_VERSION" ]]; then
-        npm run typedoc src/ -- --json "${TAG%.*}.json" --name "${TAG%.*}.x"
+        npm run typedoc -- --json "${TAG%.*}.json" --name "${TAG%.*}.x"
+        node scripts/utils/rework-docs-tree.cjs "${TAG%.*}.json"
     else
         npm run typedoc -- --json "${TAG%.*}.json" --name "${TAG%.*}.x"
     fi
