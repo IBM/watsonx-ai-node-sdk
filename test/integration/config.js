@@ -1,3 +1,3 @@
-const chatModel = 'meta-llama/llama-3-3-70b-instruct';
+const chatModel = 'ibm/granite-3-2-8b-instruct';
 
 module.exports = { chatModel };

@@ -23,6 +23,7 @@ import { ChatCompletions, EmbeddingCompletions, GenerateTextCompletions } from '
 import { Models } from './models';
 import { Providers } from './providers';
 import { Policies } from './policies';
+import { RateLimits } from './ratelimit';
 
 /**
  * Represents the chat functionality of the gateway.
@@ -92,6 +93,8 @@ export class Gateway extends APIBaseService {
 
   policies: Policies;
 
+  rateLimit: RateLimits;
+
   /**
    * Constructs an instance of Gateway with passed in options and external configuration.
    *
@@ -113,5 +116,6 @@ export class Gateway extends APIBaseService {
     this.models = new Models(this);
     this.providers = new Providers(this);
     this.policies = new Policies(this);
+    this.rateLimit = new RateLimits(this);
   }
 }

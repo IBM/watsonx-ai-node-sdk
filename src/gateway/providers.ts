@@ -35,6 +35,7 @@ import {
   ProviderResponse,
 } from './types/providers/response';
 import { Response } from '../base/types/base';
+import { validateRequiredOneOf } from './utils/utils';
 
 /**
  * Class representing the Providers resource.
@@ -46,17 +47,20 @@ export class Providers extends GatewayResource {
    * @param {string} params.providerName - Name of the selected provider. Allowed names: watsonxai, anthropic, openai, nim, azure-openai, bedrock, cerebas
    * @param {string} params.name - Name can only contain alphanumeric characters, single spaces (no consecutive spaces),
    * hyphens (-), parentheses (), and square brackets []. No leading or trailing spaces are allowed.
-   * @param {Object} params.dataReference - Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
+   * @param {Object} [params.dataReference] - Data Reference is a reference to a remote credential store.
+   * For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field.
+   * @param {Object} [params.data] - Contains the credential details for configuring the provider instance. Available only on IBM watsonx.ai software.
    * @param {AbortSignal} [params.signal] - Signal from AbortController
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @returns {Promise<Response<ProviderResponse>> } Resolves with the response from the server.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
   create(params: CreateProviderParams): Promise<Response<ProviderResponse>> {
-    const requiredParams = ['name', 'providerName', 'dataReference'];
+    const requiredParams = ['name', 'providerName'];
     const validParams = [
       'dataReference',
+      'data',
       'name',
       'providerName',
       'description',
@@ -69,13 +73,16 @@ export class Providers extends GatewayResource {
       return Promise.reject(validationErrors);
     }
 
-    const { providerName, dataReference, name, signal, headers } = params;
+    validateRequiredOneOf(params, ['dataReference', 'data']);
+
+    const { providerName, dataReference, data, name, signal, headers } = params;
 
     const path = {
       'provider_name': providerName,
     };
     const body = {
       name,
+      data,
       data_reference: dataReference,
     };
 
@@ -190,21 +197,24 @@ export class Providers extends GatewayResource {
    * @param {UpdateProviderParams} params - The parameters to send to the service.
    * @param {string} params.providerName - Name of the selected provider. Allowed names: watsonxai, anthropic, openai, nim, azure-openai, bedrock, cerebas
    * @param {string} params.providerId - Id of selected provider to be updated
-   * @param {Object} params.dataReference - Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
-   * The Value in the remote store is expected to be a JSON representation of the Data field.
    * @param {string} params.name - Name can only contain alphanumeric characters, single spaces (no consecutive spaces),
    * hyphens (-), parentheses (), and square brackets []. No leading or trailing spaces are allowed.
+   * @param {Object} [params.dataReference] - Data Reference is a reference to a remote credential store.
+   * For example, an IBM Cloud Secrets Manager secret.
+   * The Value in the remote store is expected to be a JSON representation of the Data field.
+   * @param {Object} [params.data] - Contains the credential details for configuring the provider instance. Available only on IBM watsonx.ai software.
    * @param {AbortSignal} [params.signal] - Signal from AbortController
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @returns {Promise<Response<ProviderResponse>> } Resolves with the response from the server.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
   update(params: UpdateProviderParams): Promise<Response<ProviderResponse>> {
-    const requiredParams = ['providerId', 'providerName', 'dataReference', 'name'];
+    const requiredParams = ['providerId', 'providerName', 'name'];
     const validParams = [
       'providerId',
       'providerName',
       'dataReference',
+      'data',
       'name',
       'signal',
       'headers',
@@ -214,10 +224,13 @@ export class Providers extends GatewayResource {
       return Promise.reject(validationErrors);
     }
 
-    const { name, providerName, providerId, dataReference, signal, headers } = params;
+    validateRequiredOneOf(params, ['data', 'dataReference']);
+
+    const { name, providerName, providerId, dataReference, data, signal, headers } = params;
     const body = {
       'name': name,
       'data_reference': dataReference,
+      data,
     };
 
     const path = {

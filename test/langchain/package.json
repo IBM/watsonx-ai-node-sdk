@@ -23,6 +23,10 @@
     "dotenv": "^16.4.5",
     "path": "^0.12.7",
     "ts-jest": "^29.2.5",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  },
+  "overrides": {
+    "expr-eval": "file:./stubs/expr-eval"
   }
 }

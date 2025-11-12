@@ -1,6 +1,6 @@
 {
   "name": "@ibm-cloud/watsonx-ai",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "IBM watsonx.ai Node.js SDK",
   "repository": {
     "type": "git",
@@ -21,6 +21,8 @@
     "format": "prettier --config .prettierrc.js --write \"watsonx-ai-ml\" \"helpers\" \"auth\" \"test\"",
     "build": "./scripts/build",
     "prepublishOnly": "echo 'to publish, run `npm run build && (cd dist; npm publish)`' && exit 1",
+    "preversion": "rm -rf examples/node_modules",
+    "version": "node scripts/utils/check-version.cjs && git add src/version.ts",
     "postversion": "publisher --no-checks --dry-run",
     "local-publish": "npm run build && command -v yalc >/dev/null 2>&1 || npm install -g yalc && (cd dist/ && yalc publish)",
     "install-package-regression": "npm run local-publish && cd ./test/langchain && npm run test-install",

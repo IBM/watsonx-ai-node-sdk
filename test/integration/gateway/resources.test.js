@@ -4,14 +4,16 @@ const { Gateway } = require('../../../dist/gateway/gateway.js');
 const { APIBaseService } = require('../../../dist/base/base.js');
 const authHelper = require('../../resources/auth-helper.js');
 const { Providers } = require('../../../dist/gateway/providers.js');
-const { modelCleanup, providerCleanup } = require('./utils.js');
+const { modelCleanup, providerCleanup, rateLimitCleanup } = require('./utils.js');
 const { Policies } = require('../../../dist/gateway/policies.js');
+const { RateLimits } = require('../../../dist/gateway/ratelimit.js');
 
 // testcase timeout value (20s).
 const timeout = 20000;
 
 // Location of our config file.
 const configFile = path.resolve(__dirname, '../../../credentials/watsonx_ai_ml_vml_v1.env');
+
 const describe = authHelper.prepareTests(configFile);
 authHelper.loadEnv();
 
@@ -366,6 +368,144 @@ describe('Resources', () => {
           const res = await policies.delete({ policyId });
 
           expect(res.status).toBe(204);
+        });
+      });
+    });
+  });
+  describe('RateLimits', () => {
+    describe('RateLimits init', () => {
+      test('Init', async () => {
+        const client = new APIBaseService({
+          version,
+          serviceUrl,
+        });
+        expect(client).toBeInstanceOf(APIBaseService);
+
+        const rateLimit = new RateLimits(client);
+        expect(rateLimit).toBeInstanceOf(RateLimits);
+      });
+    });
+    describe('RateLimits methods', () => {
+      const client = new APIBaseService({
+        version,
+        serviceUrl,
+      });
+      const gateway = new Gateway({
+        version,
+        serviceUrl,
+      });
+      const rateLimit = new RateLimits(client);
+
+      describe('Creation', () => {
+        let rateLimitId;
+        let providerId;
+        let modelId;
+        const timestamp = Date.now();
+
+        beforeAll(async () => {
+          const provider = await gateway.providers.create({
+            providerName: 'watsonxai',
+            name: `wx-nodejs-test-${timestamp}`,
+            dataReference: {
+              resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID,
+            },
+          });
+
+          providerId = provider.result.uuid;
+          const params = {
+            providerId,
+            modelId: modelName,
+            alias: modelAlias,
+          };
+          const res = await gateway.models.create(params);
+          modelId = res.result.uuid;
+        });
+
+        afterAll(async () => {
+          await modelCleanup(gateway.models, modelId);
+          await providerCleanup(gateway.providers, providerId);
+        });
+
+        afterEach(async () => {
+          await rateLimitCleanup(rateLimit, rateLimitId);
+        });
+
+        test('Create rate limit with tenant', async () => {
+          const res = await rateLimit.create({
+            token: { duration: '1m', amount: 10, capacity: 100 },
+            type: 'tenant',
+            request: { duration: '1m', amount: 10, capacity: 100 },
+          });
+          rateLimitId = res.result.uuid;
+          expect(res.result).toBeDefined();
+          expect(res.status).toBe(201);
+        });
+        test('Create rate limit with model', async () => {
+          const res = await rateLimit.create({
+            modelId,
+            token: { duration: '1m', amount: 10, capacity: 100 },
+            type: 'tenant',
+            request: { duration: '1m', amount: 10, capacity: 100 },
+          });
+          rateLimitId = res.result.uuid;
+          expect(res.result).toBeDefined();
+          expect(res.status).toBe(201);
+        });
+        test('Create rate limit with provider', async () => {
+          const res = await rateLimit.create({
+            providerId,
+            token: { duration: '1m', amount: 10, capacity: 100 },
+            type: 'tenant',
+            request: { duration: '1m', amount: 10, capacity: 100 },
+          });
+          rateLimitId = res.result.uuid;
+          expect(res.result).toBeDefined();
+          expect(res.status).toBe(201);
+        });
+      });
+      describe('Manipulation methods', () => {
+        let rateLimitId;
+        beforeAll(async () => {
+          const res = await rateLimit.create({
+            token: { duration: '1m', amount: 10, capacity: 100 },
+            type: 'tenant',
+            request: { duration: '1m', amount: 10, capacity: 100 },
+          });
+          rateLimitId = res.result.uuid;
+        });
+        afterAll(async () => {
+          await rateLimitCleanup(rateLimit, rateLimitId);
+        });
+
+        test('List', async () => {
+          const res = await rateLimit.list();
+
+          expect(res).toBeInstanceOf(Array);
+        });
+
+        test('getDetails with rateLimit ID', async () => {
+          const res = await rateLimit.getDetails({
+            rateLimitId,
+          });
+
+          expect(res.status).toBe(200);
+          expect(res.result).toBeDefined();
+        });
+
+        test('getDetails of multiple items', async () => {
+          const res = await rateLimit.getDetails();
+
+          expect(res.status).toBe(200);
+          expect(res.result.data).toBeInstanceOf(Array);
+        });
+
+        test('delete', async () => {
+          const res = await rateLimit.delete({
+            rateLimitId,
+          });
+
+          expect(res.status).toBe(204);
+          rateLimitId = null;
         });
       });
     });

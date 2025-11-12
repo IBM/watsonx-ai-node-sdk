@@ -4572,6 +4572,10 @@ describe('WatsonXAI', () => {
             'required': ['name', 'age'],
           },
         };
+        const repetitionPenalty = 1.1;
+        const lengthPenalty = 100;
+        const includeReasoning = true;
+        const reasoningEffort = 'low';
 
         const { signal } = new AbortController();
         const textChatParams = {
@@ -4601,6 +4605,10 @@ describe('WatsonXAI', () => {
           guidedRegex,
           guidedGrammar,
           guidedJSON,
+          repetitionPenalty,
+          lengthPenalty,
+          reasoningEffort,
+          includeReasoning,
         };
 
         const textChatResult = watsonxAIService.textChat(textChatParams);
@@ -4642,7 +4650,11 @@ describe('WatsonXAI', () => {
         expect(mockRequestOptions.body.guided_regex).toEqual(guidedRegex);
         expect(mockRequestOptions.body.guided_grammar).toEqual(guidedGrammar);
         expect(mockRequestOptions.body.guided_json).toEqual(guidedJSON);
+        expect(mockRequestOptions.body.repetition_penalty).toEqual(repetitionPenalty);
+        expect(mockRequestOptions.body.length_penalty).toEqual(lengthPenalty);
         expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);
+        expect(mockRequestOptions.body.include_reasoning).toEqual(includeReasoning);
+        expect(mockRequestOptions.body.reasoning_effort).toEqual(reasoningEffort);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
@@ -4798,6 +4810,11 @@ describe('WatsonXAI', () => {
             'required': ['name', 'age'],
           },
         };
+        const repetitionPenalty = 1.1;
+        const lengthPenalty = 100;
+        const includeReasoning = true;
+        const reasoningEffort = 'low';
+
         const { signal } = new AbortController();
         const textChatStreamParams = {
           modelId,
@@ -4825,6 +4842,10 @@ describe('WatsonXAI', () => {
           guidedRegex,
           guidedGrammar,
           guidedJSON,
+          repetitionPenalty,
+          lengthPenalty,
+          reasoningEffort,
+          includeReasoning,
           signal,
         };
         createRequestMock.mockImplementation(() => Promise.resolve({ result: stream }));
@@ -4868,6 +4889,10 @@ describe('WatsonXAI', () => {
         expect(mockRequestOptions.body.guided_regex).toEqual(guidedRegex);
         expect(mockRequestOptions.body.guided_grammar).toEqual(guidedGrammar);
         expect(mockRequestOptions.body.guided_json).toEqual(guidedJSON);
+        expect(mockRequestOptions.body.length_penalty).toEqual(lengthPenalty);
+        expect(mockRequestOptions.body.repetition_penalty).toEqual(repetitionPenalty);
+        expect(mockRequestOptions.body.include_reasoning).toEqual(includeReasoning);
+        expect(mockRequestOptions.body.reasoning_effort).toEqual(reasoningEffort);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 

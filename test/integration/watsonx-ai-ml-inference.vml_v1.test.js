@@ -455,6 +455,23 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res.result.usage.completion_tokens).toBe(10);
     });
 
+    test('textChat with reasoning', async () => {
+      const res = await watsonxAIService.textChat({
+        messages: [
+          {
+            role: 'system',
+            content: 'Do math 2+2',
+          },
+        ],
+        modelId: 'openai/gpt-oss-120b',
+        projectId,
+        includeReasoning: true,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.result.choices[0].message.reasoning_content).toBeDefined();
+    });
+
     test('textChatStream', async () => {
       const res = await watsonxAIService.textChatStream({
         messages: [
@@ -610,6 +627,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
       expect(chunks).toHaveLength(n);
     });
+
     test('textChatStream build-in aborting chunk count', async () => {
       const stream = await watsonxAIService.textChatStream({
         messages: [
@@ -634,6 +652,33 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         expect(e.message).toBe('The operation was aborted');
       }
       expect(chunks).toHaveLength(n);
+    });
+
+    test('textChatStream with reasoning', async () => {
+      const stream = await watsonxAIService.textChatStream({
+        messages: [
+          {
+            role: 'system',
+            content: 'Do math 2+2',
+          },
+        ],
+        modelId: 'openai/gpt-oss-120b',
+        projectId,
+        includeReasoning: true,
+        returnObject: true,
+      });
+
+      const result = {};
+      for await (const chunk of stream) {
+        const message = chunk.data.choices[0];
+        if (message && message.delta) {
+          for (const [key, value] of Object.entries(message.delta)) {
+            result[key] ??= '';
+            result[key] += value;
+          }
+        }
+      }
+      expect(result.reasoning_content.length).toBeGreaterThan(0);
     });
     const modelName = 'mistralai/mistral-medium-2505';
     const models = [modelName, 'ibm/granite-3-8b-instruct', chatModel];

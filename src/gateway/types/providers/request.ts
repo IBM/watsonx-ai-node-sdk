@@ -105,51 +105,6 @@ export interface OpenAIConfig {
   base_url?: string;
 }
 
-/** Parameters for the `replaceNimProvider` operation. */
-export interface ReplaceNimProviderParams extends DefaultParams {
-  /** Provider ID. */
-  providerId: string;
-  /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
-   * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
-  /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
-   *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
-   */
-  name: string;
-  /** Name of provider choosen for updating */
-  providerName: 'nim';
-}
-
-/** Parameters for the `replaceOpenaiProvider` operation. */
-export interface ReplaceOpenaiProviderParams extends DefaultParams {
-  /** Provider ID. */
-  providerId: string;
-  /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
-   * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
-  /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
-   *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
-   */
-  name: string;
-  /** Name of provider choosen for updating */
-  providerName: 'openai';
-}
-
-/** Parameters for the `replaceWatsonxaiProvider` operation. */
-export interface ReplaceWatsonxaiProviderParams extends DefaultParams {
-  /** Provider ID. */
-  providerId: string;
-  /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
-   * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
-  /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
-   *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
-   */
-  name: string;
-  /** Name of provider choosen for updating */
-  providerName: 'watsonxai';
-}
-
 /** Parameters for the `listProviders` operation. */
 export interface ListProvidersParams extends DefaultParams {
   /** Provider ID. */
@@ -167,7 +122,9 @@ export interface ProviderDataReference {
 export interface CreateAnthropicProviderParams extends DefaultParams {
   /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. Available only on IBM watsonx.ai software. */
+  data?: AnthropicConfig;
   /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
    *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
    */
@@ -178,11 +135,13 @@ export interface CreateAnthropicProviderParams extends DefaultParams {
   providerName: 'anthropic';
 }
 
-/** Parameters for the `createAzureOpenaiProvider` operation. */
-export interface CreateAzureOpenaiProviderParams extends DefaultParams {
+/** Parameters for the `createAzureOpenAIProvider` operation. */
+export interface CreateAzureOpenAIProviderParams extends DefaultParams {
   /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. */
+  data?: AzureOpenAIConfig;
   /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
    *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
    */
@@ -197,7 +156,9 @@ export interface CreateAzureOpenaiProviderParams extends DefaultParams {
 export interface CreateBedrockProviderParams extends DefaultParams {
   /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. */
+  data?: AWSBedrockConfig;
   /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
    *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
    */
@@ -212,7 +173,9 @@ export interface CreateBedrockProviderParams extends DefaultParams {
 export interface CreateCerebrasProviderParams extends DefaultParams {
   /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. */
+  data?: CerebrasConfig;
   /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
    *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
    */
@@ -223,11 +186,13 @@ export interface CreateCerebrasProviderParams extends DefaultParams {
   providerName: 'cerebas';
 }
 
-/** Parameters for the `createNimProvider` operation. */
-export interface CreateNimProviderParams extends DefaultParams {
+/** Parameters for the `createNIMProvider` operation. */
+export interface CreateNIMProviderParams extends DefaultParams {
   /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. */
+  data?: NvidiaNIMConfig;
   /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
    *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
    */
@@ -238,11 +203,13 @@ export interface CreateNimProviderParams extends DefaultParams {
   providerName: 'nim';
 }
 
-/** Parameters for the `createOpenaiProvider` operation. */
-export interface CreateOpenaiProviderParams extends DefaultParams {
+/** Parameters for the `createOpenAIProvider` operation. */
+export interface CreateOpenAIProviderParams extends DefaultParams {
   /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. */
+  data?: OpenAIConfig;
   /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
    *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
    */
@@ -257,7 +224,9 @@ export interface CreateOpenaiProviderParams extends DefaultParams {
 export interface CreateWatsonxaiProviderParams extends DefaultParams {
   /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. */
+  data?: WatsonxaiConfig;
   /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
    *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
    */
@@ -270,11 +239,11 @@ export interface CreateWatsonxaiProviderParams extends DefaultParams {
 
 export type CreateProviderParams =
   | CreateAnthropicProviderParams
-  | CreateAzureOpenaiProviderParams
+  | CreateAzureOpenAIProviderParams
   | CreateBedrockProviderParams
   | CreateCerebrasProviderParams
-  | CreateNimProviderParams
-  | CreateOpenaiProviderParams
+  | CreateNIMProviderParams
+  | CreateOpenAIProviderParams
   | CreateWatsonxaiProviderParams;
 
 /** Parameters for the `findProviders` operation. */
@@ -294,13 +263,65 @@ export interface DeleteProviderParams extends DefaultParams {
   providerId: string;
 }
 
+/** Parameters for the `replaceNIMProvider` operation. */
+export interface ReplaceNIMProviderParams extends DefaultParams {
+  /** Provider ID. */
+  providerId: string;
+  /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
+   * The Value in the remote store is expected to be a JSON representation of the Data field. */
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. Available only on IBM watsonx.ai software. */
+  data?: NvidiaNIMConfig;
+  /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
+   *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
+   */
+  name: string;
+  /** Name of provider choosen for updating */
+  providerName: 'nim';
+}
+
+/** Parameters for the `replaceOpenAIProvider` operation. */
+export interface ReplaceOpenAIProviderParams extends DefaultParams {
+  /** Provider ID. */
+  providerId: string;
+  /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
+   * The Value in the remote store is expected to be a JSON representation of the Data field. */
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. Available only on IBM watsonx.ai software. */
+  data?: OpenAIConfig;
+  /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
+   *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
+   */
+  name: string;
+  /** Name of provider choosen for updating */
+  providerName: 'openai';
+}
+
+/** Parameters for the `replaceWatsonxaiProvider` operation. */
+export interface ReplaceWatsonxaiProviderParams extends DefaultParams {
+  /** Provider ID. */
+  providerId: string;
+  /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
+   * The Value in the remote store is expected to be a JSON representation of the Data field. */
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. Available only on IBM watsonx.ai software. */
+  data?: WatsonxaiConfig;
+  /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
+   *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
+   */
+  name: string;
+  /** Name of provider choosen for updating */
+  providerName: 'watsonxai';
+}
 /** Parameters for the `replaceAnthropicProvider` operation. */
 export interface ReplaceAnthropicProviderParams extends DefaultParams {
   /** Provider ID. */
   providerId: string;
   /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. Available only on IBM watsonx.ai software. */
+  data?: AnthropicConfig;
   /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
    *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
    */
@@ -309,13 +330,15 @@ export interface ReplaceAnthropicProviderParams extends DefaultParams {
   providerName: 'anthropic';
 }
 
-/** Parameters for the `replaceAzureOpenaiProvider` operation. */
-export interface ReplaceAzureOpenaiProviderParams extends DefaultParams {
+/** Parameters for the `replaceAzureOpenAIProvider` operation. */
+export interface ReplaceAzureOpenAIProviderParams extends DefaultParams {
   /** Provider ID. */
   providerId: string;
   /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. Available only on IBM watsonx.ai software. */
+  data?: AzureOpenAIConfig;
   /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
    *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
    */
@@ -330,7 +353,9 @@ export interface ReplaceBedrockProviderParams extends DefaultParams {
   providerId: string;
   /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. Available only on IBM watsonx.ai software. */
+  data?: AWSBedrockConfig;
   /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
    *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
    */
@@ -345,7 +370,9 @@ export interface ReplaceCerebrasProviderParams extends DefaultParams {
   providerId: string;
   /** Data Reference is a reference to a remote credential store. For example, an IBM Cloud Secrets Manager secret.
    * The Value in the remote store is expected to be a JSON representation of the Data field. */
-  dataReference: ProviderDataReference;
+  dataReference?: ProviderDataReference;
+  /** Contains the credential details for configuring the provider instance. Available only on IBM watsonx.ai software. */
+  data?: CerebrasConfig;
   /** Name can only contain alphanumeric characters, single spaces (no consecutive spaces), hyphens (-),
    *  parentheses (), and square brackets []. No leading or trailing spaces are allowed.
    */
@@ -356,9 +383,18 @@ export interface ReplaceCerebrasProviderParams extends DefaultParams {
 /** Combined type of all providers params for updating */
 export type UpdateProviderParams =
   | ReplaceAnthropicProviderParams
-  | ReplaceAzureOpenaiProviderParams
+  | ReplaceAzureOpenAIProviderParams
   | ReplaceBedrockProviderParams
   | ReplaceCerebrasProviderParams
-  | ReplaceNimProviderParams
-  | ReplaceOpenaiProviderParams
+  | ReplaceNIMProviderParams
+  | ReplaceOpenAIProviderParams
   | ReplaceWatsonxaiProviderParams;
+
+export type ProviderConfig =
+  | WatsonxaiConfig
+  | AnthropicConfig
+  | NvidiaNIMConfig
+  | OpenAIConfig
+  | AWSBedrockConfig
+  | AzureOpenAIConfig
+  | CerebrasConfig;

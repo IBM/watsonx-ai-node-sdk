@@ -26,4 +26,12 @@ const modelCleanup = async (models, modelId) => {
     console.error(`Unable to delete model with id: ${modelId}\n`, e);
   }
 };
-module.exports = { setupSecretManager, providerCleanup, modelCleanup };
+const rateLimitCleanup = async (rateLimits, rateLimitId) => {
+  if (!rateLimitId) return;
+  try {
+    await rateLimits.delete({ rateLimitId });
+  } catch (e) {
+    console.error(`Unable to delete rateLimit with id: ${rateLimitId}\n`, e);
+  }
+};
+module.exports = { setupSecretManager, providerCleanup, modelCleanup, rateLimitCleanup };

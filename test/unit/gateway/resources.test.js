@@ -7,6 +7,8 @@ const { MockingRequest } = require('../../utils/utils');
 const { APIBaseService } = require('../../../dist/base');
 const { Policies } = require('../../../dist/gateway/policies');
 
+const { RateLimits } = require('../../../dist/gateway/ratelimit');
+
 const serviceUrl = 'https://us-south.ml.cloud.ibm.com';
 const version = '2023-07-07';
 const requestHeaders = {
@@ -50,6 +52,17 @@ describe('Resources', () => {
 
       expect(providers).toBeInstanceOf(Policies);
     });
+
+    test('RateLimits', async () => {
+      const client = new APIBaseService({
+        version,
+        serviceUrl,
+        authenticator: new NoAuthAuthenticator(),
+      });
+      const rateLimit = new RateLimits(client);
+
+      expect(rateLimit).toBeInstanceOf(RateLimits);
+    });
   });
 
   describe('Data manipulation methods', () => {
@@ -62,6 +75,7 @@ describe('Resources', () => {
     const models = new Models(client);
     const providers = new Providers(client);
     const policies = new Policies(client);
+    const rateLimit = new RateLimits(client);
 
     describe('Basic methods', () => {
       const methods = [
@@ -146,6 +160,26 @@ describe('Resources', () => {
           method: 'POST',
         },
         {
+          name: 'Create provider',
+          req: {
+            url: '/ml/gateway/v1/providers/{provider_name}',
+            params: {
+              providerName: 'watsonx-ai',
+              data: {
+                'project_id': '550e8400-e29b-41d4-a716-446655440000',
+                'space_id': '550e8400-e29b-41d4-a716-446655440000',
+                'api_version': '2023-07-07',
+                'apikey': 'api_key',
+                'auth_url': 'https://iam.cloud.ibm.com/identity/token',
+                'base_url': 'https://us-south.ml.cloud.ibm.com',
+              },
+              name: 'fast-llm',
+            },
+          },
+          callableMethod: (params) => providers.create(params),
+          method: 'POST',
+        },
+        {
           name: 'Get provider by id',
           req: {
             url: '/ml/gateway/v1/providers/{provider_id}',
@@ -217,10 +251,77 @@ describe('Resources', () => {
           callableMethod: (params) => policies.delete(params),
           method: 'DELETE',
         },
+        {
+          name: 'Create RateLimits',
+          req: {
+            url: '/ml/gateway/v1/ratelimits',
+            params: {
+              token: { duration: '1m', amount: 10, capacity: 100 },
+              type: 'tenant',
+              request: { duration: '1m', amount: 10, capacity: 100 },
+            },
+          },
+          callableMethod: (params) => rateLimit.create(params),
+          method: 'POST',
+          exceptions: {
+            'model_uuid': 'model_id',
+            'provider_uuid': 'provider_id',
+          },
+        },
+        {
+          name: 'Get rate limit by id',
+          req: {
+            url: '/ml/gateway/v1/ratelimits/{rate_limit_id}',
+            params: {
+              rateLimitId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7',
+            },
+          },
+          callableMethod: (params) => rateLimit.getDetails(params),
+          method: 'GET',
+        },
+        {
+          name: 'Get rate limits',
+          req: {
+            url: '/ml/gateway/v1/ratelimits',
+            params: {},
+          },
+          callableMethod: (params) => rateLimit.getDetails(params),
+          method: 'GET',
+        },
+        {
+          name: 'Update exisitng rate limit',
+          req: {
+            url: '/ml/gateway/v1/ratelimits/{rate_limit_id}',
+            params: {
+              token: { duration: '1m', amount: 10, capacity: 100 },
+              type: 'model',
+              request: { duration: '1m', amount: 10, capacity: 100 },
+              modelId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7',
+              providerId: undefined,
+            },
+          },
+          callableMethod: (params) => rateLimit.update(params),
+          method: 'PUT',
+          exceptions: {
+            'model_uuid': 'model_id',
+            'provider_uuid': 'provider_id',
+          },
+        },
+        {
+          name: 'Delete existing rate limit',
+          req: {
+            url: '/ml/gateway/v1/ratelimits/{rate_limit_id}',
+            params: {
+              rateLimitId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7',
+            },
+          },
+          callableMethod: (params) => rateLimit.delete(params),
+          method: 'DELETE',
+        },
       ];
       const negativeMethods = [
-        { name: 'Create model', callableMethod: () => models.create() },
-        { name: 'Delete model', callableMethod: () => models.delete() },
+        { name: 'Create model without data', callableMethod: () => models.create() },
+        { name: 'Delete model without data', callableMethod: () => models.delete() },
         {
           name: 'Get model details with invalidId',
           params: { invalidId: '' },
@@ -237,15 +338,31 @@ describe('Resources', () => {
           callableMethod: (params) => models.getDetails(params),
         },
 
-        { name: 'Create provider', callableMethod: () => providers.create() },
-        { name: 'Delete provider', callableMethod: () => providers.delete() },
-        { name: 'Update provider', callableMethod: () => providers.update() },
+        { name: 'Create provider without data', callableMethod: () => providers.create() },
         {
-          name: 'List providers',
+          name: 'Create provider with data and dataReference',
+          callableMethod: (params) => providers.create(params),
+          param: {
+            data: {
+              'project_id': '550e8400-e29b-41d4-a716-446655440000',
+              'space_id': '550e8400-e29b-41d4-a716-446655440000',
+              'api_version': '2023-07-07',
+              'apikey': 'api_key',
+              'auth_url': 'https://iam.cloud.ibm.com/identity/token',
+              'base_url': 'https://us-south.ml.cloud.ibm.com',
+            },
+            dataReference: {
+              resource: 'crn:v1:staging:public:secrets-manager...',
+            },
+          },
+        },
+        { name: 'Delete provider without data', callableMethod: () => providers.delete() },
+        { name: 'Update provider without data', callableMethod: () => providers.update() },
+        {
+          name: 'List providers with invalidId',
           params: { invalidId: '' },
           callableMethod: (params) => providers.list(params),
         },
-
         {
           name: 'Get providers details with invalidId',
           params: { invalidId: '' },
@@ -261,14 +378,42 @@ describe('Resources', () => {
           name: 'List available models for provider',
           callableMethod: () => providers.listAvailableModels(),
         },
-        { name: 'Create policy', callableMethod: () => policies.create() },
-        { name: 'Delete policy', callableMethod: () => policies.delete() },
+        { name: 'Create policy without data', callableMethod: () => policies.create() },
+        { name: 'Delete policy without data', callableMethod: () => policies.delete() },
         {
-          name: 'List policies',
+          name: 'List policies without data',
           params: { invalidId: '' },
           callableMethod: (params) => policies.list(params),
         },
-        { name: 'Update policy', callableMethod: () => policies.getDetails() },
+        { name: 'Update policy without data', callableMethod: () => policies.getDetails() },
+        {
+          name: 'Create rate limit for type model without modelId',
+          callableMethod: (params) => rateLimit.create(params),
+          params: {
+            type: 'model',
+          },
+        },
+        {
+          name: 'Create rate limit for type model without providerId',
+          callableMethod: (params) => rateLimit.create(params),
+          params: {
+            type: 'provider',
+          },
+        },
+        {
+          name: 'Update rate limit for type model without modelId',
+          callableMethod: (params) => rateLimit.update(params),
+          params: {
+            type: 'model',
+          },
+        },
+        {
+          name: 'Update rate limit for type model without providerId',
+          callableMethod: (params) => rateLimit.update(params),
+          params: {
+            type: 'provider',
+          },
+        },
       ];
       let createRequestMock;
 
@@ -365,6 +510,10 @@ describe('Resources', () => {
           name: 'List policies',
           callableMethod: () => policies.list(),
         },
+        {
+          name: 'List rate limits',
+          callableMethod: () => rateLimit.list(),
+        },
       ];
 
       test.each(methods)('$name', async ({ callableMethod, params }) => {
@@ -414,6 +563,12 @@ describe('Resources', () => {
         await expect(response).rejects.toThrow(
           `Policy with provided id: ${params.policyId} does not exist`
         );
+      });
+
+      test('Get rate limits list', async () => {
+        const response = await rateLimit.list();
+
+        expect(response).toBeInstanceOf(Array);
       });
     });
   });

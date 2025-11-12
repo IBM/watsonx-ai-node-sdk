@@ -26,7 +26,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if ! command -v npm &> /dev/null ; then
+if ! command -v npm &> /dev/null || ! command -v tsc &> /dev/null ; then
     scripts/setup-code.sh --node-version "${NODE_VERSION}"
 fi
 
