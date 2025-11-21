@@ -254,7 +254,7 @@ describe('Resources', () => {
         {
           name: 'Create RateLimits',
           req: {
-            url: '/ml/gateway/v1/ratelimits',
+            url: '/ml/gateway/v1/rate-limits',
             params: {
               token: { duration: '1m', amount: 10, capacity: 100 },
               type: 'tenant',
@@ -271,7 +271,7 @@ describe('Resources', () => {
         {
           name: 'Get rate limit by id',
           req: {
-            url: '/ml/gateway/v1/ratelimits/{rate_limit_id}',
+            url: '/ml/gateway/v1/rate-limits/{rate_limit_id}',
             params: {
               rateLimitId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7',
             },
@@ -282,7 +282,7 @@ describe('Resources', () => {
         {
           name: 'Get rate limits',
           req: {
-            url: '/ml/gateway/v1/ratelimits',
+            url: '/ml/gateway/v1/rate-limits',
             params: {},
           },
           callableMethod: (params) => rateLimit.getDetails(params),
@@ -291,7 +291,7 @@ describe('Resources', () => {
         {
           name: 'Update exisitng rate limit',
           req: {
-            url: '/ml/gateway/v1/ratelimits/{rate_limit_id}',
+            url: '/ml/gateway/v1/rate-limits/{rate_limit_id}',
             params: {
               token: { duration: '1m', amount: 10, capacity: 100 },
               type: 'model',
@@ -310,7 +310,7 @@ describe('Resources', () => {
         {
           name: 'Delete existing rate limit',
           req: {
-            url: '/ml/gateway/v1/ratelimits/{rate_limit_id}',
+            url: '/ml/gateway/v1/rate-limits/{rate_limit_id}',
             params: {
               rateLimitId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7',
             },

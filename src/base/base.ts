@@ -18,6 +18,8 @@
 /* eslint-disable max-classes-per-file */
 
 import { BaseService, validateParams, UserOptions, readExternalSources } from 'ibm-cloud-sdk-core';
+import { Agent } from 'https';
+import { readFileSync } from 'fs';
 import { getAuthenticatorFromEnvironment } from '../authentication/utils/get-authenticator-from-environment';
 import {
   getSdkHeaders,
@@ -29,9 +31,12 @@ import {
   CreateStreamParameters,
   DeleteParameters,
   GetParameters,
+  HttpsAgentMap,
   PostParameters,
   PutParameters,
   Response,
+  Certificates,
+  TokenAuthenticationOptions,
 } from './types/base';
 
 /**
@@ -54,6 +59,8 @@ export class WatsonxBaseService extends BaseService {
 
   /** URL required for watsonx inference endpoints */
   serviceUrl: string;
+
+  httpsAgentMap: HttpsAgentMap = { service: undefined, dataplatform: undefined };
 
   static PLATFORM_URLS_MAP = {
     'https://ca-tor.ml.cloud.ibm.com': 'https://api.ca-tor.dai.cloud.ibm.com/wx',
@@ -80,7 +87,7 @@ export class WatsonxBaseService extends BaseService {
    * @category constructor
    *
    */
-  constructor(options: UserOptions) {
+  constructor(options: UserOptions & Certificates & TokenAuthenticationOptions) {
     const _requiredParams = ['version'];
     // @ts-expect-error
     const validationErrors = validateParams(options, _requiredParams, null);
@@ -92,13 +99,32 @@ export class WatsonxBaseService extends BaseService {
 
     options.serviceName ??= WatsonxBaseService.DEFAULT_SERVICE_NAME;
 
+    let httpsAgentAuth: Agent | undefined;
+
+    if (typeof options.caCert === 'string') {
+      const certFile = readFileSync(options.caCert);
+
+      httpsAgentAuth = new Agent({
+        ca: certFile,
+      });
+
+      options.httpsAgent = httpsAgentAuth;
+    } else if (options.caCert?.auth?.path) {
+      const certFile = readFileSync(options.caCert.auth.path);
+
+      httpsAgentAuth = new Agent({
+        ca: certFile,
+      });
+    }
+
     // Create authenticator with user given params and environment variables
     if (!options.authenticator) {
-      const { serviceName, serviceUrl, requestToken } = options;
+      const { serviceName, requestToken, serviceUrl } = options;
       options.authenticator = getAuthenticatorFromEnvironment({
         serviceName,
-        serviceUrl,
         requestToken,
+        serviceUrl,
+        httpsAgent: httpsAgentAuth,
       });
     }
 
@@ -108,11 +134,29 @@ export class WatsonxBaseService extends BaseService {
 
     this.version = options.version;
 
+    this.configureService(options.serviceName);
     // Using build-in method to ensure user-given URL is correct ex. trimming slashes
     if (options.serviceUrl) {
       this.setServiceUrl(options.serviceUrl);
     } else {
       this.setServiceUrl(WatsonxBaseService.DEFAULT_SERVICE_URL);
+    }
+
+    if (typeof options.caCert !== 'string') {
+      if (options.caCert?.service?.path) {
+        const certFile = readFileSync(options.caCert.service.path);
+
+        this.httpsAgentMap.service = new Agent({
+          ca: certFile,
+        });
+      }
+      if (options.caCert?.dataplatform?.path) {
+        const certFile = readFileSync(options.caCert.dataplatform.path);
+
+        this.httpsAgentMap.dataplatform = new Agent({
+          ca: certFile,
+        });
+      }
     }
 
     if (!this.baseOptions.serviceUrl)

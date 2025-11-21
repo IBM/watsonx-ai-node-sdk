@@ -1,6 +1,6 @@
 {
   "name": "@ibm-cloud/watsonx-ai",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "description": "IBM watsonx.ai Node.js SDK",
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
     "version": "node scripts/utils/check-version.cjs && git add src/version.ts",
     "postversion": "publisher --no-checks --dry-run",
     "local-publish": "npm run build && command -v yalc >/dev/null 2>&1 || npm install -g yalc && (cd dist/ && yalc publish)",
+    "generate-types-reexports": "node scripts/utils/generate-types-reexports.cjs",
     "install-package-regression": "npm run local-publish && cd ./test/langchain && npm run test-install",
     "install-package-examples": "npm run local-publish && cd ./examples && npm run test-install",
     "jest": "jest --verbose",

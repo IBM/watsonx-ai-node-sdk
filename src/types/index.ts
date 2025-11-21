@@ -1,6 +1,5 @@
-/** @module default*/
 /**
- * © Copyright IBM Corporation 2024. All Rights Reserved.
+ * (C) Copyright IBM Corp. 2025.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +14,28 @@
  * limitations under the License.
  */
 
-export { WatsonXAI } from './vml_v1';
 export {
-  convertUtilityToolToWatsonxTool,
-  convertWatsonxToolCallToUtilityToolCall,
-} from './helpers/converters';
-export {
-  transformStreamToObjectStream,
-  transformStreamToStringStream,
-  Stream,
-  LineTransformStream,
-  ObjectTransformStream,
-} from './lib/common';
+  TextChatFunctionCall,
+  TextChatToolCall,
+  TextChatMessage,
+  TextChatMessageAssistant,
+  TextChatMessageControl,
+  TextChatMessageSystem,
+  TextChatMessageTool,
+  TextChatUserContent,
+  TextChatUserTextContent,
+  TextChatUserImageURL,
+  TextChatDataAsset,
+  TextChatUserVideoURLContent,
+  TextChatUserVideoURL,
+  TextChatUserImageURLContent,
+  TextChatUserInputAudio,
+  TextChatUserAudioContent,
+  TextChatUserContents,
+  TextChatMessageUser,
+  TextChatMessages,
+  TextChatParameterFunction,
+} from './messages';
 export {
   Options,
   EmptyObject,
@@ -360,24 +369,4 @@ export {
   TextClassificationSemanticConfig,
   TextExtractionSchema,
   TextExtractionSemanticKvpField,
-  TextChatFunctionCall,
-  TextChatToolCall,
-  TextChatMessage,
-  TextChatMessageAssistant,
-  TextChatMessageControl,
-  TextChatMessageSystem,
-  TextChatMessageTool,
-  TextChatUserContent,
-  TextChatUserTextContent,
-  TextChatUserImageURL,
-  TextChatDataAsset,
-  TextChatUserVideoURLContent,
-  TextChatUserVideoURL,
-  TextChatUserImageURLContent,
-  TextChatUserInputAudio,
-  TextChatUserAudioContent,
-  TextChatUserContents,
-  TextChatMessageUser,
-  TextChatMessages,
-  TextChatParameterFunction,
 } from './types';

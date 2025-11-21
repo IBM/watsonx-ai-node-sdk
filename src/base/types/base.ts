@@ -15,6 +15,8 @@
  */
 
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
+import { Agent } from 'https';
+import { RequestTokenResponse } from '../../authentication/utils/authenticators';
 
 /**
  * Parameters for creating a resource.
@@ -144,3 +146,20 @@ export interface Response<T = any> {
  * This type defines a callback function that takes an error and an optional response object.
  */
 export type Callback<T> = (error: any, response?: Response<T>) => void;
+
+export interface HttpsAgentMap {
+  service?: Agent;
+  dataplatform?: Agent;
+}
+
+export interface Certificates {
+  caCert?: { auth?: Certificate; service?: Certificate; dataplatform?: Certificate } | string;
+}
+
+export interface Certificate {
+  path: string;
+}
+
+export interface TokenAuthenticationOptions {
+  requestToken?: () => Promise<RequestTokenResponse>;
+}

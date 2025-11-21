@@ -100,7 +100,7 @@ export class RateLimits extends GatewayResource {
     const body = { type, providerId, modelId, token, request };
 
     const parameters = {
-      url: '/ml/gateway/v1/ratelimits',
+      url: '/ml/gateway/v1/rate-limits',
       body,
       signal,
       headers,
@@ -146,7 +146,7 @@ export class RateLimits extends GatewayResource {
     const body = { type, 'provider_uuid': providerId, 'model_uuid': modelId, token, request };
 
     const parameters = {
-      url: '/ml/gateway/v1/ratelimits/{rate_limit_id}',
+      url: '/ml/gateway/v1/rate-limits/{rate_limit_id}',
       body,
       path,
       signal,
@@ -185,7 +185,7 @@ export class RateLimits extends GatewayResource {
       const path = { 'rate_limit_id': rateLimitId };
 
       const parameters = {
-        url: '/ml/gateway/v1/ratelimits/{rate_limit_id}',
+        url: '/ml/gateway/v1/rate-limits/{rate_limit_id}',
         path,
         signal,
         headers,
@@ -193,7 +193,7 @@ export class RateLimits extends GatewayResource {
       return this.client._get<Record<string, any>>(parameters);
     }
     const parameters = {
-      url: '/ml/gateway/v1/ratelimits',
+      url: '/ml/gateway/v1/rate-limits',
       signal,
       headers,
     };
@@ -249,7 +249,7 @@ export class RateLimits extends GatewayResource {
     const path = { 'rate_limit_id': rateLimitId };
 
     const parameters = {
-      url: '/ml/gateway/v1/ratelimits/{rate_limit_id}',
+      url: '/ml/gateway/v1/rate-limits/{rate_limit_id}',
       path,
       signal,
       headers,
