@@ -855,6 +855,123 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     });
   });
 
+  describe('Crypto parameter support', () => {
+    const cryptoConfig = {
+      key_ref: process.env.WATSONX_AI_CRYPTO_KEY_REF,
+    };
+
+    test('textChat with crypto parameter', async () => {
+      const textChatMessagesModel = {
+        role: 'user',
+        content: 'Hello, how are you?',
+      };
+
+      const params = {
+        modelId: chatModel,
+        messages: [textChatMessagesModel],
+        projectId,
+        maxTokens: 50,
+        crypto: cryptoConfig,
+      };
+
+      const res = await watsonxAIService.textChat(params);
+
+      expect(res.status).toBe(200);
+      expect(res.result).toBeDefined();
+    });
+
+    test('embedText with crypto parameter', async () => {
+      const embeddingParametersModel = {
+        truncate_input_tokens: 1,
+      };
+
+      const params = {
+        modelId: 'ibm/slate-125m-english-rtrvr-v2',
+        inputs: ['Test embedding with encryption'],
+        projectId,
+        parameters: embeddingParametersModel,
+        crypto: cryptoConfig,
+      };
+
+      const res = await watsonxAIService.embedText(params);
+
+      expect(res.status).toBe(200);
+      expect(res.result).toBeDefined();
+    });
+
+    test('generateText with crypto parameter', async () => {
+      const textGenParametersModel = {
+        max_new_tokens: 50,
+        min_new_tokens: 5,
+      };
+
+      const params = {
+        input: 'What is the capital of France?',
+        modelId: chatModel,
+        projectId,
+        parameters: textGenParametersModel,
+        crypto: cryptoConfig,
+      };
+
+      const res = await watsonxAIService.generateText(params);
+
+      expect(res?.status).toBe(200);
+      expect(res.result).toBeDefined();
+    });
+
+    test('tokenizeText with crypto parameter', async () => {
+      const textTokenizeParametersModel = {
+        return_tokens: true,
+      };
+
+      const params = {
+        modelId: chatModel,
+        input: 'Tokenize this text with encryption',
+        projectId,
+        parameters: textTokenizeParametersModel,
+        crypto: cryptoConfig,
+      };
+
+      const res = await watsonxAIService.tokenizeText(params);
+
+      expect(res.status).toBe(200);
+      expect(res.result).toBeDefined();
+    });
+
+    test('textRerank with crypto parameter', async () => {
+      const result = await fetch(
+        'https://raw.github.com/IBM/watson-machine-learning-samples/master/cloud/data/foundation_models/state_of_the_union.txt'
+      );
+      const text = await result.text();
+
+      const data = [];
+      const chunkSize = 500;
+      const chunkOverlap = 100;
+      for (let i = 0; i < text.length; i += chunkSize - chunkOverlap) {
+        const chunk = text.slice(i, i + chunkSize);
+        data.push({ text: chunk });
+      }
+      const params = {
+        modelId: 'cross-encoder/ms-marco-minilm-l-12-v2',
+        inputs: data,
+        query: 'What did the president say about Ketanji Brown Jackson',
+        projectId: process.env.WATSONX_AI_PROJECT_ID,
+        parameters: {
+          return_options: {
+            top_n: 3,
+            inputs: true,
+          },
+        },
+        crypto: cryptoConfig,
+      };
+
+      const res = await watsonxAIService.textRerank(params);
+
+      expect(res.status).toBe(200);
+      expect(res.result).toBeDefined();
+    });
+  });
+
   describe('Aborting', () => {
     const testArray = [
       {

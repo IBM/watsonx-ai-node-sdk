@@ -17,6 +17,7 @@
 /* eslint-disable import/prefer-default-export */
 
 import { validateParams } from 'ibm-cloud-sdk-core';
+import { ENDPOINTS } from '../config';
 import { GatewayResource } from './resources';
 import { EmptyObject } from './types/gateway';
 import { Response } from '../base/types/base';
@@ -68,7 +69,7 @@ export class Policies extends GatewayResource {
     };
 
     const parameters = {
-      url: '/ml/gateway/v1/policies',
+      url: ENDPOINTS.GATEWAY.POLICY.BASE,
       body,
       signal,
       headers,
@@ -129,7 +130,7 @@ export class Policies extends GatewayResource {
       'policy_id': policyId,
     };
     const parameters = {
-      url: '/ml/gateway/v1/policies/{policy_id}',
+      url: ENDPOINTS.GATEWAY.POLICY.BY_ID,
       path,
       signal,
       headers,
@@ -154,7 +155,7 @@ export class Policies extends GatewayResource {
 
     const { signal, headers } = params;
     const parameters = {
-      url: '/ml/gateway/v1/policies',
+      url: ENDPOINTS.GATEWAY.POLICY.BASE,
       signal,
       headers,
     };

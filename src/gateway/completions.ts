@@ -18,6 +18,7 @@
 /* eslint-disable no-await-in-loop */
 
 import { validateParams } from 'ibm-cloud-sdk-core';
+import { ENDPOINTS } from '../config';
 import { Stream } from '../lib/common';
 import { CreateChatCompletionsParams } from './types/chat/request';
 import { ChatsResponse, ObjectStreamed } from './types/chat/response';
@@ -293,7 +294,7 @@ export class ChatCompletions extends Completions {
     };
 
     const parameters = {
-      url: '/ml/gateway/v1/chat/completions',
+      url: ENDPOINTS.GATEWAY.COMPLETION.CHAT,
       body,
       signal: params.signal,
       headers: params.headers,
@@ -362,7 +363,7 @@ export class EmbeddingCompletions extends Completions {
     };
 
     const parameters = {
-      url: '/ml/gateway/v1/embeddings',
+      url: ENDPOINTS.GATEWAY.COMPLETION.EMBEDDINGS,
       body,
       signal: params.signal,
       headers: params.headers,
@@ -524,7 +525,7 @@ export class GenerateTextCompletions extends Completions {
     };
     if (params.stream) {
       const parameters = {
-        url: '/ml/gateway/v1/completions',
+        url: ENDPOINTS.GATEWAY.COMPLETION.TEXT,
         body,
         signal: params.signal,
         headers: params.headers,
@@ -534,7 +535,7 @@ export class GenerateTextCompletions extends Completions {
         : this.client._postStream<TextCompletionStream>({ ...parameters, returnObject: true });
     }
     const parameters = {
-      url: '/ml/gateway/v1/completions',
+      url: ENDPOINTS.GATEWAY.COMPLETION.TEXT,
       body,
       signal: params.signal,
       headers: params.headers,

@@ -18,6 +18,7 @@
 /* eslint-disable max-classes-per-file */
 
 import { validateParams } from 'ibm-cloud-sdk-core';
+import { ENDPOINTS } from '../config';
 import {
   CreateModelParams,
   DeleteModelParams,
@@ -71,7 +72,7 @@ export class Models extends GatewayResource {
     };
 
     const parameters = {
-      url: '/ml/gateway/v1/providers/{provider_id}/models',
+      url: ENDPOINTS.GATEWAY.MODEL.LIST_PROVIDER_MODELS,
       body,
       path,
       signal: params.signal,
@@ -114,7 +115,7 @@ export class Models extends GatewayResource {
       };
 
       const parameters = {
-        url: '/ml/gateway/v1/models/{model_id}',
+        url: ENDPOINTS.GATEWAY.MODEL.BY_ID,
         path,
         signal,
         headers,
@@ -135,7 +136,7 @@ export class Models extends GatewayResource {
       };
 
       const parameters = {
-        url: '/ml/gateway/v1/providers/{provider_id}/models',
+        url: ENDPOINTS.GATEWAY.MODEL.LIST_PROVIDER_MODELS,
         path,
         signal,
         headers,
@@ -151,7 +152,7 @@ export class Models extends GatewayResource {
     }
 
     const parameters = {
-      url: '/ml/gateway/v1/models',
+      url: ENDPOINTS.GATEWAY.MODEL.BASE,
       signal,
       headers,
     };
@@ -202,7 +203,7 @@ export class Models extends GatewayResource {
     };
 
     const parameters = {
-      url: '/ml/gateway/v1/models/{model_id}',
+      url: ENDPOINTS.GATEWAY.MODEL.BY_ID,
       method: 'DELETE',
       path,
       signal,

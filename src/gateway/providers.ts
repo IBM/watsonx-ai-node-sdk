@@ -17,6 +17,7 @@
 /* eslint-disable import/prefer-default-export */
 
 import { validateParams } from 'ibm-cloud-sdk-core';
+import { ENDPOINTS } from '../config';
 import { GatewayResource } from './resources';
 import { EmptyObject } from './types/gateway';
 import { ListProviderAvailableModelsParams } from './types/models/request';
@@ -87,7 +88,7 @@ export class Providers extends GatewayResource {
     };
 
     const parameters = {
-      url: '/ml/gateway/v1/providers/{provider_name}',
+      url: ENDPOINTS.GATEWAY.PROVIDER.CREATE,
       body,
       path,
       signal,
@@ -128,7 +129,7 @@ export class Providers extends GatewayResource {
       };
 
       const parameters = {
-        url: '/ml/gateway/v1/providers/{provider_id}',
+        url: ENDPOINTS.GATEWAY.PROVIDER.BY_ID,
         path,
         signal,
         headers,
@@ -145,7 +146,7 @@ export class Providers extends GatewayResource {
 
     const { signal, headers } = params;
     const parameters = {
-      url: '/ml/gateway/v1/providers',
+      url: ENDPOINTS.GATEWAY.PROVIDER.BASE,
       signal,
       headers,
     };
@@ -180,7 +181,7 @@ export class Providers extends GatewayResource {
     };
 
     const parameters = {
-      url: '/ml/gateway/v1/providers/{provider_id}/models/available',
+      url: ENDPOINTS.GATEWAY.PROVIDER.LIST_AVAILABLE_MODELS,
       path,
       signal,
       headers,
@@ -239,7 +240,7 @@ export class Providers extends GatewayResource {
     };
 
     const parameters = {
-      url: '/ml/gateway/v1/providers/{provider_id}/{provider_name}',
+      url: ENDPOINTS.GATEWAY.PROVIDER.UPDATE,
       body,
       path,
       signal,
@@ -275,7 +276,7 @@ export class Providers extends GatewayResource {
     };
 
     const parameters = {
-      url: '/ml/gateway/v1/providers/{provider_id}',
+      url: ENDPOINTS.GATEWAY.PROVIDER.BY_ID,
       path,
       signal,
       headers,

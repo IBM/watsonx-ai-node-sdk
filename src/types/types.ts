@@ -1,3 +1,23 @@
+/**
+ * (C) Copyright IBM Corp. 2025.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * IBM OpenAPI SDK Code Generator Version: 3.90.0-5aad763d-20240506-203857
+ */
+
 /* eslint-disable import/extensions */
 import { UserOptions } from 'ibm-cloud-sdk-core';
 import { BaseServiceOptions } from 'ibm-cloud-sdk-core/es/lib/base-service.js';
@@ -12,6 +32,7 @@ import {
   TextChatUserImageURLContent,
   TextChatUserTextContent,
 } from './messages';
+import { EncryptionParams } from './encryption';
 
 /** Options for the `WatsonxAiMlVml_v1` constructor. */
 export interface Options extends UserOptions {
@@ -207,7 +228,7 @@ export interface DeploymentsTextGenerationStreamParams extends DefaultParams {
 }
 
 /** Parameters for the `deploymentsTextChat` operation. */
-export interface DeploymentsTextChatParams extends DefaultParams {
+export interface DeploymentsTextChatParams extends TextChatParameters, DefaultParams {
   /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
    *  allows a predefined URL to be used to post a prediction. The deployment must reference a prompt template with
    *  `input_mode` `chat`.
@@ -236,33 +257,7 @@ export interface DeploymentsTextChatParams extends DefaultParams {
 }
 
 /** Parameters for the `deploymentsTextChatStream` operation. */
-export interface DeploymentsTextChatStreamParams extends DefaultParams {
-  /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
-   *  allows a predefined URL to be used to post a prediction. The deployment must reference a prompt template with
-   *  `input_mode` `chat`.
-   *
-   *  The WML instance that is associated with the deployment will be used for limits and billing (if a paid plan).
-   */
-  idOrName: string;
-  /** The messages for this chat session. You cannot specify `system` `role` in the messages. Depending on the
-   *  model, the `content` of `system` `role` may be from `system_prompt` of the prompt template, and will be
-   *  automatically inserted into `messages`.
-   *
-   *  As an example, depending on the model, if `system_prompt` of a prompt template is "You are Granite Chat, an AI
-   *  language model developed by IBM. You are a cautious assistant. You carefully follow instructions. You are
-   *  helpful and harmless and you follow ethical guidelines and promote positive behavior.", a message with `system`
-   *  `role` having `content` the same as `system_prompt` is inserted.
-   */
-  messages: DeploymentTextChatMessages[];
-  /** If specified, `context` will be inserted into `messages`. Depending on the model, `context` may be inserted
-   *  into the `content` with `system` `role`; or into the `content` of the last message of `user` `role`.
-   *
-   *
-   *  In the example, `context` "Today is Wednesday" is inserted as such
-   *  `content` of `user` becomes "Today is Wednesday. Who are you and which day is tomorrow?".
-   */
-  context?: string;
-
+export interface DeploymentsTextChatStreamParams extends DeploymentsTextChatParams {
   returnObject?: boolean;
 }
 
@@ -693,21 +688,7 @@ export namespace TextChatConstants {
   }
 }
 
-/** Parameters for the `textChat` operation. */
-export interface TextChatParams extends DefaultParams {
-  /** The model to use for the chat completion.
-   *
-   *  Please refer to the [list of
-   *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
-   */
-  modelId: string;
-  /** The messages for this chat session. */
-  messages: TextChatMessages[];
-  /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
-  spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
-  projectId?: string;
-  /** Tool functions that can be called with the response. */
+interface TextChatParameters {
   tools?: TextChatParameterTools[];
   /** Using `none` means the model will not call any tool and instead generates a message.
    *
@@ -787,15 +768,6 @@ export interface TextChatParams extends DefaultParams {
    *  being used, there may be an enforced maximum time limit.
    */
   timeLimit?: number;
-  /** If specified, the output will be exactly one of the choices. */
-  guidedChoice?: string[];
-  /** If specified, the output will follow the regex pattern. */
-  guidedRegex?: string;
-  /** If specified, the output will follow the context free grammar. */
-  guidedGrammar?: string;
-  /** If specified, the output will follow the JSON schema. See the JSON Schema reference for
-   * documentation about the format. */
-  guidedJSON?: string;
   /**  Represents the penalty for penalizing tokens that have already been generated or belong to the context. */
   repetitionPenalty?: number;
   /** Exponential penalty to the length that is used with beam-based generation.
@@ -809,10 +781,36 @@ export interface TextChatParams extends DefaultParams {
    * Supported values are low, medium, and high. */
   reasoningEffort?: 'low' | 'medium' | 'high';
 }
+
+/** Parameters for the `textChat` operation. */
+export interface TextChatParams extends TextChatParameters, DefaultParams, EncryptionParams {
+  /** The model to use for the chat completion.
+   *
+   *  Please refer to the [list of
+   *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
+   */
+  modelId: string;
+  /** The messages for this chat session. */
+  messages: TextChatMessages[];
+  /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
+  spaceId?: string;
+  /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
+  projectId?: string;
+  /** If specified, the output will be exactly one of the choices. */
+  guidedChoice?: string[];
+  /** If specified, the output will follow the regex pattern. */
+  guidedRegex?: string;
+  /** If specified, the output will follow the context free grammar. */
+  guidedGrammar?: string;
+  /** If specified, the output will follow the JSON schema. See the JSON Schema reference for
+   * documentation about the format. */
+  guidedJSON?: string;
+}
 /** Parameters for the `textChatStream` operation. */
 export interface TextChatStreamParams extends TextChatParams {
   /* whether to return stream of objects if true or stream of strings if false or undefined */
   returnObject?: boolean;
+  crypto?: undefined;
 }
 
 /** Constants for the `textChatStream` operation. */
@@ -826,7 +824,7 @@ export namespace TextChatStreamConstants {
 }
 
 /** Parameters for the `textEmbeddings` operation. */
-export interface TextEmbeddingsParams extends DefaultParams {
+export interface TextEmbeddingsParams extends DefaultParams, EncryptionParams {
   /** The `id` of the model to be used for this request. Please refer to the [list of
    *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
    */
@@ -902,7 +900,7 @@ export interface TextExtractionDeleteParams extends DefaultParams {
 }
 
 /** Parameters for the `textGeneration` operation. */
-export interface TextGenerationParams extends DefaultParams {
+export interface TextGenerationParams extends DefaultParams, EncryptionParams {
   /** The prompt to generate completions. Note: The method tokenizes the input internally. It is recommended not
    *  to leave any trailing spaces.
    */
@@ -949,7 +947,7 @@ export interface TextGenerationStreamParams extends DefaultParams {
 }
 
 /** Parameters for the `textTokenization` operation. */
-export interface TextTokenizationParams extends DefaultParams {
+export interface TextTokenizationParams extends DefaultParams, EncryptionParams {
   /** The `id` of the model to be used for this request. Please refer to the [list of
    *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
    */
@@ -1049,7 +1047,7 @@ export interface TrainingsDeleteParams extends DefaultParams {
 }
 
 /** Parameters for the `textRerank` operation. */
-export interface TextRerankParams extends DefaultParams {
+export interface TextRerankParams extends DefaultParams, EncryptionParams {
   /** The `id` of the model to be used for this request. Please refer to the [list of
    *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
    */

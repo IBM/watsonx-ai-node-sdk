@@ -40,6 +40,8 @@ import {
 import { WatsonxBaseService } from './base';
 import * as Types from './types';
 import * as BaseTypes from './base/types';
+import { AdditionalCreateRequestParams, CreateRequestParams } from './types/request';
+import { ML_CLOUD_BASE_URL, ENDPOINTS } from './config';
 
 /**
  * SDK entrypoint for IBM watsonx.ai product
@@ -47,27 +49,9 @@ import * as BaseTypes from './base/types';
  * API Version: v1
  */
 
-const PLATFORM_URLS_MAP = {
-  'https://ca-tor.ml.cloud.ibm.com': 'https://api.ca-tor.dai.cloud.ibm.com/wx',
-  'https://jp-tok.ml.cloud.ibm.com': 'https://api.jp-tok.dataplatform.cloud.ibm.com/wx',
-  'https://eu-gb.ml.cloud.ibm.com': 'https://api.eu-gb.dataplatform.cloud.ibm.com/wx',
-  'https://eu-de.ml.cloud.ibm.com': 'https://api.eu-de.dataplatform.cloud.ibm.com/wx',
-  'https://us-south.ml.cloud.ibm.com': 'https://api.dataplatform.cloud.ibm.com/wx',
-  'https://private.ca-tor.ml.cloud.ibm.com': 'https://private.api.ca-tor.dai.cloud.ibm.com',
-  'https://private.jp-tok.ml.cloud.ibm.com': 'https://api.jp-tok.dataplatform.cloud.ibm.com/wx',
-  'https://private.eu-gb.ml.cloud.ibm.com': 'https://api.eu-gb.dataplatform.cloud.ibm.com/wx',
-  'https://private.eu-de.ml.cloud.ibm.com': 'https://api.eu-de.dataplatform.cloud.ibm.com/wx',
-  'https://private.us-south.ml.cloud.ibm.com': 'https://api.dataplatform.cloud.ibm.com/wx',
-  'https://ap-south-1.aws.wxai.ibm.com': 'https://api.ap-south-1.aws.data.ibm.com/wx',
-  'https://wxai.prep.ibmforusgov.com': 'https://api.dai.prep.ibmforusgov.com/wx',
-  'https://private.wxai.prep.ibmforusgov.com': 'https://api.dai.prep.ibmforusgov.com/wx',
-  'https://wxai.ibmforusgov.com': 'https://api.dai.ibmforusgov.com/wx',
-  'https://private.wxai.ibmforusgov.com': 'https://api.dai.ibmforusgov.com/wx',
-};
-
 class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   /** @hidden */
-  static PARAMETERIZED_SERVICE_URL: string = 'https://{region}.ml.cloud.ibm.com';
+  static PARAMETERIZED_SERVICE_URL: string = ML_CLOUD_BASE_URL;
 
   /** @hidden */
   private static defaultUrlVariables = new Map([['region', 'us-south']]);
@@ -124,14 +108,26 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     return new WatsonxAiMlVml_v1(options);
   }
 
-  protected createRequest(parameters: Record<string, any>) {
-    const apiType = parameters.defaultOptions.serviceUrl.includes('api')
-      ? 'dataplatform'
-      : 'service';
+  protected createRequest(
+    parameters: CreateRequestParams,
+    additionalParameters?: AdditionalCreateRequestParams
+  ) {
+    const apiType =
+      parameters.defaultOptions.serviceUrl && parameters.defaultOptions.serviceUrl.includes('api')
+        ? 'dataplatform'
+        : 'service';
     parameters.defaultOptions.axiosOptions.httpsAgent = this.httpsAgentMap[apiType];
+
+    if (additionalParameters) {
+      const { crypto } = additionalParameters;
+      if (crypto) {
+        parameters.options.body ??= {};
+        parameters.options.body = { crypto, ...parameters.options.body };
+      }
+    }
+
     return super.createRequest(parameters);
   }
-
   /*************************
    * deployments
    ************************/
@@ -225,7 +221,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/deployments',
+        url: ENDPOINTS.DEPLOYMENT.BASE,
         method: 'POST',
         body,
         qs: query,
@@ -333,7 +329,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/deployments',
+        url: ENDPOINTS.DEPLOYMENT.BASE,
         method: 'GET',
         qs: query,
       },
@@ -398,7 +394,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/deployments/{deployment_id}',
+        url: ENDPOINTS.DEPLOYMENT.BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -481,7 +477,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/deployments/{deployment_id}',
+        url: ENDPOINTS.DEPLOYMENT.BY_ID,
         method: 'PATCH',
         body,
         qs: query,
@@ -549,7 +545,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/deployments/{deployment_id}',
+        url: ENDPOINTS.DEPLOYMENT.BY_ID,
         method: 'DELETE',
         qs: query,
         path,
@@ -638,7 +634,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/deployments/{id_or_name}/text/generation',
+        url: ENDPOINTS.DEPLOYMENT.TEXT_GENERATION,
         method: 'POST',
         body,
         qs: query,
@@ -790,7 +786,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/deployments/{id_or_name}/text/generation_stream',
+        url: ENDPOINTS.DEPLOYMENT.TEXT_GENERATION_STREAM,
         method: 'POST',
         body,
         qs: query,
@@ -876,7 +872,35 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>> {
     const _params = { ...params };
     const _requiredParams = ['idOrName', 'messages'];
-    const _validParams = ['idOrName', 'messages', 'context', 'headers', 'signal'];
+    const _validParams = [
+      'idOrName',
+      'messages',
+      'context',
+      'tools',
+      'toolChoiceOption',
+      'toolChoice',
+      'frequencyPenalty',
+      'logitBias',
+      'logprobs',
+      'topLogprobs',
+      'maxTokens',
+      'maxCompletionTokens',
+      'n',
+      'presencePenalty',
+      'responseFormat',
+      'seed',
+      'stop',
+      'temperature',
+      'topP',
+      'timeLimit',
+      'repetitionPenalty',
+      'lengthPenalty',
+      'includeReasoning',
+      'reasoningEffort',
+      'headers',
+      'signal',
+    ];
+
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -884,7 +908,27 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const body = {
       'messages': _params.messages,
-      'context': _params.context,
+      'tools': _params.tools,
+      'tool_choice_option': _params.toolChoiceOption,
+      'tool_choice': _params.toolChoice,
+      'frequency_penalty': _params.frequencyPenalty,
+      'logit_bias': _params.logitBias,
+      'logprobs': _params.logprobs,
+      'top_logprobs': _params.topLogprobs,
+      'max_tokens': _params.maxTokens,
+      'max_completion_tokens': _params.maxCompletionTokens,
+      'n': _params.n,
+      'presence_penalty': _params.presencePenalty,
+      'response_format': _params.responseFormat,
+      'seed': _params.seed,
+      'stop': _params.stop,
+      'temperature': _params.temperature,
+      'top_p': _params.topP,
+      'repetition_penalty': _params.repetitionPenalty,
+      'length_penalty': _params.lengthPenalty,
+      'include_reasoning': _params.includeReasoning,
+      'reasoning_effort': _params.reasoningEffort,
+      'time_limit': _params.timeLimit,
     };
 
     const query = {
@@ -903,7 +947,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/deployments/{id_or_name}/text/chat',
+        url: ENDPOINTS.DEPLOYMENT.CHAT,
         method: 'POST',
         body,
         qs: query,
@@ -998,7 +1042,36 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   > {
     const _params = { ...params };
     const _requiredParams = ['idOrName', 'messages'];
-    const _validParams = ['idOrName', 'messages', 'context', 'headers', 'signal', 'returnObject'];
+    const _validParams = [
+      'idOrName',
+      'messages',
+      'context',
+      'tools',
+      'toolChoiceOption',
+      'toolChoice',
+      'frequencyPenalty',
+      'logitBias',
+      'logprobs',
+      'topLogprobs',
+      'maxTokens',
+      'maxCompletionTokens',
+      'n',
+      'presencePenalty',
+      'responseFormat',
+      'seed',
+      'stop',
+      'temperature',
+      'topP',
+      'timeLimit',
+      'repetitionPenalty',
+      'lengthPenalty',
+      'includeReasoning',
+      'reasoningEffort',
+      'headers',
+      'signal',
+      'returnObject',
+    ];
+
     const _validationErrors = validateParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -1006,7 +1079,27 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const body = {
       'messages': _params.messages,
-      'context': _params.context,
+      'tools': _params.tools,
+      'tool_choice_option': _params.toolChoiceOption,
+      'tool_choice': _params.toolChoice,
+      'frequency_penalty': _params.frequencyPenalty,
+      'logit_bias': _params.logitBias,
+      'logprobs': _params.logprobs,
+      'top_logprobs': _params.topLogprobs,
+      'max_tokens': _params.maxTokens,
+      'max_completion_tokens': _params.maxCompletionTokens,
+      'n': _params.n,
+      'presence_penalty': _params.presencePenalty,
+      'response_format': _params.responseFormat,
+      'seed': _params.seed,
+      'stop': _params.stop,
+      'temperature': _params.temperature,
+      'top_p': _params.topP,
+      'repetition_penalty': _params.repetitionPenalty,
+      'length_penalty': _params.lengthPenalty,
+      'include_reasoning': _params.includeReasoning,
+      'reasoning_effort': _params.reasoningEffort,
+      'time_limit': _params.timeLimit,
     };
 
     const query = {
@@ -1025,7 +1118,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/deployments/{id_or_name}/text/chat_stream',
+        url: ENDPOINTS.DEPLOYMENT.CHAT_STREAM,
         method: 'POST',
         body,
         qs: query,
@@ -1134,7 +1227,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/deployments/{id_or_name}/time_series/forecast',
+        url: ENDPOINTS.DEPLOYMENT.TIME_SERIES_FORECAST,
         method: 'POST',
         body,
         qs: query,
@@ -1232,7 +1325,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/foundation_model_specs',
+        url: ENDPOINTS.FOUNDATION_MODEL.LIST_SPECS,
         method: 'GET',
         qs: query,
       },
@@ -1292,7 +1385,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/foundation_model_tasks',
+        url: ENDPOINTS.FOUNDATION_MODEL.LIST_TASKS,
         method: 'GET',
         qs: query,
       },
@@ -1389,7 +1482,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompts',
+        url: ENDPOINTS.PROMPT.BASE,
         method: 'POST',
         body,
         qs: query,
@@ -1462,7 +1555,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompts/{prompt_id}',
+        url: ENDPOINTS.PROMPT.BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -1552,7 +1645,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v2/asset_types/wx_prompt/search',
+        url: ENDPOINTS.PROMPT.SEARCH,
         method: 'POST',
         body,
         qs: query,
@@ -1655,7 +1748,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompts/{prompt_id}',
+        url: ENDPOINTS.PROMPT.BY_ID,
         method: 'PATCH',
         body,
         qs: query,
@@ -1723,7 +1816,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompts/{prompt_id}',
+        url: ENDPOINTS.PROMPT.BY_ID,
         method: 'DELETE',
         qs: query,
         path,
@@ -1807,7 +1900,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompts/{prompt_id}/lock',
+        url: ENDPOINTS.PROMPT.LOCK,
         method: 'PUT',
         body,
         qs: query,
@@ -1875,7 +1968,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompts/{prompt_id}/lock',
+        url: ENDPOINTS.PROMPT.LOCK,
         method: 'GET',
         qs: query,
         path,
@@ -1958,7 +2051,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompts/{prompt_id}/input',
+        url: ENDPOINTS.PROMPT.INPUT,
         method: 'POST',
         body,
         qs: query,
@@ -2028,7 +2121,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompts/{prompt_id}/chat_items',
+        url: ENDPOINTS.PROMPT.CHAT_ITEMS,
         method: 'POST',
         body,
         qs: query,
@@ -2124,7 +2217,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompt_sessions',
+        url: ENDPOINTS.PROMPT_SESSION.BASE,
         method: 'POST',
         body,
         qs: query,
@@ -2190,7 +2283,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompt_sessions/{session_id}',
+        url: ENDPOINTS.PROMPT_SESSION.BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -2260,7 +2353,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompt_sessions/{session_id}',
+        url: ENDPOINTS.PROMPT_SESSION.BY_ID,
         method: 'PATCH',
         body,
         qs: query,
@@ -2325,7 +2418,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompt_sessions/{session_id}',
+        url: ENDPOINTS.PROMPT_SESSION.BY_ID,
         method: 'DELETE',
         qs: query,
         path,
@@ -2416,7 +2509,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompt_sessions/{session_id}/entries',
+        url: ENDPOINTS.PROMPT_SESSION.ENTRIES,
         method: 'POST',
         body,
         qs: query,
@@ -2485,7 +2578,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompt_sessions/{session_id}/entries',
+        url: ENDPOINTS.PROMPT_SESSION.ENTRIES,
         method: 'GET',
         qs: query,
         path,
@@ -2552,7 +2645,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompt_sessions/{session_id}/entries/{entry_id}/chat_items',
+        url: ENDPOINTS.PROMPT_SESSION.ENTRY_CHAT_ITEMS,
         method: 'POST',
         body,
         qs: query,
@@ -2637,7 +2730,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompt_sessions/{session_id}/lock',
+        url: ENDPOINTS.PROMPT_SESSION.LOCK,
         method: 'PUT',
         body,
         qs: query,
@@ -2702,7 +2795,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompt_sessions/{session_id}/lock',
+        url: ENDPOINTS.PROMPT_SESSION.LOCK,
         method: 'GET',
         qs: query,
         path,
@@ -2767,7 +2860,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompt_sessions/{session_id}/entries/{entry_id}',
+        url: ENDPOINTS.PROMPT_SESSION.ENTRY_BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -2832,7 +2925,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1/prompt_sessions/{session_id}/entries/{entry_id}',
+        url: ENDPOINTS.PROMPT_SESSION.ENTRY_BY_ID,
         method: 'DELETE',
         qs: query,
         path,
@@ -2915,6 +3008,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
    * It is applied as an exponent to the sequence length, which in turn is used to divide the score of the sequence.
    * Since the score is the log likelihood of the sequence (i.e. negative), `lengthPenalty` > 0.0 promotes longer sequences,
    * while `lengthPenalty` < 0.0 encourages shorter sequences.
+   * @param {Crypto} [params.crypto] - Encryption configuration for securing inference requests.
+   * Contains `key_ref` (identifier of the DEK in the keys management service IBM Key Protect CRN format).
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @param {Object} callbacks - The parameters to send to the service.
    * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
@@ -2961,6 +3056,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'lengthPenalty',
       'includeReasoning',
       'reasoningEffort',
+      'crypto',
       'headers',
       'signal',
     ];
@@ -3008,7 +3104,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/chat',
+        url: ENDPOINTS.TEXT.CHAT,
         method: 'POST',
         body,
         qs: query,
@@ -3030,7 +3126,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
       : undefined;
     callbackHandler?.handleRequest(parameters);
-    const response = this.createRequest(parameters);
+    const response = this.createRequest(parameters, { crypto: _params.crypto });
     callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
       response
     );
@@ -3237,7 +3333,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     );
     const parameters = {
       options: {
-        url: '/ml/v1/text/chat_stream',
+        url: ENDPOINTS.TEXT.CHAT_STREAM,
         method: 'POST',
         body,
         qs: query,
@@ -3295,6 +3391,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
    * to be given.
    * @param {EmbeddingParameters} [params.parameters] - Parameters for text embedding requests.
+   * @param {Crypto} [params.crypto] - Encryption configuration for securing inference requests.
+   * Contains `key_ref` (identifier of the DEK in the keys management service IBM Key Protect CRN format).
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @param {Object} callbacks - The parameters to send to the service.
    * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
@@ -3317,6 +3415,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'spaceId',
       'projectId',
       'parameters',
+      'crypto',
       'headers',
       'signal',
     ];
@@ -3345,7 +3444,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/embeddings',
+        url: ENDPOINTS.TEXT.EMBEDDINGS,
         method: 'POST',
         body,
         qs: query,
@@ -3368,7 +3467,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
       : undefined;
     callbackHandler?.handleRequest(parameters);
-    const response = this.createRequest(parameters);
+    const response = this.createRequest(parameters, { crypto: _params.crypto });
     callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
       response
     );
@@ -3450,7 +3549,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/extractions',
+        url: ENDPOINTS.TEXT.EXTRACTIONS,
         method: 'POST',
         body,
         qs: query,
@@ -3518,7 +3617,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/extractions',
+        url: ENDPOINTS.TEXT.EXTRACTIONS,
         method: 'GET',
         qs: query,
       },
@@ -3584,7 +3683,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/extractions/{id}',
+        url: ENDPOINTS.TEXT.EXTRACTION_BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -3650,7 +3749,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/extractions/{id}',
+        url: ENDPOINTS.TEXT.EXTRACTION_BY_ID,
         method: 'DELETE',
         qs: query,
         path,
@@ -3693,6 +3792,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
    * @param {Moderations} [params.moderations] - Properties that control the moderations, for usages such as `Hate and
    * profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types
    * of moderations.
+   * @param {Crypto} [params.crypto] - Encryption configuration for securing inference requests.
+   * Contains `key_ref` (identifier of the DEK in the keys management service IBM Key Protect CRN format).
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @param {Object} callbacks - The parameters to send to the service.
    * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
@@ -3716,6 +3817,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'projectId',
       'parameters',
       'moderations',
+      'crypto',
       'headers',
       'signal',
     ];
@@ -3745,7 +3847,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/generation',
+        url: ENDPOINTS.TEXT.GENERATION,
         method: 'POST',
         body,
         qs: query,
@@ -3768,7 +3870,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
       : undefined;
     callbackHandler?.handleRequest(parameters);
-    const response = this.createRequest(parameters);
+    const response = this.createRequest(parameters, { crypto: _params.crypto });
     callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
       response
     );
@@ -3889,7 +3991,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/generation_stream',
+        url: ENDPOINTS.TEXT.GENERATION_STREAM,
         method: 'POST',
         body,
         qs: query,
@@ -3948,6 +4050,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
    * to be given.
    * @param {TextTokenizeParameters} [params.parameters] - The parameters for text tokenization.
+   * @param {Crypto} [params.crypto] - Encryption configuration for securing inference requests.
+   * Contains `key_ref` (identifier of the DEK in the keys management service IBM Key Protect CRN format).
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @returns {Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextTokenizeResponse>>}
    *
@@ -3964,6 +4068,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'spaceId',
       'projectId',
       'parameters',
+      'crypto',
       'headers',
       'signal',
     ];
@@ -3992,7 +4097,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/tokenization',
+        url: ENDPOINTS.TEXT.TOKENIZATION,
         method: 'POST',
         body,
         qs: query,
@@ -4011,7 +4116,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       },
     };
 
-    return this.createRequest(parameters);
+    return this.createRequest(parameters, { crypto: _params.crypto });
   }
   /*************************
    * timeSeriesTechPreview
@@ -4082,7 +4187,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/time_series/forecast',
+        url: ENDPOINTS.TIME_SERIES.FORECAST,
         method: 'POST',
         body,
         qs: query,
@@ -4241,7 +4346,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/trainings',
+        url: ENDPOINTS.TRAINING.BASE,
         method: 'POST',
         body,
         qs: query,
@@ -4325,7 +4430,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/trainings',
+        url: ENDPOINTS.TRAINING.BASE,
         method: 'GET',
         qs: query,
       },
@@ -4390,7 +4495,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/trainings/{training_id}',
+        url: ENDPOINTS.TRAINING.BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -4458,7 +4563,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/trainings/{training_id}',
+        url: ENDPOINTS.TRAINING.BY_ID,
         method: 'DELETE',
         qs: query,
         path,
@@ -4493,6 +4598,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
    * @param {string} [params.projectId] - The project that contains the resource. Either `space_id` or `project_id` has
    * to be given.
    * @param {RerankParameters} [params.parameters] - The properties used for reranking.
+   * @param {Crypto} [params.crypto] - Encryption configuration for securing inference requests.
+   * Contains `key_ref` (identifier of the DEK in the keys management service IBM Key Protect CRN format).
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request header
    * @param {Object} callbacks - The parameters to send to the service.
    * @param {InvokeRequestCallback} [callbacks.requestCallback] - Callback invoked with paramteres payload for API call
@@ -4516,6 +4623,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'spaceId',
       'projectId',
       'parameters',
+      'crypto',
       'headers',
       'signal',
     ];
@@ -4545,7 +4653,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/rerank',
+        url: ENDPOINTS.TEXT.RERANK,
         method: 'POST',
         body,
         qs: query,
@@ -4568,7 +4676,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
       : undefined;
     callbackHandler?.handleRequest(parameters);
-    const response = this.createRequest(parameters);
+    const response = this.createRequest(parameters, { crypto: _params.crypto });
     callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
       response
     );
@@ -4667,7 +4775,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/fine_tunings',
+        url: ENDPOINTS.FINE_TUNING.BASE,
         method: 'POST',
         body,
         qs: query,
@@ -4750,7 +4858,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/fine_tunings',
+        url: ENDPOINTS.FINE_TUNING.BASE,
         method: 'GET',
         qs: query,
       },
@@ -4813,7 +4921,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/fine_tunings/{id}',
+        url: ENDPOINTS.FINE_TUNING.BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -4879,7 +4987,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/fine_tunings/{id}',
+        url: ENDPOINTS.FINE_TUNING.BY_ID,
         method: 'DELETE',
         qs: query,
         path,
@@ -4957,7 +5065,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/documents',
+        url: ENDPOINTS.TUNING_DOCUMENT.BASE,
         method: 'POST',
         body,
         qs: query,
@@ -5017,7 +5125,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/documents',
+        url: ENDPOINTS.TUNING_DOCUMENT.BASE,
         method: 'GET',
         qs: query,
       },
@@ -5080,7 +5188,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/documents/{id}',
+        url: ENDPOINTS.TUNING_DOCUMENT.BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -5146,7 +5254,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/documents/{id}',
+        url: ENDPOINTS.TUNING_DOCUMENT.BY_ID,
         method: 'DELETE',
         qs: query,
         path,
@@ -5224,7 +5332,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/synthetic_data',
+        url: ENDPOINTS.SYNTHETIC_DATA.BASE,
         method: 'POST',
         body,
         qs: query,
@@ -5282,7 +5390,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/synthetic_data',
+        url: ENDPOINTS.SYNTHETIC_DATA.BASE,
         method: 'GET',
         qs: query,
       },
@@ -5343,7 +5451,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/synthetic_data/{id}',
+        url: ENDPOINTS.SYNTHETIC_DATA.BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -5409,7 +5517,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/synthetic_data/{id}',
+        url: ENDPOINTS.SYNTHETIC_DATA.BY_ID,
         method: 'DELETE',
         qs: query,
         path,
@@ -5488,7 +5596,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/taxonomies_imports',
+        url: ENDPOINTS.TAXONOMY.BASE,
         method: 'POST',
         body,
         qs: query,
@@ -5546,7 +5654,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/taxonomies_imports',
+        url: ENDPOINTS.TAXONOMY.BASE,
         method: 'GET',
         qs: query,
       },
@@ -5607,7 +5715,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/taxonomies_imports/{id}',
+        url: ENDPOINTS.TAXONOMY.BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -5673,7 +5781,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/tuning/taxonomies_imports/{id}',
+        url: ENDPOINTS.TAXONOMY.BY_ID,
         method: 'DELETE',
         qs: query,
         path,
@@ -5838,7 +5946,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/models',
+        url: ENDPOINTS.MODEL.BASE,
         method: 'POST',
         body,
         qs: query,
@@ -5916,7 +6024,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/models',
+        url: ENDPOINTS.MODEL.BASE,
         method: 'GET',
         qs: query,
       },
@@ -5979,7 +6087,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/models/{model_id}',
+        url: ENDPOINTS.MODEL.BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -6048,7 +6156,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/models/{model_id}',
+        url: ENDPOINTS.MODEL.BY_ID,
         method: 'PATCH',
         body,
         qs: query,
@@ -6111,7 +6219,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v4/models/{model_id}',
+        url: ENDPOINTS.MODEL.BY_ID,
         method: 'DELETE',
         qs: query,
         path,
@@ -6164,7 +6272,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1-beta/utility_agent_tools',
+        url: ENDPOINTS.UTILITY_AGENT_TOOL.BASE,
         method: 'GET',
       },
       defaultOptions: {
@@ -6219,7 +6327,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1-beta/utility_agent_tools/{tool_id}',
+        url: ENDPOINTS.UTILITY_AGENT_TOOL.BY_ID,
         method: 'GET',
         path,
       },
@@ -6273,7 +6381,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1-beta/utility_agent_tools/run',
+        url: ENDPOINTS.UTILITY_AGENT_TOOL.RUN,
         method: 'POST',
         body,
       },
@@ -6333,7 +6441,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v1-beta/utility_agent_tools/run/{tool_id}',
+        url: ENDPOINTS.UTILITY_AGENT_TOOL.RUN_BY_ID,
         method: 'POST',
         body,
         path,
@@ -6433,7 +6541,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v2/spaces',
+        url: ENDPOINTS.SPACE.BASE,
         method: 'POST',
         body,
         path,
@@ -6714,7 +6822,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/v2/spaces',
+        url: ENDPOINTS.SPACE.BASE,
         method: 'GET',
         qs: query,
       },
@@ -6790,7 +6898,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     };
     const parameters = {
       options: {
-        url: '/ml/v1/audio/transcriptions',
+        url: ENDPOINTS.AUDIO.TRANSCRIPTIONS,
         method: 'POST',
         body: form,
         qs: query,
@@ -6871,7 +6979,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/classifications',
+        url: ENDPOINTS.TEXT.CLASSIFICATIONS,
         method: 'POST',
         body,
         qs: query,
@@ -6939,7 +7047,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/classifications',
+        url: ENDPOINTS.TEXT.CLASSIFICATIONS,
         method: 'GET',
         qs: query,
       },
@@ -7005,7 +7113,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/classifications/{id}',
+        url: ENDPOINTS.TEXT.CLASSIFICATION_BY_ID,
         method: 'GET',
         qs: query,
         path,
@@ -7071,7 +7179,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
     const parameters = {
       options: {
-        url: '/ml/v1/text/classifications/{id}',
+        url: ENDPOINTS.TEXT.CLASSIFICATION_BY_ID,
         method: 'DELETE',
         qs: query,
         path,

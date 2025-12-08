@@ -17,6 +17,7 @@
 /* eslint-disable import/prefer-default-export */
 
 import { validateParams } from 'ibm-cloud-sdk-core';
+import { ENDPOINTS } from '../config';
 import { GatewayResource } from './resources';
 import {
   CreateRateLimitParams,
@@ -100,7 +101,7 @@ export class RateLimits extends GatewayResource {
     const body = { type, providerId, modelId, token, request };
 
     const parameters = {
-      url: '/ml/gateway/v1/rate-limits',
+      url: ENDPOINTS.GATEWAY.RATE_LIMIT.BASE,
       body,
       signal,
       headers,
@@ -146,7 +147,7 @@ export class RateLimits extends GatewayResource {
     const body = { type, 'provider_uuid': providerId, 'model_uuid': modelId, token, request };
 
     const parameters = {
-      url: '/ml/gateway/v1/rate-limits/{rate_limit_id}',
+      url: ENDPOINTS.GATEWAY.RATE_LIMIT.BY_ID,
       body,
       path,
       signal,
@@ -185,7 +186,7 @@ export class RateLimits extends GatewayResource {
       const path = { 'rate_limit_id': rateLimitId };
 
       const parameters = {
-        url: '/ml/gateway/v1/rate-limits/{rate_limit_id}',
+        url: ENDPOINTS.GATEWAY.RATE_LIMIT.BY_ID,
         path,
         signal,
         headers,
@@ -193,7 +194,7 @@ export class RateLimits extends GatewayResource {
       return this.client._get<Record<string, any>>(parameters);
     }
     const parameters = {
-      url: '/ml/gateway/v1/rate-limits',
+      url: ENDPOINTS.GATEWAY.RATE_LIMIT.BASE,
       signal,
       headers,
     };
@@ -249,7 +250,7 @@ export class RateLimits extends GatewayResource {
     const path = { 'rate_limit_id': rateLimitId };
 
     const parameters = {
-      url: '/ml/gateway/v1/rate-limits/{rate_limit_id}',
+      url: ENDPOINTS.GATEWAY.RATE_LIMIT.BY_ID,
       path,
       signal,
       headers,

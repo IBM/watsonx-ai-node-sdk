@@ -24,7 +24,7 @@ const { StreamTransform } = require('../../dist/lib/common');
 // need to import the whole package to mock getAuthenticatorFromEnvironment
 const get_authenticator_from_environment = require('../../dist/authentication/utils/get-authenticator-from-environment');
 
-const { NoAuthAuthenticator } = sdkCorePackage;
+const { NoAuthAuthenticator, BaseService } = sdkCorePackage;
 const { WatsonXAI } = require('../../dist/vml_v1');
 const { checkAxiosOptions } = require('./utils/checks');
 
@@ -53,10 +53,11 @@ const watsonxAIService = new WatsonXAI(watsonxAIServiceOptions);
 let createRequestMock = null;
 function mock_createRequest() {
   if (!createRequestMock) {
-    createRequestMock = jest.spyOn(watsonxAIService, 'createRequest');
+    createRequestMock = jest.spyOn(BaseService.prototype, 'createRequest');
     createRequestMock.mockImplementation(() => Promise.resolve());
   }
 }
+
 function unmock_createRequest() {
   if (createRequestMock) {
     createRequestMock.mockRestore();
@@ -1627,12 +1628,52 @@ describe('WatsonXAI', () => {
         // Construct the params object for operation deploymentsTextChat
         const idOrName = 'testString';
         const messages = [deploymentTextChatMessagesModel];
-        const context = 'testString';
+        const tools = [{ type: 'function', function: { name: 'testFunction' } }];
+        const toolChoiceOption = 'auto';
+        const toolChoice = { type: 'function', function: { name: 'testFunction' } };
+        const frequencyPenalty = 0.5;
+        const logitBias = { '1': 1.5 };
+        const logprobs = true;
+        const topLogprobs = 2;
+        const maxTokens = 100;
+        const maxCompletionTokens = 100;
+        const n = 1;
+        const presencePenalty = 0.5;
+        const responseFormat = { type: 'json_object' };
+        const seed = 42;
+        const stop = ['stop1', 'stop2'];
+        const temperature = 0.7;
+        const topP = 0.9;
+        const timeLimit = 60000;
+        const repetitionPenalty = 1.1;
+        const lengthPenalty = 1.0;
+        const includeReasoning = true;
+        const reasoningEffort = 'medium';
         const { signal } = new AbortController();
         const deploymentsTextChatParams = {
           idOrName,
           messages,
-          context,
+          tools,
+          toolChoiceOption,
+          toolChoice,
+          frequencyPenalty,
+          logitBias,
+          logprobs,
+          topLogprobs,
+          maxTokens,
+          maxCompletionTokens,
+          n,
+          presencePenalty,
+          responseFormat,
+          seed,
+          stop,
+          temperature,
+          topP,
+          timeLimit,
+          repetitionPenalty,
+          lengthPenalty,
+          includeReasoning,
+          reasoningEffort,
           signal,
         };
         const deploymentsTextChatResult =
@@ -1652,7 +1693,27 @@ describe('WatsonXAI', () => {
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.messages).toEqual(messages);
-        expect(mockRequestOptions.body.context).toEqual(context);
+        expect(mockRequestOptions.body.tools).toEqual(tools);
+        expect(mockRequestOptions.body.tool_choice_option).toEqual(toolChoiceOption);
+        expect(mockRequestOptions.body.tool_choice).toEqual(toolChoice);
+        expect(mockRequestOptions.body.frequency_penalty).toEqual(frequencyPenalty);
+        expect(mockRequestOptions.body.logit_bias).toEqual(logitBias);
+        expect(mockRequestOptions.body.logprobs).toEqual(logprobs);
+        expect(mockRequestOptions.body.top_logprobs).toEqual(topLogprobs);
+        expect(mockRequestOptions.body.max_tokens).toEqual(maxTokens);
+        expect(mockRequestOptions.body.max_completion_tokens).toEqual(maxCompletionTokens);
+        expect(mockRequestOptions.body.n).toEqual(n);
+        expect(mockRequestOptions.body.presence_penalty).toEqual(presencePenalty);
+        expect(mockRequestOptions.body.response_format).toEqual(responseFormat);
+        expect(mockRequestOptions.body.seed).toEqual(seed);
+        expect(mockRequestOptions.body.stop).toEqual(stop);
+        expect(mockRequestOptions.body.temperature).toEqual(temperature);
+        expect(mockRequestOptions.body.top_p).toEqual(topP);
+        expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);
+        expect(mockRequestOptions.body.repetition_penalty).toEqual(repetitionPenalty);
+        expect(mockRequestOptions.body.length_penalty).toEqual(lengthPenalty);
+        expect(mockRequestOptions.body.include_reasoning).toEqual(includeReasoning);
+        expect(mockRequestOptions.body.reasoning_effort).toEqual(reasoningEffort);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.path.id_or_name).toEqual(idOrName);
       }
@@ -1744,13 +1805,55 @@ describe('WatsonXAI', () => {
         // Construct the params object for operation deploymentsTextChatStream
         const idOrName = 'testString';
         const messages = [deploymentTextChatMessagesModel];
-        const context = 'testString';
+        const tools = [{ type: 'function', function: { name: 'testFunction' } }];
+        const toolChoiceOption = 'auto';
+        const toolChoice = { type: 'function', function: { name: 'testFunction' } };
+        const frequencyPenalty = 0.5;
+        const logitBias = { '1': 1.5 };
+        const logprobs = true;
+        const topLogprobs = 2;
+        const maxTokens = 100;
+        const maxCompletionTokens = 100;
+        const n = 1;
+        const presencePenalty = 0.5;
+        const responseFormat = { type: 'json_object' };
+        const seed = 42;
+        const stop = ['stop1', 'stop2'];
+        const temperature = 0.7;
+        const topP = 0.9;
+        const timeLimit = 60000;
+        const repetitionPenalty = 1.1;
+        const lengthPenalty = 1.0;
+        const includeReasoning = true;
+        const reasoningEffort = 'medium';
+        const returnObject = true;
         const { signal } = new AbortController();
         const deploymentsTextChatStreamParams = {
           idOrName,
           messages,
-          context,
+          tools,
+          toolChoiceOption,
+          toolChoice,
+          frequencyPenalty,
+          logitBias,
+          logprobs,
+          topLogprobs,
+          maxTokens,
+          maxCompletionTokens,
+          n,
+          presencePenalty,
+          responseFormat,
+          seed,
+          stop,
+          temperature,
+          topP,
+          timeLimit,
+          repetitionPenalty,
+          lengthPenalty,
+          includeReasoning,
+          reasoningEffort,
           signal,
+          returnObject,
         };
 
         const deploymentsTextChatStreamResult = watsonxAIService.deploymentsTextChatStream(
@@ -1775,7 +1878,27 @@ describe('WatsonXAI', () => {
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
         expect(mockRequestOptions.body.messages).toEqual(messages);
-        expect(mockRequestOptions.body.context).toEqual(context);
+        expect(mockRequestOptions.body.tools).toEqual(tools);
+        expect(mockRequestOptions.body.tool_choice_option).toEqual(toolChoiceOption);
+        expect(mockRequestOptions.body.tool_choice).toEqual(toolChoice);
+        expect(mockRequestOptions.body.frequency_penalty).toEqual(frequencyPenalty);
+        expect(mockRequestOptions.body.logit_bias).toEqual(logitBias);
+        expect(mockRequestOptions.body.logprobs).toEqual(logprobs);
+        expect(mockRequestOptions.body.top_logprobs).toEqual(topLogprobs);
+        expect(mockRequestOptions.body.max_tokens).toEqual(maxTokens);
+        expect(mockRequestOptions.body.max_completion_tokens).toEqual(maxCompletionTokens);
+        expect(mockRequestOptions.body.n).toEqual(n);
+        expect(mockRequestOptions.body.presence_penalty).toEqual(presencePenalty);
+        expect(mockRequestOptions.body.response_format).toEqual(responseFormat);
+        expect(mockRequestOptions.body.seed).toEqual(seed);
+        expect(mockRequestOptions.body.stop).toEqual(stop);
+        expect(mockRequestOptions.body.temperature).toEqual(temperature);
+        expect(mockRequestOptions.body.top_p).toEqual(topP);
+        expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);
+        expect(mockRequestOptions.body.repetition_penalty).toEqual(repetitionPenalty);
+        expect(mockRequestOptions.body.length_penalty).toEqual(lengthPenalty);
+        expect(mockRequestOptions.body.include_reasoning).toEqual(includeReasoning);
+        expect(mockRequestOptions.body.reasoning_effort).toEqual(reasoningEffort);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.path.id_or_name).toEqual(idOrName);
       }
@@ -4576,6 +4699,9 @@ describe('WatsonXAI', () => {
         const lengthPenalty = 100;
         const includeReasoning = true;
         const reasoningEffort = 'low';
+        const crypto = {
+          key_ref: 'test-key-ref',
+        };
 
         const { signal } = new AbortController();
         const textChatParams = {
@@ -4609,6 +4735,7 @@ describe('WatsonXAI', () => {
           lengthPenalty,
           reasoningEffort,
           includeReasoning,
+          crypto,
         };
 
         const textChatResult = watsonxAIService.textChat(textChatParams);
@@ -4655,6 +4782,7 @@ describe('WatsonXAI', () => {
         expect(mockRequestOptions.body.time_limit).toEqual(timeLimit);
         expect(mockRequestOptions.body.include_reasoning).toEqual(includeReasoning);
         expect(mockRequestOptions.body.reasoning_effort).toEqual(reasoningEffort);
+        expect(mockRequestOptions.body.crypto).toEqual(crypto);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
@@ -4978,6 +5106,9 @@ describe('WatsonXAI', () => {
         const spaceId = 'testString';
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const parameters = embeddingParametersModel;
+        const crypto = {
+          key_ref: 'test-key-ref',
+        };
         const { signal } = new AbortController();
         const embedTextParams = {
           modelId,
@@ -4985,6 +5116,7 @@ describe('WatsonXAI', () => {
           spaceId,
           projectId,
           parameters,
+          crypto,
           signal,
         };
 
@@ -5008,6 +5140,7 @@ describe('WatsonXAI', () => {
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
+        expect(mockRequestOptions.body.crypto).toEqual(crypto);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
@@ -5173,6 +5306,9 @@ describe('WatsonXAI', () => {
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const parameters = textGenParametersModel;
         const moderations = moderationsModel;
+        const crypto = {
+          key_ref: 'test-key-ref',
+        };
         const { signal } = new AbortController();
         const generateTextParams = {
           input,
@@ -5181,6 +5317,7 @@ describe('WatsonXAI', () => {
           projectId,
           parameters,
           moderations,
+          crypto,
           signal,
         };
 
@@ -5205,6 +5342,7 @@ describe('WatsonXAI', () => {
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.moderations).toEqual(moderations);
+        expect(mockRequestOptions.body.crypto).toEqual(crypto);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 
@@ -5486,6 +5624,9 @@ describe('WatsonXAI', () => {
         const spaceId = 'testString';
         const projectId = '12ac4cf1-252f-424b-b52d-5cdd9814987f';
         const parameters = textTokenizeParametersModel;
+        const crypto = {
+          key_ref: 'test-key-ref',
+        };
         const { signal } = new AbortController();
         const tokenizeTextParams = {
           modelId,
@@ -5493,6 +5634,7 @@ describe('WatsonXAI', () => {
           spaceId,
           projectId,
           parameters,
+          crypto,
           signal,
         };
 
@@ -5516,6 +5658,7 @@ describe('WatsonXAI', () => {
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
+        expect(mockRequestOptions.body.crypto).toEqual(crypto);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
       }
 

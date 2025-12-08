@@ -370,3 +370,5 @@ export {
   TextExtractionSchema,
   TextExtractionSemanticKvpField,
 } from './types';
+export { EncryptionParams, Crypto } from './encryption';
+export { CreateRequestParams } from './request';
