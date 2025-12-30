@@ -55,7 +55,7 @@
     "@types/node": "^18.0.0",
     "extend": "3.0.2",
     "form-data": "^4.0.4",
-    "ibm-cloud-sdk-core": "^5.4.3"
+    "ibm-cloud-sdk-core": "^5.4.5"
   },
   "devDependencies": {
     "@ibm-cloud/sdk-test-utilities": "^1.0.0",
