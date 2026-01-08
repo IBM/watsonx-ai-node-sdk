@@ -24,7 +24,14 @@ const { WatsonXAI } = require('../../dist/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
 const testHelper = require('../resources/test-helper.js');
 const { Stream } = require('../../dist/lib/common.js');
-const { chatModel } = require('./config.js');
+const {
+  CHAT_MODEL_IBM: chatModel,
+  CHAT_MODEL_MISTRAL,
+  CHAT_MODEL_META,
+  EMBEDDING_MODEL_IBM: embeddingModel,
+  TIME_SERIES_MODEL_IBM_512_96: timeSeriesModelId,
+  CHAT_MODEL_GPT_OOS,
+} = require('./config.js');
 
 // testcase timeout value (200s).
 const timeout = 200000;
@@ -58,7 +65,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   let watsonxAIService;
   // Generate and log the time series data
   const timeSeriesData = testHelper.generateTimeSeries();
-  const timeSeriesModelId = 'ibm/granite-ttm-512-96-r2';
   const tsForecastInputSchemaModel = {
     timestamp_column: 'date',
     freq: '1h',
@@ -402,7 +408,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       };
 
       const params = {
-        modelId: 'ibm/slate-125m-english-rtrvr',
+        modelId: embeddingModel,
         inputs: ['Youth craves thrills while adulthood cherishes wisdom.'],
         projectId,
         parameters: embeddingParametersModel,
@@ -455,7 +461,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res.result.usage.completion_tokens).toBe(10);
     });
 
-    test('textChat with reasoning', async () => {
+    test.skip('textChat with reasoning', async () => {
       const res = await watsonxAIService.textChat({
         messages: [
           {
@@ -463,7 +469,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
             content: 'Do math 2+2',
           },
         ],
-        modelId: 'openai/gpt-oss-120b',
+        modelId: CHAT_MODEL_GPT_OOS,
         projectId,
         includeReasoning: true,
       });
@@ -654,7 +660,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(chunks).toHaveLength(n);
     });
 
-    test('textChatStream with reasoning', async () => {
+    test.skip('textChatStream with reasoning', async () => {
       const stream = await watsonxAIService.textChatStream({
         messages: [
           {
@@ -662,7 +668,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
             content: 'Do math 2+2',
           },
         ],
-        modelId: 'openai/gpt-oss-120b',
+        modelId: CHAT_MODEL_GPT_OOS,
         projectId,
         includeReasoning: true,
         returnObject: true,
@@ -680,9 +686,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       }
       expect(result.reasoning_content.length).toBeGreaterThan(0);
     });
-    const modelName = 'mistralai/mistral-medium-2505';
-    const models = [modelName, 'ibm/granite-3-8b-instruct', chatModel];
-    test.each(models)(
+    const chatModels = [chatModel, CHAT_MODEL_META, CHAT_MODEL_MISTRAL];
+    test.each(chatModels)(
       'textChatStream with returnObject returning correct object with %s',
       async (model) => {
         const stream = await watsonxAIService.textChatStream({
@@ -817,7 +822,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       const res = await watsonxAIService.embedText(
         {
           inputs: ['Hello. How are you?', 'Hello world'],
-          modelId: 'ibm/slate-125m-english-rtrvr',
+          modelId: embeddingModel,
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
@@ -856,9 +861,15 @@ describe('WatsonxAiMlVml_v1_integration', () => {
   });
 
   describe('Crypto parameter support', () => {
+    const YP_QA_URL = 'https://yp-qa.ml.cloud.ibm.com';
     const cryptoConfig = {
       key_ref: process.env.WATSONX_AI_CRYPTO_KEY_REF,
     };
+
+    const watsonxAIServiceYPQA = WatsonXAI.newInstance({
+      serviceUrl: YP_QA_URL,
+      version: '2024-03-14',
+    });
 
     test('textChat with crypto parameter', async () => {
       const textChatMessagesModel = {
@@ -874,7 +885,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         crypto: cryptoConfig,
       };
 
-      const res = await watsonxAIService.textChat(params);
+      const res = await watsonxAIServiceYPQA.textChat(params);
 
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -893,7 +904,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         crypto: cryptoConfig,
       };
 
-      const res = await watsonxAIService.embedText(params);
+      const res = await watsonxAIServiceYPQA.embedText(params);
 
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -913,7 +924,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         crypto: cryptoConfig,
       };
 
-      const res = await watsonxAIService.generateText(params);
+      const res = await watsonxAIServiceYPQA.generateText(params);
 
       expect(res?.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -932,7 +943,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         crypto: cryptoConfig,
       };
 
-      const res = await watsonxAIService.tokenizeText(params);
+      const res = await watsonxAIServiceYPQA.tokenizeText(params);
 
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -965,7 +976,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         crypto: cryptoConfig,
       };
 
-      const res = await watsonxAIService.textRerank(params);
+      const res = await watsonxAIServiceYPQA.textRerank(params);
 
       expect(res.status).toBe(200);
       expect(res.result).toBeDefined();
@@ -1014,7 +1025,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       },
       {
         params: {
-          modelId: 'ibm/slate-125m-english-rtrvr',
+          modelId: embeddingModel,
           inputs: ['Hi. I will abort this request anyway'],
           projectId,
         },

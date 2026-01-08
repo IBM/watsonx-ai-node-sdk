@@ -20,7 +20,7 @@ const watsonxAIService = WatsonXAI.newInstance({
 
 // Specify two models
 const modelName = 'ibm/granite-3-3-8b-instruct';
-const modelName2 = 'meta-llama/llama-3-3-70b-instruct';
+const modelName2 = 'mistralai/mistral-small-3-1-24b-instruct-2503';
 
 // Specify input data
 const input =

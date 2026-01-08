@@ -12,8 +12,8 @@ import { DataType } from '@zilliz/milvus2-sdk-node';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
 
-const modelName = 'ibm/granite-3-2-8b-instruct';
-const embeddingsModelName = 'ibm/slate-30m-english-rtrvr-v2';
+const modelName = 'ibm/granite-3-3-8b-instruct';
+const embeddingsModelName = 'ibm/slate-125m-english-rtrvr-v2';
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
@@ -61,79 +61,86 @@ const schema = [
   { name: 'loc', data_type: DataType.VarChar, max_length: 200 },
   { name: 'source', data_type: DataType.VarChar, max_length: 200 },
   { name: 'langchain_text', data_type: DataType.VarChar, max_length: 1000 },
-  { name: 'langchain_vector', data_type: DataType.FloatVector, dim: 384 },
+  { name: 'langchain_vector', data_type: DataType.FloatVector, dim: 768 },
 ];
 
 const milvus = new Milvus(embeddings, authParams);
-const res = await milvus.client.createCollection({
-  collection_name: collectionName,
-  fields: schema,
-  auto_id: true,
-});
 
-const documentsArray = chunkArray(chunkArray<Document>(split, 500), 10);
-let i = 1;
-for (const documents of documentsArray) {
-  console.log('Start loading batch ' + i);
-  await Promise.all(documents.map((document) => milvus.addDocuments(document)));
-  console.log('Finish loading batch ' + i);
-  i += 1;
-}
-await milvus.client.createIndex({
-  collection_name: collectionName,
-  field_name: 'langchain_vector',
-  index_name: 'myindex',
-  index_type: 'HNSW',
-  params: { efConstruction: 10, M: 4 },
-  metric_type: 'L2',
-});
-
-const llm = new ChatWatsonx({
-  projectId: process.env.WATSONX_AI_PROJECT_ID,
-  serviceUrl: process.env.WATSONX_AI_SERVICE_URL as string,
-  watsonxAIApikey: process.env.WATSONX_AI_APIKEY,
-  watsonxAIAuthType: 'iam',
-  version: '2024-05-31',
-  model: modelName,
-  maxRetries: 0,
-});
-
-const retrieveSchema = z.object({ query: z.string() });
-
-const retrieve = tool(
-  async ({ query }) => {
-    const searchResult = 2;
-    const retrievedDocs = await milvus.similaritySearch(query, searchResult);
-    const serialized = retrievedDocs
-      .map((doc) => `Source: ${doc.metadata.source}\nContent: ${doc.pageContent}`)
-      .join('\n');
-    return [serialized, retrievedDocs];
-  },
-  {
-    name: 'retrieve',
-    description: 'Retrieve information related to a query.',
-    schema: retrieveSchema,
-    responseFormat: 'content_and_artifact',
+try {
+  const res = await milvus.client.createCollection({
+    collection_name: collectionName,
+    fields: schema,
+    auto_id: true,
+  });
+  const documentsArray = chunkArray(chunkArray<Document>(split, 500), 10);
+  let i = 1;
+  for (const documents of documentsArray) {
+    console.log('Start loading batch ' + i);
+    await Promise.all(documents.map((document) => milvus.addDocuments(document)));
+    console.log('Finish loading batch ' + i);
+    i += 1;
   }
-);
+  await milvus.client.createIndex({
+    collection_name: collectionName,
+    field_name: 'langchain_vector',
+    index_name: 'myindex',
+    index_type: 'HNSW',
+    params: { efConstruction: 10, M: 4 },
+    metric_type: 'L2',
+  });
 
-const agent = createAgent({
-  model: llm,
-  tools: [retrieve],
-});
+  const llm = new ChatWatsonx({
+    projectId: process.env.WATSONX_AI_PROJECT_ID,
+    serviceUrl: process.env.WATSONX_AI_SERVICE_URL as string,
+    watsonxAIApikey: process.env.WATSONX_AI_APIKEY,
+    watsonxAIAuthType: 'iam',
+    version: '2024-05-31',
+    model: modelName,
+    maxRetries: 0,
+  });
 
-const questions: [number, string, string][] = [
-  [
-    0,
-    'What did the president say about Ketanji Brown Jackson?',
-    'That he nominated her to serve United States Supreme Court ',
-  ],
-];
-for (const [index, [_qid, question, answer]] of questions.entries()) {
-  const result = await agent.invoke({ messages: [{ role: 'user', content: question }] });
-  console.log(`============================= Question #${index + 1} =============================`);
-  console.log('\t' + question + '\n');
-  console.log('Model answer: ' + result.messages.at(-1)?.content + '\n');
-  console.log('Expected answer: ' + answer + '\n');
+  const retrieveSchema = z.object({ query: z.string() });
+
+  const retrieve = tool(
+    async ({ query }) => {
+      const searchResult = 2;
+      const retrievedDocs = await milvus.similaritySearch(query, searchResult);
+      const serialized = retrievedDocs
+        .map((doc) => `Source: ${doc.metadata.source}\nContent: ${doc.pageContent}`)
+        .join('\n');
+      return [serialized, retrievedDocs];
+    },
+    {
+      name: 'retrieve',
+      description: 'Retrieve information related to a query.',
+      schema: retrieveSchema,
+      responseFormat: 'content_and_artifact',
+    }
+  );
+
+  const agent = createAgent({
+    model: llm,
+    tools: [retrieve],
+  });
+
+  const questions: [number, string, string][] = [
+    [
+      0,
+      'What did the president say about Ketanji Brown Jackson?',
+      'That he nominated her to serve United States Supreme Court ',
+    ],
+  ];
+  for (const [index, [_qid, question, answer]] of questions.entries()) {
+    const result = await agent.invoke({ messages: [{ role: 'user', content: question }] });
+    console.log(
+      `============================= Question #${index + 1} =============================`
+    );
+    console.log('\t' + question + '\n');
+    console.log('Model answer: ' + result.messages.at(-1)?.content + '\n');
+    console.log('Expected answer: ' + answer + '\n');
+  }
+} catch (e) {
+  throw e;
+} finally {
+  await milvus.client.dropCollection({ collection_name: collectionName });
 }
-await milvus.client.dropCollection({ collection_name: collectionName });

@@ -118,7 +118,7 @@ export interface CreateChatCompletionsParams extends DefaultParams {
   /** Constrains effort on reasoning for reasoning models. For OpenAI, currently supported by `o1` models only.
    *  Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
    */
-  reasoningEffort?: CreateChatCompletionsConstants.ReasoningEffort | string;
+  reasoningEffort?: 'low' | 'medium' | 'high';
   /** An object specifying the format that the model must output.
    *  - Setting to `{ "type": "json_schema", "json_schema": {...} }` enables [Structured Outputs] which ensures the
    *  model will match your supplied JSON schema.

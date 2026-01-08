@@ -3,7 +3,7 @@ import { AIMessage, HumanMessage, SystemMessage } from '@langchain/core/messages
 import { conversationPrinter } from './utils.ts';
 import '../../utils/config.ts';
 
-const modelName = 'ibm/granite-3-2-8b-instruct';
+const modelName = 'ibm/granite-3-3-8b-instruct';
 const model = new ChatWatsonx({
   projectId: process.env.WATSONX_AI_PROJECT_ID,
   serviceUrl: process.env.WATSONX_AI_SERVICE_URL as string,

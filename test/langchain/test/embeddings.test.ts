@@ -1,5 +1,6 @@
 import { WatsonxEmbeddings } from '@langchain/community/embeddings/ibm';
 import { config } from 'dotenv';
+import { EMBEDDING_MODEL_IBM } from './config.ts';
 
 config({ path: '../../credentials/watsonx_ai_ml_vml_v1.env' });
 
@@ -7,7 +8,7 @@ const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const spaceId = process.env.WATSONX_AI_SPACE_ID;
 const version = '2024-05-31';
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
-const model = 'ibm/slate-125m-english-rtrvr';
+const model = EMBEDDING_MODEL_IBM;
 
 describe('Regression tests regarding langchain embeddings', () => {
   describe('Positive tests', () => {
@@ -64,7 +65,7 @@ describe('Regression tests regarding langchain embeddings', () => {
           projectId,
           serviceUrl,
           truncateInputTokens: 1,
-          model: 'ibm/slate-30m-english-rtrvr-v2',
+          model,
         });
         const result = await embeddings.embedDocuments(['Hello', 'world']);
         expect(result).toBeInstanceOf(Array);
@@ -83,15 +84,17 @@ describe('Regression tests regarding langchain embeddings', () => {
       await expect(embeddings.embedQuery('Hello world')).rejects.toThrow();
     });
     test('Passing not existing props', async () => {
-      const embeddings = new WatsonxEmbeddings({
-        version,
-        projectId,
-        serviceUrl,
-        model: 'NotExistings',
-        // @ts-expect-error
-        notExisting: 'notExisting',
-      });
-      await expect(embeddings.embedQuery('Hello world')).rejects.toThrow();
+      expect(
+        () =>
+          new WatsonxEmbeddings({
+            version,
+            projectId,
+            serviceUrl,
+            model: 'NotExistings',
+            // @ts-expect-error
+            notExisting: 'notExisting',
+          })
+      ).toThrow();
     });
   });
 });

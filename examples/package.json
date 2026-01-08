@@ -38,7 +38,7 @@
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
     "@langchain/community": "^1.0.4",
-    "@langchain/core": "^1.0.6",
+    "@langchain/core": "^1.1.11",
     "@langchain/langgraph": "^1.0.2",
     "@zilliz/milvus2-sdk-node": "^2.5.0",
     "axios": "^1.7.8",

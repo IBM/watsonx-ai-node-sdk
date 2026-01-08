@@ -11,7 +11,7 @@
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
     "@langchain/community": "^1.0.0",
-    "@langchain/core": "^1.0.1",
+    "@langchain/core": "^1.1.11",
     "@langchain/langgraph": "^1.0.1",
     "@swc/jest": "^0.2.39",
     "axios": "^1.7.7",

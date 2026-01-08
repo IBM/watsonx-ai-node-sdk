@@ -7,7 +7,7 @@ import z from 'zod/v3';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
 
-const modelName = 'ibm/granite-3-2-8b-instruct';
+const modelName = 'ibm/granite-3-3-8b-instruct';
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
@@ -23,7 +23,7 @@ const embeddings = new WatsonxEmbeddings({
   watsonxAIAuthType: 'iam',
   version: '2024-05-31',
   maxRetries: 0,
-  model: 'ibm/slate-30m-english-rtrvr-v2',
+  model: 'ibm/slate-125m-english-rtrvr-v2',
 });
 
 const loader = new CheerioWebBaseLoader(

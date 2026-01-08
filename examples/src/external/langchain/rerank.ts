@@ -9,7 +9,7 @@ const embeddings = new WatsonxEmbeddings({
   version: '2023-05-31',
   serviceUrl: process.env.WATSONX_AI_SERVICE_URL as string,
   projectId: process.env.WATSONX_AI_PROJECT_ID,
-  model: 'ibm/slate-125m-english-rtrvr',
+  model: 'ibm/slate-125m-english-rtrvr-v2',
 });
 
 const query = 'What did the president say about Ketanji Brown Jackson';

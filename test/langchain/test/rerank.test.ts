@@ -1,13 +1,14 @@
 import { WatsonxRerank } from '@langchain/community/document_compressors/ibm';
 import { Document } from '@langchain/core/documents';
 import { config } from 'dotenv';
+import { CROSS_ENCODER_MODEL } from './config.ts';
 
 config({ path: '../../credentials/watsonx_ai_ml_vml_v1.env' });
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const spaceId = process.env.WATSONX_AI_SPACE_ID;
 const version = '2024-05-31';
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
-const model = 'cross-encoder/ms-marco-minilm-l-12-v2';
+const model = CROSS_ENCODER_MODEL;
 const query = 'What is the capital of the United States?';
 const docs = [
   new Document({

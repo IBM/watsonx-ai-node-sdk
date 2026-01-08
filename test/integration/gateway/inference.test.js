@@ -46,8 +46,8 @@ describe('Completions', () => {
 
     const textCompletions = new GenerateTextCompletions(client);
     const chat = new Chat(client);
-    const modelAlias = 'ibm/granite-3-2-8b-instruct';
-    const modelName = 'ibm/granite-3-2-8b-instruct';
+    const modelAlias = 'ibm/granite-3-3-8b-instruct';
+    const modelName = 'ibm/granite-3-3-8b-instruct';
 
     beforeAll(async () => {
       const timestamp = Date.now();
@@ -178,7 +178,7 @@ describe('Completions', () => {
 });
 
 describe('Embeddings', () => {
-  const model = 'ibm/granite-embedding-107m-multilingual';
+  const model = 'ibm/slate-125m-english-rtrvr-v2';
   jest.setTimeout(timeout);
 
   describe('Init embeddings instances', () => {

@@ -23,7 +23,7 @@ const path = require('path');
 const { WatsonXAI } = require('../../dist/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
 const { Stream } = require('../../dist/lib/common.js');
-const { chatModel } = require('./config.js');
+const { CHAT_MODEL_IBM: chatModel } = require('./config.js');
 // testcase timeout value (200s).
 const timeout = 200000;
 

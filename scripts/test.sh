@@ -32,24 +32,28 @@ for cmd in npm tsc; do
         break
     fi
 done
-
+set +e
 case "${TEST_SUITE}" in
     unit)
         npm run test-unit
         ;;
     integration)
-        npm run test-integration
+        npm run test-integration; p_stat=$?
+        source scripts/utils.sh; set-test-status $TEST_SUITE ${p_stat}
         ;;
     regression)
-        npm run test-regression
+        npm run test-regression; p_stat=$?
+        source scripts/utils.sh; set-test-status $TEST_SUITE ${p_stat}
         ;;
     examples)
-        npm run test-examples
+        npm run test-examples; p_stat=$?
+        source scripts/utils.sh; set-test-status $TEST_SUITE ${p_stat}
         ;;
     --*)
         echo "Unknown test suite (--test-suite) value: ${TEST_SUITE}, should be one of: [unit, integration, regression, examples]"
         exit 1
         ;;
 esac
+set -e
 
 npm run check-packages
