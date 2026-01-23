@@ -42,4 +42,6 @@ fi
     pnpm build
     pnpm test:single ibm
 )
+SUBSHELL_EXIT=$?
 rm -rf langchainjs
+exit $SUBSHELL_EXIT

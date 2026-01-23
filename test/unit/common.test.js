@@ -30,7 +30,7 @@ describe('Tests of Common Library', () => {
     test('should return correct User-Agent header', () => {
       const headers = getSdkHeaders('service1', 'v1', 'operation1');
       expect(headers).not.toBeNull();
-      expect(headers['User-Agent']).toMatch(/^autogen-node-sdk\/.*/);
+      expect(headers['User-Agent']).toMatch(/^ibm-cloud-watsonx-ai\/.*/);
     });
   });
 

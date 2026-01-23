@@ -23,6 +23,7 @@
 /* eslint-disable import/first */
 /* eslint-disable import/extensions */
 
+import { RequestCallbacks } from './types';
 import { Crypto } from './encryption';
 
 export interface CreateRequestParams {
@@ -40,4 +41,5 @@ export interface CreateRequestParams {
 
 export interface AdditionalCreateRequestParams {
   crypto?: Crypto;
+  callbacks?: RequestCallbacks;
 }

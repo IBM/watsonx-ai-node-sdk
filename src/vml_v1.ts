@@ -31,12 +31,14 @@ import {
   validateParams,
 } from 'ibm-cloud-sdk-core';
 import FormData from 'form-data';
+import { Unzip } from 'zlib';
 import {
   getSdkHeaders,
   Stream,
   transformStreamToObjectStream,
   transformStreamToStringStream,
 } from './lib/common';
+import { validateRequestParams } from './helpers/validators';
 import { WatsonxBaseService } from './base';
 import * as Types from './types';
 import * as BaseTypes from './base/types';
@@ -108,10 +110,10 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     return new WatsonxAiMlVml_v1(options);
   }
 
-  protected createRequest(
+  protected createRequest<T>(
     parameters: CreateRequestParams,
     additionalParameters?: AdditionalCreateRequestParams
-  ) {
+  ): Promise<T> {
     const apiType =
       parameters.defaultOptions.serviceUrl && parameters.defaultOptions.serviceUrl.includes('api')
         ? 'dataplatform'
@@ -126,7 +128,13 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       }
     }
 
-    return super.createRequest(parameters);
+    const callbackHandler = additionalParameters?.callbacks
+      ? new WatsonxAiMlVml_v1.CallbackHandler(additionalParameters?.callbacks)
+      : undefined;
+    callbackHandler?.handleRequest(parameters);
+    const response = super.createRequest(parameters);
+    callbackHandler?.handleResponse<T>(response);
+    return response;
   }
   /*************************
    * deployments
@@ -172,8 +180,6 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     const _params = { ...params };
     const _requiredParams = ['name', 'online'];
     const _validParams = [
-      'name',
-      'online',
       'projectId',
       'spaceId',
       'description',
@@ -184,11 +190,9 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'hardwareRequest',
       'asset',
       'baseModelId',
-      'headers',
-      'signal',
       'baseDeploymentId',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -299,10 +303,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'type',
       'state',
       'conflict',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -370,8 +372,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResource>> {
     const _params = { ...params };
     const _requiredParams = ['deploymentId'];
-    const _validParams = ['deploymentId', 'spaceId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -452,8 +454,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DeploymentResource>> {
     const _params = { ...params };
     const _requiredParams = ['deploymentId', 'jsonPatch'];
-    const _validParams = ['deploymentId', 'jsonPatch', 'spaceId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -521,8 +523,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['deploymentId'];
-    const _validParams = ['deploymentId', 'spaceId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -601,13 +603,13 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   public deploymentGenerateText(
     params: WatsonxAiMlVml_v1.DeploymentsTextGenerationParams,
     callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>
     >
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>> {
     const _params = { ...params };
     const _requiredParams = ['idOrName'];
-    const _validParams = ['idOrName', 'input', 'parameters', 'moderations', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['input', 'parameters', 'moderations'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -654,15 +656,10 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       },
     };
 
-    const callbackHandler = callbacks
-      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
-      : undefined;
-    callbackHandler?.handleRequest(parameters);
-    const response = this.createRequest(parameters);
-    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
-      response
+    return this.createRequest<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>>(
+      parameters,
+      { callbacks }
     );
-    return response;
   }
 
   /**
@@ -728,38 +725,24 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
   public async deploymentGenerateTextStream(
     params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams & { returnObject?: false },
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<Stream<string>>;
 
   public async deploymentGenerateTextStream(
     params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams & { returnObject: true },
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<Stream<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
 
   public async deploymentGenerateTextStream(
     params: WatsonxAiMlVml_v1.DeploymentsTextGenerationStreamParams,
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<
     AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>
   > {
     const _params = { ...params };
     const _requiredParams = ['idOrName'];
-    const _validParams = [
-      'idOrName',
-      'input',
-      'parameters',
-      'moderations',
-      'headers',
-      'signal',
-      'returnObject',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['input', 'parameters', 'moderations', 'returnObject'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -809,14 +792,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       },
     };
 
-    const callbackHandler = callbacks
-      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
-      : undefined;
-    callbackHandler?.handleRequest(parameters);
-    const apiResponse = await this.createRequest(parameters);
-    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
-      apiResponse
-    );
+    const apiResponse = await this.createRequest(parameters, { callbacks });
+
     const stream = _params.returnObject
       ? transformStreamToObjectStream<
           WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>
@@ -873,8 +850,6 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     const _params = { ...params };
     const _requiredParams = ['idOrName', 'messages'];
     const _validParams = [
-      'idOrName',
-      'messages',
       'context',
       'tools',
       'toolChoiceOption',
@@ -897,11 +872,9 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'lengthPenalty',
       'includeReasoning',
       'reasoningEffort',
-      'headers',
-      'signal',
     ];
 
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -967,15 +940,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       },
     };
 
-    const callbackHandler = callbacks
-      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
-      : undefined;
-    callbackHandler?.handleRequest(parameters);
-    const response = this.createRequest(parameters);
-    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
-      response
-    );
-    return response;
+    return this.createRequest(parameters, { callbacks });
   }
 
   /**
@@ -1020,31 +985,23 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
    */
   public async deploymentsTextChatStream(
     params: WatsonxAiMlVml_v1.DeploymentsTextChatStreamParams & { returnObject?: false },
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<Stream<string>>;
 
   public async deploymentsTextChatStream(
     params: WatsonxAiMlVml_v1.DeploymentsTextChatStreamParams & { returnObject: true },
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<Stream<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>>;
 
   public async deploymentsTextChatStream(
     params: WatsonxAiMlVml_v1.DeploymentsTextChatStreamParams,
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<
     Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>
   > {
     const _params = { ...params };
     const _requiredParams = ['idOrName', 'messages'];
     const _validParams = [
-      'idOrName',
-      'messages',
       'context',
       'tools',
       'toolChoiceOption',
@@ -1067,12 +1024,10 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'lengthPenalty',
       'includeReasoning',
       'reasoningEffort',
-      'headers',
-      'signal',
       'returnObject',
     ];
 
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -1141,14 +1096,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       },
     };
 
-    const callbackHandler = callbacks
-      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
-      : undefined;
-    callbackHandler?.handleRequest(parameters);
-    const apiResponse = await this.createRequest(parameters);
-    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
-      apiResponse
-    );
+    const apiResponse = await this.createRequest(parameters, { callbacks });
+
     const stream = _params.returnObject
       ? transformStreamToObjectStream<
           WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>
@@ -1190,16 +1139,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TSForecastResponse>> {
     const _params = { ...params };
     const _requiredParams = ['idOrName', 'data', 'schema'];
-    const _validParams = [
-      'idOrName',
-      'data',
-      'schema',
-      'parameters',
-      'futureData',
-      'signal',
-      'headers',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['parameters', 'futureData'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -1303,8 +1244,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FoundationModels>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['start', 'limit', 'filters', 'techPreview', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['start', 'limit', 'filters', 'techPreview'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -1365,8 +1306,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FoundationModelTasks>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['start', 'limit', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['start', 'limit'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -1438,8 +1379,6 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     const _params = { ...params };
     const _requiredParams = ['name', 'prompt'];
     const _validParams = [
-      'name',
-      'prompt',
       'description',
       'createdAt',
       'taskIds',
@@ -1449,10 +1388,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'inputMode',
       'projectId',
       'spaceId',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -1528,15 +1465,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
-    const _validParams = [
-      'promptId',
-      'projectId',
-      'spaceId',
-      'restrictModelParameters',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId', 'restrictModelParameters'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -1614,10 +1544,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'sort',
       'include',
       'skip',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -1699,9 +1627,6 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     const _params = { ...params };
     const _requiredParams = ['promptId', 'name', 'prompt'];
     const _validParams = [
-      'promptId',
-      'name',
-      'prompt',
       'id',
       'description',
       'taskIds',
@@ -1711,10 +1636,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'inputMode',
       'projectId',
       'spaceId',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -1793,8 +1716,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
-    const _validParams = ['promptId', 'projectId', 'spaceId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -1860,18 +1783,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>> {
     const _params = { ...params };
     const _requiredParams = ['promptId', 'locked'];
-    const _validParams = [
-      'promptId',
-      'locked',
-      'lockType',
-      'lockedBy',
-      'projectId',
-      'spaceId',
-      'force',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['lockType', 'lockedBy', 'projectId', 'spaceId', 'force'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -1945,8 +1858,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
-    const _validParams = ['promptId', 'spaceId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2015,16 +1928,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.GetPromptInputResponse>> {
     const _params = { ...params };
     const _requiredParams = ['promptId'];
-    const _validParams = [
-      'promptId',
-      'input',
-      'promptVariables',
-      'spaceId',
-      'projectId',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['input', 'promptVariables', 'spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2097,8 +2002,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['promptId', 'chatItem'];
-    const _validParams = ['promptId', 'chatItem', 'spaceId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2175,7 +2080,6 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     const _params = { ...params };
     const _requiredParams = ['name'];
     const _validParams = [
-      'name',
       'id',
       'description',
       'createdAt',
@@ -2185,10 +2089,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'lock',
       'prompts',
       'projectId',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2260,8 +2162,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSession>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
-    const _validParams = ['sessionId', 'projectId', 'prefetch', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'prefetch'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2326,8 +2228,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSession>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
-    const _validParams = ['sessionId', 'name', 'description', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['name', 'description', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2396,8 +2298,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
-    const _validParams = ['sessionId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2464,20 +2366,14 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'name', 'createdAt', 'prompt'];
     const _validParams = [
-      'sessionId',
-      'name',
-      'createdAt',
-      'prompt',
       'id',
       'description',
       'promptVariables',
       'isTemplate',
       'inputMode',
       'projectId',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2554,8 +2450,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptSessionEntryList>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
-    const _validParams = ['sessionId', 'projectId', 'bookmark', 'limit', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'bookmark', 'limit'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2621,8 +2517,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'entryId', 'chatItem'];
-    const _validParams = ['sessionId', 'entryId', 'chatItem', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2692,17 +2588,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'locked'];
-    const _validParams = [
-      'sessionId',
-      'locked',
-      'lockType',
-      'lockedBy',
-      'projectId',
-      'force',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['lockType', 'lockedBy', 'projectId', 'force'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2773,8 +2660,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.PromptLock>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId'];
-    const _validParams = ['sessionId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2837,8 +2724,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxPromptResponse>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'entryId'];
-    const _validParams = ['sessionId', 'entryId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -2902,8 +2789,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['sessionId', 'entryId'];
-    const _validParams = ['sessionId', 'entryId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -3027,8 +2914,6 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'messages'];
     const _validParams = [
-      'modelId',
-      'messages',
       'spaceId',
       'projectId',
       'tools',
@@ -3057,10 +2942,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'includeReasoning',
       'reasoningEffort',
       'crypto',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -3122,15 +3005,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
         },
       },
     };
-    const callbackHandler = callbacks
-      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
-      : undefined;
-    callbackHandler?.handleRequest(parameters);
-    const response = this.createRequest(parameters, { crypto: _params.crypto });
-    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
-      response
-    );
-    return response;
+    return this.createRequest(parameters, { crypto: _params.crypto, callbacks });
   }
 
   /**
@@ -3229,31 +3104,23 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
   public async textChatStream(
     params: WatsonxAiMlVml_v1.TextChatStreamParams & { returnObject?: false },
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<Stream<string>>;
 
   public async textChatStream(
     params: WatsonxAiMlVml_v1.TextChatStreamParams & { returnObject: true },
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<Stream<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>>;
 
   public async textChatStream(
     params: WatsonxAiMlVml_v1.TextChatStreamParams,
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<
     Stream<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>>
   > {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'messages'];
     const _validParams = [
-      'modelId',
-      'messages',
       'spaceId',
       'projectId',
       'tools',
@@ -3281,11 +3148,9 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'lengthPenalty',
       'includeReasoning',
       'reasoningEffort',
-      'headers',
-      'signal',
       'returnObject',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -3354,14 +3219,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
         },
       },
     };
-    const callbackHandler = callbacks
-      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
-      : undefined;
-    callbackHandler?.handleRequest(parameters);
-    const apiResponse = await this.createRequest(parameters);
-    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
-      apiResponse
-    );
+    const apiResponse = await this.createRequest(parameters, { callbacks });
     const stream = _params.returnObject
       ? transformStreamToObjectStream<
           WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextChatStreamResponse>
@@ -3404,22 +3262,13 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   public embedText(
     params: WatsonxAiMlVml_v1.TextEmbeddingsParams,
     callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmbeddingsResponse>
     >
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmbeddingsResponse>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'inputs'];
-    const _validParams = [
-      'modelId',
-      'inputs',
-      'spaceId',
-      'projectId',
-      'parameters',
-      'crypto',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'parameters', 'crypto'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -3463,15 +3312,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       },
     };
 
-    const callbackHandler = callbacks
-      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
-      : undefined;
-    callbackHandler?.handleRequest(parameters);
-    const response = this.createRequest(parameters, { crypto: _params.crypto });
-    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
-      response
-    );
-    return response;
+    return this.createRequest(parameters, { crypto: _params.crypto, callbacks });
   }
 
   /*************************
@@ -3509,19 +3350,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextExtractionResponse>> {
     const _params = { ...params };
     const _requiredParams = ['documentReference', 'resultsReference'];
-    const _validParams = [
-      'documentReference',
-      'resultsReference',
-      'steps',
-      'assemblyJson',
-      'assemblyMd',
-      'custom',
-      'projectId',
-      'spaceId',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['steps', 'assemblyJson', 'assemblyMd', 'custom', 'projectId', 'spaceId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -3595,8 +3425,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextExtractionResources>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['spaceId', 'projectId', 'start', 'limit', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'start', 'limit'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -3659,8 +3489,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextExtractionResponse>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'spaceId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -3724,8 +3554,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'spaceId', 'projectId', 'hardDelete', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'hardDelete'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -3805,23 +3635,13 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   public generateText(
     params: WatsonxAiMlVml_v1.TextGenerationParams,
     callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>
     >
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextGenResponse>> {
     const _params = { ...params };
     const _requiredParams = ['input', 'modelId'];
-    const _validParams = [
-      'input',
-      'modelId',
-      'spaceId',
-      'projectId',
-      'parameters',
-      'moderations',
-      'crypto',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'parameters', 'moderations', 'crypto'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -3866,15 +3686,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       },
     };
 
-    const callbackHandler = callbacks
-      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
-      : undefined;
-    callbackHandler?.handleRequest(parameters);
-    const response = this.createRequest(parameters, { crypto: _params.crypto });
-    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
-      response
-    );
-    return response;
+    return this.createRequest(parameters, { crypto: _params.crypto, callbacks });
   }
 
   /**
@@ -3932,40 +3744,24 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
 
   public async generateTextStream(
     params: WatsonxAiMlVml_v1.TextGenerationStreamParams & { returnObject?: false },
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<Stream<string>>;
 
   public async generateTextStream(
     params: WatsonxAiMlVml_v1.TextGenerationStreamParams & { returnObject: true },
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<Stream<WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>>;
 
   public async generateTextStream(
     params: WatsonxAiMlVml_v1.TextGenerationStreamParams,
-    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
-    >
+    callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<WatsonxAiMlVml_v1.Response<Unzip>>
   ): Promise<
     AsyncIterable<string | WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>>
   > {
     const _params = { ...params };
     const _requiredParams = ['input', 'modelId'];
-    const _validParams = [
-      'input',
-      'modelId',
-      'spaceId',
-      'projectId',
-      'parameters',
-      'moderations',
-      'headers',
-      'signal',
-      'returnObject',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'parameters', 'moderations', 'returnObject'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -4014,14 +3810,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       },
     };
 
-    const callbackHandler = callbacks
-      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
-      : undefined;
-    callbackHandler?.handleRequest(parameters);
-    const apiResponse = await this.createRequest(parameters);
-    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
-      apiResponse
-    );
+    const apiResponse = await this.createRequest(parameters, { callbacks });
     const stream = _params.returnObject
       ? transformStreamToObjectStream<
           WatsonxAiMlVml_v1.ObjectStreamed<WatsonxAiMlVml_v1.TextGenResponse>
@@ -4062,17 +3851,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextTokenizeResponse>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'input'];
-    const _validParams = [
-      'modelId',
-      'input',
-      'spaceId',
-      'projectId',
-      'parameters',
-      'crypto',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'parameters', 'crypto'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -4151,17 +3931,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TSForecastResponse>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'data', 'schema'];
-    const _validParams = [
-      'modelId',
-      'data',
-      'schema',
-      'projectId',
-      'spaceId',
-      'parameters',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId', 'parameters'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -4303,8 +4074,6 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     const _params = { ...params };
     const _requiredParams = ['name', 'resultsReference'];
     const _validParams = [
-      'name',
-      'resultsReference',
       'spaceId',
       'projectId',
       'description',
@@ -4313,10 +4082,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'trainingDataReferences',
       'custom',
       'autoUpdateModel',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -4403,10 +4170,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'state',
       'spaceId',
       'projectId',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -4471,8 +4236,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TrainingResource>> {
     const _params = { ...params };
     const _requiredParams = ['trainingId'];
-    const _validParams = ['trainingId', 'spaceId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -4538,8 +4303,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['trainingId'];
-    const _validParams = ['trainingId', 'spaceId', 'projectId', 'hardDelete', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'hardDelete'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -4611,23 +4376,13 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   public textRerank(
     params: WatsonxAiMlVml_v1.TextRerankParams,
     callbacks?: WatsonxAiMlVml_v1.RequestCallbacks<
-      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>
+      WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.RerankResponse>
     >
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.RerankResponse>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'inputs', 'query'];
-    const _validParams = [
-      'modelId',
-      'inputs',
-      'query',
-      'spaceId',
-      'projectId',
-      'parameters',
-      'crypto',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'parameters', 'crypto'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -4672,15 +4427,7 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       },
     };
 
-    const callbackHandler = callbacks
-      ? new WatsonxAiMlVml_v1.CallbackHandler(callbacks)
-      : undefined;
-    callbackHandler?.handleRequest(parameters);
-    const response = this.createRequest(parameters, { crypto: _params.crypto });
-    callbackHandler?.handleResponse<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextChatResponse>>(
-      response
-    );
-    return response;
+    return this.createRequest(parameters, { crypto: _params.crypto, callbacks });
   }
   /*************************
    * fineTunings
@@ -4728,9 +4475,6 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     const _params = { ...params };
     const _requiredParams = ['name', 'trainingDataReferences', 'resultsReference'];
     const _validParams = [
-      'name',
-      'trainingDataReferences',
-      'resultsReference',
       'description',
       'tags',
       'projectId',
@@ -4740,10 +4484,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'type',
       'testDataReferences',
       'custom',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -4829,11 +4571,9 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'state',
       'spaceId',
       'projectId',
-      'headers',
-      'signal',
       'type',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -4897,8 +4637,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.FineTuningResource>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'spaceId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -4962,8 +4702,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'spaceId', 'projectId', 'hardDelete', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'hardDelete'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5029,17 +4769,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResource>> {
     const _params = { ...params };
     const _requiredParams = ['name', 'documentReferences'];
-    const _validParams = [
-      'name',
-      'documentReferences',
-      'resultsReference',
-      'tags',
-      'projectId',
-      'spaceId',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['resultsReference', 'tags', 'projectId', 'spaceId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5105,8 +4836,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResources>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['projectId', 'spaceId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5164,8 +4895,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.DocumentExtractionResource>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5229,8 +4960,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId', 'hardDelete'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5298,16 +5029,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResource>> {
     const _params = { ...params };
     const _requiredParams = ['name'];
-    const _validParams = [
-      'name',
-      'spaceId',
-      'projectId',
-      'dataReference',
-      'resultsReference',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'dataReference', 'resultsReference'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5370,8 +5093,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResources>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['projectId', 'spaceId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5427,8 +5150,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SyntheticDataGenerationResource>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5492,8 +5215,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId', 'hardDelete'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5562,16 +5285,13 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     const _params = { ...params };
     const _requiredParams = ['name'];
     const _validParams = [
-      'name',
       'description',
       'spaceId',
       'projectId',
       'dataReference',
-      'headers',
-      'signal',
       'resultsReference',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5634,8 +5354,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TaxonomyResources>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['projectId', 'spaceId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5691,8 +5411,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TaxonomyResource>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5756,8 +5476,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'projectId', 'spaceId', 'hardDelete', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId', 'hardDelete'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5873,8 +5593,6 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
     const _params = { ...params };
     const _requiredParams = ['name', 'type'];
     const _validParams = [
-      'name',
-      'type',
       'projectId',
       'spaceId',
       'description',
@@ -5900,10 +5618,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'training',
       'contentLocation',
       'foundationModel',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -5995,17 +5711,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.ModelResources>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = [
-      'spaceId',
-      'projectId',
-      'start',
-      'limit',
-      'tagValue',
-      'search',
-      'headers',
-      'signal',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'start', 'limit', 'tagValue', 'search'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6066,8 +5773,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.ModelResource>> {
     const _params = { ...params };
     const _requiredParams = ['modelId'];
-    const _validParams = ['modelId', 'spaceId', 'projectId', 'rev', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'rev'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6135,8 +5842,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.ModelResource>> {
     const _params = { ...params };
     const _requiredParams = ['modelId', 'jsonPatch'];
-    const _validParams = ['modelId', 'jsonPatch', 'spaceId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6199,8 +5906,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['modelId'];
-    const _validParams = ['modelId', 'spaceId', 'projectId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6258,8 +5965,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxUtilityAgentToolsResponse>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['signal', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams: string[] = [];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6309,8 +6016,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.UtilityAgentTool>> {
     const _params = { ...params };
     const _requiredParams = ['toolId'];
-    const _validParams = ['toolId', 'signal', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams: string[] = [];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6366,8 +6073,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxUtilityAgentToolsRunResponse>> {
     const _params = { ...params };
     const _requiredParams = ['wxUtilityAgentToolsRunRequest'];
-    const _validParams = ['wxUtilityAgentToolsRunRequest', 'signal', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams: string[] = [];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6422,8 +6129,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.WxUtilityAgentToolsRunResponse>> {
     const _params = { ...params };
     const _requiredParams = ['toolId', 'wxUtilityAgentToolsRunRequest'];
-    const _validParams = ['toolId', 'wxUtilityAgentToolsRunRequest', 'signal', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams: string[] = [];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6504,7 +6211,6 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       ? ['name', 'storage']
       : ['name'];
     const _validParams = [
-      'name',
       'description',
       'storage',
       'compute',
@@ -6513,10 +6219,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'stage',
       'type',
       'settings',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6586,8 +6290,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SpaceResource>> {
     const _params = { ...params };
     const _requiredParams = ['spaceId'];
-    const _validParams = ['spaceId', 'include', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['include'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6642,8 +6346,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['spaceId'];
-    const _validParams = ['spaceId', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams: string[] = [];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6702,8 +6406,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.SpaceResource>> {
     const _params = { ...params };
     const _requiredParams = ['spaceId', 'jsonPatch'];
-    const _validParams = ['spaceId', 'jsonPatch', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams: string[] = [];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6793,10 +6497,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
       'subName',
       'computeCrn',
       'type',
-      'headers',
-      'signal',
     ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
 
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
@@ -6864,8 +6566,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.AudioTranscriptionResult>> {
     const _params = { ...params };
     const _requiredParams = ['model', 'file'];
-    const _validParams = ['model', 'file', 'projectId', 'spaceId', 'language', 'headers', 'signal'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['projectId', 'spaceId', 'language'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -6945,16 +6647,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextClassificationResponse>> {
     const _params = { ...params };
     const _requiredParams = ['documentReference', 'parameters'];
-    const _validParams = [
-      'documentReference',
-      'parameters',
-      'custom',
-      'projectId',
-      'spaceId',
-      'signal',
-      'headers',
-    ];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['custom', 'projectId', 'spaceId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -7025,8 +6719,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextClassificationResources>> {
     const _params = { ...params };
     const _requiredParams: string[] = [];
-    const _validParams = ['spaceId', 'projectId', 'start', 'limit', 'signal', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'start', 'limit'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -7089,8 +6783,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.TextClassificationResponse>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'spaceId', 'projectId', 'signal', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }
@@ -7154,8 +6848,8 @@ class WatsonxAiMlVml_v1 extends WatsonxBaseService {
   ): Promise<WatsonxAiMlVml_v1.Response<WatsonxAiMlVml_v1.EmptyObject>> {
     const _params = { ...params };
     const _requiredParams = ['id'];
-    const _validParams = ['id', 'spaceId', 'projectId', 'hardDelete', 'signal', 'headers'];
-    const _validationErrors = validateParams(_params, _requiredParams, _validParams);
+    const _validParams = ['spaceId', 'projectId', 'hardDelete'];
+    const _validationErrors = validateRequestParams(_params, _requiredParams, _validParams);
     if (_validationErrors) {
       return Promise.reject(_validationErrors);
     }

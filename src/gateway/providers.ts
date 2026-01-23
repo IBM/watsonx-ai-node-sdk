@@ -16,7 +16,6 @@
 
 /* eslint-disable import/prefer-default-export */
 
-import { validateParams } from 'ibm-cloud-sdk-core';
 import { ENDPOINTS } from '../config';
 import { GatewayResource } from './resources';
 import { EmptyObject } from './types/gateway';
@@ -37,6 +36,7 @@ import {
 } from './types/providers/response';
 import { Response } from '../base/types/base';
 import { validateRequiredOneOf } from './utils/utils';
+import { validateRequestParams } from '../helpers/validators';
 
 /**
  * Class representing the Providers resource.
@@ -59,17 +59,9 @@ export class Providers extends GatewayResource {
    */
   create(params: CreateProviderParams): Promise<Response<ProviderResponse>> {
     const requiredParams = ['name', 'providerName'];
-    const validParams = [
-      'dataReference',
-      'data',
-      'name',
-      'providerName',
-      'description',
-      'signal',
-      'headers',
-    ];
+    const validParams = ['dataReference', 'data', 'description'];
 
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -117,8 +109,8 @@ export class Providers extends GatewayResource {
   ): Promise<Response<Provider | ProviderCollection>> {
     if ('providerId' in params) {
       const requiredParams = ['providerId'];
-      const validParams = ['providerId', 'signal', 'headers'];
-      const validationErrors = validateParams(params, requiredParams, validParams);
+      const validParams: string[] = [];
+      const validationErrors = validateRequestParams(params, requiredParams, validParams);
       if (validationErrors) {
         return Promise.reject(validationErrors);
       }
@@ -138,8 +130,8 @@ export class Providers extends GatewayResource {
       return this.client._get<Provider>(parameters);
     }
     const requiredParams: string[] = [];
-    const validParams = ['signal', 'headers'];
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validParams: string[] = [];
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -169,8 +161,8 @@ export class Providers extends GatewayResource {
     params: ListProviderAvailableModelsParams
   ): Promise<Response<AvailableModelCollection>> {
     const requiredParams = ['providerId'];
-    const validParams = ['providerId', 'signal', 'headers'];
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validParams: string[] = [];
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -211,16 +203,8 @@ export class Providers extends GatewayResource {
    */
   update(params: UpdateProviderParams): Promise<Response<ProviderResponse>> {
     const requiredParams = ['providerId', 'providerName', 'name'];
-    const validParams = [
-      'providerId',
-      'providerName',
-      'dataReference',
-      'data',
-      'name',
-      'signal',
-      'headers',
-    ];
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validParams = ['dataReference', 'data'];
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -264,8 +248,8 @@ export class Providers extends GatewayResource {
    */
   delete(params: DeleteProviderParams): Promise<Response<EmptyObject>> {
     const requiredParams = ['providerId'];
-    const validParams = ['providerId', 'signal', 'headers'];
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validParams: string[] = [];
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -293,8 +277,8 @@ export class Providers extends GatewayResource {
    */
   async list(params: ListProvidersParams = {}): Promise<Provider[]> {
     const requiredParams: string[] = [];
-    const validParams = ['providerId', 'signal', 'headers'];
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validParams = ['providerId'];
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }

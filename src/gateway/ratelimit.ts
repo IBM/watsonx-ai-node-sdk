@@ -16,7 +16,6 @@
 
 /* eslint-disable import/prefer-default-export */
 
-import { validateParams } from 'ibm-cloud-sdk-core';
 import { ENDPOINTS } from '../config';
 import { GatewayResource } from './resources';
 import {
@@ -29,6 +28,7 @@ import {
 import { ListRateLimitResponse } from './types/ratelimit/response';
 import { EmptyObject } from './types';
 import { Response } from '../base';
+import { validateRequestParams } from '../helpers/validators';
 
 /**
  * Validates that the required ID parameters are provided based on the rate limit type.
@@ -83,9 +83,9 @@ export class RateLimits extends GatewayResource {
    */
   create(params: CreateRateLimitParams): Promise<Response<Record<string, any>>> {
     const requiredParams = ['type'];
-    const validParams = ['type', 'providerId', 'modelId', 'token', 'request', 'signal', 'headers'];
+    const validParams = ['providerId', 'modelId', 'token', 'request'];
 
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -127,9 +127,9 @@ export class RateLimits extends GatewayResource {
    */
   update(params: UpdateRateLimitParams): Promise<Response<Record<string, any>>> {
     const requiredParams = ['type'];
-    const validParams = ['type', 'providerId', 'modelId', 'token', 'request', 'signal', 'headers'];
+    const validParams = ['providerId', 'modelId', 'token', 'request'];
 
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -174,9 +174,9 @@ export class RateLimits extends GatewayResource {
     params: GetRateLimitParams = {}
   ): Promise<Response<Record<string, any> | ListRateLimitResponse>> {
     const requiredParams: string[] = [];
-    const validParams = ['rateLimitId', 'signal', 'headers'];
+    const validParams = ['rateLimitId'];
 
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -214,9 +214,9 @@ export class RateLimits extends GatewayResource {
    */
   async list(params: ListRateLimitsParams = {}): Promise<Record<string, any>[]> {
     const requiredParams: string[] = [];
-    const validParams = ['signal', 'headers'];
+    const validParams: string[] = [];
 
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -238,9 +238,9 @@ export class RateLimits extends GatewayResource {
    */
   delete(params: DeleteRateLimitParams): Promise<Record<string, any>> {
     const requiredParams = ['rateLimitId'];
-    const validParams = ['rateLimitId', 'signal', 'headers'];
+    const validParams: string[] = [];
 
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }

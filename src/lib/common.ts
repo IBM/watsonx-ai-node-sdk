@@ -47,14 +47,14 @@ export function getSdkHeaders(
   serviceVersion?: string,
   operationId?: string
 ): SdkHeaders | {} {
-  const sdkName = 'autogen-node-sdk';
+  const packageName = 'ibm-cloud-watsonx-ai';
   const sdkVersion = VERSION;
   const osName = os.platform();
   const osVersion = os.release();
   const nodeVersion = process.version;
 
   const headers = {
-    'User-Agent': `${sdkName}/${sdkVersion} (lang=node.js; os.name=${osName} os.version=${osVersion} node.version=${nodeVersion})`,
+    'User-Agent': `${packageName}/${sdkVersion} (lang=node.js; os.name=${osName} os.version=${osVersion} node.version=${nodeVersion})`,
   };
 
   return headers;

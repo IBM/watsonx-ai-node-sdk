@@ -16,7 +16,6 @@
 
 /* eslint-disable import/prefer-default-export */
 
-import { validateParams } from 'ibm-cloud-sdk-core';
 import { ENDPOINTS } from '../config';
 import { GatewayResource } from './resources';
 import { EmptyObject } from './types/gateway';
@@ -29,6 +28,7 @@ import {
   TenantPolicy,
   TenantPolicyCollection,
 } from './types';
+import { validateRequestParams } from '../helpers/validators';
 
 /**
  * Class representing the Policies resource.
@@ -52,9 +52,9 @@ export class Policies extends GatewayResource {
    */
   create(params: CreatePolicyParams): Promise<Response<TenantPolicy>> {
     const requiredParams = ['action', 'effect', 'resource', 'subject'];
-    const validParams = ['action', 'effect', 'resource', 'subject', 'signal', 'headers'];
+    const validParams: string[] = [];
 
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -91,8 +91,8 @@ export class Policies extends GatewayResource {
    */
   async getDetails(params: GetPolicyParams): Promise<TenantPolicy> {
     const requiredParams = ['policyId'];
-    const validParams = ['policyId', 'signal', 'headers'];
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validParams: string[] = [];
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -119,8 +119,8 @@ export class Policies extends GatewayResource {
    */
   delete(params: DeletePolicyParams): Promise<Response<EmptyObject>> {
     const requiredParams = ['policyId'];
-    const validParams = ['policyId', 'signal', 'headers'];
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validParams: string[] = [];
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -147,8 +147,8 @@ export class Policies extends GatewayResource {
    */
   async list(params: ListPolicyParams = {}): Promise<TenantPolicy[]> {
     const requiredParams: string[] = [];
-    const validParams = ['signal', 'headers'];
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validParams: string[] = [];
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }

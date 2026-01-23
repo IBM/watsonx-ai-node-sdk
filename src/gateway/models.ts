@@ -17,7 +17,6 @@
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable max-classes-per-file */
 
-import { validateParams } from 'ibm-cloud-sdk-core';
 import { ENDPOINTS } from '../config';
 import {
   CreateModelParams,
@@ -30,6 +29,7 @@ import { EmptyObject } from './types/gateway';
 import { Model, ModelCollection } from './types/models/response';
 import { GatewayResource } from './resources';
 import { Response } from '../base/types/base';
+import { validateRequestParams } from '../helpers/validators';
 
 /**
  * Models class for handling model-related operations.
@@ -55,8 +55,8 @@ export class Models extends GatewayResource {
    */
   create(params: CreateModelParams): Promise<Response<Model>> {
     const requiredParams = ['providerId', 'modelId'];
-    const validParams = ['providerId', 'modelId', 'alias', 'metadata', 'signal', 'headers'];
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validParams = ['alias', 'metadata'];
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -104,8 +104,8 @@ export class Models extends GatewayResource {
     if ('modelId' in params) {
       const { modelId, signal, headers } = params;
       const requiredParams = ['modelId'];
-      const validParams = ['modelId', 'signal', 'headers'];
-      const validationErrors = validateParams(params, requiredParams, validParams);
+      const validParams: string[] = [];
+      const validationErrors = validateRequestParams(params, requiredParams, validParams);
       if (validationErrors) {
         return Promise.reject(validationErrors);
       }
@@ -125,8 +125,8 @@ export class Models extends GatewayResource {
     if ('providerId' in params) {
       const { providerId, signal, headers } = params;
       const requiredParams = ['providerId'];
-      const validParams = ['providerId', 'signal', 'headers'];
-      const validationErrors = validateParams(params, requiredParams, validParams);
+      const validParams: string[] = [];
+      const validationErrors = validateRequestParams(params, requiredParams, validParams);
       if (validationErrors) {
         return Promise.reject(validationErrors);
       }
@@ -145,8 +145,8 @@ export class Models extends GatewayResource {
     }
     const { signal, headers } = params;
     const requiredParams: string[] = [];
-    const validParams = ['signal', 'headers'];
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validParams: string[] = [];
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -192,8 +192,8 @@ export class Models extends GatewayResource {
    */
   delete(params: DeleteModelParams): Promise<EmptyObject> {
     const requiredParams = ['modelId'];
-    const validParams = ['modelId', 'signal', 'headers'];
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validParams: string[] = [];
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }

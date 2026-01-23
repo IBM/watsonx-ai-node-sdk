@@ -17,7 +17,6 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-await-in-loop */
 
-import { validateParams } from 'ibm-cloud-sdk-core';
 import { ENDPOINTS } from '../config';
 import { Stream } from '../lib/common';
 import { CreateChatCompletionsParams } from './types/chat/request';
@@ -28,6 +27,7 @@ import { CreateCompletionsParams } from './types/text_completions/request';
 import { CompletionsResponse } from './types/text_completions/response';
 import { APIBaseService } from '../base/base';
 import { Response } from '../base/types/base';
+import { validateRequestParams } from '../helpers/validators';
 
 // Type for streamed chat object responses
 export type ChatObjectStream = ObjectStreamed<ChatsResponse>;
@@ -216,8 +216,6 @@ export class ChatCompletions extends Completions {
   ): Promise<Response<ChatsResponse> | Stream<string | ChatObjectStream>> {
     const requiredParams = ['messages', 'model'];
     const validParams = [
-      'messages',
-      'model',
       'audio',
       'cache',
       'frequencyPenalty',
@@ -248,12 +246,10 @@ export class ChatCompletions extends Completions {
       'topLogprobs',
       'topP',
       'user',
-      'signal',
-      'headers',
       'returnObject',
     ];
 
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -339,17 +335,9 @@ export class EmbeddingCompletions extends Completions {
    */
   create(params: CreateEmbeddingsParams): Promise<Response<EmbeddingResponse>> {
     const requiredParams = ['input', 'model'];
-    const validParams = [
-      'input',
-      'model',
-      'dimensions',
-      'encodingFormat',
-      'user',
-      'signal',
-      'headers',
-    ];
+    const validParams = ['dimensions', 'encodingFormat', 'user'];
 
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
@@ -469,8 +457,6 @@ export class GenerateTextCompletions extends Completions {
   ): Promise<Response<CompletionsResponse> | Stream<string | TextCompletionStream>> {
     const requiredParams = ['model', 'prompt'];
     const validParams = [
-      'model',
-      'prompt',
       'bestOf',
       'cache',
       'echo',
@@ -490,12 +476,10 @@ export class GenerateTextCompletions extends Completions {
       'temperature',
       'topP',
       'user',
-      'signal',
-      'headers',
       'returnObject',
     ];
 
-    const validationErrors = validateParams(params, requiredParams, validParams);
+    const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {
       return Promise.reject(validationErrors);
     }
