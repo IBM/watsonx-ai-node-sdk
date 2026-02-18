@@ -172,6 +172,7 @@ describe('APIBaseService', () => {
         });
 
         expect(response).toBeInstanceOf(Promise);
+
         const stream = await response;
         for await (const chunk of stream) {
           expect(chunk).toBeInstanceOf(Object);
@@ -201,6 +202,7 @@ describe('APIBaseService', () => {
         });
 
         expect(response).toBeInstanceOf(Promise);
+
         const stream = await response;
         for await (const chunk of stream) {
           expect(typeof chunk).toBe('string');

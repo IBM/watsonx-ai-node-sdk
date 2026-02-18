@@ -1,33 +1,29 @@
 /**
- * © Copyright IBM Corporation 2024. All Rights Reserved.
+ * (C) Copyright IBM Corp. 2025-2026.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable max-classes-per-file */
-
-import { BaseService, validateParams, UserOptions, readExternalSources } from 'ibm-cloud-sdk-core';
+import type { UserOptions } from 'ibm-cloud-sdk-core';
+import { BaseService, validateParams, readExternalSources } from 'ibm-cloud-sdk-core';
 import { Agent } from 'https';
 import { readFileSync } from 'fs';
 import { getAuthenticatorFromEnvironment } from '../authentication/utils/get-authenticator-from-environment';
+import type { Stream } from '../lib/common';
 import {
   getSdkHeaders,
-  Stream,
   transformStreamToObjectStream,
   transformStreamToStringStream,
 } from '../lib/common';
-import {
+import type {
   CreateStreamParameters,
   DeleteParameters,
   GetParameters,
@@ -40,15 +36,16 @@ import {
 } from './types/base';
 
 /**
- * WatsonxBaseService class extends BaseService and provides common functionalities for Watsonx services.
+ * WatsonxBaseService class extends BaseService and provides common functionalities for Watsonx
+ * services.
  *
  * @category BaseService
  */
 export class WatsonxBaseService extends BaseService {
-  /** @hidden */
+  /** @ignore */
   static DEFAULT_SERVICE_URL: string = 'https://us-south.ml.cloud.ibm.com';
 
-  /** @hidden */
+  /** @ignore */
   static DEFAULT_SERVICE_NAME: string = 'watsonx_ai';
 
   /** The version date for the API of the form `YYYY-MM-DD`. */
@@ -78,19 +75,18 @@ export class WatsonxBaseService extends BaseService {
   /**
    * Constructs an instance of WatsonxBaseService with passed in options and external configuration.
    *
+   * @category Constructor
    * @param {UserOptions} [options] - The parameters to send to the service.
    * @param {string} [options.version] - The version date for the API of the form `YYYY-MM-DD`
    * @param {string} [options.serviceUrl] - The base URL for the service
    * @param {string} [options.serviceName] - The name of the service to configure
-   * @param {Authenticator} [options.authenticator] - The Authenticator object used to authenticate requests to the service
-   *
-   * @category constructor
-   *
+   * @param {Authenticator} [options.authenticator] - The Authenticator object used to authenticate
+   *   requests to the service
    */
   constructor(options: UserOptions & Certificates & TokenAuthenticationOptions) {
-    const _requiredParams = ['version'];
-    // @ts-expect-error
-    const validationErrors = validateParams(options, _requiredParams, null);
+    const requiredParams = ['version'];
+    // @ts-expect-error validateParams has invalid type declaration, it accepts null however typing does not allow it
+    const validationErrors = validateParams(options, requiredParams, null);
     if (validationErrors) {
       throw validationErrors;
     }
@@ -195,6 +191,7 @@ export class APIBaseService extends WatsonxBaseService {
   /**
    * Performs a POST request to the specified URL.
    *
+   * @template T
    * @param {PostParameters} params - The parameters for the POST request.
    * @param {string} params.url - The parameters for the POST request.
    * @param {Record<string, any>} [params.body] - Body parameters to be passed to an endpoint
@@ -202,7 +199,8 @@ export class APIBaseService extends WatsonxBaseService {
    * @param {Record<string, any>} [params.path] - Path parameters to be used to create url.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers.
    * @param {AbortSignal} [params.signal] - Signal from AbortController
-   * @returns {Promise<Response<T>>} - A promise that resolves to the response from the POST request.
+   * @returns {Promise<Response<T>>} - A promise that resolves to the response from the POST
+   *   request.
    */
   async _post<T>(params: PostParameters): Promise<Response<T>> {
     if (!params) throw new Error('Input is required');
@@ -241,6 +239,7 @@ export class APIBaseService extends WatsonxBaseService {
   /**
    * Performs a GET request to the specified URL.
    *
+   * @template T
    * @param {GetParameters} params - The parameters for the GET request.
    * @param {string} [params.url] - The parameters for the GET request.
    * @param {Record<string, any>} [params.query] - Query parameters to be passed with url.
@@ -286,6 +285,7 @@ export class APIBaseService extends WatsonxBaseService {
   /**
    * Performs a DELETE request to the specified URL.
    *
+   * @template T
    * @param {DeleteParameters} params - The parameters for the DELETE request.
    * @param {string} params.url - The parameters for the DELETE request.
    * @param {Record<string, any>} [params.body] - Body parameters to be passed to an endpoint
@@ -293,7 +293,8 @@ export class APIBaseService extends WatsonxBaseService {
    * @param {Record<string, any>} [params.path] - Path parameters to be used to create url.
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers.
    * @param {AbortSignal} [params.signal] - Signal from AbortController
-   * @returns {Promise<Response<T>>} - A promise that resolves to the response from the DELETE request.
+   * @returns {Promise<Response<T>>} - A promise that resolves to the response from the DELETE
+   *   request.
    */
   async _delete<T>(params: DeleteParameters): Promise<Response<T>> {
     if (!params) throw new Error('Input is required');
@@ -334,6 +335,7 @@ export class APIBaseService extends WatsonxBaseService {
   /**
    * Performs a PUT request to the specified URL.
    *
+   * @template T
    * @param {PutParameters} params - The parameters for the PUT request.
    * @param {string} params.url - The parameters for the PUT request.
    * @param {Record<string, any>} [params.body] - Body parameters to be passed to an endpoint
@@ -382,16 +384,18 @@ export class APIBaseService extends WatsonxBaseService {
   /**
    * Performs a POST request to the specified URL and returns a stream.
    *
+   * @template T
    * @param {CreateStreamParameters} params - The parameters for the POST request.
    * @param {string} params.url - The parameters for the POST request.
    * @param {Record<string, any>} [params.body] - Body parameters to be passed to an endpoint
    * @param {Record<string, any>} [params.query] - Query parameters to be passed with url.
    * @param {Record<string, any>} [params.path] - Path parameters to be used to create url.
-   * @param {Record<string, any>} [params.returnObject] - Flag that indicates return type. Set 'true' to return objects, 'false' to return SSE
+   * @param {Record<string, any>} [params.returnObject] - Flag that indicates return type. Set
+   *   'true' to return objects, 'false' to return SSE
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers.
    * @param {AbortSignal} [params.signal] - Signal from AbortController
-   *
-   * @returns {Promise<Stream<T | string>>} - A promise that resolves to a stream from the POST request.
+   * @returns {Promise<Stream<T | string>>} - A promise that resolves to a stream from the POST
+   *   request.
    */
   async _postStream<T>(params: CreateStreamParameters): Promise<Stream<T | string>> {
     if (!params) throw new Error('Input is required');

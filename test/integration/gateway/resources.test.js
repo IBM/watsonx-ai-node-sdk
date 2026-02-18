@@ -7,6 +7,7 @@ const { Providers } = require('../../../dist/gateway/providers.js');
 const { modelCleanup, providerCleanup, rateLimitCleanup } = require('./utils.js');
 const { Policies } = require('../../../dist/gateway/policies.js');
 const { RateLimits } = require('../../../dist/gateway/ratelimit.js');
+const { expectSuccessResponse } = require('../../utils/utils.js');
 
 // testcase timeout value (20s).
 const timeout = 20000;
@@ -32,9 +33,11 @@ describe('Resources', () => {
           version,
           serviceUrl,
         });
+
         expect(client).toBeInstanceOf(APIBaseService);
 
         const providers = new Providers(client);
+
         expect(providers).toBeInstanceOf(Providers);
       });
     });
@@ -64,9 +67,11 @@ describe('Resources', () => {
             },
           });
           providerId = provider.result.uuid;
+
           expect(providerId).toBeDefined();
 
           const providerResponse = await providers.getDetails({ providerId });
+
           expect(providerResponse.result.data_reference.resource).toBe(
             process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID
           );
@@ -104,14 +109,16 @@ describe('Resources', () => {
           test('Get details with providerId', async () => {
             const res = await providers.getDetails({ providerId });
 
-            expect(res.status).toBe(200);
+            expectSuccessResponse(res, 200);
+
             expect(res.result.name).toBe(name);
           });
 
           test('Get details of all providers', async () => {
             const res = await providers.getDetails();
 
-            expect(res.status).toBe(200);
+            expectSuccessResponse(res, 200);
+
             expect(res.result.data).toBeInstanceOf(Array);
             expect(res.result.data.length).toBeGreaterThanOrEqual(1);
           });
@@ -119,7 +126,8 @@ describe('Resources', () => {
           test('Get available model details', async () => {
             const res = await providers.getAvailableModelsDetails({ providerId });
 
-            expect(res.status).toBe(200);
+            expectSuccessResponse(res, 200);
+
             expect(res.result.data).toBeInstanceOf(Array);
             expect(res.result.data.length).toBeGreaterThanOrEqual(1);
           });
@@ -147,7 +155,7 @@ describe('Resources', () => {
               providerId,
             });
 
-            expect(res.status).toBe(204);
+            expectSuccessResponse(res, 204);
             providerId = null;
           });
         });
@@ -157,14 +165,14 @@ describe('Resources', () => {
 
   describe('Models', () => {
     describe('Models init', () => {
-      test('Init', async () => {
+      test('Models instance init', async () => {
         const client = new APIBaseService({
           version,
           serviceUrl,
         });
-        expect(client).toBeInstanceOf(APIBaseService);
-
         const providers = new Models(client);
+
+        expect(client).toBeInstanceOf(APIBaseService);
         expect(providers).toBeInstanceOf(Models);
       });
     });
@@ -205,6 +213,7 @@ describe('Resources', () => {
 
       describe('Model creation', () => {
         let modelId;
+
         afterAll(async () => {
           await modelCleanup(models, modelId);
         });
@@ -221,8 +230,7 @@ describe('Resources', () => {
           };
           const res = await models.create(params);
 
-          expect(res.status).toBe(201);
-          expect(res.result).toBeDefined();
+          expectSuccessResponse(res, 201);
           modelId = res.result.uuid;
         });
       });
@@ -253,14 +261,14 @@ describe('Resources', () => {
           test('Get model details by modelId', async () => {
             const res = await models.getDetails({ modelId });
 
-            expect(res.status).toBe(200);
-            expect(res.result).toBeDefined();
+            expectSuccessResponse(res, 200);
           });
 
           test('Get models details by providerId', async () => {
             const res = await models.getDetails({ providerId });
 
-            expect(res.status).toBe(200);
+            expectSuccessResponse(res, 200);
+
             expect(res.result.data).toBeInstanceOf(Array);
             expect(res.result.data.length).toBeGreaterThanOrEqual(1);
           });
@@ -268,7 +276,8 @@ describe('Resources', () => {
           test('Get all model details', async () => {
             const res = await models.getDetails();
 
-            expect(res.status).toBe(200);
+            expectSuccessResponse(res, 200);
+
             expect(res.result.data).toBeInstanceOf(Array);
             expect(res.result.data.length).toBeGreaterThanOrEqual(1);
           });
@@ -290,13 +299,11 @@ describe('Resources', () => {
           });
         });
 
-        describe('delete', () => {
-          test('Delete model', async () => {
-            const res = await models.delete({ modelId });
+        test('Delete model', async () => {
+          const res = await models.delete({ modelId });
 
-            expect(res.status).toBe(204);
-            modelId = null;
-          });
+          expectSuccessResponse(res, 204);
+          modelId = null;
         });
       });
     });
@@ -304,17 +311,18 @@ describe('Resources', () => {
 
   describe('Policies', () => {
     describe('Policies init', () => {
-      test('Init', async () => {
+      test('Policies instance init', async () => {
         const client = new APIBaseService({
           version,
           serviceUrl,
         });
-        expect(client).toBeInstanceOf(APIBaseService);
-
         const providers = new Policies(client);
+
+        expect(client).toBeInstanceOf(APIBaseService);
         expect(providers).toBeInstanceOf(Policies);
       });
     });
+
     describe('Policies methods', () => {
       const client = new APIBaseService({
         version,
@@ -327,31 +335,35 @@ describe('Resources', () => {
         'resource': 'model:62a04a11-07bf-5309-a78e-95323dbbc333',
         'subject': 'AccessGroupId-56c5e703-80d4-4f06-a7e6-844618ec39b3',
       };
+
       describe('Creation', () => {
         let policyId;
+
         afterAll(async () => {
           try {
             await policies.delete({ policyId });
           } catch (e) {
-            console.error(`Unable to delete policy with id: ${policyId}.`, e);
+            console.error('Unable to delete policy with id:', policyId, e);
           }
         });
 
         test('Create policy', async () => {
           const policy = await policies.create(data);
-
           policyId = policy.result.uuid;
+
           expect(policy.status).toBe(201);
         });
       });
+
       describe('Manipulation methods', () => {
         let policyId;
+
         beforeAll(async () => {
           const { result } = await policies.create(data);
           policyId = result.uuid;
         });
 
-        test('List', async () => {
+        test('List policies', async () => {
           const res = await policies.list();
 
           expect(res).toBeInstanceOf(Array);
@@ -367,24 +379,26 @@ describe('Resources', () => {
         test('delete', async () => {
           const res = await policies.delete({ policyId });
 
-          expect(res.status).toBe(204);
+          expectSuccessResponse(res, 204);
         });
       });
     });
   });
+
   describe('RateLimits', () => {
     describe('RateLimits init', () => {
-      test('Init', async () => {
+      test('RateLimits instance init', async () => {
         const client = new APIBaseService({
           version,
           serviceUrl,
         });
-        expect(client).toBeInstanceOf(APIBaseService);
-
         const rateLimit = new RateLimits(client);
+
+        expect(client).toBeInstanceOf(APIBaseService);
         expect(rateLimit).toBeInstanceOf(RateLimits);
       });
     });
+
     describe('RateLimits methods', () => {
       const client = new APIBaseService({
         version,
@@ -436,10 +450,10 @@ describe('Resources', () => {
             type: 'tenant',
             request: { duration: '1m', amount: 10, capacity: 100 },
           });
+          expectSuccessResponse(res, 201);
           rateLimitId = res.result.uuid;
-          expect(res.result).toBeDefined();
-          expect(res.status).toBe(201);
         });
+
         test('Create rate limit with model', async () => {
           const res = await rateLimit.create({
             modelId,
@@ -447,10 +461,10 @@ describe('Resources', () => {
             type: 'tenant',
             request: { duration: '1m', amount: 10, capacity: 100 },
           });
+          expectSuccessResponse(res, 201);
           rateLimitId = res.result.uuid;
-          expect(res.result).toBeDefined();
-          expect(res.status).toBe(201);
         });
+
         test('Create rate limit with provider', async () => {
           const res = await rateLimit.create({
             providerId,
@@ -458,13 +472,14 @@ describe('Resources', () => {
             type: 'tenant',
             request: { duration: '1m', amount: 10, capacity: 100 },
           });
+          expectSuccessResponse(res, 201);
           rateLimitId = res.result.uuid;
-          expect(res.result).toBeDefined();
-          expect(res.status).toBe(201);
         });
       });
+
       describe('Manipulation methods', () => {
         let rateLimitId;
+
         beforeAll(async () => {
           const res = await rateLimit.create({
             token: { duration: '1m', amount: 10, capacity: 100 },
@@ -473,11 +488,12 @@ describe('Resources', () => {
           });
           rateLimitId = res.result.uuid;
         });
+
         afterAll(async () => {
           await rateLimitCleanup(rateLimit, rateLimitId);
         });
 
-        test('List', async () => {
+        test('List ratelimits', async () => {
           const res = await rateLimit.list();
 
           expect(res).toBeInstanceOf(Array);
@@ -488,23 +504,23 @@ describe('Resources', () => {
             rateLimitId,
           });
 
-          expect(res.status).toBe(200);
-          expect(res.result).toBeDefined();
+          expectSuccessResponse(res, 200);
         });
 
         test('getDetails of multiple items', async () => {
           const res = await rateLimit.getDetails();
 
-          expect(res.status).toBe(200);
+          expectSuccessResponse(res, 200);
+
           expect(res.result.data).toBeInstanceOf(Array);
         });
 
-        test('delete', async () => {
+        test('delete ratelimit', async () => {
           const res = await rateLimit.delete({
             rateLimitId,
           });
 
-          expect(res.status).toBe(204);
+          expectSuccessResponse(res, 204);
           rateLimitId = null;
         });
       });

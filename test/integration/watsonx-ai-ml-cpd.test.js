@@ -1,22 +1,16 @@
 /**
  * (C) Copyright IBM Corp. 2024.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
-
-/* eslint-disable no-console */
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 
 const path = require('path');
 const { createReadStream } = require('fs');
@@ -34,7 +28,8 @@ const describe = authHelper.checkCPD();
 
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
-describe('WatsonxAiMlVml_v1_integration on cpd environment', () => {
+
+describe('WatsonXAI_integration on cpd environment', () => {
   const service = WatsonXAI.newInstance({
     serviceUrl,
     version: '2024-03-14',
@@ -71,10 +66,13 @@ describe('WatsonxAiMlVml_v1_integration on cpd environment', () => {
         isNegative: true,
       },
     ];
+
     test.each(testParams)(`$name`, async ({ params, isNegative }) => {
       const res = await service.transcribeAudio(params);
+
       expect(res.status).toBe(200);
       expect(res.result.model).toBe(model);
+
       if (isNegative) {
         expect(res.result.text.toLowerCase()).not.toMatch(/the ending was terrific/);
       } else {

@@ -1,21 +1,16 @@
 /**
  * (C) Copyright IBM Corp. 2024.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
-
-/* eslint-disable no-console */
-/* eslint-disable no-await-in-loop */
 
 const { Readable, addAbortSignal } = require('node:stream');
 const { readExternalSources } = require('ibm-cloud-sdk-core');
@@ -24,6 +19,7 @@ const { WatsonXAI } = require('../../dist/vml_v1.js');
 const authHelper = require('../resources/auth-helper.js');
 const testHelper = require('../resources/test-helper.js');
 const { Stream } = require('../../dist/lib/common.js');
+const { expectSuccessResponse, testPagerPattern } = require('../utils/utils.js');
 const {
   CHAT_MODEL_IBM: chatModel,
   CHAT_MODEL_MISTRAL,
@@ -58,7 +54,7 @@ const checkAborting = async (requestFnc, params) =>
     }
   });
 
-describe('WatsonxAiMlVml_v1_integration', () => {
+describe('WatsonXAI_integration', () => {
   jest.setTimeout(timeout);
 
   // Service instance
@@ -80,6 +76,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
     expect(watsonxAIService).not.toBeNull();
 
     const config = readExternalSources(WatsonXAI.DEFAULT_SERVICE_NAME);
+
     expect(config).not.toBeNull();
 
     watsonxAIService.enableRetries();
@@ -94,9 +91,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       };
 
       const res = await watsonxAIService.listFoundationModelSpecs(params);
-      expect(res).toBeDefined();
-      expect(res.status).toBe(200);
-      expect(res.result).toBeDefined();
+      expectSuccessResponse(res, 200);
     });
 
     test('listFoundationModelSpecs() via FoundationModelSpecsPager', async () => {
@@ -106,21 +101,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         techPreview: false,
       };
 
-      const allResults = [];
-
-      // Test getNext().
-      let pager = new WatsonXAI.FoundationModelSpecsPager(watsonxAIService, params);
-      while (pager.hasNext()) {
-        const nextPage = await pager.getNext();
-        expect(nextPage).not.toBeNull();
-        allResults.push(...nextPage);
-      }
-
-      // Test getAll().
-      pager = new WatsonXAI.FoundationModelSpecsPager(watsonxAIService, params);
-      const allItems = await pager.getAll();
-      expect(allItems).not.toBeNull();
-      expect(allItems).toHaveLength(allResults.length);
+      await testPagerPattern(WatsonXAI.FoundationModelSpecsPager, watsonxAIService, params, 0);
     });
 
     test('listFoundationModelTasks()', async () => {
@@ -129,9 +110,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       };
 
       const res = await watsonxAIService.listFoundationModelTasks(params);
-      expect(res).toBeDefined();
-      expect(res.status).toBe(200);
-      expect(res.result).toBeDefined();
+      expectSuccessResponse(res, 200);
     });
 
     test('listFoundationModelTasks() via FoundationModelTasksPager', async () => {
@@ -139,21 +118,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         limit: 50,
       };
 
-      const allResults = [];
-
-      // Test getNext().
-      let pager = new WatsonXAI.FoundationModelTasksPager(watsonxAIService, params);
-      while (pager.hasNext()) {
-        const nextPage = await pager.getNext();
-        expect(nextPage).not.toBeNull();
-        allResults.push(...nextPage);
-      }
-
-      // Test getAll().
-      pager = new WatsonXAI.FoundationModelTasksPager(watsonxAIService, params);
-      const allItems = await pager.getAll();
-      expect(allItems).not.toBeNull();
-      expect(allItems).toHaveLength(allResults.length);
+      await testPagerPattern(WatsonXAI.FoundationModelTasksPager, watsonxAIService, params, 0);
     });
   });
 
@@ -261,9 +226,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       };
 
       const res = await watsonxAIService.generateText(params);
-      expect(res).toBeDefined();
-      expect(res.status).toBe(200);
-      expect(res.result).toBeDefined();
+      expectSuccessResponse(res, 200);
     });
 
     test('generateTextStream', async () => {
@@ -386,9 +349,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       };
 
       const res = await watsonxAIService.tokenizeText(params);
-      expect(res).toBeDefined();
-      expect(res.status).toBe(200);
-      expect(res.result).toBeDefined();
+      expectSuccessResponse(res, 200);
     });
   });
 
@@ -415,9 +376,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       };
 
       const res = await watsonxAIService.embedText(params);
-      expect(res).toBeDefined();
-      expect(res.status).toBe(200);
-      expect(res.result).toBeDefined();
+      expectSuccessResponse(res, 200);
     });
   });
 
@@ -434,9 +393,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       });
 
-      expect(res).toBeDefined();
-      expect(res.status).toBe(200);
-      expect(res.result).toBeDefined();
+      expectSuccessResponse(res, 200);
     });
 
     test('textChat favor maxCompletionTokens', async () => {
@@ -461,7 +418,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       expect(res.result.usage.completion_tokens).toBe(10);
     });
 
-    test.skip('textChat with reasoning', async () => {
+    test('textChat with reasoning', async () => {
       const res = await watsonxAIService.textChat({
         messages: [
           {
@@ -490,7 +447,6 @@ describe('WatsonxAiMlVml_v1_integration', () => {
         projectId,
       });
 
-      expect(res).toBeDefined();
       expect(res).toBeInstanceOf(Stream);
     });
 
@@ -514,10 +470,12 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       });
 
       expect(res).toBeInstanceOf(Stream);
+
       let lastChunk;
       for await (const chunk of res) {
         lastChunk = chunk;
       }
+
       expect(lastChunk.data.usage.completion_tokens).toBe(5);
     });
 
@@ -538,6 +496,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       });
       for await (const chunk of stream) {
         expect(typeof chunk === 'string').toBe(true);
+
         break;
       }
     });
@@ -556,6 +515,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       });
       for await (const chunk of stream) {
         expect(typeof chunk.id === 'number').toBe(true);
+
         break;
       }
     });
@@ -579,6 +539,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           controller.abort();
         }
       };
+
       await expect(abortStreaming()).rejects.toThrow('The operation was aborted');
     });
 
@@ -602,6 +563,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           stream.controller.abort();
         }
       };
+
       await expect(abortStreaming()).rejects.toThrow('The operation was aborted');
     });
 
@@ -631,6 +593,7 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       } catch (e) {
         expect(e.message).toBe('The operation was aborted');
       }
+
       expect(chunks).toHaveLength(n);
     });
 
@@ -657,10 +620,11 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       } catch (e) {
         expect(e.message).toBe('The operation was aborted');
       }
+
       expect(chunks).toHaveLength(n);
     });
 
-    test.skip('textChatStream with reasoning', async () => {
+    test('textChatStream with reasoning', async () => {
       const stream = await watsonxAIService.textChatStream({
         messages: [
           {
@@ -684,9 +648,12 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           }
         }
       }
+
       expect(result.reasoning_content.length).toBeGreaterThan(0);
     });
+
     const chatModels = [chatModel, CHAT_MODEL_META, CHAT_MODEL_MISTRAL];
+
     test.each(chatModels)(
       'textChatStream with returnObject returning correct object with %s',
       async (model) => {
@@ -726,9 +693,8 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       };
 
       const res = await watsonxAIService.timeSeriesForecast(params);
-      expect(res).toBeDefined();
-      expect(res.status).toBe(200);
-      expect(res.result).toBeDefined();
+      expectSuccessResponse(res, 200);
+
       expect(res.result.results[0].target).toHaveLength(38);
     });
 
@@ -741,27 +707,26 @@ describe('WatsonxAiMlVml_v1_integration', () => {
       };
 
       const res = await watsonxAIService.timeSeriesForecast(params);
-      expect(res).toBeDefined();
-      expect(res.status).toBe(200);
-      expect(res.result).toBeDefined();
+      expectSuccessResponse(res, 200);
+
       expect(res.result.results[0].target).toHaveLength(96);
     });
   });
 
   describe('Callback tests', () => {
-    const requestCallback = (req) => {
+    const assertRequestCallback = (req) => {
       expect(req).toBeDefined();
       expect(req.options).toBeDefined();
       expect(req.defaultOptions).toBeDefined();
       expect(req.defaultOptions.headers).toBeUndefined();
     };
-    const responseCallback = (res) => {
-      expect(res).toBeDefined();
+    const assertResponseCallback = (res) => {
       expect(res.result).toBeDefined();
       expect(res.status).toBeDefined();
       expect(res.statusText).toBeDefined();
       expect(res.headers).toBeDefined();
     };
+
     test('textChat with callbacks', async () => {
       const res = await watsonxAIService.textChat(
         {
@@ -770,12 +735,14 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          requestCallback,
-          responseCallback,
+          assertRequestCallback,
+          assertResponseCallback,
         }
       );
+
       expect(res).toBeDefined();
     });
+
     test('textChatSteam with callbacks', async () => {
       const res = await watsonxAIService.textChatStream(
         {
@@ -784,12 +751,14 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          requestCallback,
-          responseCallback,
+          assertRequestCallback,
+          assertResponseCallback,
         }
       );
+
       expect(res).toBeDefined();
     });
+
     test('generateText with callbacks', async () => {
       const res = await watsonxAIService.generateText(
         {
@@ -798,12 +767,14 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          requestCallback,
-          responseCallback,
+          assertRequestCallback,
+          assertResponseCallback,
         }
       );
+
       expect(res).toBeDefined();
     });
+
     test('generateTextStream with callbacks', async () => {
       const res = await watsonxAIService.generateTextStream(
         {
@@ -812,12 +783,14 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          requestCallback,
-          responseCallback,
+          assertRequestCallback,
+          assertResponseCallback,
         }
       );
+
       expect(res).toBeDefined();
     });
+
     test('embedText with callbacks', async () => {
       const res = await watsonxAIService.embedText(
         {
@@ -826,13 +799,15 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          requestCallback,
-          responseCallback,
+          assertRequestCallback,
+          assertResponseCallback,
         }
       );
+
       expect(res).toBeDefined();
     });
-    test('generateText with single requestCallback callback', async () => {
+
+    test('generateText with single assertRequestCallback callback', async () => {
       const res = await watsonxAIService.generateText(
         {
           input: 'Hello. How are you?',
@@ -840,12 +815,14 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          requestCallback,
+          assertRequestCallback,
         }
       );
+
       expect(res).toBeDefined();
     });
-    test('generateText with single responseCallback callback', async () => {
+
+    test('generateText with single assertResponseCallback callback', async () => {
       const res = await watsonxAIService.generateText(
         {
           input: 'Hello. How are you?',
@@ -853,9 +830,10 @@ describe('WatsonxAiMlVml_v1_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          responseCallback,
+          assertResponseCallback,
         }
       );
+
       expect(res).toBeDefined();
     });
   });

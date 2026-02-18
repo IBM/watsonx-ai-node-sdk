@@ -1,27 +1,26 @@
 /**
- * (C) Copyright IBM Corp. 2025.
+ * (C) Copyright IBM Corp. 2025-2026.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
-import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
-import { Agent } from 'https';
-import { RequestTokenResponse } from '../../authentication/utils/authenticators';
+import type { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
+import type { Agent } from 'https';
+import type { RequestTokenResponse } from '../../authentication/utils/authenticators';
 
 /**
  * Parameters for creating a resource.
+ *
  * @remarks
- * This interface defines the parameters required for creating a resource.
+ *   This interface defines the parameters required for creating a resource.
  */
 export interface CreateParameters {
   /** The URL of the resource to create. */
@@ -38,8 +37,9 @@ export interface CreateParameters {
 
 /**
  * Parameters for getting a resource.
+ *
  * @remarks
- * This interface defines the parameters required for getting a resource.
+ *   This interface defines the parameters required for getting a resource.
  */
 export interface GetParameters {
   /** The URL of the resource to get. */
@@ -56,8 +56,9 @@ export interface GetParameters {
 
 /**
  * Parameters for posting a resource.
+ *
  * @remarks
- * This interface defines the parameters required for posting a resource.
+ *   This interface defines the parameters required for posting a resource.
  */
 export interface PostParameters {
   /** The URL of the resource to post. */
@@ -76,8 +77,9 @@ export interface PostParameters {
 
 /**
  * Parameters for updating a resource.
+ *
  * @remarks
- * This interface defines the parameters required for updating a resource.
+ *   This interface defines the parameters required for updating a resource.
  */
 export interface PutParameters {
   /** The URL of the resource to update. */
@@ -96,8 +98,9 @@ export interface PutParameters {
 
 /**
  * Parameters for deleting a resource.
+ *
  * @remarks
- * This interface defines the parameters required for deleting a resource.
+ *   This interface defines the parameters required for deleting a resource.
  */
 export interface DeleteParameters {
   /** The URL of the resource to delete. */
@@ -116,8 +119,10 @@ export interface DeleteParameters {
 
 /**
  * Extended parameters for creating a resource with streaming support.
+ *
  * @remarks
- * This interface extends `CreateParameters` to include an optional flag for returning an object instead of a stream.
+ *   This interface extends `CreateParameters` to include an optional flag for returning an object
+ *   instead of a stream.
  */
 export interface CreateStreamParameters extends CreateParameters {
   /** Flag to indicate whether to return the result as an object or a stream. */
@@ -126,8 +131,10 @@ export interface CreateStreamParameters extends CreateParameters {
 
 /**
  * Represents the response from a service request.
+ *
  * @remarks
- * This interface defines the structure of a response object, including the result, status, status text, and headers.
+ *   This interface defines the structure of a response object, including the result, status, status
+ *   text, and headers.
  */
 export interface Response<T = any> {
   /** The actual result of the request. */
@@ -142,8 +149,9 @@ export interface Response<T = any> {
 
 /**
  * Callback function type for handling service request results.
+ *
  * @remarks
- * This type defines a callback function that takes an error and an optional response object.
+ *   This type defines a callback function that takes an error and an optional response object.
  */
 export type Callback<T> = (error: any, response?: Response<T>) => void;
 

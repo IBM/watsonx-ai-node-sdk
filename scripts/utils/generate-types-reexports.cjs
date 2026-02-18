@@ -54,9 +54,9 @@ const path = require('path');
   } else {
     // Insert block inside existing namespace if not found
     updatedContent = mainContent.replace(
-      /export namespace WatsonxAiMlVml_v1\s*{([\s\S]*?)}/,
+      /export namespace WatsonXAI\s*{([\s\S]*?)}/,
       (match, inner) => {
-        return `export namespace WatsonxAiMlVml_v1 {\n${inner.trimEnd()}\n\n${updatedBlock}\n}`;
+        return `export namespace WatsonXAI {\n${inner.trimEnd()}\n\n${updatedBlock}\n}`;
       }
     );
   }

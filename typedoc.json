@@ -8,7 +8,7 @@
   "tsconfig": "tsconfig.json",
   "out": "apidocs",
   "includeVersion": false,
-  "plugin": ["./scripts/plugins/typedoc-hide-reexports.js"],
+  "plugin": ["./scripts/plugins/typedoc-hide-reexports.mjs"],
   "entryPoints": [
     "src/index.ts",
     "src/gateway/index.ts",

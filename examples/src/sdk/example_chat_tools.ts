@@ -1,12 +1,12 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - create messages for chat conversation
- * - create tools for chat
- * - request with tools and question to a model
- * - retrive response from a model
+ *
+ * - Initialize SDK
+ * - Create messages for chat conversation
+ * - Create tools for chat
+ * - Request with tools and question to a model
+ * - Retrive response from a model
  */
-/* eslint-disable no-restricted-syntax */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';

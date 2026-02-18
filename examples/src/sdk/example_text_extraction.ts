@@ -1,8 +1,9 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - tokenize input on two chosen models
- * - compare how input is split into tokens between two models
+ *
+ * - Initialize SDK
+ * - Tokenize input on two chosen models
+ * - Compare how input is split into tokens between two models
  */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
@@ -16,13 +17,13 @@ const credentialsPath = path.join(__dirname, '/../../../credentials/watsonx_ai_m
 config({ path: credentialsPath });
 
 /**
- * This is another option of authentication. For this to work please remove following properties from Watsonx instance initialization
- * watsonxAIApikey, watsonxAIAuthType
- * */
+ * This is another option of authentication. For this to work please remove following properties
+ * from Watsonx instance initialization watsonxAIApikey, watsonxAIAuthType
+ */
 // process.env.IBM_CREDENTIALS_FILE = path.join(__dirname, '/../../../credentials/watsonx_ai_ml_vml_v1.env')
 
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
-const spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
+const _spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 
 const watsonxAIService = WatsonXAI.newInstance({

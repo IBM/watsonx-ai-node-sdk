@@ -1,13 +1,13 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - create messages for chat conversation
- * - request with messages and response type as string
- * - read stream passed as response
- * - request with messages and response type as object
- * - read stream passed as response
+ *
+ * - Initialize SDK
+ * - Create messages for chat conversation
+ * - Request with messages and response type as string
+ * - Read stream passed as response
+ * - Request with messages and response type as object
+ * - Read stream passed as response
  */
-/* eslint-disable no-restricted-syntax */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';

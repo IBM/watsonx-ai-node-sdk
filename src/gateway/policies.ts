@@ -1,26 +1,22 @@
 /**
- * (C) Copyright IBM Corp. 2025.
+ * (C) Copyright IBM Corp. 2025-2026.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
-
-/* eslint-disable import/prefer-default-export */
 
 import { ENDPOINTS } from '../config';
 import { GatewayResource } from './resources';
-import { EmptyObject } from './types/gateway';
-import { Response } from '../base/types/base';
-import {
+import type { EmptyObject } from '../types/common';
+import type { Response } from '../base/types/base';
+import type {
   CreatePolicyParams,
   DeletePolicyParams,
   GetPolicyParams,
@@ -31,8 +27,8 @@ import {
 import { validateRequestParams } from '../helpers/validators';
 
 /**
- * Class representing the Policies resource.
- * This class provides methods to interact with ML Gateway policies.
+ * Class representing the Policies resource. This class provides methods to interact with ML Gateway
+ * policies.
  */
 export class Policies extends GatewayResource {
   /**
@@ -47,7 +43,7 @@ export class Policies extends GatewayResource {
    * @param {string} params.subject - The subject that the policy pertains to.
    * @param {AbortSignal} [params.signal] - Signal from AbortController
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<Response<EmptyObject>> } - Resolves with the response from the server.
+   * @returns {Promise<Response<EmptyObject>>} - Resolves with the response from the server.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
   create(params: CreatePolicyParams): Promise<Response<TenantPolicy>> {
@@ -87,7 +83,8 @@ export class Policies extends GatewayResource {
    * @param {AbortSignal} [params.signal] - Signal from AbortController
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @returns {Promise<TenantPolicy>} Resolves with the response from the server.
-   * @throws {Error} If validation fails, policy with provided id is not listed or an error occurs during the request.
+   * @throws {Error} If validation fails, policy with provided id is not listed or an error occurs
+   *   during the request.
    */
   async getDetails(params: GetPolicyParams): Promise<TenantPolicy> {
     const requiredParams = ['policyId'];
@@ -140,6 +137,7 @@ export class Policies extends GatewayResource {
 
   /**
    * List all policies.
+   *
    * @param {Object} params - Parameters for listing policies.
    * @param {string} [params.providerId] - Policy id.
    * @returns {Promise<Response<TenantPolicyCollection>>} Resolves with the list of policies.

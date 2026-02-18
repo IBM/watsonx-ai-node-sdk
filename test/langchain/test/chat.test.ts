@@ -245,9 +245,8 @@ describe.each(Object.values(CHAT_MODELS))(
               messages.push(new AIMessage(toolMessage));
 
               for (const tool_call of toolMessage?.tool_calls as ToolCall[]) {
-                const toolCallMessage = await toolsByName[
-                  tool_call.name as keyof typeof toolsByName
-                ].invoke(tool_call);
+                const toolCallMessage =
+                  await toolsByName[tool_call.name as keyof typeof toolsByName].invoke(tool_call);
                 messages.push(toolCallMessage);
               }
               const result = await modelWithTools.invoke(messages);

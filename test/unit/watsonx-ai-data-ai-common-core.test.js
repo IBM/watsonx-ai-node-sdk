@@ -1,20 +1,16 @@
 /**
  * (C) Copyright IBM Corp. 2025.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
-
-/* eslint-disable no-await-in-loop */
 
 const nock = require('nock');
 const sdkCorePackage = require('ibm-cloud-sdk-core');
@@ -44,6 +40,7 @@ const createRequestMocker = new MockingRequest(watsonxAIService, 'createRequest'
 
 describe('Data & AI Common Core methods', () => {
   let createRequestMock;
+
   beforeEach(() => {
     createRequestMocker.mock(() => Promise.resolve());
     createRequestMock = createRequestMocker.functionMock;
@@ -111,6 +108,7 @@ describe('Data & AI Common Core methods', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(createSpaceParams.name);
         expect(mockRequestOptions.body.type).toEqual(createSpaceParams.type);
         expect(mockRequestOptions.body.project_id).toEqual(createSpaceParams.project_id);
@@ -246,6 +244,7 @@ describe('Data & AI Common Core methods', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.start).toEqual(listSpacesParams.start);
         expect(mockRequestOptions.qs.limit).toEqual(listSpacesParams.limit);
         expect(mockRequestOptions.qs.tags.join(',')).toEqual(listSpacesParams.tags.join(','));
@@ -411,9 +410,12 @@ describe('Data & AI Common Core methods', () => {
         const pager = new WatsonXAI.ListSpacesPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
+
           expect(nextPage).not.toBeNull();
+
           allResults.push(...nextPage);
         }
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -424,6 +426,7 @@ describe('Data & AI Common Core methods', () => {
         };
         const pager = new WatsonXAI.ListSpacesPager(watsonxAIService, params);
         const allResults = await pager.getAll();
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -454,6 +457,7 @@ describe('Data & AI Common Core methods', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.path.space_id).toEqual(getSpaceParams.spaceId);
       }
 
@@ -525,6 +529,7 @@ describe('Data & AI Common Core methods', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.path.space_id).toEqual(deleteSpaceParams.spaceId);
       }
 

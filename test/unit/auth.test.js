@@ -1,20 +1,17 @@
 /**
  * (C) Copyright IBM Corp. 2025.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
-/* eslint-disable no-await-in-loop */
 const path = require('path');
 const { Agent } = require('https');
 const { WatsonXAI } = require('../../dist/vml_v1.js');
@@ -72,9 +69,11 @@ describe('Authentication unit tests', () => {
     const requestTokenMocker = new MockingRequest(auth, 'requestAdminToken');
     let requestTokenMock;
     const serviceUrl = 'https://cpd.cp.fyre.ibm.com';
+
     beforeAll(() => {
       process.env.WATSONX_AI_AUTH_TYPE = 'zen';
     });
+
     afterAll(() => {
       delete process.env.WATSONX_AI_AUTH_TYPE;
     });
@@ -84,9 +83,11 @@ describe('Authentication unit tests', () => {
         requestTokenMocker.mock();
         requestTokenMock = requestTokenMocker.functionMock;
       });
+
       afterEach(() => {
         requestTokenMocker.clearMock();
       });
+
       test('Multiple requests with valid token', async () => {
         const instance = WatsonXAI.newInstance({
           version,
@@ -98,10 +99,12 @@ describe('Authentication unit tests', () => {
         expect(instance.getAuthenticator()).toBeInstanceOf(JWTRequestBaseAuthenticator);
 
         const chatFirstCall = instance.textChat(textChatParams);
+
         expect(chatFirstCall).toBeInstanceOf(Promise);
         expect(requestTokenMock).toHaveBeenCalledTimes(1);
 
         const chatSecondCall = instance.textChat(textChatParams);
+
         expect(chatSecondCall).toBeInstanceOf(Promise);
         expect(requestTokenMock).toHaveBeenCalledTimes(1);
       });
@@ -119,12 +122,15 @@ describe('Authentication unit tests', () => {
 
         for (let i = 1; i <= 3; i += 1) {
           const chatFirstCall = instance.textChat(textChatParams);
+
           expect(chatFirstCall).toBeInstanceOf(Promise);
           expect(requestTokenMock).toHaveBeenCalledTimes(i);
+
           await wait(tokenValidationTime + 10); // adding extra 10ms to catch token expiration
         }
       });
     });
+
     describe('Negative tests', () => {
       test('Request with invalid token', async () => {
         requestTokenMocker.mock({
@@ -142,6 +148,7 @@ describe('Authentication unit tests', () => {
         expect(instance).toBeDefined();
 
         const chatCall = instance.textChat(textChatParams);
+
         expect(chatCall).toBeInstanceOf(Promise);
         await expect(chatCall).rejects.toThrow('Access token received is not a valid JWT');
         expect(requestTokenMock).toHaveBeenCalledTimes(1);
@@ -155,6 +162,7 @@ describe('Authentication unit tests', () => {
             version,
             serviceUrl,
           });
+
         expect(initInstance).toThrow(
           'requestToken function not provided. This function is necessary for zen authentication.'
         );
@@ -169,11 +177,14 @@ describe('Authentication unit tests', () => {
             serviceUrl,
             requestToken: auth.requestAdminToken,
           });
+
         expect(initInstance).toThrow('requestToken function is only valid for zen authentication');
+
         process.env.WATSONX_AI_AUTH_TYPE = oldAuthType;
       });
     });
   });
+
   describe('IAM cloud authentication', () => {
     const serviceUrl = 'https://us-south.ml.cloud.ibm.com';
 
@@ -186,6 +197,7 @@ describe('Authentication unit tests', () => {
       delete process.env.WATSONX_AI_AUTH_TYPE;
       delete process.env.WATSONX_AI_APIKEY;
     });
+
     const iamRequestTokenMocker = new MockingRequest(
       authenticators.IamTokenManager.prototype,
       'requestToken'
@@ -209,16 +221,21 @@ describe('Authentication unit tests', () => {
           version,
           serviceUrl,
         });
+
         expect(instance.getAuthenticator()).toBeInstanceOf(authenticators.IamAuthenticator);
+
         const chatFirstCall = instance.textChat(textChatParams);
+
         expect(chatFirstCall).toBeInstanceOf(Promise);
         expect(iamRequestTokenMock).toHaveBeenCalledTimes(1);
       });
     });
+
     describe('Negative tests', () => {
       afterEach(() => {
         process.env.WATSONX_AI_APIKEY = 'testString';
       });
+
       test('Request with invalid token', async () => {
         iamRequestTokenMocker.mock({
           result: {
@@ -234,14 +251,17 @@ describe('Authentication unit tests', () => {
         expect(instance).toBeDefined();
 
         const chatCall = instance.textChat(textChatParams);
+
         expect(chatCall).toBeInstanceOf(Promise);
         await expect(chatCall).rejects.toThrow('Access token received is not a valid JWT');
         expect(iamRequestTokenMock).toHaveBeenCalledTimes(1);
 
         iamRequestTokenMocker.unmock();
       });
+
       test('Instance creation with no apikey', async () => {
         delete process.env.WATSONX_AI_APIKEY;
+
         expect(() =>
           WatsonXAI.newInstance({
             version,
@@ -251,6 +271,7 @@ describe('Authentication unit tests', () => {
       });
     });
   });
+
   describe('IBM watsonx.ai software authentication', () => {
     const serviceUrl = 'https://cpd.cp.fyre.ibm.com';
 
@@ -292,14 +313,19 @@ describe('Authentication unit tests', () => {
           version,
           serviceUrl,
         });
+
         expect(instance.getAuthenticator()).toBeInstanceOf(
           authenticators.CloudPakForDataAuthenticator
         );
+
         const chatFirstCall = instance.textChat(textChatParams);
+
         expect(chatFirstCall).toBeInstanceOf(Promise);
         expect(iamRequestTokenMock).toHaveBeenCalledTimes(1);
+
         delete process.env.WATSONX_AI_PASSWORD;
       });
+
       test('Instance creation and request with apikey instead of password', async () => {
         process.env.WATSONX_AI_APIKEY = 'testApikey';
         const instance = WatsonXAI.newInstance({
@@ -308,11 +334,14 @@ describe('Authentication unit tests', () => {
         });
 
         const chatFirstCall = instance.textChat(textChatParams);
+
         expect(chatFirstCall).toBeInstanceOf(Promise);
         expect(iamRequestTokenMock).toHaveBeenCalledTimes(1);
+
         delete process.env.WATSONX_AI_APIKEY;
       });
     });
+
     describe('Negative tests', () => {
       test('Request with invalid token', async () => {
         process.env.WATSONX_AI_PASSWORD = 'testPassword';
@@ -331,6 +360,7 @@ describe('Authentication unit tests', () => {
         expect(instance).toBeDefined();
 
         const chatCall = instance.textChat(textChatParams);
+
         expect(chatCall).toBeInstanceOf(Promise);
         await expect(chatCall).rejects.toThrow('Access token received is not a valid JWT');
         expect(cp4dRequestTokenMock).toHaveBeenCalledTimes(1);
@@ -348,20 +378,24 @@ describe('Authentication unit tests', () => {
           })
         ).toThrow('Exactly one of `apikey` or `password` must be specified.');
       });
+
       test('Instance creation with both apikey and password', async () => {
         process.env.WATSONX_AI_APIKEY = 'testApikey';
         process.env.WATSONX_AI_PASSWORD = 'testPassword';
+
         expect(() =>
           WatsonXAI.newInstance({
             version,
             serviceUrl,
           })
         ).toThrow('Exactly one of `apikey` or `password` must be specified.');
+
         delete process.env.WATSONX_AI_APIKEY;
         delete process.env.WATSONX_AI_PASSWORD;
       });
     });
   });
+
   describe('Bearer token authentication', () => {
     const serviceUrl = 'https://us-south.ml.cloud.ibm.com';
 
@@ -383,11 +417,13 @@ describe('Authentication unit tests', () => {
         });
 
         const chatFirstCall = instance.textChat(textChatParams);
+
         expect(chatFirstCall).toBeInstanceOf(Promise);
         expect(instance.getAuthenticator()).toBeInstanceOf(authenticators.BearerTokenAuthenticator);
       });
     });
   });
+
   describe('AWS authentication', () => {
     const serviceUrl = 'https://ap-south-1.aws.wxai.ibm.com';
     const requestTokenMocker = new MockingRequest(
@@ -395,6 +431,7 @@ describe('Authentication unit tests', () => {
       'requestToken'
     );
     let requestTokenMock;
+
     beforeAll(() => {
       process.env.WATSONX_AI_AUTH_TYPE = 'aws';
       process.env.WATSONX_AI_APIKEY = 'fakeAPIKey';
@@ -411,9 +448,11 @@ describe('Authentication unit tests', () => {
         requestTokenMocker.mock(tokenResponse);
         requestTokenMock = requestTokenMocker.functionMock;
       });
+
       afterEach(() => {
         requestTokenMocker.unmock();
       });
+
       test('Request with valid token', async () => {
         const instance = WatsonXAI.newInstance({
           version,
@@ -421,6 +460,7 @@ describe('Authentication unit tests', () => {
         });
 
         const chatFirstCall = instance.textChat(textChatParams);
+
         expect(chatFirstCall).toBeInstanceOf(Promise);
         expect(instance.getAuthenticator()).toBeInstanceOf(authenticators.AWSAuthenticator);
       });
@@ -431,9 +471,11 @@ describe('Authentication unit tests', () => {
 describe('Authentication with cert', () => {
   describe('AWS cert authentication', () => {
     const serviceUrl = 'https://wxai.prep.ibmforusgov.com';
+
     beforeAll(() => {
       process.env.WATSONX_AI_AUTH_TYPE = 'aws';
     });
+
     afterAll(() => {
       delete process.env.WATSONX_AI_AUTH_TYPE;
     });
@@ -453,6 +495,7 @@ describe('Authentication with cert', () => {
         const sendRequestMock = sendRequestMocker.functionMock;
 
         await instance.textChat(textChatParams);
+
         expect(instance).toBeDefined();
         expect(sendRequestMock).toHaveBeenCalledWith({
           options: {
@@ -463,6 +506,7 @@ describe('Authentication with cert', () => {
             ...sendRequestCalledWith,
           },
         });
+
         sendRequestMocker.clearMock();
       });
 
@@ -481,6 +525,7 @@ describe('Authentication with cert', () => {
         const sendRequestMock = sendRequestMocker.functionMock;
 
         await instance.textChat(textChatParams);
+
         expect(instance).toBeDefined();
         expect(sendRequestMock).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -493,6 +538,7 @@ describe('Authentication with cert', () => {
             }),
           })
         );
+
         sendRequestMocker.clearMock();
       });
 
@@ -511,6 +557,7 @@ describe('Authentication with cert', () => {
         const sendRequestMock = sendRequestMocker.functionMock;
 
         await instance.textChat(textChatParams);
+
         expect(instance).toBeDefined();
         expect(sendRequestMock).toHaveBeenCalledWith({
           'options': {
@@ -528,6 +575,7 @@ describe('Authentication with cert', () => {
             'url': 'https://test.ibm.com/test/authentication/url',
           },
         });
+
         delete process.env.WATSONX_AI_AUTH_URL;
         sendRequestMocker.clearMock();
       });

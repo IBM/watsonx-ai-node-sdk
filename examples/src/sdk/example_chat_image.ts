@@ -1,8 +1,9 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - create messages with image as content for chat conversation
- * - infere with chat with messages
+ *
+ * - Initialize SDK
+ * - Create messages with image as content for chat conversation
+ * - Infere with chat with messages
  */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';

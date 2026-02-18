@@ -1,10 +1,10 @@
 /**
  * The following example flow:
+ *
  * - Retrievs tools with toolkit
  * - Adds tools to chat
  * - Infere chat to use tools
  */
-/* eslint-disable no-restricted-syntax */
 
 import {
   convertUtilityToolToWatsonxTool,

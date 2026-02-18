@@ -1,29 +1,23 @@
 /**
- * (C) Copyright IBM Corp. 2025.
+ * (C) Copyright IBM Corp. 2025-2026.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
-/**
- * IBM OpenAPI SDK Code Generator Version: 3.90.0-5aad763d-20240506-203857
- */
+/** IBM OpenAPI SDK Code Generator Version: 3.90.0-5aad763d-20240506-203857 */
 
-/* eslint-disable import/extensions */
-import { UserOptions } from 'ibm-cloud-sdk-core';
-import { BaseServiceOptions } from 'ibm-cloud-sdk-core/es/lib/base-service.js';
-import { OutgoingHttpHeaders } from 'http';
-import * as Messages from './messages';
-import {
+import type { UserOptions } from 'ibm-cloud-sdk-core';
+import type { BaseServiceOptions } from 'ibm-cloud-sdk-core/es/lib/base-service.js';
+import type * as Messages from './messages';
+import type {
   TextChatMessages,
   TextChatMessageSystem,
   TextChatMessageTool,
@@ -32,44 +26,24 @@ import {
   TextChatUserImageURLContent,
   TextChatUserTextContent,
 } from './messages';
-import { EncryptionParams } from './encryption';
+import type { EncryptionParams } from './encryption';
+import type { JsonObject, DefaultParams } from './common';
 
-/** Options for the `WatsonxAiMlVml_v1` constructor. */
+/** Options for the `WatsonXAI` constructor. */
 export interface Options extends UserOptions {
   /** The version date for the API of the form `YYYY-MM-DD`. */
   version: string;
 }
 
-/** The body of a service request that returns no response data. */
-export interface EmptyObject {}
-
-/** A standard JS object, defined to avoid the limitations of `Object` and `object` */
-export interface JsonObject {
-  [key: string]: any;
-}
-
-/** Chunk interface when returnObject=true in stream */
-export interface ObjectStreamed<T> {
-  id: number;
-  event: string;
-  data: T;
-}
-
-/*************************
- * request interfaces
- ************************/
-
-export interface DefaultParams {
-  signal?: AbortSignal;
-  headers?: OutgoingHttpHeaders;
-}
+/** Request interfaces */
 
 /** Parameters for the `createDeployment` operation. */
 export interface CreateDeploymentParams extends DefaultParams {
   /** The name of the resource. */
   name: string;
-  /** Indicates that this is an online deployment. An object has to be specified but can be empty.
-   *  The `serving_name` can be provided in the `online.parameters`.
+  /**
+   * Indicates that this is an online deployment. An object has to be specified but can be empty.
+   * The `serving_name` can be provided in the `online.parameters`.
    */
   online: OnlineDeployment;
   /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
@@ -90,21 +64,29 @@ export interface CreateDeploymentParams extends DefaultParams {
   hardwareRequest?: HardwareRequest;
   /** A reference to a resource. */
   asset?: Rel;
-  /** The base model that is required for this deployment if this is for a prompt template or a prompt tune for an
-   *  IBM foundation model.
+  /**
+   * The base model that is required for this deployment if this is for a prompt template or a
+   * prompt tune for an IBM foundation model.
    */
   baseModelId?: string;
   /**
-   * The base deployment when this is a custom foundation model with a prompt template. The id must be the id of the custom foundation model deployment.
+   * The base deployment when this is a custom foundation model with a prompt template. The id must
+   * be the id of the custom foundation model deployment.
    */
   baseDeploymentId?: string;
 }
 
 /** Parameters for the `listDeployments` operation. */
 export interface ListDeploymentsParams extends DefaultParams {
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
   /** Retrieves the deployment, if any, that contains this `serving_name`. */
   servingName?: string;
@@ -116,30 +98,39 @@ export interface ListDeploymentsParams extends DefaultParams {
   promptTemplateId?: string;
   /** Retrieves only the resources with the given name. */
   name?: string;
-  /** Retrieves the resources filtered with the given type. There are the deployment types as well as an
-   *  additional
-   *  `prompt_template` if the deployment type includes a prompt template.
+  /**
+   * Retrieves the resources filtered with the given type. There are the deployment types as well as
+   * an additional `prompt_template` if the deployment type includes a prompt template.
    *
-   *  The supported deployment types are (see the description for `deployed_asset_type` in the deployment entity):
+   * The supported deployment types are (see the description for `deployed_asset_type` in the
+   * deployment entity):
    *
-   *  1. `prompt_tune` - when a prompt tuned model is deployed. 2. `foundation_model` - when a prompt template is used
-   *  on a pre-deployed IBM provided model. 3. `custom_foundation_model` - when a custom foundation model is deployed.
+   * 1. `prompt_tune` - when a prompt tuned model is deployed. 2. `foundation_model` - when a prompt
+   *    template is used on a pre-deployed IBM provided model. 3. `custom_foundation_model`
    *
-   *  These can be combined with the flag `prompt_template` like this:
+   *    - When a custom foundation model is deployed.
    *
-   *  1. `type=prompt_tune` - return all prompt tuned model deployments. 2. `type=prompt_tune and prompt_template` -
-   *  return all prompt tuned model deployments with a prompt template. 3. `type=foundation_model` - return all prompt
-   *  template deployments. 4. `type=foundation_model and prompt_template` - return all prompt template deployments -
-   *  this is the same as the previous query because a `foundation_model` can only exist with a prompt template. 5.
-   *  `type=prompt_template` - return all deployments with a prompt template.
+   * These can be combined with the flag `prompt_template` like this:
+   *
+   * 1. `type=prompt_tune` - return all prompt tuned model deployments. 2. `type=prompt_tune and
+   *    prompt_template` - return all prompt tuned model deployments with a prompt template. 3.
+   *    `type=foundation_model` - return all prompt template deployments. 4. `type=foundation_model
+   *    and prompt_template` - return all prompt template deployments
+   *
+   *    - This is the same as the previous query because a `foundation_model` can only exist with a
+   *         prompt template.
+   *
+   *    5. `type=prompt_template` - return all deployments with a prompt template.
    */
   type?: string;
-  /** Retrieves the resources filtered by state. Allowed values are `initializing`, `updating`, `ready` and
-   *  `failed`.
+  /**
+   * Retrieves the resources filtered by state. Allowed values are `initializing`, `updating`,
+   * `ready` and `failed`.
    */
   state?: string;
-  /** Returns whether `serving_name` is available for use or not. This query parameter cannot be combined with any
-   *  other parameter except for `serving_name`.
+  /**
+   * Returns whether `serving_name` is available for use or not. This query parameter cannot be
+   * combined with any other parameter except for `serving_name`.
    */
   conflict?: boolean;
 }
@@ -148,9 +139,15 @@ export interface ListDeploymentsParams extends DefaultParams {
 export interface DeploymentsGetParams extends DefaultParams {
   /** The deployment id. */
   deploymentId: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
 }
 
@@ -160,9 +157,15 @@ export interface DeploymentsUpdateParams extends DefaultParams {
   deploymentId: string;
   /** The json patch. */
   jsonPatch: JsonPatchOperation[];
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
 }
 
@@ -170,56 +173,68 @@ export interface DeploymentsUpdateParams extends DefaultParams {
 export interface DeploymentsDeleteParams extends DefaultParams {
   /** The deployment id. */
   deploymentId: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
 }
 
 /** Parameters for the `deploymentsTextGeneration` operation. */
 export interface DeploymentsTextGenerationParams extends DefaultParams {
-  /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
-   *  allows a predefined URL to be used to post a prediction.
+  /**
+   * The `id_or_name` can be either the `deployment_id` that identifies the deployment or a
+   * `serving_name` that allows a predefined URL to be used to post a prediction.
    *
-   *  The `project` or `space` for the deployment must have a WML instance that will be used for limits and billing
-   *  (if a paid plan).
+   * The `project` or `space` for the deployment must have a WML instance that will be used for
+   * limits and billing (if a paid plan).
    */
   idOrName: string;
-  /** The prompt to generate completions. Note: The method tokenizes the input internally. It is recommended not
-   *  to leave any trailing spaces.
+  /**
+   * The prompt to generate completions. Note: The method tokenizes the input internally. It is
+   * recommended not to leave any trailing spaces.
    *
-   *
-   *  This field is ignored if there is a prompt template.
+   * This field is ignored if there is a prompt template.
    */
   input?: string;
   /** The template properties if this request refers to a prompt template. */
   parameters?: DeploymentTextGenProperties;
-  /** Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and `Personal
-   *  identifiable information` (PII) filtering. This list can be extended with new types of moderations.
+  /**
+   * Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and
+   * `Personal identifiable information` (PII) filtering. This list can be extended with new types
+   * of moderations.
    */
   moderations?: Moderations;
 }
 
 /** Parameters for the `deploymentsTextGenerationStream` operation. */
 export interface DeploymentsTextGenerationStreamParams extends DefaultParams {
-  /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
-   *  allows a predefined URL to be used to post a prediction.
+  /**
+   * The `id_or_name` can be either the `deployment_id` that identifies the deployment or a
+   * `serving_name` that allows a predefined URL to be used to post a prediction.
    *
-   *  The `project` or `space` for the deployment must have a WML instance that will be used for limits and billing
-   *  (if a paid plan).
+   * The `project` or `space` for the deployment must have a WML instance that will be used for
+   * limits and billing (if a paid plan).
    */
   idOrName: string;
-  /** The prompt to generate completions. Note: The method tokenizes the input internally. It is recommended not
-   *  to leave any trailing spaces.
+  /**
+   * The prompt to generate completions. Note: The method tokenizes the input internally. It is
+   * recommended not to leave any trailing spaces.
    *
-   *
-   *  This field is ignored if there is a prompt template.
+   * This field is ignored if there is a prompt template.
    */
   input?: string;
   /** The template properties if this request refers to a prompt template. */
   parameters?: DeploymentTextGenProperties;
-  /** Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and `Personal
-   *  identifiable information` (PII) filtering. This list can be extended with new types of moderations.
+  /**
+   * Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and
+   * `Personal identifiable information` (PII) filtering. This list can be extended with new types
+   * of moderations.
    */
   moderations?: Moderations;
 
@@ -229,29 +244,34 @@ export interface DeploymentsTextGenerationStreamParams extends DefaultParams {
 
 /** Parameters for the `deploymentsTextChat` operation. */
 export interface DeploymentsTextChatParams extends TextChatParameters, DefaultParams {
-  /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
-   *  allows a predefined URL to be used to post a prediction. The deployment must reference a prompt template with
-   *  `input_mode` `chat`.
+  /**
+   * The `id_or_name` can be either the `deployment_id` that identifies the deployment or a
+   * `serving_name` that allows a predefined URL to be used to post a prediction. The deployment
+   * must reference a prompt template with `input_mode` `chat`.
    *
-   *  The WML instance that is associated with the deployment will be used for limits and billing (if a paid plan).
+   * The WML instance that is associated with the deployment will be used for limits and billing (if
+   * a paid plan).
    */
   idOrName: string;
-  /** The messages for this chat session. You cannot specify `system` `role` in the messages. Depending on the
-   *  model, the `content` of `system` `role` may be from `system_prompt` of the prompt template, and will be
-   *  automatically inserted into `messages`.
+  /**
+   * The messages for this chat session. You cannot specify `system` `role` in the messages.
+   * Depending on the model, the `content` of `system` `role` may be from `system_prompt` of the
+   * prompt template, and will be automatically inserted into `messages`.
    *
-   *  As an example, depending on the model, if `system_prompt` of a prompt template is "You are Granite Chat, an AI
-   *  language model developed by IBM. You are a cautious assistant. You carefully follow instructions. You are
-   *  helpful and harmless and you follow ethical guidelines and promote positive behavior.", a message with `system`
-   *  `role` having `content` the same as `system_prompt` is inserted.
+   * As an example, depending on the model, if `system_prompt` of a prompt template is "You are
+   * Granite Chat, an AI language model developed by IBM. You are a cautious assistant. You
+   * carefully follow instructions. You are helpful and harmless and you follow ethical guidelines
+   * and promote positive behavior.", a message with `system` `role` having `content` the same as
+   * `system_prompt` is inserted.
    */
   messages: DeploymentTextChatMessages[];
-  /** If specified, `context` will be inserted into `messages`. Depending on the model, `context` may be inserted
-   *  into the `content` with `system` `role`; or into the `content` of the last message of `user` `role`.
+  /**
+   * If specified, `context` will be inserted into `messages`. Depending on the model, `context` may
+   * be inserted into the `content` with `system` `role`; or into the `content` of the last message
+   * of `user` `role`.
    *
-   *
-   *  In the example, `context` "Today is Wednesday" is inserted as such
-   *  `content` of `user` becomes "Today is Wednesday. Who are you and which day is tomorrow?".
+   * In the example, `context` "Today is Wednesday" is inserted as such `content` of `user` becomes
+   * "Today is Wednesday. Who are you and which day is tomorrow?".
    */
   context?: string;
 }
@@ -263,68 +283,78 @@ export interface DeploymentsTextChatStreamParams extends DeploymentsTextChatPara
 
 /** Parameters for the `deploymentsTimeSeriesForecast` operation. */
 export interface DeploymentsTimeSeriesForecastParams extends DefaultParams {
-  /** The `id_or_name` can be either the `deployment_id` that identifies the deployment or a `serving_name` that
-   *  allows a predefined URL to be used to post a prediction.
+  /**
+   * The `id_or_name` can be either the `deployment_id` that identifies the deployment or a
+   * `serving_name` that allows a predefined URL to be used to post a prediction.
    *
-   *  The WML instance that is associated with the deployment will be used for limits and billing (if a paid plan).
+   * The WML instance that is associated with the deployment will be used for limits and billing (if
+   * a paid plan).
    */
   idOrName: string;
-  /** A payload of data matching `schema`. We assume the following about your data:
-   *    * All timeseries are of equal length and are uniform in nature (the time difference between two successive
-   *  rows is constant). This implies that there are no missing rows of data;
-   *    * The data meet the minimum model-dependent historical context length which
-   *    can be any number of rows per timeseries;
+  /**
+   * A payload of data matching `schema`. We assume the following about your data:
    *
-   *  Note that the example payloads shown are for illustration purposes only. An actual payload would necessary be
-   *  much larger to meet minimum model-specific context lengths.
+   * - All timeseries are of equal length and are uniform in nature (the time difference between two
+   *   successive rows is constant). This implies that there are no missing rows of data;
+   * - The data meet the minimum model-dependent historical context length which can be any number of
+   *   rows per timeseries;
+   *
+   * Note that the example payloads shown are for illustration purposes only. An actual payload
+   * would necessary be much larger to meet minimum model-specific context lengths.
    */
   data: JsonObject;
   /** Contains metadata about your timeseries data input. */
   schema: TSForecastInputSchema;
   /** The parameters for the forecast request. */
   parameters?: DeploymentTSForecastParameters;
-  /** Exogenous or supporting features that extend into the forecasting horizon (e.g., a weather forecast or
-   *  calendar of special promotions) which are known in advance. `future_data` would be in the same format as `data`
-   *  except  that all timestamps would be in the forecast horizon and it would not include previously specified
-   *  `target_columns`.
+  /**
+   * Exogenous or supporting features that extend into the forecasting horizon (e.g., a weather
+   * forecast or calendar of special promotions) which are known in advance. `future_data` would be
+   * in the same format as `data` except that all timestamps would be in the forecast horizon and it
+   * would not include previously specified `target_columns`.
    */
   futureData?: JsonObject;
 }
 
 /** Parameters for the `listFoundationModelSpecs` operation. */
 export interface ListFoundationModelSpecsParams extends DefaultParams {
-  /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
-   *  the service and it is set in the href available in the `next` field.
+  /**
+   * Token required for token-based pagination. This token cannot be determined by end user. It is
+   * generated by the service and it is set in the href available in the `next` field.
    */
   start?: string;
   /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
   limit?: number;
-  /** A set of filters to specify the list of models, filters are described as the `pattern` shown below.
-   *  ```text
-   *   pattern: tfilter[,tfilter][:(or|and)]
-   *   tfilter: filter | !filter
-   *     filter: Requires existence of the filter.
-   *     !filter: Requires absence of the filter.
-   *   filter: one of
-   *     modelid_*:     Filters by model id.
-   *                    Namely, select a model with a specific model id.
-   *     provider_*:    Filters by provider.
-   *                    Namely, select all models with a specific provider.
-   *     source_*:      Filters by source.
-   *                    Namely, select all models with a specific source.
-   *     input_tier_*:  Filters by input tier.
-   *                    Namely, select all models with a specific input tier.
-   *     output_tier_*: Filters by output tier.
-   *                    Namely, select all models with a specific output tier.
-   *     tier_*:        Filters by tier.
-   *                    Namely, select all models with a specific input or output tier.
-   *     task_*:        Filters by task id.
-   *                    Namely, select all models that support a specific task id.
-   *     lifecycle_*:   Filters by lifecycle state.
-   *                    Namely, select all models that are currently in the specified lifecycle state.
-   *     function_*:    Filters by function.
-   *                    Namely, select all models that support a specific function.
-   *  ```.
+  /**
+   * A set of filters to specify the list of models, filters are described as the `pattern` shown
+   * below.
+   *
+   * ```text
+   *  pattern: tfilter[,tfilter][:(or|and)]
+   *  tfilter: filter | !filter
+   *    filter: Requires existence of the filter.
+   *    !filter: Requires absence of the filter.
+   *  filter: one of
+   *    modelid_*:     Filters by model id.
+   *                   Namely, select a model with a specific model id.
+   *    provider_*:    Filters by provider.
+   *                   Namely, select all models with a specific provider.
+   *    source_*:      Filters by source.
+   *                   Namely, select all models with a specific source.
+   *    input_tier_*:  Filters by input tier.
+   *                   Namely, select all models with a specific input tier.
+   *    output_tier_*: Filters by output tier.
+   *                   Namely, select all models with a specific output tier.
+   *    tier_*:        Filters by tier.
+   *                   Namely, select all models with a specific input or output tier.
+   *    task_*:        Filters by task id.
+   *                   Namely, select all models that support a specific task id.
+   *    lifecycle_*:   Filters by lifecycle state.
+   *                   Namely, select all models that are currently in the specified lifecycle state.
+   *    function_*:    Filters by function.
+   *                   Namely, select all models that support a specific function.
+   * ```.
+   * ```
    */
   filters?: string;
   /** See all the `Tech Preview` models if entitled. */
@@ -333,8 +363,9 @@ export interface ListFoundationModelSpecsParams extends DefaultParams {
 
 /** Parameters for the `listFoundationModelTasks` operation. */
 export interface ListFoundationModelTasksParams extends DefaultParams {
-  /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
-   *  the service and it is set in the href available in the `next` field.
+  /**
+   * Token required for token-based pagination. This token cannot be determined by end user. It is
+   * generated by the service and it is set in the href available in the `next` field.
    */
   start?: string;
   /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
@@ -386,12 +417,19 @@ export interface GetPromptParams extends DefaultParams {
 }
 
 export interface CatalogSearch {
-  /** The limit request body field can be specified to limit the number of assets in the search results.
-    The default limit is 200. The maximum limit value is 200, and any greater value is ignored. */
+  /**
+   * The limit request body field can be specified to limit the number of assets in the search
+   * results. The default limit is 200. The maximum limit value is 200, and any greater value is
+   * ignored.
+   */
   limit?: number;
   /** Returns the number of query results for each unique value of each named field. */
   counts?: string[];
-  /** Restrict results to documents with a dimension equal to the specified label. Note that, multiple values for a single key in a drilldown means an OR relation between them and there is an AND relation between multiple keys. */
+  /**
+   * Restrict results to documents with a dimension equal to the specified label. Note that,
+   * multiple values for a single key in a drilldown means an OR relation between them and there is
+   * an AND relation between multiple keys.
+   */
   drilldown?: Record<string, any>;
   /** Bookmark of the query result */
   bookmark?: string;
@@ -456,8 +494,9 @@ export interface PutPromptLockParams extends DefaultParams {
   promptId: string;
   /** True if the prompt is currently locked. */
   locked: boolean;
-  /** Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in PUT /lock
-   *  requests.
+  /**
+   * Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in PUT
+   * /lock requests.
    */
   lockType?: PutPromptLockConstants.LockType | string;
   /** Locked by is computed by the server and shouldn't be passed. */
@@ -472,7 +511,10 @@ export interface PutPromptLockParams extends DefaultParams {
 
 /** Constants for the `putPromptLock` operation. */
 export namespace PutPromptLockConstants {
-  /** Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in PUT /lock requests. */
+  /**
+   * Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in PUT
+   * /lock requests.
+   */
   export enum LockType {
     EDIT = 'edit',
     GOVERNANCE = 'governance',
@@ -493,12 +535,14 @@ export interface GetPromptLockParams extends DefaultParams {
 export interface GetPromptInputParams extends DefaultParams {
   /** Prompt ID. */
   promptId: string;
-  /** Override input string that will be used to generate the response. The string can contain template
-   *  parameters.
+  /**
+   * Override input string that will be used to generate the response. The string can contain
+   * template parameters.
    */
   input?: string;
-  /** Supply only to replace placeholders. Object content must be key:value pairs where the 'key' is the parameter
-   *  to replace and 'value' is the value to use.
+  /**
+   * Supply only to replace placeholders. Object content must be key:value pairs where the 'key' is
+   * the parameter to replace and 'value' is the value to use.
    */
   promptVariables?: JsonObject;
   /** [REQUIRED] Specifies the space ID as the target. One target must be supplied per request. */
@@ -629,8 +673,9 @@ export interface PutPromptSessionLockParams extends DefaultParams {
   sessionId: string;
   /** True if the prompt is currently locked. */
   locked: boolean;
-  /** Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in PUT /lock
-   *  requests.
+  /**
+   * Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in PUT
+   * /lock requests.
    */
   lockType?: PutPromptSessionLockConstants.LockType | string;
   /** Locked by is computed by the server and shouldn't be passed. */
@@ -643,7 +688,10 @@ export interface PutPromptSessionLockParams extends DefaultParams {
 
 /** Constants for the `putPromptSessionLock` operation. */
 export namespace PutPromptSessionLockConstants {
-  /** Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in PUT /lock requests. */
+  /**
+   * Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in PUT
+   * /lock requests.
+   */
   export enum LockType {
     EDIT = 'edit',
     GOVERNANCE = 'governance',
@@ -680,7 +728,13 @@ export interface DeletePromptSessionEntryParams extends DefaultParams {
 
 /** Constants for the `textChat` operation. */
 export namespace TextChatConstants {
-  /** Using `none` means the model will not call any tool and instead generates a message. **The following options (`auto` and `required`) are not yet supported.** Using `auto` means the model can pick between generating a message or calling one or more tools. Using `required` means the model must call one or more tools. Only one of `tool_choice_option` or `tool_choice` must be present. */
+  /**
+   * Using `none` means the model will not call any tool and instead generates a message. **The
+   * following options (`auto` and `required`) are not yet supported.** Using `auto` means the model
+   * can pick between generating a message or calling one or more tools. Using `required` means the
+   * model must call one or more tools. Only one of `tool_choice_option` or `tool_choice` must be
+   * present.
+   */
   export enum ToolChoiceOption {
     NONE = 'none',
     AUTO = 'auto',
@@ -690,104 +744,129 @@ export namespace TextChatConstants {
 
 interface TextChatParameters {
   tools?: TextChatParameterTools[];
-  /** Using `none` means the model will not call any tool and instead generates a message.
+  /**
+   * Using `none` means the model will not call any tool and instead generates a message.
    *
-   *  **The following options (`auto` and `required`) are not yet supported.**
+   * **The following options (`auto` and `required`) are not yet supported.**
    *
-   *  Using `auto` means the model can pick between generating a message or calling one or more tools. Using
-   *  `required` means the model must call one or more tools.
+   * Using `auto` means the model can pick between generating a message or calling one or more
+   * tools. Using `required` means the model must call one or more tools.
    *
-   *  Only one of `tool_choice_option` or `tool_choice` must be present.
+   * Only one of `tool_choice_option` or `tool_choice` must be present.
    */
   toolChoiceOption?: TextChatConstants.ToolChoiceOption | string;
-  /** Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}` forces the
-   *  model to call that tool.
+  /**
+   * Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}`
+   * forces the model to call that tool.
    *
-   *  Only one of `tool_choice_option` or `tool_choice` must be present.
+   * Only one of `tool_choice_option` or `tool_choice` must be present.
    */
   toolChoice?: TextChatToolChoiceTool;
-  /** Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the
-   *  model's likelihood to repeat the same line verbatim.
+  /**
+   * Positive values penalize new tokens based on their existing frequency in the text so far,
+   * decreasing the model's likelihood to repeat the same line verbatim.
    */
   frequencyPenalty?: number;
-  /** Increasing or decreasing probability of tokens being selected during generation; a positive bias makes a
-   *  token more likely to appear, while a negative bias makes it less likely.
+  /**
+   * Increasing or decreasing probability of tokens being selected during generation; a positive
+   * bias makes a token more likely to appear, while a negative bias makes it less likely.
    */
   logitBias?: JsonObject;
-  /** Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of
-   *  each output token returned in the content of message.
+  /**
+   * Whether to return log probabilities of the output tokens or not. If true, returns the log
+   * probabilities of each output token returned in the content of message.
    */
   logprobs?: boolean;
-  /** An integer specifying the number of most likely tokens to return at each token position, each with an
-   *  associated log probability. The option `logprobs` must be set to `true` if this parameter is used.
+  /**
+   * An integer specifying the number of most likely tokens to return at each token position, each
+   * with an associated log probability. The option `logprobs` must be set to `true` if this
+   * parameter is used.
    */
   topLogprobs?: number;
-  /** The maximum number of tokens that can be generated in the chat completion.
-   * The total length of input tokens and generated tokens is limited by the model's context length.
-   * Set to 0 for the model's configured max generated tokens.
-   * This value is now deprecated in favor of maxCompletionTokens.
-   * If specified together with maxCompletionTokens, maxTokens will be ignored.
+  /**
+   * The maximum number of tokens that can be generated in the chat completion. The total length of
+   * input tokens and generated tokens is limited by the model's context length. Set to 0 for the
+   * model's configured max generated tokens. This value is now deprecated in favor of
+   * maxCompletionTokens. If specified together with maxCompletionTokens, maxTokens will be
+   * ignored.
    */
   maxTokens?: number;
-  /** The maximum number of tokens that can be generated in the chat completion. The total length of input tokens
-   * and generated tokens is limited by the model's context length. Set to 0 for the model's configured max generated tokens.
+  /**
+   * The maximum number of tokens that can be generated in the chat completion. The total length of
+   * input tokens and generated tokens is limited by the model's context length. Set to 0 for the
+   * model's configured max generated tokens.
    */
   maxCompletionTokens?: number;
-  /** How many chat completion choices to generate for each input message. Note that you will be charged based on
-   *  the number of generated tokens across all of the choices. Keep n as 1 to minimize costs.
+  /**
+   * How many chat completion choices to generate for each input message. Note that you will be
+   * charged based on the number of generated tokens across all of the choices. Keep n as 1 to
+   * minimize costs.
    */
   n?: number;
-  /** Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's
-   *  likelihood to talk about new topics.
+  /**
+   * Positive values penalize new tokens based on whether they appear in the text so far, increasing
+   * the model's likelihood to talk about new topics.
    */
   presencePenalty?: number;
   /** The chat response format parameters. */
   responseFormat?: TextChatResponseFormat;
   /** Random number generator seed to use in sampling mode for experimental repeatability. */
   seed?: number;
-  /** Stop sequences are one or more strings which will cause the text generation to stop if/when they are
-   *  produced as part of the output. Stop sequences encountered prior to the minimum number of tokens being generated
-   *  will be ignored.
+  /**
+   * Stop sequences are one or more strings which will cause the text generation to stop if/when
+   * they are produced as part of the output. Stop sequences encountered prior to the minimum number
+   * of tokens being generated will be ignored.
    */
   stop?: string[];
-  /** What sampling temperature to use,. Higher values like 0.8 will make the output more random, while lower
-   *  values like 0.2 will make it more focused and deterministic.
+  /**
+   * What sampling temperature to use,. Higher values like 0.8 will make the output more random,
+   * while lower values like 0.2 will make it more focused and deterministic.
    *
-   *  We generally recommend altering this or `top_p` but not both.
+   * We generally recommend altering this or `top_p` but not both.
    */
   temperature?: number;
-  /** An alternative to sampling with temperature, called nucleus sampling, where the model considers the results
-   *  of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass
-   *  are considered.
+  /**
+   * An alternative to sampling with temperature, called nucleus sampling, where the model considers
+   * the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising
+   * the top 10% probability mass are considered.
    *
-   *  We generally recommend altering this or `temperature` but not both.
+   * We generally recommend altering this or `temperature` but not both.
    */
   topP?: number;
-  /** Time limit in milliseconds - if not completed within this time, generation will stop. The text generated so
-   *  far will be returned along with the `TIME_LIMIT`` stop reason. Depending on the users plan, and on the model
-   *  being used, there may be an enforced maximum time limit.
+  /**
+   * Time limit in milliseconds - if not completed within this time, generation will stop. The text
+   * generated so far will be returned along with the `TIME_LIMIT`` stop reason. Depending on the
+   * users plan, and on the model being used, there may be an enforced maximum time limit.
    */
   timeLimit?: number;
-  /**  Represents the penalty for penalizing tokens that have already been generated or belong to the context. */
+  /**
+   * Represents the penalty for penalizing tokens that have already been generated or belong to the
+   * context.
+   */
   repetitionPenalty?: number;
-  /** Exponential penalty to the length that is used with beam-based generation.
-   * It is applied as an exponent to the sequence length, which in turn is used to divide the score of the sequence.
-   * Since the score is the log likelihood of the sequence (i.e. negative), `lengthPenalty` > 0.0 promotes longer sequences,
-   * while `lengthPenalty` < 0.0 encourages shorter sequences. */
+  /**
+   * Exponential penalty to the length that is used with beam-based generation. It is applied as an
+   * exponent to the sequence length, which in turn is used to divide the score of the sequence.
+   * Since the score is the log likelihood of the sequence (i.e. negative), `lengthPenalty` > 0.0
+   * promotes longer sequences, while `lengthPenalty` < 0.0 encourages shorter sequences.
+   */
   lengthPenalty?: number;
   /** Whether to include reasoning_content in the response. Default is true. */
   includeReasoning?: boolean;
-  /** A lower reasoning effort can result in faster responses, fewer tokens used, and shorter reasoning_content in the responses.
-   * Supported values are low, medium, and high. */
+  /**
+   * A lower reasoning effort can result in faster responses, fewer tokens used, and shorter
+   * reasoning_content in the responses. Supported values are low, medium, and high.
+   */
   reasoningEffort?: 'low' | 'medium' | 'high';
 }
 
 /** Parameters for the `textChat` operation. */
 export interface TextChatParams extends TextChatParameters, DefaultParams, EncryptionParams {
-  /** The model to use for the chat completion.
+  /**
+   * The model to use for the chat completion.
    *
-   *  Please refer to the [list of
-   *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
+   * Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
    */
   modelId: string;
   /** The messages for this chat session. */
@@ -802,8 +881,10 @@ export interface TextChatParams extends TextChatParameters, DefaultParams, Encry
   guidedRegex?: string;
   /** If specified, the output will follow the context free grammar. */
   guidedGrammar?: string;
-  /** If specified, the output will follow the JSON schema. See the JSON Schema reference for
-   * documentation about the format. */
+  /**
+   * If specified, the output will follow the JSON schema. See the JSON Schema reference for
+   * documentation about the format.
+   */
   guidedJSON?: string;
 }
 /** Parameters for the `textChatStream` operation. */
@@ -815,7 +896,13 @@ export interface TextChatStreamParams extends TextChatParams {
 
 /** Constants for the `textChatStream` operation. */
 export namespace TextChatStreamConstants {
-  /** Using `none` means the model will not call any tool and instead generates a message. **The following options (`auto` and `required`) are not yet supported.** Using `auto` means the model can pick between generating a message or calling one or more tools. Using `required` means the model must call one or more tools. Only one of `tool_choice_option` or `tool_choice` must be present. */
+  /**
+   * Using `none` means the model will not call any tool and instead generates a message. **The
+   * following options (`auto` and `required`) are not yet supported.** Using `auto` means the model
+   * can pick between generating a message or calling one or more tools. Using `required` means the
+   * model must call one or more tools. Only one of `tool_choice_option` or `tool_choice` must be
+   * present.
+   */
   export enum ToolChoiceOption {
     NONE = 'none',
     AUTO = 'auto',
@@ -825,8 +912,9 @@ export namespace TextChatStreamConstants {
 
 /** Parameters for the `textEmbeddings` operation. */
 export interface TextEmbeddingsParams extends DefaultParams, EncryptionParams {
-  /** The `id` of the model to be used for this request. Please refer to the [list of
-   *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
+  /**
+   * The `id` of the model to be used for this request. Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
    */
   modelId: string;
   /** The input text. */
@@ -847,10 +935,11 @@ export interface TextExtractionParams extends DefaultParams {
   resultsReference: TextExtractionDataReference;
   /** The steps for the text extraction pipeline. */
   steps?: TextExtractionSteps;
-  /** Set this as an empty object to specify `json` output.
+  /**
+   * Set this as an empty object to specify `json` output.
    *
-   *  Note that this is not strictly required because if an
-   *  `assembly_md` object is not found then the default will be `json`.
+   * Note that this is not strictly required because if an `assembly_md` object is not found then
+   * the default will be `json`.
    */
   assemblyJson?: JsonObject;
   /** Set this as an empty object to specify `markdown` output. */
@@ -865,12 +954,19 @@ export interface TextExtractionParams extends DefaultParams {
 
 /** Parameters for the `listTextExtractions` operation. */
 export interface ListTextExtractionsParams extends DefaultParams {
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
-   *  the service and it is set in the href available in the `next` field.
+  /**
+   * Token required for token-based pagination. This token cannot be determined by end user. It is
+   * generated by the service and it is set in the href available in the `next` field.
    */
   start?: string;
   /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
@@ -881,9 +977,15 @@ export interface ListTextExtractionsParams extends DefaultParams {
 export interface TextExtractionGetParams extends DefaultParams {
   /** The identifier of the extraction request. */
   id: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
 }
 
@@ -891,9 +993,15 @@ export interface TextExtractionGetParams extends DefaultParams {
 export interface TextExtractionDeleteParams extends DefaultParams {
   /** The identifier of the extraction request. */
   id: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
   /** Set to true in order to also delete the job or request metadata. */
   hardDelete?: boolean;
@@ -901,12 +1009,14 @@ export interface TextExtractionDeleteParams extends DefaultParams {
 
 /** Parameters for the `textGeneration` operation. */
 export interface TextGenerationParams extends DefaultParams, EncryptionParams {
-  /** The prompt to generate completions. Note: The method tokenizes the input internally. It is recommended not
-   *  to leave any trailing spaces.
+  /**
+   * The prompt to generate completions. Note: The method tokenizes the input internally. It is
+   * recommended not to leave any trailing spaces.
    */
   input: string;
-  /** The `id` of the model to be used for this request. Please refer to the [list of
-   *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
+  /**
+   * The `id` of the model to be used for this request. Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
    */
   modelId: string;
   /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
@@ -915,20 +1025,24 @@ export interface TextGenerationParams extends DefaultParams, EncryptionParams {
   projectId?: string;
   /** Properties that control the model and response. */
   parameters?: TextGenParameters;
-  /** Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and `Personal
-   *  identifiable information` (PII) filtering. This list can be extended with new types of moderations.
+  /**
+   * Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and
+   * `Personal identifiable information` (PII) filtering. This list can be extended with new types
+   * of moderations.
    */
   moderations?: Moderations;
 }
 
 /** Parameters for the `textGenerationStream` operation. */
 export interface TextGenerationStreamParams extends DefaultParams {
-  /** The prompt to generate completions. Note: The method tokenizes the input internally. It is recommended not
-   *  to leave any trailing spaces.
+  /**
+   * The prompt to generate completions. Note: The method tokenizes the input internally. It is
+   * recommended not to leave any trailing spaces.
    */
   input: string;
-  /** The `id` of the model to be used for this request. Please refer to the [list of
-   *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
+  /**
+   * The `id` of the model to be used for this request. Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
    */
   modelId: string;
   /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
@@ -937,8 +1051,10 @@ export interface TextGenerationStreamParams extends DefaultParams {
   projectId?: string;
   /** Properties that control the model and response. */
   parameters?: TextGenParameters;
-  /** Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and `Personal
-   *  identifiable information` (PII) filtering. This list can be extended with new types of moderations.
+  /**
+   * Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and
+   * `Personal identifiable information` (PII) filtering. This list can be extended with new types
+   * of moderations.
    */
   moderations?: Moderations;
 
@@ -948,8 +1064,9 @@ export interface TextGenerationStreamParams extends DefaultParams {
 
 /** Parameters for the `textTokenization` operation. */
 export interface TextTokenizationParams extends DefaultParams, EncryptionParams {
-  /** The `id` of the model to be used for this request. Please refer to the [list of
-   *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
+  /**
+   * The `id` of the model to be used for this request. Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
    */
   modelId: string;
   /** The input string to tokenize. */
@@ -966,8 +1083,9 @@ export interface TextTokenizationParams extends DefaultParams, EncryptionParams 
 export interface TrainingsCreateParams extends DefaultParams {
   /** The name of the training. */
   name: string;
-  /** The training results. Normally this is specified as `type=container` which
-   *  means that it is stored in the space or project.
+  /**
+   * The training results. Normally this is specified as `type=container` which means that it is
+   * stored in the space or project.
    */
   resultsReference: ObjectLocation;
   /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
@@ -984,16 +1102,18 @@ export interface TrainingsCreateParams extends DefaultParams {
   trainingDataReferences?: DataConnectionReference[];
   /** User defined properties specified as key-value pairs. */
   custom?: JsonObject;
-  /** If set to `true` then the result of the training, if successful, will be uploaded to the repository as a
-   *  model.
+  /**
+   * If set to `true` then the result of the training, if successful, will be uploaded to the
+   * repository as a model.
    */
   autoUpdateModel?: boolean;
 }
 
 /** Parameters for the `trainingsList` operation. */
 export interface TrainingsListParams extends DefaultParams {
-  /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
-   *  the service and it is set in the href available in the `next` field.
+  /**
+   * Token required for token-based pagination. This token cannot be determined by end user. It is
+   * generated by the service and it is set in the href available in the `next` field.
    */
   start?: string;
   /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
@@ -1004,9 +1124,15 @@ export interface TrainingsListParams extends DefaultParams {
   tagValue?: string;
   /** Filter based on on the training job state. */
   state?: TrainingsListConstants.State | string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
 }
 
@@ -1028,9 +1154,15 @@ export namespace TrainingsListConstants {
 export interface TrainingsGetParams extends DefaultParams {
   /** The training identifier. */
   trainingId: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
 }
 
@@ -1038,9 +1170,15 @@ export interface TrainingsGetParams extends DefaultParams {
 export interface TrainingsDeleteParams extends DefaultParams {
   /** The training identifier. */
   trainingId: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
   /** Set to true in order to also delete the job or request metadata. */
   hardDelete?: boolean;
@@ -1048,8 +1186,9 @@ export interface TrainingsDeleteParams extends DefaultParams {
 
 /** Parameters for the `textRerank` operation. */
 export interface TextRerankParams extends DefaultParams, EncryptionParams {
-  /** The `id` of the model to be used for this request. Please refer to the [list of
-   *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
+  /**
+   * The `id` of the model to be used for this request. Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
    */
   modelId: string;
   /** The rank input strings. */
@@ -1068,14 +1207,16 @@ export interface TextRerankParams extends DefaultParams, EncryptionParams {
 export interface TimeSeriesForecastParams extends DefaultParams {
   /** The model to be used for generating a forecast. */
   modelId: string;
-  /** A payload of data matching `schema`. We assume the following about your data:
-   *    * All timeseries are of equal length and are uniform in nature (the time difference between two successive
-   *  rows is constant). This implies that there are no missing rows of data;
-   *    * The data meet the minimum model-dependent historical context length which
-   *    can be 512 or more rows per timeseries;
+  /**
+   * A payload of data matching `schema`. We assume the following about your data:
    *
-   *  Note that the example payloads shown are for illustration purposes only. An actual payload would necessary be
-   *  much larger to meet minimum model-specific context lengths.
+   * - All timeseries are of equal length and are uniform in nature (the time difference between two
+   *   successive rows is constant). This implies that there are no missing rows of data;
+   * - The data meet the minimum model-dependent historical context length which can be 512 or more
+   *   rows per timeseries;
+   *
+   * Note that the example payloads shown are for illustration purposes only. An actual payload
+   * would necessary be much larger to meet minimum model-specific context lengths.
    */
   data: JsonObject;
   /** Contains metadata about your timeseries data input. */
@@ -1094,8 +1235,9 @@ export interface CreateFineTuningParams extends DefaultParams {
   name: string;
   /** The training datasets. */
   trainingDataReferences: ObjectLocation[];
-  /** The training results. Normally this is specified as `type=container` which
-   *  means that it is stored in the space or project.
+  /**
+   * The training results. Normally this is specified as `type=container` which means that it is
+   * stored in the space or project.
    */
   resultsReference: ObjectLocation;
   /** The description of the job. */
@@ -1106,22 +1248,26 @@ export interface CreateFineTuningParams extends DefaultParams {
   projectId?: string;
   /** The space that contains the resource. Either `space_id` or `project_id` has to be given. */
   spaceId?: string;
-  /** This field must not be set while creating a fine tuning job with InstructLab.
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
    *
-   *  If set to `true` then the result of the training, if successful, will be uploaded to the repository as a model.
+   * If set to `true` then the result of the training, if successful, will be uploaded to the
+   * repository as a model.
    */
   autoUpdateModel?: boolean;
-  /** This field must not be set while creating a fine tuning job with InstructLab.
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
    *
-   *  The parameters for the job. Note that if `verbalizer` is provided
-   *  then `response_template` must also be provided (and vice versa).
+   * The parameters for the job. Note that if `verbalizer` is provided then `response_template` must
+   * also be provided (and vice versa).
    */
   parameters?: FineTuningParameters;
   /** The `type` of Fine Tuning training. The `type` is set to `ilab` for InstructLab training. */
   type?: CreateFineTuningConstants.Type | string;
-  /** This field must not be set while creating a fine tuning job with InstructLab.
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
    *
-   *  The holdout/test datasets.
+   * The holdout/test datasets.
    */
   testDataReferences?: ObjectLocation[];
   /** User defined properties specified as key-value pairs. */
@@ -1138,8 +1284,9 @@ export namespace CreateFineTuningConstants {
 
 /** Parameters for the `fineTuningList` operation. */
 export interface FineTuningListParams extends DefaultParams {
-  /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
-   *  the service and it is set in the href available in the `next` field.
+  /**
+   * Token required for token-based pagination. This token cannot be determined by end user. It is
+   * generated by the service and it is set in the href available in the `next` field.
    */
   start?: string;
   /** How many resources should be returned. */
@@ -1150,9 +1297,15 @@ export interface FineTuningListParams extends DefaultParams {
   tagValue?: string;
   /** Filter based on on the job state: queued, running, completed, failed etc. */
   state?: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
   /** The type of Fine Tuning training. The type is set to ilab for InstructLab training. */
   type: string;
@@ -1162,9 +1315,15 @@ export interface FineTuningListParams extends DefaultParams {
 export interface GetFineTuningParams extends DefaultParams {
   /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
   id: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
 }
 
@@ -1172,9 +1331,15 @@ export interface GetFineTuningParams extends DefaultParams {
 export interface DeleteFineTuningParams extends DefaultParams {
   /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
   id: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
   /** Set to true in order to also delete the job or request metadata. */
   hardDelete?: boolean;
@@ -1198,9 +1363,15 @@ export interface CreateDocumentExtractionParams extends DefaultParams {
 
 /** Parameters for the `listDocumentExtractions` operation. */
 export interface ListDocumentExtractionsParams extends DefaultParams {
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
 }
 
@@ -1208,9 +1379,15 @@ export interface ListDocumentExtractionsParams extends DefaultParams {
 export interface GetDocumentExtractionParams extends DefaultParams {
   /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
   id: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
 }
 
@@ -1218,9 +1395,15 @@ export interface GetDocumentExtractionParams extends DefaultParams {
 export interface CancelDocumentExtractionsParams extends DefaultParams {
   /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
   id: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
   /** Set to true in order to also delete the job metadata information. */
   hardDelete?: boolean;
@@ -1242,9 +1425,15 @@ export interface CreateSyntheticDataGenerationParams extends DefaultParams {
 
 /** Parameters for the `listSyntheticDataGenerations` operation. */
 export interface ListSyntheticDataGenerationsParams extends DefaultParams {
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
 }
 
@@ -1252,9 +1441,15 @@ export interface ListSyntheticDataGenerationsParams extends DefaultParams {
 export interface GetSyntheticDataGenerationParams extends DefaultParams {
   /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
   id: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
 }
 
@@ -1262,9 +1457,15 @@ export interface GetSyntheticDataGenerationParams extends DefaultParams {
 export interface CancelSyntheticDataGenerationParams extends DefaultParams {
   /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
   id: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
   /** Set to true in order to also delete the job metadata information. */
   hardDelete?: boolean;
@@ -1282,17 +1483,24 @@ export interface CreateTaxonomyParams extends DefaultParams {
   projectId?: string;
   /** A reference to data. */
   dataReference?: ObjectLocation;
-  /** The training results. Normally this is specified as `type=container` which
-   *  means that it is stored in the space or project.
+  /**
+   * The training results. Normally this is specified as `type=container` which means that it is
+   * stored in the space or project.
    */
   resultsReference: ObjectLocation;
 }
 
 /** Parameters for the `listTaxonomies` operation. */
 export interface ListTaxonomiesParams extends DefaultParams {
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
 }
 
@@ -1300,9 +1508,15 @@ export interface ListTaxonomiesParams extends DefaultParams {
 export interface GetTaxonomyParams extends DefaultParams {
   /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
   id: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
 }
 
@@ -1310,9 +1524,15 @@ export interface GetTaxonomyParams extends DefaultParams {
 export interface DeleteTaxonomyParams extends DefaultParams {
   /** The `id` is the identifier that was returned in the `metadata.id` field of the request. */
   id: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
   /** Set to `true` in order to also delete the job metadata information. */
   hardDelete?: boolean;
@@ -1321,8 +1541,9 @@ export interface DeleteTaxonomyParams extends DefaultParams {
 export interface ModelsCreateParams extends DefaultParams {
   /** The name of the resource. */
   name: string;
-  /** The model type. The supported model types can be found in the documentation
-   *  [here](https://dataplatform.cloud.ibm.com/docs/content/wsj/wmls/wmls-deploy-python-types.html?context=analytics).
+  /**
+   * The model type. The supported model types can be found in the documentation
+   * [here](https://dataplatform.cloud.ibm.com/docs/content/wsj/wmls/wmls-deploy-python-types.html?context=analytics).
    */
   type: string;
   /** The project that contains the resource. Either `space_id` or `project_id` has to be given. */
@@ -1341,27 +1562,30 @@ export interface ModelsCreateParams extends DefaultParams {
   modelDefinition?: ModelDefinitionId;
   /** Hyper parameters used for training this model. */
   hyperParameters?: JsonObject;
-  /** User provided domain name for this model. For example: sentiment, entity, visual-recognition, finance,
-   *  retail, real estate etc.
+  /**
+   * User provided domain name for this model. For example: sentiment, entity, visual-recognition,
+   * finance, retail, real estate etc.
    */
   domain?: string;
   /** The training data that was used to create this model. */
   trainingDataReferences?: DataConnectionReference[];
   /** The holdout/test datasets. */
   testDataReferences?: DataConnectionReference[];
-  /** If the prediction schemas are provided here then they take precedent over any schemas
-   *  provided in the data references. Note that data references contain the schema for the
-   *  associated data and this object contains the schema(s) for the associated prediction, if any.
-   *  In the case that the prediction input data matches exactly the schema of the training data
-   *  references then the prediction schema can be omitted. However it is highly recommended to
-   *  always specify the prediction schemas using this field.
+  /**
+   * If the prediction schemas are provided here then they take precedent over any schemas provided
+   * in the data references. Note that data references contain the schema for the associated data
+   * and this object contains the schema(s) for the associated prediction, if any. In the case that
+   * the prediction input data matches exactly the schema of the training data references then the
+   * prediction schema can be omitted. However it is highly recommended to always specify the
+   * prediction schemas using this field.
    */
   schemas?: ModelEntitySchemas;
   /** The name of the label column. */
   labelColumn?: string;
-  /** The name of the  label column seen by the estimator, which may have been transformed by the previous
-   *  transformers in the pipeline. This is not necessarily the same column as the `label_column` in the initial data
-   *  set.
+  /**
+   * The name of the label column seen by the estimator, which may have been transformed by the
+   * previous transformers in the pipeline. This is not necessarily the same column as the
+   * `label_column` in the initial data set.
    */
   transformedLabelColumn?: string;
   /** This will be used by scoring to record the size of the model. */
@@ -1370,29 +1594,33 @@ export interface ModelsCreateParams extends DefaultParams {
   metrics?: Metric[];
   /** User defined properties specified as key-value pairs. */
   custom?: JsonObject;
-  /** User defined objects referenced by the model. For any user defined class or function used in the model, its
-   *  name, as referenced in the model, must be specified as the `key` and its fully qualified class or function name
-   *  must be specified as the `value`. This is applicable for `Tensorflow 2.X` models serialized in `H5` format using
-   *  the `tf.keras` API.
+  /**
+   * User defined objects referenced by the model. For any user defined class or function used in
+   * the model, its name, as referenced in the model, must be specified as the `key` and its fully
+   * qualified class or function name must be specified as the `value`. This is applicable for
+   * `Tensorflow 2.X` models serialized in `H5` format using the `tf.keras` API.
    */
   userDefinedObjects?: JsonObject;
-  /** The list of the software specifications that are used by the pipeline that generated this model, if the
-   *  model was generated by a pipeline.
+  /**
+   * The list of the software specifications that are used by the pipeline that generated this
+   * model, if the model was generated by a pipeline.
    */
   hybridPipelineSoftwareSpecs?: SoftwareSpecRel[];
-  /** Optional metadata that can be used to provide information
-   *  about this model that can be tracked with IBM AI Factsheets.
-   *  See [Using AI
-   *  Factsheets](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/factsheets-model-inventory.html)
-   *  for more details.
+  /**
+   * Optional metadata that can be used to provide information about this model that can be tracked
+   * with IBM AI Factsheets. See [Using AI
+   * Factsheets](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/factsheets-model-inventory.html)
+   * for more details.
    */
   modelVersion?: ModelEntityModelVersion;
-  /** Deprecated: this is replaced by `training.id`. This field can be used to store the `id` of the training job
-   *  that was used to produce this model.
+  /**
+   * Deprecated: this is replaced by `training.id`. This field can be used to store the `id` of the
+   * training job that was used to produce this model.
    */
   trainingId?: string;
-  /** An optional array which contains the data preprocessing transformations that were executed by the training
-   *  job that created this model.
+  /**
+   * An optional array which contains the data preprocessing transformations that were executed by
+   * the training job that created this model.
    */
   dataPreprocessing?: DataPreprocessingTransformation[];
   /** Information about the training job that created this model. */
@@ -1405,21 +1633,32 @@ export interface ModelsCreateParams extends DefaultParams {
 
 /** Parameters for the `modelsList` operation. */
 export interface ModelsListParams extends DefaultParams {
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
-   *  the service and it is set in the href available in the `next` field.
+  /**
+   * Token required for token-based pagination. This token cannot be determined by end user. It is
+   * generated by the service and it is set in the href available in the `next` field.
    */
   start?: string;
   /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
   limit?: number;
-  /** Return only the resources with the given tag values, separated by `or` or `and` to support multiple tags. */
+  /**
+   * Return only the resources with the given tag values, separated by `or` or `and` to support
+   * multiple tags.
+   */
   tagValue?: string;
-  /** Returns only resources that match this search string. The path to the field must be the complete path to the
-   *  field, and this field must be one of the indexed fields for this resource type. Note that the search string must
-   *  be URL encoded.
+  /**
+   * Returns only resources that match this search string. The path to the field must be the
+   * complete path to the field, and this field must be one of the indexed fields for this resource
+   * type. Note that the search string must be URL encoded.
    */
   search?: string;
 }
@@ -1428,9 +1667,15 @@ export interface ModelsListParams extends DefaultParams {
 export interface ModelsGetParams extends DefaultParams {
   /** Model identifier. */
   modelId: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
   /** The revision number of the resource. */
   rev?: string;
@@ -1440,13 +1685,20 @@ export interface ModelsGetParams extends DefaultParams {
 export interface ModelsUpdateParams extends DefaultParams {
   /** Model identifier. */
   modelId: string;
-  /** Input For Patch. This is the patch body which corresponds to the JavaScript Object Notation (JSON) Patch
-   *  standard (RFC 6902).
+  /**
+   * Input For Patch. This is the patch body which corresponds to the JavaScript Object Notation
+   * (JSON) Patch standard (RFC 6902).
    */
   jsonPatch: JsonPatchOperation[];
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
 }
 
@@ -1454,9 +1706,15 @@ export interface ModelsUpdateParams extends DefaultParams {
 export interface ModelsDeleteParams extends DefaultParams {
   /** Model identifier. */
   modelId: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
 }
 
@@ -1565,11 +1823,20 @@ export interface TranscribeAudioParams extends DefaultParams {
   model: string;
   /** The path to a mp3 or wav audio file to transcribe. */
   file: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** Optional target language to which to transcribe; for example, fr for French. Default is English. */
+  /**
+   * Optional target language to which to transcribe; for example, fr for French. Default is
+   * English.
+   */
   language?: string;
 }
 
@@ -1589,12 +1856,19 @@ export interface TextClassificationParams extends DefaultParams {
 
 /** Parameters for the `listTextClassifications` operation. */
 export interface ListTextClassificationsParams extends DefaultParams {
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
-  /** Token required for token-based pagination. This token cannot be determined by end user. It is generated by
-   *  the service and it is set in the href available in the `next` field.
+  /**
+   * Token required for token-based pagination. This token cannot be determined by end user. It is
+   * generated by the service and it is set in the href available in the `next` field.
    */
   start?: string;
   /** How many resources should be returned. By default limit is 100. Max limit allowed is 200. */
@@ -1605,9 +1879,15 @@ export interface ListTextClassificationsParams extends DefaultParams {
 export interface TextClassificationGetParams extends DefaultParams {
   /** The identifier of the classification request. */
   id: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
 }
 
@@ -1615,17 +1895,21 @@ export interface TextClassificationGetParams extends DefaultParams {
 export interface TextClassificationDeleteParams extends DefaultParams {
   /** The identifier of the classification request. */
   id: string;
-  /** The space that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
+   * be given.
+   */
   spaceId?: string;
-  /** The project that contains the resource. Either `space_id` or `project_id` query parameter has to be given. */
+  /**
+   * The project that contains the resource. Either `space_id` or `project_id` query parameter has
+   * to be given.
+   */
   projectId?: string;
   /** Set to true in order to also delete the job or request metadata. */
   hardDelete?: boolean;
 }
 
-/*************************
- * model interfaces
- ************************/
+/** Model interfaces */
 
 /** An error message. */
 export interface ApiError {
@@ -1675,33 +1959,34 @@ export interface BaseModel {
 export interface ConsumptionsLimit {
   /** The hard limit on the call time for a request, if set. */
   call_time?: string;
-  /** The hard limit on the number of input tokens for a request, if set. A value of zero will disable this
-   *  feature.
+  /**
+   * The hard limit on the number of input tokens for a request, if set. A value of zero will
+   * disable this feature.
    */
   max_input_tokens?: number;
-  /** The hard limit on the number of output tokens for a request, if set. A value of zero will disable this
-   *  feature.
+  /**
+   * The hard limit on the number of output tokens for a request, if set. A value of zero will
+   * disable this feature.
    */
   max_output_tokens?: number;
 }
 
-/** Contains a set of fields specific to each connection. See here for [details about specifying connections](#datareferences). */
+/**
+ * Contains a set of fields specific to each connection. See here for [details about specifying
+ * connections](#datareferences).
+ */
 export interface DataConnection {
   /** DataConnection accepts additional properties. */
   [propName: string]: any;
 }
 
-/**
- * Contains a set of location fields specific to each data source.
- */
+/** Contains a set of location fields specific to each data source. */
 export interface CosDataConnection {
   /** The id of the connection asset that contains the credentials required to access the data. */
   id: string;
 }
 
-/**
- * Contains a set of fields specific to each connection.
- */
+/** Contains a set of fields specific to each connection. */
 export interface CosDataLocation {
   /** The name of the file. */
   file_name: string;
@@ -1709,29 +1994,41 @@ export interface CosDataLocation {
   bucket?: string;
 }
 
-/** A reference to data with an optional data schema. If necessary, it is possible to provide a data connection that contains just the data schema. */
+/**
+ * A reference to data with an optional data schema. If necessary, it is possible to provide a data
+ * connection that contains just the data schema.
+ */
 export interface DataConnectionReference {
   /** Optional item identification inside a collection. */
   id?: string;
-  /** The data source type like `connection_asset` or `data_asset`. If the data connection contains just a schema
-   *  then this field is not required.
+  /**
+   * The data source type like `connection_asset` or `data_asset`. If the data connection contains
+   * just a schema then this field is not required.
    */
   type: DataConnectionReference.Constants.Type | string;
-  /** Contains a set of fields specific to each connection.
-   *  See here for [details about specifying connections](#datareferences).
+  /**
+   * Contains a set of fields specific to each connection. See here for [details about specifying
+   * connections](#datareferences).
    */
   connection?: DataConnection;
-  /** Contains a set of fields that describe the location of the data with respect to the `connection`. */
+  /**
+   * Contains a set of fields that describe the location of the data with respect to the
+   * `connection`.
+   */
   location?: JsonObject;
-  /** The schema of the expected data, see
-   *  [datarecord-metadata-v2-schema](https://raw.githubusercontent.com/elyra-ai/pipeline-schemas/master/common-pipeline/datarecord-metadata/datarecord-metadata-v2-schema.json)
-   *  for the schema definition.
+  /**
+   * The schema of the expected data, see
+   * [datarecord-metadata-v2-schema](https://raw.githubusercontent.com/elyra-ai/pipeline-schemas/master/common-pipeline/datarecord-metadata/datarecord-metadata-v2-schema.json)
+   * for the schema definition.
    */
   schema?: DataSchema;
 }
 export namespace DataConnectionReference {
   export namespace Constants {
-    /** The data source type like `connection_asset` or `data_asset`. If the data connection contains just a schema then this field is not required. */
+    /**
+     * The data source type like `connection_asset` or `data_asset`. If the data connection contains
+     * just a schema then this field is not required.
+     */
     export enum Type {
       CONNECTION_ASSET = 'connection_asset',
       DATA_ASSET = 'data_asset',
@@ -1741,7 +2038,11 @@ export namespace DataConnectionReference {
   }
 }
 
-/** The schema of the expected data, see [datarecord-metadata-v2-schema](https://raw.githubusercontent.com/elyra-ai/pipeline-schemas/master/common-pipeline/datarecord-metadata/datarecord-metadata-v2-schema.json) for the schema definition. */
+/**
+ * The schema of the expected data, see
+ * [datarecord-metadata-v2-schema](https://raw.githubusercontent.com/elyra-ai/pipeline-schemas/master/common-pipeline/datarecord-metadata/datarecord-metadata-v2-schema.json)
+ * for the schema definition.
+ */
 export interface DataSchema {
   /** An id to identify a schema. */
   id: string;
@@ -1759,8 +2060,9 @@ export interface DeploymentEntity {
   custom?: JsonObject;
   /** A reference to a resource. */
   prompt_template?: SimpleRel;
-  /** Indicates that this is an online deployment. An object has to be specified but can be empty.
-   *  The `serving_name` can be provided in the `online.parameters`.
+  /**
+   * Indicates that this is an online deployment. An object has to be specified but can be empty.
+   * The `serving_name` can be provided in the `online.parameters`.
    */
   online: OnlineDeployment;
   /** A hardware specification. */
@@ -1769,31 +2071,38 @@ export interface DeploymentEntity {
   hardware_request?: HardwareRequest;
   /** A reference to a resource. */
   asset?: ModelRel;
-  /** The base model that is required for this deployment if this is for a prompt template or a prompt tune for an
-   *  IBM foundation model.
+  /**
+   * The base model that is required for this deployment if this is for a prompt template or a
+   * prompt tune for an IBM foundation model.
    */
   base_model_id?: string;
-  /** The type of the deployed model. The possible values are the following:
+  /**
+   * The type of the deployed model. The possible values are the following:
    *
-   *  1. `prompt_tune` - when a prompt tuned model is deployed.
-   *
-   *  2. `foundation_model` - when a prompt template is used on a pre-deployed IBM provided model.
-   *
-   *  3. `custom_foundation_model` - when a custom foundation model is deployed.
+   * 1. `prompt_tune` - when a prompt tuned model is deployed.
+   * 2. `foundation_model` - when a prompt template is used on a pre-deployed IBM provided model.
+   * 3. `custom_foundation_model` - when a custom foundation model is deployed.
    */
   deployed_asset_type?: DeploymentEntity.Constants.DeployedAssetType | string;
-  /** The verbalizer that was used to train this model if the deployment has `deployed_asset_type` of
-   *  `prompt_tune`.
+  /**
+   * The verbalizer that was used to train this model if the deployment has `deployed_asset_type` of
+   * `prompt_tune`.
    */
   verbalizer?: string;
-  /** Specifies the current status, additional information about the deployment
-   *  and any failure messages in case of deployment failures.
+  /**
+   * Specifies the current status, additional information about the deployment and any failure
+   * messages in case of deployment failures.
    */
   status?: DeploymentStatus;
 }
 export namespace DeploymentEntity {
   export namespace Constants {
-    /** The type of the deployed model. The possible values are the following: 1. `prompt_tune` - when a prompt tuned model is deployed. 2. `foundation_model` - when a prompt template is used on a pre-deployed IBM provided model. 3. `custom_foundation_model` - when a custom foundation model is deployed. */
+    /**
+     * The type of the deployed model. The possible values are the following: 1. `prompt_tune` -
+     * when a prompt tuned model is deployed. 2. `foundation_model` - when a prompt template is used
+     * on a pre-deployed IBM provided model. 3. `custom_foundation_model` - when a custom foundation
+     * model is deployed.
+     */
     export enum DeployedAssetType {
       PROMPT_TUNE = 'prompt_tune',
       FOUNDATION_MODEL = 'foundation_model',
@@ -1812,8 +2121,9 @@ export interface DeploymentResource {
 
 /** The deployment resources. */
 export interface DeploymentResourceCollection {
-  /** The total number of resources. Computed explicitly only when 'total_count=true' query parameter is present.
-   *  This is in order to avoid performance penalties.
+  /**
+   * The total number of resources. Computed explicitly only when 'total_count=true' query parameter
+   * is present. This is in order to avoid performance penalties.
    */
   total_count?: number;
   /** The number of items to return in each page. */
@@ -1842,7 +2152,10 @@ export interface DeploymentResourcePatch {
   asset?: Rel;
 }
 
-/** Specifies the current status, additional information about the deployment and any failure messages in case of deployment failures. */
+/**
+ * Specifies the current status, additional information about the deployment and any failure
+ * messages in case of deployment failures.
+ */
 export interface DeploymentStatus {
   /** Specifies the current state of the deployment. */
   state?: DeploymentStatus.Constants.State | string;
@@ -1850,8 +2163,9 @@ export interface DeploymentStatus {
   message?: Message;
   /** The data returned when an error is encountered. */
   failure?: ApiErrorResponse;
-  /** The URLs that can be used to submit inference API requests. These URLs will contain the
-   *  `deployment_id` and the `serving_name`, if the `serving_name` was set.
+  /**
+   * The URLs that can be used to submit inference API requests. These URLs will contain the
+   * `deployment_id` and the `serving_name`, if the `serving_name` was set.
    */
   inference?: Inference[];
 }
@@ -1869,13 +2183,17 @@ export namespace DeploymentStatus {
 
 /** System details including warnings. */
 export interface DeploymentSystem {
-  /** Optional details provided by the service about statistics of the number of deployments created. The
-   *  deployments that are counted will depend on the request parameters.
+  /**
+   * Optional details provided by the service about statistics of the number of deployments created.
+   * The deployments that are counted will depend on the request parameters.
    */
   system?: DeploymentSystemDetails;
 }
 
-/** Optional details provided by the service about statistics of the number of deployments created. The deployments that are counted will depend on the request parameters. */
+/**
+ * Optional details provided by the service about statistics of the number of deployments created.
+ * The deployments that are counted will depend on the request parameters.
+ */
 export interface DeploymentSystemDetails {
   /** Any warnings coming from the system. */
   warnings?: Warning[];
@@ -1883,88 +2201,104 @@ export interface DeploymentSystemDetails {
   stats?: Stats[];
 }
 
-/**
- * DeploymentTextChatMessages.
- */
+/** DeploymentTextChatMessages. */
 export interface DeploymentTextChatMessages {}
 
 /** The template properties if this request refers to a prompt template. */
 export interface DeploymentTextGenProperties {
-  /** Represents the strategy used for picking the tokens during generation of the output text.
+  /**
+   * Represents the strategy used for picking the tokens during generation of the output text.
    *
-   *  During text generation when parameter value is set to greedy, each successive token corresponds to the highest
-   *  probability token given the text that has already been generated. This strategy can lead to repetitive results
-   *  especially for longer output sequences. The alternative sample strategy generates text by picking subsequent
-   *  tokens based on the probability distribution of possible next tokens defined by (i.e., conditioned on) the
-   *  already-generated text and the top_k and top_p parameters described below. See this
-   *  [url](https://huggingface.co/blog/how-to-generate) for an informative article about text generation.
+   * During text generation when parameter value is set to greedy, each successive token corresponds
+   * to the highest probability token given the text that has already been generated. This strategy
+   * can lead to repetitive results especially for longer output sequences. The alternative sample
+   * strategy generates text by picking subsequent tokens based on the probability distribution of
+   * possible next tokens defined by (i.e., conditioned on) the already-generated text and the top_k
+   * and top_p parameters described below. See this
+   * [url](https://huggingface.co/blog/how-to-generate) for an informative article about text
+   * generation.
    */
   decoding_method?: DeploymentTextGenProperties.Constants.DecodingMethod | string;
-  /** It can be used to exponentially increase the likelihood of the text generation terminating once a specified
-   *  number of tokens have been generated.
+  /**
+   * It can be used to exponentially increase the likelihood of the text generation terminating once
+   * a specified number of tokens have been generated.
    */
   length_penalty?: TextGenLengthPenalty;
-  /** The maximum number of new tokens to be generated. The maximum supported value for this field depends on the
-   *  model being used.
+  /**
+   * The maximum number of new tokens to be generated. The maximum supported value for this field
+   * depends on the model being used.
    *
-   *  How the "token" is defined depends on the tokenizer and vocabulary size, which in turn depends on the model.
-   *  Often the tokens are a mix of full words and sub-words. To learn more about tokenization, [see
-   *  here](https://huggingface.co/course/chapter2/4).
+   * How the "token" is defined depends on the tokenizer and vocabulary size, which in turn depends
+   * on the model. Often the tokens are a mix of full words and sub-words. To learn more about
+   * tokenization, [see here](https://huggingface.co/course/chapter2/4).
    *
-   *  Depending on the users plan, and on the model being used, there may be an enforced maximum number of new tokens.
+   * Depending on the users plan, and on the model being used, there may be an enforced maximum
+   * number of new tokens.
    */
   max_new_tokens?: number;
   /** If stop sequences are given, they are ignored until minimum tokens are generated. */
   min_new_tokens?: number;
   /** Random number generator seed to use in sampling mode for experimental repeatability. */
   random_seed?: number;
-  /** Stop sequences are one or more strings which will cause the text generation to stop if/when they are
-   *  produced as part of the output. Stop sequences encountered prior to the minimum number of tokens being generated
-   *  will be ignored.
+  /**
+   * Stop sequences are one or more strings which will cause the text generation to stop if/when
+   * they are produced as part of the output. Stop sequences encountered prior to the minimum number
+   * of tokens being generated will be ignored.
    */
   stop_sequences?: string[];
-  /** A value used to modify the next-token probabilities in sampling mode. Values less than 1.0 sharpen the
-   *  probability distribution, resulting in "less random" output. Values greater than 1.0 flatten the probability
-   *  distribution, resulting in "more random" output. A value of 1.0 has no effect.
+  /**
+   * A value used to modify the next-token probabilities in sampling mode. Values less than 1.0
+   * sharpen the probability distribution, resulting in "less random" output. Values greater than
+   * 1.0 flatten the probability distribution, resulting in "more random" output. A value of 1.0 has
+   * no effect.
    */
   temperature?: number;
-  /** Time limit in milliseconds - if not completed within this time, generation will stop. The text generated so
-   *  far will be returned along with the TIME_LIMIT stop reason.
+  /**
+   * Time limit in milliseconds - if not completed within this time, generation will stop. The text
+   * generated so far will be returned along with the TIME_LIMIT stop reason.
    *
-   *  Depending on the users plan, and on the model being used, there may be an enforced maximum time limit.
+   * Depending on the users plan, and on the model being used, there may be an enforced maximum time
+   * limit.
    */
   time_limit?: number;
-  /** The number of highest probability vocabulary tokens to keep for top-k-filtering. Only applies for sampling
-   *  mode. When decoding_strategy is set to sample, only the top_k most likely tokens are considered as candidates
-   *  for the next generated token.
+  /**
+   * The number of highest probability vocabulary tokens to keep for top-k-filtering. Only applies
+   * for sampling mode. When decoding_strategy is set to sample, only the top_k most likely tokens
+   * are considered as candidates for the next generated token.
    */
   top_k?: number;
-  /** Similar to top_k except the candidates to generate the next token are the most likely tokens with
-   *  probabilities that add up to at least top_p. Also known as nucleus sampling. A value of 1.0 is equivalent to
-   *  disabled.
+  /**
+   * Similar to top_k except the candidates to generate the next token are the most likely tokens
+   * with probabilities that add up to at least top_p. Also known as nucleus sampling. A value of
+   * 1.0 is equivalent to disabled.
    */
   top_p?: number;
-  /** Represents the penalty for penalizing tokens that have already been generated or belong to the context. The
-   *  value 1.0 means that there is no penalty.
+  /**
+   * Represents the penalty for penalizing tokens that have already been generated or belong to the
+   * context. The value 1.0 means that there is no penalty.
    */
   repetition_penalty?: number;
-  /** Represents the maximum number of input tokens accepted. This can be used to avoid requests failing due to
-   *  input being longer than configured limits. If the text is truncated, then it truncates the start of the input
-   *  (on the left), so the end of the input will remain the same. If this value exceeds the `maximum sequence length`
-   *  (refer to the documentation to find this value for the model) then the call will fail if the total number of
-   *  tokens exceeds the `maximum sequence length`.
+  /**
+   * Represents the maximum number of input tokens accepted. This can be used to avoid requests
+   * failing due to input being longer than configured limits. If the text is truncated, then it
+   * truncates the start of the input (on the left), so the end of the input will remain the same.
+   * If this value exceeds the `maximum sequence length` (refer to the documentation to find this
+   * value for the model) then the call will fail if the total number of tokens exceeds the `maximum
+   * sequence length`.
    */
   truncate_input_tokens?: number;
   /** Properties that control what is returned. */
   return_options?: ReturnOptionProperties;
-  /** Pass `false` to omit matched stop sequences from the end of the output text. The default is `true`, meaning
-   *  that the output will end with the stop sequence text when matched.
+  /**
+   * Pass `false` to omit matched stop sequences from the end of the output text. The default is
+   * `true`, meaning that the output will end with the stop sequence text when matched.
    */
   include_stop_sequence?: boolean;
-  /** Local typicality measures how similar the conditional probability of predicting a target token next is to
-   *  the expected conditional probability of predicting a random token next, given the partial text already
-   *  generated. If less than 1, the smallest set of the most locally typical tokens with probabilities that add up to
-   *  typical_p or higher are kept for generation.
+  /**
+   * Local typicality measures how similar the conditional probability of predicting a target token
+   * next is to the expected conditional probability of predicting a random token next, given the
+   * partial text already generated. If less than 1, the smallest set of the most locally typical
+   * tokens with probabilities that add up to typical_p or higher are kept for generation.
    */
   typical_p?: number;
   /** The prompt variables. */
@@ -1972,7 +2306,17 @@ export interface DeploymentTextGenProperties {
 }
 export namespace DeploymentTextGenProperties {
   export namespace Constants {
-    /** Represents the strategy used for picking the tokens during generation of the output text. During text generation when parameter value is set to greedy, each successive token corresponds to the highest probability token given the text that has already been generated. This strategy can lead to repetitive results especially for longer output sequences. The alternative sample strategy generates text by picking subsequent tokens based on the probability distribution of possible next tokens defined by (i.e., conditioned on) the already-generated text and the top_k and top_p parameters described below. See this [url](https://huggingface.co/blog/how-to-generate) for an informative article about text generation. */
+    /**
+     * Represents the strategy used for picking the tokens during generation of the output text.
+     * During text generation when parameter value is set to greedy, each successive token
+     * corresponds to the highest probability token given the text that has already been generated.
+     * This strategy can lead to repetitive results especially for longer output sequences. The
+     * alternative sample strategy generates text by picking subsequent tokens based on the
+     * probability distribution of possible next tokens defined by (i.e., conditioned on) the
+     * already-generated text and the top_k and top_p parameters described below. See this
+     * [url](https://huggingface.co/blog/how-to-generate) for an informative article about text
+     * generation.
+     */
     export enum DecodingMethod {
       SAMPLE = 'sample',
       GREEDY = 'greedy',
@@ -1980,22 +2324,26 @@ export namespace DeploymentTextGenProperties {
   }
 }
 
-/**
- * The parameters for the forecast request.
- */
+/** The parameters for the forecast request. */
 export interface DeploymentTSForecastParameters {
-  /** The prediction length for the forecast. The service will return this many periods beyond the last timestamp
-   *  in the inference data payload. If specified, `prediction_length` must be an integer >=1 and no more than the
-   *  model default prediction length. When omitted the model default prediction_length will be used.
+  /**
+   * The prediction length for the forecast. The service will return this many periods beyond the
+   * last timestamp in the inference data payload. If specified, `prediction_length` must be an
+   * integer >=1 and no more than the model default prediction length. When omitted the model
+   * default prediction_length will be used.
    */
   prediction_length?: number;
-  /** The batch size used during inference. When multiple time series are present, the inference will be conducted
-   *  in batches. If not specified, the model default batch size will be used.
+  /**
+   * The batch size used during inference. When multiple time series are present, the inference will
+   * be conducted in batches. If not specified, the model default batch size will be used.
    */
   inference_batch_size?: number;
 }
 
-/** The embedding values for a text string. The `input` field is only set if the corresponding `return_option` is set. */
+/**
+ * The embedding values for a text string. The `input` field is only set if the corresponding
+ * `return_option` is set.
+ */
 export interface Embedding {
   /** The text input to the model. */
   input?: string;
@@ -2005,11 +2353,13 @@ export interface Embedding {
 
 /** Parameters for text embedding requests. */
 export interface EmbeddingParameters {
-  /** Represents the maximum number of input tokens accepted. This can be used to avoid requests failing due to
-   *  input being longer than configured limits. If the text is truncated, then it truncates the end of the input (on
-   *  the right), so the start of the input will remain the same. If this value exceeds the `maximum sequence length`
-   *  (refer to the documentation to find this value for the model) then the call will fail if the total number of
-   *  tokens exceeds the `maximum sequence length`.
+  /**
+   * Represents the maximum number of input tokens accepted. This can be used to avoid requests
+   * failing due to input being longer than configured limits. If the text is truncated, then it
+   * truncates the end of the input (on the right), so the start of the input will remain the same.
+   * If this value exceeds the `maximum sequence length` (refer to the documentation to find this
+   * value for the model) then the call will fail if the total number of tokens exceeds the `maximum
+   * sequence length`.
    */
   truncate_input_tokens?: number;
   /** The return options for text embeddings. */
@@ -2024,8 +2374,9 @@ export interface EmbeddingReturnOptions {
 
 /** System details. */
 export interface EmbeddingsResponse {
-  /** The `id` of the model to be used for this request. Please refer to the [list of
-   *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
+  /**
+   * The `id` of the model to be used for this request. Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
    */
   model_id: string;
   /** The embedding values for a given text. */
@@ -2034,7 +2385,10 @@ export interface EmbeddingsResponse {
   created_at: string;
   /** The number of input tokens that were consumed. */
   input_token_count: number;
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
@@ -2075,20 +2429,23 @@ export interface FoundationModel {
   task_ids?: string[];
   /** The tasks that are supported by this model. */
   tasks?: TaskDescription[];
-  /** The tier of the model, depending on the `tier` the billing will be different, refer to the plan for the
-   *  details. Note that input tokens and output tokens may be charged differently.
+  /**
+   * The tier of the model, depending on the `tier` the billing will be different, refer to the plan
+   * for the details. Note that input tokens and output tokens may be charged differently.
    */
   input_tier: FoundationModel.Constants.InputTier | string;
-  /** The tier of the model, depending on the `tier` the billing will be different, refer to the plan for the
-   *  details. Note that input tokens and output tokens may be charged differently.
+  /**
+   * The tier of the model, depending on the `tier` the billing will be different, refer to the plan
+   * for the details. Note that input tokens and output tokens may be charged differently.
    */
   output_tier: FoundationModel.Constants.OutputTier | string;
   /** Specifies the provider of this model. */
   source: string;
   /** The minimum number of examples required for the model. */
   min_shot_size?: number;
-  /** The number of parameters used for the model, it will accept `m` for million, `b` for billion and `t` for
-   *  trillion.
+  /**
+   * The number of parameters used for the model, it will accept `m` for million, `b` for billion
+   * and `t` for trillion.
    */
   number_params: string;
   /** The limits that are applied for the model, for all the plans. */
@@ -2104,14 +2461,20 @@ export interface FoundationModel {
 }
 export namespace FoundationModel {
   export namespace Constants {
-    /** The tier of the model, depending on the `tier` the billing will be different, refer to the plan for the details. Note that input tokens and output tokens may be charged differently. */
+    /**
+     * The tier of the model, depending on the `tier` the billing will be different, refer to the
+     * plan for the details. Note that input tokens and output tokens may be charged differently.
+     */
     export enum InputTier {
       CLASS_1 = 'class_1',
       CLASS_2 = 'class_2',
       CLASS_3 = 'class_3',
       CLASS_C1 = 'class_c1',
     }
-    /** The tier of the model, depending on the `tier` the billing will be different, refer to the plan for the details. Note that input tokens and output tokens may be charged differently. */
+    /**
+     * The tier of the model, depending on the `tier` the billing will be different, refer to the
+     * plan for the details. Note that input tokens and output tokens may be charged differently.
+     */
     export enum OutputTier {
       CLASS_1 = 'class_1',
       CLASS_2 = 'class_2',
@@ -2151,7 +2514,10 @@ export interface FoundationModelTasks {
   next?: PaginationNext;
   /** The supported foundation model tasks. */
   resources?: FoundationModelTask[];
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
@@ -2175,7 +2541,10 @@ export interface FoundationModels {
   next?: PaginationNext;
   /** The supported foundation models. */
   resources?: FoundationModel[];
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
@@ -2221,11 +2590,17 @@ export interface Inference {
   url: string;
   /** This is `true` if the inference API supports SSE streaming. */
   sse?: boolean;
-  /** This is `true` if the inference API uses the `serving_name` that was defined in this deployment. */
+  /**
+   * This is `true` if the inference API uses the `serving_name` that was defined in this
+   * deployment.
+   */
   uses_serving_name?: boolean;
 }
 
-/** This model represents an individual patch operation to be performed on a JSON document, as defined by RFC 6902. */
+/**
+ * This model represents an individual patch operation to be performed on a JSON document, as
+ * defined by RFC 6902.
+ */
 export interface JsonPatchOperation {
   /** The operation to be performed. */
   op: JsonPatchOperation.Constants.Op | string;
@@ -2252,15 +2627,17 @@ export namespace JsonPatchOperation {
 
 /** The lifecycle details. */
 export interface LifeCycleState {
-  /** The possible lifecycle stages, in order, are described below:
+  /**
+   * The possible lifecycle stages, in order, are described below:
    *
-   *  - `available`: this means that the model is available for use.
-   *  - `deprecated`: this means that the model is still available but the model will be removed soon, so an
-   *  alternative model should be used.
-   *  - `constricted`: this means that the model is still available for inferencing but cannot be used for training or
-   *  in a deployment. The model will be removed soon so an alternative model should be used.
-   *  - `withdrawn`: this means that the model is no longer available, check the `alternative_model_ids` to see what
-   *  it can be replaced by.
+   * - `available`: this means that the model is available for use.
+   * - `deprecated`: this means that the model is still available but the model will be removed soon,
+   *   so an alternative model should be used.
+   * - `constricted`: this means that the model is still available for inferencing but cannot be used
+   *   for training or in a deployment. The model will be removed soon so an alternative model
+   *   should be used.
+   * - `withdrawn`: this means that the model is no longer available, check the
+   *   `alternative_model_ids` to see what it can be replaced by.
    */
   id: LifeCycleState.Constants.Id | string;
   /** An optional label that may be used in the UI. */
@@ -2274,7 +2651,17 @@ export interface LifeCycleState {
 }
 export namespace LifeCycleState {
   export namespace Constants {
-    /** The possible lifecycle stages, in order, are described below: - `available`: this means that the model is available for use. - `deprecated`: this means that the model is still available but the model will be removed soon, so an alternative model should be used. - `constricted`: this means that the model is still available for inferencing but cannot be used for training or in a deployment. The model will be removed soon so an alternative model should be used. - `withdrawn`: this means that the model is no longer available, check the `alternative_model_ids` to see what it can be replaced by. */
+    /**
+     * The possible lifecycle stages, in order, are described below:
+     *
+     * - `available`: this means that the model is available for use.
+     * - `deprecated`: this means that the model is still available but the model will be removed
+     *   soon, so an alternative model should be used. - `constricted`: this means that the model is
+     *   still available for inferencing but cannot be used for training or in a deployment. The
+     *   model will be removed soon so an alternative model should be used.
+     * - `withdrawn`: this means that the model is no longer available, check the
+     *   `alternative_model_ids` to see what it can be replaced by.
+     */
     export enum Id {
       AVAILABLE = 'available',
       DEPRECATED = 'deprecated',
@@ -2284,10 +2671,14 @@ export namespace LifeCycleState {
   }
 }
 
-/** The properties specific to masking. If this object exists, even if it is empty, then masking will be applied. */
+/**
+ * The properties specific to masking. If this object exists, even if it is empty, then masking will
+ * be applied.
+ */
 export interface MaskProperties {
-  /** If this field is `true` then the entity value, that contains the text that was masked, will also be removed
-   *  from the output.
+  /**
+   * If this field is `true` then the entity value, that contains the text that was masked, will
+   * also be removed from the output.
    */
   remove_entity_value?: boolean;
 }
@@ -2310,8 +2701,9 @@ export interface MetricsContext {
 
 /** The limits that are applied for the model, for all the plans. */
 export interface ModelLimits {
-  /** This is the maximum allowed value for the number of tokens in the input prompt plus the number of tokens in
-   *  the output generated by the model.
+  /**
+   * This is the maximum allowed value for the number of tokens in the input prompt plus the number
+   * of tokens in the output generated by the model.
    */
   max_sequence_length?: number;
   /** This is the maximum number of records that can be accepted when training this model. */
@@ -2334,8 +2726,9 @@ export interface ModerationHapProperties {
   input?: TextModeration;
   /** Properties that control the moderation on the text. */
   output?: TextModeration;
-  /** The properties specific to masking. If this object exists,
-   *  even if it is empty, then masking will be applied.
+  /**
+   * The properties specific to masking. If this object exists, even if it is empty, then masking
+   * will be applied.
    */
   mask?: MaskProperties;
   /** ModerationHapProperties accepts additional properties. */
@@ -2348,15 +2741,19 @@ export interface ModerationPiiProperties {
   input?: TextModerationWithoutThreshold;
   /** Properties that control the moderation on the text. */
   output?: TextModerationWithoutThreshold;
-  /** The properties specific to masking. If this object exists,
-   *  even if it is empty, then masking will be applied.
+  /**
+   * The properties specific to masking. If this object exists, even if it is empty, then masking
+   * will be applied.
    */
   mask?: MaskProperties;
   /** ModerationPiiProperties accepts additional properties. */
   [propName: string]: any;
 }
 
-/** The properties for the moderation. Each type of moderation may have additional properties that are specific to that moderation. */
+/**
+ * The properties for the moderation. Each type of moderation may have additional properties that
+ * are specific to that moderation.
+ */
 export interface ModerationProperties {
   /** Properties that control the moderation on the text. */
   input?: TextModeration;
@@ -2368,7 +2765,7 @@ export interface ModerationProperties {
 
 /** A specific moderation result. */
 export interface ModerationResult {
-  /** the probability that this is a real match. */
+  /** The probability that this is a real match. */
   score: number;
   /** This defines if this was found in the input (`true`) or the output (`false`). */
   input: boolean;
@@ -2376,9 +2773,10 @@ export interface ModerationResult {
   position: ModerationTextRange;
   /** The entity that was identified by the moderation. */
   entity: string;
-  /** The text that was identified for this entity.
+  /**
+   * The text that was identified for this entity.
    *
-   *  This field may be removed if requested in the moderation request body.
+   * This field may be removed if requested in the moderation request body.
    */
   word?: string;
 }
@@ -2397,20 +2795,26 @@ export interface ModerationResults {
 export interface ModerationTextRange {
   /** The start index of the range. */
   start: number;
-  /** The end index of the range. The end index is exclusive meaning that the character at this index will not be
-   *  included in the range.
+  /**
+   * The end index of the range. The end index is exclusive meaning that the character at this index
+   * will not be included in the range.
    */
   end: number;
 }
 
-/** Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and `Personal identifiable information` (PII) filtering. This list can be extended with new types of moderations. */
+/**
+ * Properties that control the moderations, for usages such as `Hate and profanity` (HAP) and
+ * `Personal identifiable information` (PII) filtering. This list can be extended with new types of
+ * moderations.
+ */
 export interface Moderations {
   /** The properties specific to HAP. */
   hap?: ModerationHapProperties;
   /** The properties specific to PII. */
   pii?: ModerationPiiProperties;
-  /** If set, then only these ranges will be applied to the moderations. This is useful in the case that certain
-   *  parts of the input text have already been checked.
+  /**
+   * If set, then only these ranges will be applied to the moderations. This is useful in the case
+   * that certain parts of the input text have already been checked.
    */
   input_ranges?: ModerationTextRange[];
   /** Moderations accepts additional properties. */
@@ -2423,11 +2827,15 @@ export interface ObjectLocation {
   id?: string;
   /** The data source type like `connection_asset` or `data_asset`. */
   type: ObjectLocation.Constants.Type | string;
-  /** Contains a set of fields specific to each connection.
-   *  See here for [details about specifying connections](#datareferences).
+  /**
+   * Contains a set of fields specific to each connection. See here for [details about specifying
+   * connections](#datareferences).
    */
   connection?: DataConnection;
-  /** Contains a set of fields that describe the location of the data with respect to the `connection`. */
+  /**
+   * Contains a set of fields that describe the location of the data with respect to the
+   * `connection`.
+   */
   location: JsonObject;
 }
 export namespace ObjectLocation {
@@ -2442,7 +2850,10 @@ export namespace ObjectLocation {
   }
 }
 
-/** Indicates that this is an online deployment. An object has to be specified but can be empty. The `serving_name` can be provided in the `online.parameters`. */
+/**
+ * Indicates that this is an online deployment. An object has to be specified but can be empty. The
+ * `serving_name` can be provided in the `online.parameters`.
+ */
 export interface OnlineDeployment {
   /** A set of key-value pairs that are used to configure the deployment. */
   parameters?: OnlineDeploymentParameters;
@@ -2493,14 +2904,17 @@ export interface PromptTuning {
   num_epochs?: number;
   /** Learning rate to be used while tuning prompt vectors. */
   learning_rate?: number;
-  /** Number of steps to be used for gradient accumulation. Gradient accumulation refers to a method of collecting
-   *  gradient for configured number of steps instead of updating the model variables at every step and then applying
-   *  the update to model variables. This can be used as a tool to overcome smaller batch size limitation. Often also
-   *  referred in conjunction with "effective batch size".
+  /**
+   * Number of steps to be used for gradient accumulation. Gradient accumulation refers to a method
+   * of collecting gradient for configured number of steps instead of updating the model variables
+   * at every step and then applying the update to model variables. This can be used as a tool to
+   * overcome smaller batch size limitation. Often also referred in conjunction with "effective
+   * batch size".
    */
   accumulate_steps?: number;
-  /** Verbalizer template to be used for formatting data at train and inference time. This template may use
-   *  brackets to indicate where fields from the data model must be rendered.
+  /**
+   * Verbalizer template to be used for formatting data at train and inference time. This template
+   * may use brackets to indicate where fields from the data model must be rendered.
    */
   verbalizer?: string;
   /** The batch size is a number of samples processed before the model is updated. */
@@ -2511,7 +2925,10 @@ export interface PromptTuning {
   max_output_tokens?: number;
   /** The `text` method requires `init_text` to be set. */
   init_method?: PromptTuning.Constants.InitMethod | string;
-  /** Initialization text to be used if `init_method` is set to `text` otherwise this will be ignored. */
+  /**
+   * Initialization text to be used if `init_method` is set to `text` otherwise this will be
+   * ignored.
+   */
   init_text?: string;
 }
 export namespace PromptTuning {
@@ -2563,11 +2980,13 @@ export interface RerankInput {
 
 /** The properties used for reranking. */
 export interface RerankParameters {
-  /** Represents the maximum number of input tokens accepted. This can be used to avoid requests failing due to
-   *  input being longer than configured limits. If the text is truncated, then it truncates the end of the input (on
-   *  the right), so the start of the input will remain the same. If this value exceeds the `maximum sequence length`
-   *  (refer to the documentation to find this value for the model) then the call will fail if the total number of
-   *  tokens exceeds the `maximum sequence length`.
+  /**
+   * Represents the maximum number of input tokens accepted. This can be used to avoid requests
+   * failing due to input being longer than configured limits. If the text is truncated, then it
+   * truncates the end of the input (on the right), so the start of the input will remain the same.
+   * If this value exceeds the `maximum sequence length` (refer to the documentation to find this
+   * value for the model) then the call will fail if the total number of tokens exceeds the `maximum
+   * sequence length`.
    */
   truncate_input_tokens?: number;
   /** The return options for text reranking. */
@@ -2576,8 +2995,9 @@ export interface RerankParameters {
 
 /** System details. */
 export interface RerankResponse {
-  /** The `id` of the model to be used for this request. Please refer to the [list of
-   *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
+  /**
+   * The `id` of the model to be used for this request. Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models-embed.html?context=wx&audience=wdp).
    */
   model_id: string;
   /** The model version (using semantic versioning) if set. */
@@ -2590,7 +3010,10 @@ export interface RerankResponse {
   input_token_count: number;
   /** The rank query, if requested. */
   query?: string;
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
@@ -2656,25 +3079,30 @@ export interface ResourceMeta {
 export interface ReturnOptionProperties {
   /** Include input text in the `generated_text` field. */
   input_text?: boolean;
-  /** Include the list of individual generated tokens. Extra token information is included based on the other
-   *  flags below.
+  /**
+   * Include the list of individual generated tokens. Extra token information is included based on
+   * the other flags below.
    */
   generated_tokens?: boolean;
-  /** Include the list of input tokens. Extra token information is included based on the other flags here, but
-   *  only for decoder-only models.
+  /**
+   * Include the list of input tokens. Extra token information is included based on the other flags
+   * here, but only for decoder-only models.
    */
   input_tokens?: boolean;
-  /** Include logprob (natural log of probability) for each returned token. Applicable only if generated_tokens ==
-   *  true and/or input_tokens == true.
+  /**
+   * Include logprob (natural log of probability) for each returned token. Applicable only if
+   * generated_tokens == true and/or input_tokens == true.
    */
   token_logprobs?: boolean;
-  /** Include rank of each returned token. Applicable only if generated_tokens == true and/or input_tokens ==
-   *  true.
+  /**
+   * Include rank of each returned token. Applicable only if generated_tokens == true and/or
+   * input_tokens == true.
    */
   token_ranks?: boolean;
-  /** Include top n candidate tokens at the position of each returned token. The maximum value permitted is 5, but
-   *  more may be returned if there is a tie for nth place. Applicable only if generated_tokens == true and/or
-   *  input_tokens == true.
+  /**
+   * Include top n candidate tokens at the position of each returned token. The maximum value
+   * permitted is 5, but more may be returned if there is a tie for nth place. Applicable only if
+   * generated_tokens == true and/or input_tokens == true.
    */
   top_n_tokens?: number;
 }
@@ -2752,13 +3180,16 @@ export interface TaskDescription {
 
 /** The ratings for this task for this model. */
 export interface TaskRating {
-  /** A metric that indicates the cost expected to be incurred by the model's support of an inference task, in
-   *  terms of resource consumption and processing time, on a scale of 1 to 5, where 5 is the least cost and 1 is the
-   *  most cost. A missing value means that the cost is not known.
+  /**
+   * A metric that indicates the cost expected to be incurred by the model's support of an inference
+   * task, in terms of resource consumption and processing time, on a scale of 1 to 5, where 5 is
+   * the least cost and 1 is the most cost. A missing value means that the cost is not known.
    */
   cost?: number;
-  /** A metric that indicates the quality of the model's support of an inference task, on a scale of 1 to 5, where
-   *  5 is the best support and 1 is poor support. A missing value means that the quality is not known.
+  /**
+   * A metric that indicates the quality of the model's support of an inference task, on a scale of
+   * 1 to 5, where 5 is the best support and 1 is poor support. A missing value means that the
+   * quality is not known.
    */
   quality?: number;
 }
@@ -2767,12 +3198,17 @@ export interface TaskRating {
 export interface TextChatParameterFunction {
   /** The name of the function. */
   name: string;
-  /** A description of what the function does, used by the model to choose when and how to call the function. */
+  /**
+   * A description of what the function does, used by the model to choose when and how to call the
+   * function.
+   */
   description?: string;
-  /** The parameters the functions accepts, described as a JSON Schema object. See the [JSON Schema
-   *  reference](https://json-schema.org/learn/getting-started-step-by-step) for documentation about the format.
+  /**
+   * The parameters the functions accepts, described as a JSON Schema object. See the [JSON Schema
+   * reference](https://json-schema.org/learn/getting-started-step-by-step) for documentation about
+   * the format.
    *
-   *  Omitting parameters defines a function with an empty parameter list.
+   * Omitting parameters defines a function with an empty parameter list.
    */
   parameters?: JsonObject;
 }
@@ -2809,7 +3245,10 @@ export interface TextChatResponse {
   created_at?: string;
   /** Usage statistics for the completion request. */
   usage?: TextChatUsage;
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
@@ -2829,25 +3268,38 @@ export interface TextChatStreamResponse {
   created_at?: string;
   /** Usage statistics for the completion request. */
   usage?: TextChatUsage;
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
 /** The chat response format parameters. */
 export interface TextChatResponseFormat {
-  /** Used to enable JSON mode, which guarantees the message the model generates is valid JSON.
+  /**
+   * Used to enable JSON mode, which guarantees the message the model generates is valid JSON.
    *
-   *  **Important:** when using JSON mode, you must also instruct the model to produce JSON yourself via a system or
-   *  user message. Without this, the model may generate an unending stream of whitespace until the generation reaches
-   *  the token limit, resulting in a long-running and seemingly "stuck" request. Also note that the message content
-   *  may be partially cut off if `finish_reason="length"`, which indicates the generation exceeded `max_tokens` or
-   *  the conversation exceeded the max context length.
+   * **Important:** when using JSON mode, you must also instruct the model to produce JSON yourself
+   * via a system or user message. Without this, the model may generate an unending stream of
+   * whitespace until the generation reaches the token limit, resulting in a long-running and
+   * seemingly "stuck" request. Also note that the message content may be partially cut off if
+   * `finish_reason="length"`, which indicates the generation exceeded `max_tokens` or the
+   * conversation exceeded the max context length.
    */
   type: TextChatResponseFormat.Constants.Type | string;
 }
 export namespace TextChatResponseFormat {
   export namespace Constants {
-    /** Used to enable JSON mode, which guarantees the message the model generates is valid JSON. **Important:** when using JSON mode, you must also instruct the model to produce JSON yourself via a system or user message. Without this, the model may generate an unending stream of whitespace until the generation reaches the token limit, resulting in a long-running and seemingly "stuck" request. Also note that the message content may be partially cut off if `finish_reason="length"`, which indicates the generation exceeded `max_tokens` or the conversation exceeded the max context length. */
+    /**
+     * Used to enable JSON mode, which guarantees the message the model generates is valid JSON.
+     * **Important:** when using JSON mode, you must also instruct the model to produce JSON
+     * yourself via a system or user message. Without this, the model may generate an unending
+     * stream of whitespace until the generation reaches the token limit, resulting in a
+     * long-running and seemingly "stuck" request. Also note that the message content may be
+     * partially cut off if `finish_reason="length"`, which indicates the generation exceeded
+     * `max_tokens` or the conversation exceeded the max context length.
+     */
     export enum Type {
       JSON_OBJECT = 'json_object',
     }
@@ -2860,14 +3312,16 @@ export interface TextChatResultChoice {
   index?: number;
   /** A message result. */
   message?: TextChatResultMessage;
-  /** The reason why the call stopped, can be one of:
-   *  - `stop` - The model hit a natural stop point or a provided stop sequence.
-   *  - `length` - The maximum number of tokens specified in the request was reached.
-   *  - `tool_calls` - The model called a tool.
-   *  - `time_limit`` - Time limit reached.
-   *  - `cancelled`` - Request canceled by the client.
-   *  - `error`` - Error encountered.
-   *  - `null` - API response still in progress or incomplete.
+  /**
+   * The reason why the call stopped, can be one of:
+   *
+   * - `stop` - The model hit a natural stop point or a provided stop sequence.
+   * - `length` - The maximum number of tokens specified in the request was reached.
+   * - `tool_calls` - The model called a tool.
+   * - `time_limit`` - Time limit reached.
+   * - `cancelled`` - Request canceled by the client.
+   * - `error`` - Error encountered.
+   * - `null` - API response still in progress or incomplete.
    */
   finish_reason?: TextChatResultChoice.Constants.FinishReason | string;
 }
@@ -2877,20 +3331,30 @@ export interface TextChatStreamResultChoice {
   index?: number;
   /** A message chunk result. */
   delta?: TextChatResultMessage;
-  /** The reason why the call stopped, can be one of:
-   *  - `stop` - The model hit a natural stop point or a provided stop sequence.
-   *  - `length` - The maximum number of tokens specified in the request was reached.
-   *  - `tool_calls` - The model called a tool.
-   *  - `time_limit`` - Time limit reached.
-   *  - `cancelled`` - Request canceled by the client.
-   *  - `error`` - Error encountered.
-   *  - `null` - API response still in progress or incomplete.
+  /**
+   * The reason why the call stopped, can be one of:
+   *
+   * - `stop` - The model hit a natural stop point or a provided stop sequence.
+   * - `length` - The maximum number of tokens specified in the request was reached.
+   * - `tool_calls` - The model called a tool.
+   * - `time_limit`` - Time limit reached.
+   * - `cancelled`` - Request canceled by the client.
+   * - `error`` - Error encountered.
+   * - `null` - API response still in progress or incomplete.
    */
   finish_reason?: TextChatResultChoice.Constants.FinishReason | string;
 }
 export namespace TextChatResultChoice {
   export namespace Constants {
-    /** The reason why the call stopped, can be one of: - `stop` - The model hit a natural stop point or a provided stop sequence. - `length` - The maximum number of tokens specified in the request was reached. - `tool_calls` - The model called a tool. - `time_limit`` - Time limit reached. - `cancelled`` - Request canceled by the client. - `error`` - Error encountered. - `null` - API response still in progress or incomplete. */
+    /**
+     * The reason why the call stopped, can be one of: - `stop` - The model hit a natural stop point
+     * or a provided stop sequence. - `length` - The maximum number of tokens specified in the
+     * request was reached. - `tool_calls` - The model called a tool.
+     *
+     * - `time_limit`` - Time limit reached. - `cancelled`- Request canceled by the client. -`error`-
+     *   Error encountered. -`null`
+     * - API response still in progress or incomplete.
+     */
     export enum FinishReason {
       STOP = 'stop',
       LENGTH = 'length',
@@ -2916,9 +3380,7 @@ export interface TextChatResultMessage {
   reasoning_content?: string;
 }
 
-/**
- * A message result.
- */
+/** A message result. */
 export interface TextChatResultDelta {
   /** The role of the author of this message. */
   role: string;
@@ -2930,29 +3392,37 @@ export interface TextChatResultDelta {
   tool_calls?: TextChatToolCall[];
 }
 
-/**
- * A tool related result.
- */
+/** A tool related result. */
 export interface TextChatResultChoiceStream {
   /** The index of this result. */
   index?: number;
   /** A message result. */
   delta?: TextChatResultDelta;
-  /** The reason why the call stopped, can be one of:
-   *  - `stop` - The model hit a natural stop point or a provided stop sequence.
-   *  - `length` - The maximum number of tokens specified in the request was reached.
-   *  - `tool_calls` - The model called a tool.
-   *  - `time_limit`` - Time limit reached.
-   *  - `cancelled`` - Request canceled by the client.
-   *  - `error`` - Error encountered.
-   *  - `null` - API response still in progress or incomplete.
+  /**
+   * The reason why the call stopped, can be one of:
+   *
+   * - `stop` - The model hit a natural stop point or a provided stop sequence.
+   * - `length` - The maximum number of tokens specified in the request was reached.
+   * - `tool_calls` - The model called a tool.
+   * - `time_limit`` - Time limit reached.
+   * - `cancelled`` - Request canceled by the client.
+   * - `error`` - Error encountered.
+   * - `null` - API response still in progress or incomplete.
    */
   finish_reason?: TextChatResultChoiceStream.Constants.FinishReason | string;
 }
 
 export namespace TextChatResultChoiceStream {
   export namespace Constants {
-    /** The reason why the call stopped, can be one of: - `stop` - The model hit a natural stop point or a provided stop sequence. - `length` - The maximum number of tokens specified in the request was reached. - `tool_calls` - The model called a tool. - `time_limit`` - Time limit reached. - `cancelled`` - Request canceled by the client. - `error`` - Error encountered. - `null` - API response still in progress or incomplete. */
+    /**
+     * The reason why the call stopped, can be one of: - `stop` - The model hit a natural stop point
+     * or a provided stop sequence. - `length` - The maximum number of tokens specified in the
+     * request was reached. - `tool_calls` - The model called a tool.
+     *
+     * - `time_limit`` - Time limit reached. - `cancelled`- Request canceled by the client. -`error`-
+     *   Error encountered. -`null`
+     * - API response still in progress or incomplete.
+     */
     export enum FinishReason {
       STOP = 'stop',
       LENGTH = 'length',
@@ -2964,16 +3434,15 @@ export namespace TextChatResultChoiceStream {
   }
 }
 
-/**
- * System details.
- */
+/** System details. */
 export interface TextChatStreamItem {
   /** A unique identifier for the chat completion. */
   id: string;
   /** The model used for the chat completion. */
   model_id: string;
-  /** This field is a duplicate of `model_id` and is provided in order to provide better compatibility with other
-   *  APIs.
+  /**
+   * This field is a duplicate of `model_id` and is provided in order to provide better
+   * compatibility with other APIs.
    */
   model?: string;
   /** The model version (using semantic versioning) if set. */
@@ -2986,11 +3455,18 @@ export interface TextChatStreamItem {
   usage?: TextChatUsage;
   /** A list of chat completion choices. Can be more than one if `n` is greater than 1. */
   choices: TextChatResultChoiceStream[];
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
-/** Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}` forces the model to call that tool. Only one of `tool_choice_option` or `tool_choice` must be present. */
+/**
+ * Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}`
+ * forces the model to call that tool. Only one of `tool_choice_option` or `tool_choice` must be
+ * present.
+ */
 export interface TextChatToolChoiceTool {
   /** The tool type. */
   type: TextChatToolChoiceTool.Constants.Type | string;
@@ -3021,9 +3497,7 @@ export interface TextChatUsage {
   /** Total number of tokens used in the request (prompt + completion). */
   total_tokens?: number;
 }
-/**
- * A reference to data.
- */
+/** A reference to data. */
 export interface TextExtractionDataReference {
   /** The data source type. */
   type: TextExtractionDataReference.Constants.Type | string;
@@ -3041,9 +3515,7 @@ export namespace TextExtractionDataReference {
   }
 }
 
-/**
- * Common metadata for a resource where `project_id` or `space_id` must be present.
- */
+/** Common metadata for a resource where `project_id` or `space_id` must be present. */
 export interface TextExtractionMetadata {
   /** The id of the resource. */
   id: string;
@@ -3055,9 +3527,7 @@ export interface TextExtractionMetadata {
   project_id?: string;
 }
 
-/**
- * The text extraction resource.
- */
+/** The text extraction resource. */
 export interface TextExtractionResource {
   /** Common metadata for a resource where `project_id` or `space_id` must be present. */
   metadata?: TextExtractionMetadata;
@@ -3065,9 +3535,7 @@ export interface TextExtractionResource {
   entity?: TextExtractionResourceEntity;
 }
 
-/**
- * The document details for the text extraction.
- */
+/** The document details for the text extraction. */
 export interface TextExtractionResourceEntity {
   /** A reference to data. */
   document_reference: TextExtractionDataReference;
@@ -3075,10 +3543,11 @@ export interface TextExtractionResourceEntity {
   results_reference: TextExtractionDataReference;
   /** The steps for the text extraction pipeline. */
   steps?: TextExtractionSteps;
-  /** Set this as an empty object to specify `json` output.
+  /**
+   * Set this as an empty object to specify `json` output.
    *
-   *  Note that this is not strictly required because if an
-   *  `assembly_md` object is not found then the default will be `json`.
+   * Note that this is not strictly required because if an `assembly_md` object is not found then
+   * the default will be `json`.
    */
   assembly_json?: JsonObject;
   /** Set this as an empty object to specify `markdown` output. */
@@ -3089,12 +3558,11 @@ export interface TextExtractionResourceEntity {
   results: TextExtractionResults;
 }
 
-/**
- * A paginated list of resources.
- */
+/** A paginated list of resources. */
 export interface TextExtractionResources {
-  /** The total number of resources. Computed explicitly only when 'total_count=true' query parameter is present.
-   *  This is in order to avoid performance penalties.
+  /**
+   * The total number of resources. Computed explicitly only when 'total_count=true' query parameter
+   * is present. This is in order to avoid performance penalties.
    */
   total_count?: number;
   /** The number of items to return in each page. */
@@ -3105,25 +3573,27 @@ export interface TextExtractionResources {
   next?: PaginationNext;
   /** A list of resources. */
   resources?: TextExtractionResource[];
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
-/**
- * The text extraction response.
- */
+/** The text extraction response. */
 export interface TextExtractionResponse {
   /** Common metadata for a resource where `project_id` or `space_id` must be present. */
   metadata?: TextExtractionMetadata;
   /** The document details for the text extraction. */
   entity?: TextExtractionResourceEntity;
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
-/**
- * The current status of the text extraction.
- */
+/** The current status of the text extraction. */
 export interface TextExtractionResults {
   /** The status of the request. */
   status: TextExtractionResults.Constants.Status | string;
@@ -3131,8 +3601,9 @@ export interface TextExtractionResults {
   running_at?: string;
   /** The time when the request completed or failed. */
   completed_at?: string;
-  /** The number of pages that have been processed in the document. If the status is `completed` then this is the
-   *  number of pages that will be billed.
+  /**
+   * The number of pages that have been processed in the document. If the status is `completed` then
+   * this is the number of pages that will be billed.
    */
   number_pages_processed: number;
   /** The total number of pages to be processed. */
@@ -3141,9 +3612,7 @@ export interface TextExtractionResults {
   error?: ServiceError;
 }
 
-/**
- * A service error message.
- */
+/** A service error message. */
 export interface ServiceError {
   /** A simple code that should convey the general sense of the error. */
   code: string;
@@ -3167,27 +3636,22 @@ export namespace TextExtractionResults {
   }
 }
 
-/**
- * The OCR text extraction step.
- */
+/** The OCR text extraction step. */
 export interface TextExtractionStepOcr {
-  /** Set of languages to be expected in the document. The language codes follow `ISO 639`. See the documentation
-   *  for the currently supported languages.
+  /**
+   * Set of languages to be expected in the document. The language codes follow `ISO 639`. See the
+   * documentation for the currently supported languages.
    */
   languages_list?: string[];
 }
 
-/**
- * The tables processing text extraction step.
- */
+/** The tables processing text extraction step. */
 export interface TextExtractionStepTablesProcessing {
   /** Should tables be processed for text extraction. */
   enabled?: boolean;
 }
 
-/**
- * The steps for the text extraction pipeline.
- */
+/** The steps for the text extraction pipeline. */
 export interface TextExtractionSteps {
   /** The OCR text extraction step. */
   ocr?: TextExtractionStepOcr;
@@ -3195,7 +3659,10 @@ export interface TextExtractionSteps {
   tables_processing?: TextExtractionStepTablesProcessing;
 }
 
-/** It can be used to exponentially increase the likelihood of the text generation terminating once a specified number of tokens have been generated. */
+/**
+ * It can be used to exponentially increase the likelihood of the text generation terminating once a
+ * specified number of tokens have been generated.
+ */
 export interface TextGenLengthPenalty {
   /** Represents the factor of exponential decay. Larger values correspond to more aggressive decay. */
   decay_factor?: number;
@@ -3205,81 +3672,108 @@ export interface TextGenLengthPenalty {
 
 /** Properties that control the model and response. */
 export interface TextGenParameters {
-  /** Represents the strategy used for picking the tokens during generation of the output text.
+  /**
+   * Represents the strategy used for picking the tokens during generation of the output text.
    *
-   *  During text generation when parameter value is set to greedy, each successive token corresponds to the highest
-   *  probability token given the text that has already been generated. This strategy can lead to repetitive results
-   *  especially for longer output sequences. The alternative sample strategy generates text by picking subsequent
-   *  tokens based on the probability distribution of possible next tokens defined by (i.e., conditioned on) the
-   *  already-generated text and the top_k and top_p parameters described below. See this
-   *  [url](https://huggingface.co/blog/how-to-generate) for an informative article about text generation.
+   * During text generation when parameter value is set to greedy, each successive token corresponds
+   * to the highest probability token given the text that has already been generated. This strategy
+   * can lead to repetitive results especially for longer output sequences. The alternative sample
+   * strategy generates text by picking subsequent tokens based on the probability distribution of
+   * possible next tokens defined by (i.e., conditioned on) the already-generated text and the top_k
+   * and top_p parameters described below. See this
+   * [url](https://huggingface.co/blog/how-to-generate) for an informative article about text
+   * generation.
    */
   decoding_method?: TextGenParameters.Constants.DecodingMethod | string;
-  /** It can be used to exponentially increase the likelihood of the text generation terminating once a specified
-   *  number of tokens have been generated.
+  /**
+   * It can be used to exponentially increase the likelihood of the text generation terminating once
+   * a specified number of tokens have been generated.
    */
   length_penalty?: TextGenLengthPenalty;
-  /** The maximum number of new tokens to be generated. The maximum supported value for this field depends on the
-   *  model being used.
+  /**
+   * The maximum number of new tokens to be generated. The maximum supported value for this field
+   * depends on the model being used.
    *
-   *  How the "token" is defined depends on the tokenizer and vocabulary size, which in turn depends on the model.
-   *  Often the tokens are a mix of full words and sub-words. To learn more about tokenization, [see
-   *  here](https://huggingface.co/course/chapter2/4).
+   * How the "token" is defined depends on the tokenizer and vocabulary size, which in turn depends
+   * on the model. Often the tokens are a mix of full words and sub-words. To learn more about
+   * tokenization, [see here](https://huggingface.co/course/chapter2/4).
    *
-   *  Depending on the users plan, and on the model being used, there may be an enforced maximum number of new tokens.
+   * Depending on the users plan, and on the model being used, there may be an enforced maximum
+   * number of new tokens.
    */
   max_new_tokens?: number;
   /** If stop sequences are given, they are ignored until minimum tokens are generated. */
   min_new_tokens?: number;
   /** Random number generator seed to use in sampling mode for experimental repeatability. */
   random_seed?: number;
-  /** Stop sequences are one or more strings which will cause the text generation to stop if/when they are
-   *  produced as part of the output. Stop sequences encountered prior to the minimum number of tokens being generated
-   *  will be ignored.
+  /**
+   * Stop sequences are one or more strings which will cause the text generation to stop if/when
+   * they are produced as part of the output. Stop sequences encountered prior to the minimum number
+   * of tokens being generated will be ignored.
    */
   stop_sequences?: string[];
-  /** A value used to modify the next-token probabilities in sampling mode. Values less than 1.0 sharpen the
-   *  probability distribution, resulting in "less random" output. Values greater than 1.0 flatten the probability
-   *  distribution, resulting in "more random" output. A value of 1.0 has no effect.
+  /**
+   * A value used to modify the next-token probabilities in sampling mode. Values less than 1.0
+   * sharpen the probability distribution, resulting in "less random" output. Values greater than
+   * 1.0 flatten the probability distribution, resulting in "more random" output. A value of 1.0 has
+   * no effect.
    */
   temperature?: number;
-  /** Time limit in milliseconds - if not completed within this time, generation will stop. The text generated so
-   *  far will be returned along with the TIME_LIMIT stop reason.
+  /**
+   * Time limit in milliseconds - if not completed within this time, generation will stop. The text
+   * generated so far will be returned along with the TIME_LIMIT stop reason.
    *
-   *  Depending on the users plan, and on the model being used, there may be an enforced maximum time limit.
+   * Depending on the users plan, and on the model being used, there may be an enforced maximum time
+   * limit.
    */
   time_limit?: number;
-  /** The number of highest probability vocabulary tokens to keep for top-k-filtering. Only applies for sampling
-   *  mode. When decoding_strategy is set to sample, only the top_k most likely tokens are considered as candidates
-   *  for the next generated token.
+  /**
+   * The number of highest probability vocabulary tokens to keep for top-k-filtering. Only applies
+   * for sampling mode. When decoding_strategy is set to sample, only the top_k most likely tokens
+   * are considered as candidates for the next generated token.
    */
   top_k?: number;
-  /** Similar to top_k except the candidates to generate the next token are the most likely tokens with
-   *  probabilities that add up to at least top_p. Also known as nucleus sampling. A value of 1.0 is equivalent to
-   *  disabled.
+  /**
+   * Similar to top_k except the candidates to generate the next token are the most likely tokens
+   * with probabilities that add up to at least top_p. Also known as nucleus sampling. A value of
+   * 1.0 is equivalent to disabled.
    */
   top_p?: number;
-  /** Represents the penalty for penalizing tokens that have already been generated or belong to the context. The
-   *  value 1.0 means that there is no penalty.
+  /**
+   * Represents the penalty for penalizing tokens that have already been generated or belong to the
+   * context. The value 1.0 means that there is no penalty.
    */
   repetition_penalty?: number;
-  /** Represents the maximum number of input tokens accepted. This can be used to avoid requests failing due to
-   *  input being longer than configured limits. If the text is truncated, then it truncates the start of the input
-   *  (on the left), so the end of the input will remain the same. If this value exceeds the `maximum sequence length`
-   *  (refer to the documentation to find this value for the model) then the call will fail if the total number of
-   *  tokens exceeds the `maximum sequence length`.
+  /**
+   * Represents the maximum number of input tokens accepted. This can be used to avoid requests
+   * failing due to input being longer than configured limits. If the text is truncated, then it
+   * truncates the start of the input (on the left), so the end of the input will remain the same.
+   * If this value exceeds the `maximum sequence length` (refer to the documentation to find this
+   * value for the model) then the call will fail if the total number of tokens exceeds the `maximum
+   * sequence length`.
    */
   truncate_input_tokens?: number;
   /** Properties that control what is returned. */
   return_options?: ReturnOptionProperties;
-  /** Pass `false` to omit matched stop sequences from the end of the output text. The default is `true`, meaning
-   *  that the output will end with the stop sequence text when matched.
+  /**
+   * Pass `false` to omit matched stop sequences from the end of the output text. The default is
+   * `true`, meaning that the output will end with the stop sequence text when matched.
    */
   include_stop_sequence?: boolean;
 }
 export namespace TextGenParameters {
   export namespace Constants {
-    /** Represents the strategy used for picking the tokens during generation of the output text. During text generation when parameter value is set to greedy, each successive token corresponds to the highest probability token given the text that has already been generated. This strategy can lead to repetitive results especially for longer output sequences. The alternative sample strategy generates text by picking subsequent tokens based on the probability distribution of possible next tokens defined by (i.e., conditioned on) the already-generated text and the top_k and top_p parameters described below. See this [url](https://huggingface.co/blog/how-to-generate) for an informative article about text generation. */
+    /**
+     * Represents the strategy used for picking the tokens during generation of the output text.
+     * During text generation when parameter value is set to greedy, each successive token
+     * corresponds to the highest probability token given the text that has already been generated.
+     * This strategy can lead to repetitive results especially for longer output sequences. The
+     * alternative sample strategy generates text by picking subsequent tokens based on the
+     * probability distribution of possible next tokens defined by (i.e., conditioned on) the
+     * already-generated text and the top_k and top_p parameters described below. See this
+     * [url](https://huggingface.co/blog/how-to-generate) for an informative article about text
+     * generation.
+     */
     export enum DecodingMethod {
       SAMPLE = 'sample',
       GREEDY = 'greedy',
@@ -3297,7 +3791,10 @@ export interface TextGenResponse {
   created_at: string;
   /** The generated tokens. */
   results: TextGenResponseFieldsResultsItem[];
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
@@ -3305,17 +3802,19 @@ export interface TextGenResponse {
 export interface TextGenResponseFieldsResultsItem {
   /** The text that was generated by the model. */
   generated_text: string;
-  /** The reason why the call stopped, can be one of:
-   *  - not_finished - Possibly more tokens to be streamed.
-   *  - max_tokens - Maximum requested tokens reached.
-   *  - eos_token - End of sequence token encountered.
-   *  - cancelled - Request canceled by the client.
-   *  - time_limit - Time limit reached.
-   *  - stop_sequence - Stop sequence encountered.
-   *  - token_limit - Token limit reached.
-   *  - error - Error encountered.
+  /**
+   * The reason why the call stopped, can be one of:
    *
-   *  Note that these values will be lower-cased so test for values case insensitive.
+   * - Not_finished - Possibly more tokens to be streamed.
+   * - Max_tokens - Maximum requested tokens reached.
+   * - Eos_token - End of sequence token encountered.
+   * - Cancelled - Request canceled by the client.
+   * - Time_limit - Time limit reached.
+   * - Stop_sequence - Stop sequence encountered.
+   * - Token_limit - Token limit reached.
+   * - Error - Error encountered.
+   *
+   * Note that these values will be lower-cased so test for values case insensitive.
    */
   stop_reason: TextGenResponseFieldsResultsItem.Constants.StopReason | string;
   /** The number of generated tokens. */
@@ -3324,12 +3823,14 @@ export interface TextGenResponseFieldsResultsItem {
   input_token_count?: number;
   /** The seed used, if it exists. */
   seed?: number;
-  /** The list of individual generated tokens. Extra token information is included based on the other flags in the
-   *  `return_options` of the request.
+  /**
+   * The list of individual generated tokens. Extra token information is included based on the other
+   * flags in the `return_options` of the request.
    */
   generated_tokens?: TextGenTokenInfo[];
-  /** The list of input tokens. Extra token information is included based on the other flags in the
-   *  `return_options` of the request, but for decoder-only models.
+  /**
+   * The list of input tokens. Extra token information is included based on the other flags in the
+   * `return_options` of the request, but for decoder-only models.
    */
   input_tokens?: TextGenTokenInfo[];
   /** The result of any detected moderations. */
@@ -3337,7 +3838,16 @@ export interface TextGenResponseFieldsResultsItem {
 }
 export namespace TextGenResponseFieldsResultsItem {
   export namespace Constants {
-    /** The reason why the call stopped, can be one of: - not_finished - Possibly more tokens to be streamed. - max_tokens - Maximum requested tokens reached. - eos_token - End of sequence token encountered. - cancelled - Request canceled by the client. - time_limit - Time limit reached. - stop_sequence - Stop sequence encountered. - token_limit - Token limit reached. - error - Error encountered. Note that these values will be lower-cased so test for values case insensitive. */
+    /**
+     * The reason why the call stopped, can be one of: - not_finished
+     *
+     * - Possibly more tokens to be streamed. - max_tokens - Maximum requested tokens reached. -
+     *   eos_token
+     * - End of sequence token encountered. - cancelled - Request canceled by the client.
+     * - Time_limit - Time limit reached. - stop_sequence - Stop sequence encountered. - token_limit -
+     *   Token limit reached. - error - Error encountered. Note that these values will be
+     *   lower-cased so test for values case insensitive.
+     */
     export enum StopReason {
       NOT_FINISHED = 'not_finished',
       MAX_TOKENS = 'max_tokens',
@@ -3373,11 +3883,11 @@ export interface TextGenTopTokenInfo {
 
 /** Properties that control the moderation on the text. */
 export interface TextModeration {
-  /** Should this moderation be enabled on the text.
+  /**
+   * Should this moderation be enabled on the text.
    *
-   *
-   *  The default value is `true` which means that if the parent object exists but the `enabled` field does not exist
-   *  then this is considered to be enabled.
+   * The default value is `true` which means that if the parent object exists but the `enabled`
+   * field does not exist then this is considered to be enabled.
    */
   enabled?: boolean;
   /** The threshold probability that this is a real match. */
@@ -3388,11 +3898,11 @@ export interface TextModeration {
 
 /** Properties that control the moderation on the text. */
 export interface TextModerationWithoutThreshold {
-  /** Should this moderation be enabled on the text.
+  /**
+   * Should this moderation be enabled on the text.
    *
-   *
-   *  The default value is `true` which means that if the parent object exists but the `enabled` field does not exist
-   *  then this is considered to be enabled.
+   * The default value is `true` which means that if the parent object exists but the `enabled`
+   * field does not exist then this is considered to be enabled.
    */
   enabled?: boolean;
   /** TextModerationWithoutThreshold accepts additional properties. */
@@ -3407,8 +3917,9 @@ export interface TextTokenizeParameters {
 
 /** The tokenization result. */
 export interface TextTokenizeResponse {
-  /** The `id` of the model to be used for this request. Please refer to the [list of
-   *  models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
+  /**
+   * The `id` of the model to be used for this request. Please refer to the [list of
+   * models](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-models.html?context=wx).
    */
   model_id: string;
   /** The result of tokenizing the input string. */
@@ -3423,62 +3934,69 @@ export interface TextTokenizeResult {
   tokens?: string[];
 }
 
-/**
- * Contains metadata about your timeseries data input.
- */
+/** Contains metadata about your timeseries data input. */
 export interface TSForecastInputSchema {
-  /** A valid column in the data that should be treated as the timestamp. Although not absolutely necessary, if
-   *  using calendar dates  (simple integer time offsets are also allowed), users should consider using a format such
-   *  as ISO 8601 that includes a UTC offset (e.g.,
-   *  '2024-10-18T01:09:21.454746+00:00'). This will avoid potential issues such as duplicate dates appearing due to
-   *  daylight savings change overs. There are many date formats in existence and inferring the correct one can be a
-   *  challenge so please do consider adhering to ISO 8601.
+  /**
+   * A valid column in the data that should be treated as the timestamp. Although not absolutely
+   * necessary, if using calendar dates (simple integer time offsets are also allowed), users should
+   * consider using a format such as ISO 8601 that includes a UTC offset (e.g.,
+   * '2024-10-18T01:09:21.454746+00:00'). This will avoid potential issues such as duplicate dates
+   * appearing due to daylight savings change overs. There are many date formats in existence and
+   * inferring the correct one can be a challenge so please do consider adhering to ISO 8601.
    */
   timestamp_column: string;
-  /** Columns that define a unique key for timeseries. This is similar to a compound primary key in a database
-   *  table.
+  /**
+   * Columns that define a unique key for timeseries. This is similar to a compound primary key in a
+   * database table.
    */
   id_columns?: string[];
-  /** A frequency indicator for the given timestamp_column. See
-   *  https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#period-aliases for a description of the
-   *  allowed values. If not provided, we will attempt to infer it from the data.
+  /**
+   * A frequency indicator for the given timestamp_column. See
+   * https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#period-aliases for a
+   * description of the allowed values. If not provided, we will attempt to infer it from the data.
    */
   freq?: string;
-  /** An array of column headings which constitute the target variables in the data. These are the data that will
-   *  be forecasted.
+  /**
+   * An array of column headings which constitute the target variables in the data. These are the
+   * data that will be forecasted.
    */
   target_columns?: string[];
 }
 
-/**
- * The parameters for the forecast request.
- */
+/** The parameters for the forecast request. */
 export interface TSForecastParameters {
-  /** The prediction length for the forecast. The service will return this many periods beyond the last timestamp
-   *  in the inference data payload. If specified, `prediction_length` must be an integer >=1 and no more than the
-   *  model default prediction length. When omitted the model default prediction_length will be used.
+  /**
+   * The prediction length for the forecast. The service will return this many periods beyond the
+   * last timestamp in the inference data payload. If specified, `prediction_length` must be an
+   * integer >=1 and no more than the model default prediction length. When omitted the model
+   * default prediction_length will be used.
    */
   prediction_length?: number;
 }
 
-/**
- * The time series forecast response.
- */
+/** The time series forecast response. */
 export interface TSForecastResponse {
   /** The model used to generate the forecast. */
   model_id?: string;
   /** The time when the response was created in ISO 8601 format. */
   created_at?: string;
-  /** The list of prediction results. There will be a forecast for each time series in the input data. The
-   *  `prediction_length` field in the request specifies the number of predictions in the results. The actual number
-   *  of rows in the results will be equal to the `prediction length` multiplied by the number of unique ids in
-   *  `id_columns`. The `timestamp_column` field in the request indicates the name of the timestamp column in the
-   *  results.
+  /**
+   * The list of prediction results. There will be a forecast for each time series in the input
+   * data. The `prediction_length` field in the request specifies the number of predictions in the
+   * results. The actual number of rows in the results will be equal to the `prediction length`
+   * multiplied by the number of unique ids in `id_columns`. The `timestamp_column` field in the
+   * request indicates the name of the timestamp column in the results.
    */
   results?: JsonObject[];
 }
 
-/** Number of steps to be used for gradient accumulation. Gradient accumulation refers to a method of collecting gradient for configured number of steps instead of updating the model variables at every step and then applying the update to model variables. This can be used as a tool to overcome smaller batch size limitation. Often also referred in conjunction with "effective batch size". */
+/**
+ * Number of steps to be used for gradient accumulation. Gradient accumulation refers to a method of
+ * collecting gradient for configured number of steps instead of updating the model variables at
+ * every step and then applying the update to model variables. This can be used as a tool to
+ * overcome smaller batch size limitation. Often also referred in conjunction with "effective batch
+ * size".
+ */
 export interface TrainingAccumulatedSteps {
   /** The default value. */
   default?: number;
@@ -3554,7 +4072,10 @@ export interface TrainingMetric {
   context?: MetricsContext;
 }
 
-/** The number of epochs is the number of complete passes through the training dataset. The quality depends on the number of epochs. */
+/**
+ * The number of epochs is the number of complete passes through the training dataset. The quality
+ * depends on the number of epochs.
+ */
 export interface TrainingNumEpochs {
   /** The default value. */
   default?: number;
@@ -3564,7 +4085,12 @@ export interface TrainingNumEpochs {
   max?: number;
 }
 
-/** Number of virtual tokens to be used for training. In prompt tuning we are essentially learning the embedded representations for soft prompts, which are known as virtual tokens, via back propagation for a specific task(s) while keeping the rest of the model fixed. `num_virtual_tokens` is the number of dimensions for these virtual tokens. */
+/**
+ * Number of virtual tokens to be used for training. In prompt tuning we are essentially learning
+ * the embedded representations for soft prompts, which are known as virtual tokens, via back
+ * propagation for a specific task(s) while keeping the rest of the model fixed.
+ * `num_virtual_tokens` is the number of dimensions for these virtual tokens.
+ */
 export interface TrainingNumVirtualTokens {
   /** The possible values for the number of virtual tokens. */
   supported?: number[];
@@ -3578,19 +4104,22 @@ export interface TrainingParameters {
   init_method?: TrainingInitMethod;
   /** Initialization text to be used if init_method is set to `text`, otherwise this will be ignored. */
   init_text?: TrainingInitText;
-  /** Number of virtual tokens to be used for training.
-   *  In prompt tuning we are essentially learning the embedded representations for soft prompts,
-   *  which are known as virtual tokens, via back propagation for a specific task(s) while keeping
-   *  the rest of the model fixed. `num_virtual_tokens` is the number of dimensions for these virtual tokens.
+  /**
+   * Number of virtual tokens to be used for training. In prompt tuning we are essentially learning
+   * the embedded representations for soft prompts, which are known as virtual tokens, via back
+   * propagation for a specific task(s) while keeping the rest of the model fixed.
+   * `num_virtual_tokens` is the number of dimensions for these virtual tokens.
    */
   num_virtual_tokens?: TrainingNumVirtualTokens;
-  /** The number of epochs is the number of complete passes through the training dataset.
-   *  The quality depends on the number of epochs.
+  /**
+   * The number of epochs is the number of complete passes through the training dataset. The quality
+   * depends on the number of epochs.
    */
   num_epochs?: TrainingNumEpochs;
-  /** Verbalizer template to be used for formatting data at train and inference time.
-   *  This template may use brackets to indicate where fields from the data model
-   *  TrainGenerationRecord must be rendered.
+  /**
+   * Verbalizer template to be used for formatting data at train and inference time. This template
+   * may use brackets to indicate where fields from the data model TrainGenerationRecord must be
+   * rendered.
    */
   verbalizer?: TrainingVerbalizer;
   /** The batch size is a number of samples processed before the model is updated. */
@@ -3599,17 +4128,19 @@ export interface TrainingParameters {
   max_input_tokens?: TrainingMaxInputTokens;
   /** Maximum length of output tokens being predicted. */
   max_output_tokens?: TrainingMaxOutputTokens;
-  /** Datatype to use for training of the underlying text generation model.
-   *  If no value is provided, we pull from torch_dtype in config.
-   *  If an in memory resource is provided which does not match the specified data type,
-   *  the model underpinning the resource will be converted in place to the correct torch dtype.
+  /**
+   * Datatype to use for training of the underlying text generation model. If no value is provided,
+   * we pull from torch_dtype in config. If an in memory resource is provided which does not match
+   * the specified data type, the model underpinning the resource will be converted in place to the
+   * correct torch dtype.
    */
   torch_dtype?: TrainingTorchDtype;
-  /** Number of steps to be used for gradient accumulation.
-   *  Gradient accumulation refers to a method of collecting gradient for configured number of steps
-   *  instead of updating the model variables at every step and then applying the update to model variables.
-   *  This can be used as a tool to overcome smaller batch size limitation.
-   *  Often also referred in conjunction with "effective batch size".
+  /**
+   * Number of steps to be used for gradient accumulation. Gradient accumulation refers to a method
+   * of collecting gradient for configured number of steps instead of updating the model variables
+   * at every step and then applying the update to model variables. This can be used as a tool to
+   * overcome smaller batch size limitation. Often also referred in conjunction with "effective
+   * batch size".
    */
   accumulate_steps?: TrainingAccumulatedSteps;
   /** Learning rate to be used for training. */
@@ -3626,8 +4157,9 @@ export interface TrainingResource {
 
 /** Information for paging when querying resources. */
 export interface TrainingResourceCollection {
-  /** The total number of resources. Computed explicitly only when 'total_count=true' query parameter is present.
-   *  This is in order to avoid performance penalties.
+  /**
+   * The total number of resources. Computed explicitly only when 'total_count=true' query parameter
+   * is present. This is in order to avoid performance penalties.
    */
   total_count?: number;
   /** The number of items to return in each page. */
@@ -3638,7 +4170,10 @@ export interface TrainingResourceCollection {
   next?: PaginationNext;
   /** The training resources. */
   resources?: TrainingResource[];
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: TrainingResourceCollectionSystem;
 }
 
@@ -3656,16 +4191,19 @@ export interface TrainingResourceEntity {
   training_data_references?: DataConnectionReference[];
   /** User defined properties specified as key-value pairs. */
   custom?: JsonObject;
-  /** If set to `true` then the result of the training, if successful, will be uploaded to the repository as a
-   *  model.
+  /**
+   * If set to `true` then the result of the training, if successful, will be uploaded to the
+   * repository as a model.
    */
   auto_update_model?: boolean;
-  /** The training results. Normally this is specified as `type=container` which means that it is stored in the
-   *  space or project. Note that the training will add some fields that point to the training status, the model
-   *  request and the assets.
+  /**
+   * The training results. Normally this is specified as `type=container` which means that it is
+   * stored in the space or project. Note that the training will add some fields that point to the
+   * training status, the model request and the assets.
    *
-   *  The `model_request_path` is the request body that should be used when creating the trained model in the API, if
-   *  this model is to be deployed. If `auto_update_model` was set to `true` then this file is not needed.
+   * The `model_request_path` is the request body that should be used when creating the trained
+   * model in the API, if this model is to be deployed. If `auto_update_model` was set to `true`
+   * then this file is not needed.
    */
   results_reference: ObjectLocation;
   /** Status of the training job. */
@@ -3704,13 +4242,22 @@ export namespace TrainingStatus {
   }
 }
 
-/** Datatype to use for training of the underlying text generation model. If no value is provided, we pull from torch_dtype in config. If an in memory resource is provided which does not match the specified data type, the model underpinning the resource will be converted in place to the correct torch dtype. */
+/**
+ * Datatype to use for training of the underlying text generation model. If no value is provided, we
+ * pull from torch_dtype in config. If an in memory resource is provided which does not match the
+ * specified data type, the model underpinning the resource will be converted in place to the
+ * correct torch dtype.
+ */
 export interface TrainingTorchDtype {
   /** The datatype. */
   default?: string;
 }
 
-/** Verbalizer template to be used for formatting data at train and inference time. This template may use brackets to indicate where fields from the data model TrainGenerationRecord must be rendered. */
+/**
+ * Verbalizer template to be used for formatting data at train and inference time. This template may
+ * use brackets to indicate where fields from the data model TrainGenerationRecord must be
+ * rendered.
+ */
 export interface TrainingVerbalizer {
   /** The default verbalizer. */
   default?: string;
@@ -3823,8 +4370,9 @@ export interface PromptData {
 export interface PromptLock {
   /** True if the prompt is currently locked. */
   locked: boolean;
-  /** Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in PUT /lock
-   *  requests.
+  /**
+   * Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in PUT
+   * /lock requests.
    */
   lock_type?: PromptLock.Constants.LockType | string;
   /** Locked by is computed by the server and shouldn't be passed. */
@@ -3832,7 +4380,10 @@ export interface PromptLock {
 }
 export namespace PromptLock {
   export namespace Constants {
-    /** Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in PUT /lock requests. */
+    /**
+     * Lock type: 'edit' for working on prompts/templates or 'governance'. Can only be supplied in
+     * PUT /lock requests.
+     */
     export enum LockType {
       EDIT = 'edit',
       GOVERNANCE = 'governance',
@@ -3851,16 +4402,15 @@ export interface PromptWithExternal {
   external_information?: ExternalInformation;
 }
 
-/**
- * UtilityAgentTool.
- */
+/** UtilityAgentTool. */
 export interface UtilityAgentTool {
   /** Name of the tool. */
   name: string;
   /** A plain text description of what the tool is used for. */
   description: string;
-  /** The precise instruction to agent LLMs and should be treated as part of the system prompt. If not provided,
-   *  `description` can be used in it's place.
+  /**
+   * The precise instruction to agent LLMs and should be treated as part of the system prompt. If
+   * not provided, `description` can be used in it's place.
    */
   agent_description?: string;
   /** The JSON schema of the input that is provided when running the tool if applicable. */
@@ -3977,25 +4527,19 @@ export interface WxPromptSessionEntryList {
   bookmark?: string;
 }
 
-/**
- * WxUtilityAgentToolsResponse.
- */
+/** WxUtilityAgentToolsResponse. */
 export interface WxUtilityAgentToolsResponse {
   resources: UtilityAgentTool[];
 }
 
-/**
- * WxUtilityAgentToolsRunRequest.
- */
+/** WxUtilityAgentToolsRunRequest. */
 export interface WxUtilityAgentToolsRunRequest {
   input: string | Record<string, any>;
   tool_name: string;
   config?: Record<string, any>;
 }
 
-/**
- * WxUtilityAgentToolsRunResponse.
- */
+/** WxUtilityAgentToolsRunResponse. */
 export interface WxUtilityAgentToolsRunResponse {
   /** The output from running the tool. */
   output: any;
@@ -4058,8 +4602,7 @@ export namespace TextChatMessagesTextChatMessageUser {
 }
 
 /** The definition of a user image content. */
-export interface TextChatUserContentsTextChatUserImageURLContent
-  extends TextChatUserImageURLContent {}
+export interface TextChatUserContentsTextChatUserImageURLContent extends TextChatUserImageURLContent {}
 export namespace TextChatUserContentsTextChatUserImageURLContent {
   export namespace Constants {
     /** The type of the user content. */
@@ -4106,32 +4649,35 @@ export interface RequestCallbacks<T = any> {
   responseCallback?: ReceiveResponseCallback<T>;
 }
 
-/**
- * Status of the training job.
- */
+/** Status of the training job. */
 export interface FineTuningEntity {
-  /** This field must not be set while creating a fine tuning job with InstructLab.
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
    *
-   *  If set to `true` then the result of the training, if successful, will be uploaded to the repository as a model.
+   * If set to `true` then the result of the training, if successful, will be uploaded to the
+   * repository as a model.
    */
   auto_update_model?: boolean;
-  /** This field must not be set while creating a fine tuning job with InstructLab.
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
    *
-   *  The parameters for the job. Note that if `verbalizer` is provided
-   *  then `response_template` must also be provided (and vice versa).
+   * The parameters for the job. Note that if `verbalizer` is provided then `response_template` must
+   * also be provided (and vice versa).
    */
   parameters?: FineTuningParameters;
   /** The `type` of Fine Tuning training. The `type` is set to `ilab` for InstructLab training. */
   type?: FineTuningEntity.Constants.Type | string;
   /** The training datasets. */
   training_data_references: ObjectLocation[];
-  /** This field must not be set while creating a fine tuning job with InstructLab.
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
    *
-   *  The holdout/test datasets.
+   * The holdout/test datasets.
    */
   test_data_references?: ObjectLocation[];
-  /** The training results. Normally this is specified as `type=container` which
-   *  means that it is stored in the space or project.
+  /**
+   * The training results. Normally this is specified as `type=container` which means that it is
+   * stored in the space or project.
    */
   results_reference: ObjectLocation;
   /** User defined properties specified as key-value pairs. */
@@ -4151,13 +4697,16 @@ export namespace FineTuningEntity {
 /**
  * This field must not be set while creating a fine tuning job with InstructLab.
  *
- * The parameters for the job. Note that if `verbalizer` is provided then `response_template` must also be provided
- * (and vice versa).
+ * The parameters for the job. Note that if `verbalizer` is provided then `response_template` must
+ * also be provided (and vice versa).
  */
 export interface FineTuningParameters {
   /** The task that is targeted for this model. */
   task_id?: string;
-  /** Number of updates steps to accumulate the gradients for, before performing a backward/update pass. */
+  /**
+   * Number of updates steps to accumulate the gradients for, before performing a backward/update
+   * pass.
+   */
   accumulate_steps?: number;
   /** The model id of the base model for this job. */
   base_model: BaseModel;
@@ -4167,61 +4716,74 @@ export interface FineTuningParameters {
   learning_rate?: number;
   /** The batch size per GPU/XPU/TPU/MPS/NPU core/CPU for training. */
   batch_size?: number;
-  /** Maximum sequence length in terms of number of tokens. Any sequence beyond this maximum length will be
-   *  truncated.
+  /**
+   * Maximum sequence length in terms of number of tokens. Any sequence beyond this maximum length
+   * will be truncated.
    */
   max_seq_length?: number;
   /** Separator for the prediction/response in the single sequence to train on completions only. */
   response_template?: string;
-  /** Verbalizer template to be used for formatting data at train and inference time.
+  /**
+   * Verbalizer template to be used for formatting data at train and inference time.
    *
-   *  This template may use brackets to indicate where fields from the data model must be rendered.
+   * This template may use brackets to indicate where fields from the data model must be rendered.
    */
   verbalizer?: string;
   /** The name and number of GPUs used for the Fine Tuning job. */
   gpu?: GPU;
   /** Parameters to be set when running a Fine Tuning job with LoRA/QLoRA. */
   peft_parameters?: FineTuningPeftParameters;
-  /** Enabling gradient checkpointing reduces GPU memory required at the cost of slowing training by approx 20%. */
+  /**
+   * Enabling gradient checkpointing reduces GPU memory required at the cost of slowing training by
+   * approx 20%.
+   */
   gradient_checkpointing?: boolean;
 }
 
-/**
- * Parameters to be set when running a Fine Tuning job with LoRA/QLoRA.
- */
+/** Parameters to be set when running a Fine Tuning job with LoRA/QLoRA. */
 export interface FineTuningPeftParameters {
-  /** This field must not be set while creating a fine tuning job with InstructLab.
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
    *
-   *  The type specification for a LoRA or QLoRA Fine Tuning job. If type is set to `none`, no other parameters in
-   *  this object need to be specified.
+   * The type specification for a LoRA or QLoRA Fine Tuning job. If type is set to `none`, no other
+   * parameters in this object need to be specified.
    */
   type?: FineTuningPeftParameters.Constants.Type | string;
-  /** This field must not be set while creating a fine tuning job with InstructLab.
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
    *
-   *  The Lora attention dimension (the "rank").
+   * The Lora attention dimension (the "rank").
    */
   rank?: number;
-  /** This field must not be set while creating a fine tuning job with InstructLab.
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
    *
-   *  The names of the modules to apply the adapter to. If this is specified, only the modules with the specified
-   *  names will be replaced. Please specify modules as per model architecture. If the value is ["all-linear"], then
-   *  LORA selects all linear and Conv1D modules as per model architecture, except for the output layer.
+   * The names of the modules to apply the adapter to. If this is specified, only the modules with
+   * the specified names will be replaced. Please specify modules as per model architecture. If the
+   * value is ["all-linear"], then LORA selects all linear and Conv1D modules as per model
+   * architecture, except for the output layer.
    */
   target_modules?: string[];
-  /** This field must not be set while creating a fine tuning job with InstructLab.
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
    *
-   *  The alpha parameter for Lora scaling.
+   * The alpha parameter for Lora scaling.
    */
   lora_alpha?: number;
-  /** This field must not be set while creating a fine tuning job with InstructLab.
+  /**
+   * This field must not be set while creating a fine tuning job with InstructLab.
    *
-   *  The dropout probability for Lora layers.
+   * The dropout probability for Lora layers.
    */
   lora_dropout?: number;
 }
 export namespace FineTuningPeftParameters {
   export namespace Constants {
-    /** This field must not be set while creating a fine tuning job with InstructLab. The type specification for a LoRA or QLoRA Fine Tuning job. If type is set to `none`, no other parameters in this object need to be specified. */
+    /**
+     * This field must not be set while creating a fine tuning job with InstructLab. The type
+     * specification for a LoRA or QLoRA Fine Tuning job. If type is set to `none`, no other
+     * parameters in this object need to be specified.
+     */
     export enum Type {
       LORA = 'lora',
       QLORA = 'qlora',
@@ -4230,24 +4792,24 @@ export namespace FineTuningPeftParameters {
   }
 }
 
-/**
- * The response of a fine tuning job.
- */
+/** The response of a fine tuning job. */
 export interface FineTuningResource {
   /** Common metadata for a resource where `project_id` or `space_id` must be present. */
   metadata?: ResourceMeta;
   /** Status of the training job. */
   entity?: FineTuningEntity;
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
-/**
- * System details.
- */
+/** System details. */
 export interface FineTuningResources {
-  /** The total number of resources. Computed explicitly only when 'total_count=true' query parameter is present.
-   *  This is in order to avoid performance penalties.
+  /**
+   * The total number of resources. Computed explicitly only when 'total_count=true' query parameter
+   * is present. This is in order to avoid performance penalties.
    */
   total_count?: number;
   /** The number of items to return in each page. */
@@ -4257,7 +4819,10 @@ export interface FineTuningResources {
   /** A reference to the first item of the next page, if any. */
   next?: PaginationNext;
   resources?: FineTuningResource[];
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
@@ -4266,22 +4831,21 @@ export interface DocumentExtractionResource {
   metadata?: ResourceMeta;
   /** The document extraction job properties. */
   entity?: DocumentExtractionResponse;
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
-/**
- * The response of getting all document extraction jobs.
- */
+/** The response of getting all document extraction jobs. */
 export interface DocumentExtractionResources {
   /** The number of items to return in each page. */
   limit: number;
   resources?: DocumentExtractionResource[];
 }
 
-/**
- * The document extraction job properties.
- */
+/** The document extraction job properties. */
 export interface DocumentExtractionResponse {
   /** The name of the document. */
   name: string;
@@ -4295,9 +4859,7 @@ export interface DocumentExtractionResponse {
   status?: DocumentExtractionStatus;
 }
 
-/**
- * Status of the document extraction job.
- */
+/** Status of the document extraction job. */
 export interface DocumentExtractionStatus {
   /** Current state of document extraction. */
   state: DocumentExtractionStatus.Constants.State | string;
@@ -4321,25 +4883,25 @@ export namespace DocumentExtractionStatus {
   }
 }
 
-/**
- * The Synthetic Data Generation context.
- */
+/** The Synthetic Data Generation context. */
 export interface SyntheticDataGenerationContext {
   /** The Synthetic Data Generation location metrics. */
   samples?: SyntheticDataGenerationLocations;
 }
 
-/**
- * A reference to data.
- */
+/** A reference to data. */
 export interface SyntheticDataGenerationDataReference {
   /** The data source type like `connection_asset` or `data_asset`. */
   type: SyntheticDataGenerationDataReference.Constants.Type | string;
-  /** Contains a set of fields specific to each connection.
-   *  See here for [details about specifying connections](#datareferences).
+  /**
+   * Contains a set of fields specific to each connection. See here for [details about specifying
+   * connections](#datareferences).
    */
   connection?: DataConnection;
-  /** Contains a set of fields that describe the location of the data with respect to the `connection`. */
+  /**
+   * Contains a set of fields that describe the location of the data with respect to the
+   * `connection`.
+   */
   location: JsonObject;
 }
 export namespace SyntheticDataGenerationDataReference {
@@ -4354,9 +4916,7 @@ export namespace SyntheticDataGenerationDataReference {
   }
 }
 
-/**
- * The Synthetic Data Generation location metrics.
- */
+/** The Synthetic Data Generation location metrics. */
 export interface SyntheticDataGenerationLocations {
   /** The path to the created Knowledge file. */
   knowledge?: string;
@@ -4368,17 +4928,13 @@ export interface SyntheticDataGenerationLocations {
   artifacts?: string;
 }
 
-/**
- * The Synthetic Data Generation metrics.
- */
+/** The Synthetic Data Generation metrics. */
 export interface SyntheticDataGenerationMetric {
   /** The Synthetic Data Generation sample metrics. */
   samples?: SyntheticDataGenerationSample;
 }
 
-/**
- * All the Synthetic Data Generation metrics.
- */
+/** All the Synthetic Data Generation metrics. */
 export interface SyntheticDataGenerationMetrics {
   /** The Synthetic Data Generation metrics. */
   synthetic_data_generation_metrics?: SyntheticDataGenerationMetric;
@@ -4386,30 +4942,27 @@ export interface SyntheticDataGenerationMetrics {
   context?: SyntheticDataGenerationContext;
 }
 
-/**
- * The response from getting a specified synthetic data generation job.
- */
+/** The response from getting a specified synthetic data generation job. */
 export interface SyntheticDataGenerationResource {
   /** Common metadata for a resource where `project_id` or `space_id` must be present. */
   metadata?: ResourceMeta;
   /** The synthetic data generation job properties. */
   entity?: SyntheticDataGenerationResponse;
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
-/**
- * The response of getting all synthetic data generation jobs.
- */
+/** The response of getting all synthetic data generation jobs. */
 export interface SyntheticDataGenerationResources {
   /** The number of items to return in each page. */
   limit: number;
   resources?: SyntheticDataGenerationResource[];
 }
 
-/**
- * The synthetic data generation job properties.
- */
+/** The synthetic data generation job properties. */
 export interface SyntheticDataGenerationResponse {
   /** A reference to data. */
   results_reference?: ObjectLocation;
@@ -4419,9 +4972,7 @@ export interface SyntheticDataGenerationResponse {
   data_reference?: ObjectLocation;
 }
 
-/**
- * The Synthetic Data Generation sample metrics.
- */
+/** The Synthetic Data Generation sample metrics. */
 export interface SyntheticDataGenerationSample {
   /** The knowledge metric value. */
   knowledge?: number;
@@ -4431,9 +4982,7 @@ export interface SyntheticDataGenerationSample {
   total?: number;
 }
 
-/**
- * The status of a Synthetic Data Generation job.
- */
+/** The status of a Synthetic Data Generation job. */
 export interface SyntheticDataGenerationStatus {
   /** The status of the job. */
   state: SyntheticDataGenerationStatus.Constants.State | string;
@@ -4455,21 +5004,20 @@ export namespace SyntheticDataGenerationStatus {
   }
 }
 
-/**
- * The response fields from a Taxonomy request.
- */
+/** The response fields from a Taxonomy request. */
 export interface TaxonomyResource {
   /** Common metadata for a resource where `project_id` or `space_id` must be present. */
   metadata?: ResourceMeta;
   /** The Taxonomy entity. */
   entity?: TaxonomyResponse;
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
-/**
- * The list of Taxonomy jobs in specified project or space.
- */
+/** The list of Taxonomy jobs in specified project or space. */
 export interface TaxonomyResources {
   /** The number of items to return in each page. */
   limit: number;
@@ -4477,9 +5025,7 @@ export interface TaxonomyResources {
   resources?: TaxonomyResource[];
 }
 
-/**
- * The Taxonomy entity.
- */
+/** The Taxonomy entity. */
 export interface TaxonomyResponse {
   /** A reference to data. */
   results_reference?: ObjectLocation;
@@ -4489,9 +5035,7 @@ export interface TaxonomyResponse {
   data_reference?: ObjectLocation;
 }
 
-/**
- * The status of a Taxonomy job.
- */
+/** The status of a Taxonomy job. */
 export interface TaxonomyStatus {
   /** The status of the job. */
   state?: TaxonomyStatus.Constants.State | string;
@@ -4515,9 +5059,7 @@ export namespace TaxonomyStatus {
   }
 }
 
-/**
- * A software specification.
- */
+/** A software specification. */
 export interface SoftwareSpecRel {
   /** The id of the software specification. */
   id?: string;
@@ -4537,9 +5079,7 @@ export interface TrainingDetails {
   /** The optional verbalizer that was used during the training, if appropriate. */
   verbalizer?: string;
 }
-/**
- * Data shape (rows, columns) passed as input to the transformer/transformation.
- */
+/** Data shape (rows, columns) passed as input to the transformer/transformation. */
 export interface DataInput {
   /** The number of rows. */
   rows?: number;
@@ -4547,9 +5087,7 @@ export interface DataInput {
   columns?: number;
 }
 
-/**
- * Data shape after the transformation.
- */
+/** Data shape after the transformation. */
 export interface DataOutput {
   /** The number of rows. */
   rows?: number;
@@ -4564,15 +5102,17 @@ export interface Metric {
   iteration?: number;
   /** The metrics. */
   ml_metrics?: JsonObject;
-  /** The metrics from the time series. For more information, please see the [Time Series
-   *  Implementation](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/autoai-timeseries-details.html?audience=wdp#ts-metrics)
-   *  documentation.
+  /**
+   * The metrics from the time series. For more information, please see the [Time Series
+   * Implementation](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/autoai-timeseries-details.html?audience=wdp#ts-metrics)
+   * documentation.
    */
   ts_metrics?: MetricTsMetrics;
-  /** The metrics from the time series anomaly detection. For more information, please see the [Creating a Time
-   *  Series Anomaly
-   *  Prediction](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/autoai-ts-ad.html?audience=wdp)
-   *  documentation.
+  /**
+   * The metrics from the time series anomaly detection. For more information, please see the
+   * [Creating a Time Series Anomaly
+   * Prediction](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/autoai-ts-ad.html?audience=wdp)
+   * documentation.
    */
   tsad_metrics?: MetricTsadMetrics;
   /** The metrics from federated training. */
@@ -4584,8 +5124,8 @@ export interface Metric {
 export interface MetricTsMetrics {}
 
 /**
- * The metrics from the time series anomaly detection. For more information, please see the [Creating a Time Series
- * Anomaly
+ * The metrics from the time series anomaly detection. For more information, please see the
+ * [Creating a Time Series Anomaly
  * Prediction](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/autoai-ts-ad.html?audience=wdp)
  * documentation.
  */
@@ -4602,12 +5142,11 @@ export interface DataPreprocessingTransformation {
   props?: JsonObject;
 }
 
-/**
- * Information related to the upload of the model content.
- */
+/** Information related to the upload of the model content. */
 export interface ModelResourceEntity {
-  /** The model type. The supported model types can be found in the documentation
-   *  [here](https://dataplatform.cloud.ibm.com/docs/content/wsj/wmls/wmls-deploy-python-types.html?context=analytics).
+  /**
+   * The model type. The supported model types can be found in the documentation
+   * [here](https://dataplatform.cloud.ibm.com/docs/content/wsj/wmls/wmls-deploy-python-types.html?context=analytics).
    */
   type: string;
   /** A software specification. */
@@ -4618,27 +5157,30 @@ export interface ModelResourceEntity {
   model_definition?: ModelDefinitionId;
   /** Hyper parameters used for training this model. */
   hyper_parameters?: JsonObject;
-  /** User provided domain name for this model. For example: sentiment, entity, visual-recognition, finance,
-   *  retail, real estate etc.
+  /**
+   * User provided domain name for this model. For example: sentiment, entity, visual-recognition,
+   * finance, retail, real estate etc.
    */
   domain?: string;
   /** The training data that was used to create this model. */
   training_data_references?: DataConnectionReference[];
   /** The holdout/test datasets. */
   test_data_references?: DataConnectionReference[];
-  /** If the prediction schemas are provided here then they take precedent over any schemas
-   *  provided in the data references. Note that data references contain the schema for the
-   *  associated data and this object contains the schema(s) for the associated prediction, if any.
-   *  In the case that the prediction input data matches exactly the schema of the training data
-   *  references then the prediction schema can be omitted. However it is highly recommended to
-   *  always specify the prediction schemas using this field.
+  /**
+   * If the prediction schemas are provided here then they take precedent over any schemas provided
+   * in the data references. Note that data references contain the schema for the associated data
+   * and this object contains the schema(s) for the associated prediction, if any. In the case that
+   * the prediction input data matches exactly the schema of the training data references then the
+   * prediction schema can be omitted. However it is highly recommended to always specify the
+   * prediction schemas using this field.
    */
   schemas?: ModelEntitySchemas;
   /** The name of the label column. */
   label_column?: string;
-  /** The name of the  label column seen by the estimator, which may have been transformed by the previous
-   *  transformers in the pipeline. This is not necessarily the same column as the `label_column` in the initial data
-   *  set.
+  /**
+   * The name of the label column seen by the estimator, which may have been transformed by the
+   * previous transformers in the pipeline. This is not necessarily the same column as the
+   * `label_column` in the initial data set.
    */
   transformed_label_column?: string;
   /** This will be used by scoring to record the size of the model. */
@@ -4647,29 +5189,33 @@ export interface ModelResourceEntity {
   metrics?: Metric[];
   /** User defined properties specified as key-value pairs. */
   custom?: JsonObject;
-  /** User defined objects referenced by the model. For any user defined class or function used in the model, its
-   *  name, as referenced in the model, must be specified as the `key` and its fully qualified class or function name
-   *  must be specified as the `value`. This is applicable for `Tensorflow 2.X` models serialized in `H5` format using
-   *  the `tf.keras` API.
+  /**
+   * User defined objects referenced by the model. For any user defined class or function used in
+   * the model, its name, as referenced in the model, must be specified as the `key` and its fully
+   * qualified class or function name must be specified as the `value`. This is applicable for
+   * `Tensorflow 2.X` models serialized in `H5` format using the `tf.keras` API.
    */
   user_defined_objects?: JsonObject;
-  /** The list of the software specifications that are used by the pipeline that generated this model, if the
-   *  model was generated by a pipeline.
+  /**
+   * The list of the software specifications that are used by the pipeline that generated this
+   * model, if the model was generated by a pipeline.
    */
   hybrid_pipeline_software_specs?: SoftwareSpecRel[];
-  /** Optional metadata that can be used to provide information
-   *  about this model that can be tracked with IBM AI Factsheets.
-   *  See [Using AI
-   *  Factsheets](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/factsheets-model-inventory.html)
-   *  for more details.
+  /**
+   * Optional metadata that can be used to provide information about this model that can be tracked
+   * with IBM AI Factsheets. See [Using AI
+   * Factsheets](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/factsheets-model-inventory.html)
+   * for more details.
    */
   model_version?: ModelEntityModelVersion;
-  /** Deprecated: this is replaced by `training.id`. This field can be used to store the `id` of the training job
-   *  that was used to produce this model.
+  /**
+   * Deprecated: this is replaced by `training.id`. This field can be used to store the `id` of the
+   * training job that was used to produce this model.
    */
   training_id?: string;
-  /** An optional array which contains the data preprocessing transformations that were executed by the training
-   *  job that created this model.
+  /**
+   * An optional array which contains the data preprocessing transformations that were executed by
+   * the training job that created this model.
    */
   data_preprocessing?: DataPreprocessingTransformation[];
   /** Information about the training job that created this model. */
@@ -4693,7 +5239,10 @@ export interface ModelResource {
   metadata: ResourceMeta;
   /** Information related to the upload of the model content. */
   entity?: ModelResourceEntity;
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
@@ -4702,19 +5251,24 @@ export interface ModelEntityModelVersion {
   number?: string;
   /** This is the user-provided tag for the model. */
   tag?: string;
-  /** This is the user provided description that provides context for the change in the model version. */
+  /**
+   * This is the user provided description that provides context for the change in the model
+   * version.
+   */
   description?: string;
 }
 
 export interface ModelEntitySchemas {
-  /** The schema of the expected prediction input data, see
-   *  [datarecord-metadata-v2-schema](https://raw.githubusercontent.com/elyra-ai/pipeline-schemas/master/common-pipeline/datarecord-metadata/datarecord-metadata-v2-schema.json)
-   *  for the schema definition.
+  /**
+   * The schema of the expected prediction input data, see
+   * [datarecord-metadata-v2-schema](https://raw.githubusercontent.com/elyra-ai/pipeline-schemas/master/common-pipeline/datarecord-metadata/datarecord-metadata-v2-schema.json)
+   * for the schema definition.
    */
   input?: DataSchema[];
-  /** The schema of the expected prediction output data, see
-   *  [datarecord-metadata-v2-schema](https://raw.githubusercontent.com/elyra-ai/pipeline-schemas/master/common-pipeline/datarecord-metadata/datarecord-metadata-v2-schema.json)
-   *  for the schema definition.
+  /**
+   * The schema of the expected prediction output data, see
+   * [datarecord-metadata-v2-schema](https://raw.githubusercontent.com/elyra-ai/pipeline-schemas/master/common-pipeline/datarecord-metadata/datarecord-metadata-v2-schema.json)
+   * for the schema definition.
    */
   output?: DataSchema[];
 }
@@ -4733,12 +5287,14 @@ export interface ContentInfo {
   location: string;
   /** The file name that will be used when downloading the content from the UI. */
   file_name: string;
-  /** The `pipeline_node_id` that corresponds to this content. This is required only if the `content_format` is
-   *  `pipeline-node` otherwise it is rejected or ignored.
+  /**
+   * The `pipeline_node_id` that corresponds to this content. This is required only if the
+   * `content_format` is `pipeline-node` otherwise it is rejected or ignored.
    */
   pipeline_node_id?: string;
-  /** The `deployment_id` that corresponds to this content. This is required only if the `content_format` is
-   *  `coreml` otherwise it is rejected or ignored.
+  /**
+   * The `deployment_id` that corresponds to this content. This is required only if the
+   * `content_format` is `coreml` otherwise it is rejected or ignored.
    */
   deployment_id?: string;
 }
@@ -4775,12 +5331,11 @@ export interface AudioTranscriptionResult {
   token_count: number;
 }
 
-/**
- * A paginated list of models.
- */
+/** A paginated list of models. */
 export interface ModelResources {
-  /** The total number of resources. Computed explicitly only when 'total_count=true' query parameter is present.
-   *  This is in order to avoid performance penalties.
+  /**
+   * The total number of resources. Computed explicitly only when 'total_count=true' query parameter
+   * is present. This is in order to avoid performance penalties.
    */
   total_count?: number;
   /** The number of items to return in each page. */
@@ -4791,13 +5346,14 @@ export interface ModelResources {
   next?: PaginationNext;
   /** A list of models. */
   resources?: ModelResource[];
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
-/**
- * ModelDefinitionEntityPlatform.
- */
+/** ModelDefinitionEntityPlatform. */
 export interface ModelDefinitionEntityPlatform {
   /** The name of the platform. */
   name: string;
@@ -4805,9 +5361,7 @@ export interface ModelDefinitionEntityPlatform {
   versions: string[];
 }
 
-/**
- * ModelDefinitionEntityRequestPlatform.
- */
+/** ModelDefinitionEntityRequestPlatform. */
 export interface ModelDefinitionEntityRequestPlatform {
   /** The name of the platform. */
   name: string;
@@ -4816,8 +5370,8 @@ export interface ModelDefinitionEntityRequestPlatform {
 }
 
 /**
- * The definition of a model. The `software_spec` is used only for training. Either space_id or project_id has to be
- * provided and is mandatory.
+ * The definition of a model. The `software_spec` is used only for training. Either space_id or
+ * project_id has to be provided and is mandatory.
  */
 export interface ModelDefinitionEntity {
   /** The package version. */
@@ -4831,17 +5385,15 @@ export interface ModelDefinitionEntity {
   custom?: JsonObject;
 }
 
-/**
- * The model definition.
- */
+/** The model definition. */
 export interface ModelDefinitionId {
   /** The id of the model definition. */
   id?: string;
 }
 
 /**
- * A model. The `software_spec` is a reference to a software specification. The `hardware_spec` is a reference to a
- * hardware specification.
+ * A model. The `software_spec` is a reference to a software specification. The `hardware_spec` is a
+ * reference to a hardware specification.
  */
 export interface ModelDefinitionRel {
   /** The id of the referenced resource. */
@@ -4860,23 +5412,25 @@ export interface ModelDefinitionRel {
   parameters?: JsonObject;
 }
 
-/**
- * The name and number of GPUs used for the Fine Tuning job.
- */
+/** The name and number of GPUs used for the Fine Tuning job. */
 export interface GPU {
   /** The number of GPUs used for the Fine Tuning job. */
   num?: number;
-  /** The name of the GPU(s) used for the Fine Tuning job. The GPU specified must be available on the cluster. */
+  /**
+   * The name of the GPU(s) used for the Fine Tuning job. The GPU specified must be available on the
+   * cluster.
+   */
   name?: string;
 }
 
-/**
- * A reference to data.
- */
+/** A reference to data. */
 export interface DocumentExtractionObjectLocation {
   /** The data source type. This field must be set to `container`. */
   type: DocumentExtractionObjectLocation.Constants.Type | string;
-  /** Contains a set of fields that describe the location of the data with respect to the `connection`. */
+  /**
+   * Contains a set of fields that describe the location of the data with respect to the
+   * `connection`.
+   */
   location: JsonObject;
 }
 export namespace DocumentExtractionObjectLocation {
@@ -4888,13 +5442,14 @@ export namespace DocumentExtractionObjectLocation {
   }
 }
 
-/**
- * A reference to data.
- */
+/** A reference to data. */
 export interface ObjectLocationGithub {
   /** The data source type, for now only `github` is supported. */
   type: ObjectLocationGithub.Constants.Type | string;
-  /** Contains a set of fields that describe the location of the data with respect to the `connection`. */
+  /**
+   * Contains a set of fields that describe the location of the data with respect to the
+   * `connection`.
+   */
   location: JsonObject;
 }
 export namespace ObjectLocationGithub {
@@ -4974,27 +5529,30 @@ export namespace TextClassificationDataReference {
   }
 }
 
-/**
- * The parameters for the text extraction.
- */
+/** The parameters for the text extraction. */
 export interface TextClassificationParameters {
-  /** If OCR should be used when processing a document. An empty value allows the service to select the best
-   *  option for your processing mode.
-   *  - `enabled`: OCR is run on embedded images, OCR is only run if no programmatic text could be extracted from the
-   *  area.
-   *  - `disabled`: OCR is not run, no information is extracted from images or scanned documents.
-   *  - `forced`: WDU will take a picture of the page and run OCR across it, this applies to all documents even purely
-   *  programmatic ones.
+  /**
+   * If OCR should be used when processing a document. An empty value allows the service to select
+   * the best option for your processing mode.
+   *
+   * - `enabled`: OCR is run on embedded images, OCR is only run if no programmatic text could be
+   *   extracted from the area.
+   * - `disabled`: OCR is not run, no information is extracted from images or scanned documents.
+   * - `forced`: WDU will take a picture of the page and run OCR across it, this applies to all
+   *   documents even purely programmatic ones.
    */
   ocr_mode?: TextClassificationParameters.Constants.OcrMode | string;
-  /** The classification mode. The value `exact` gives the exact schema name the the document is classified to.
-   *  The option `binary`` only gives whether the document is classified to a known schema or not.
+  /**
+   * The classification mode. The value `exact` gives the exact schema name the the document is
+   * classified to. The option `binary`` only gives whether the document is classified to a known
+   * schema or not.
    */
   classification_mode?: TextClassificationParameters.Constants.ClassificationMode | string;
   /** Should the service attempt to fix a rotated page or image. */
   auto_rotation_correction?: boolean;
-  /** Set of languages to be expected in the document. The language codes follow `ISO 639` where possible. See the
-   *  documentation for the currently supported languages.
+  /**
+   * Set of languages to be expected in the document. The language codes follow `ISO 639` where
+   * possible. See the documentation for the currently supported languages.
    */
   languages?: string[];
   /** Additional configuration settings for the Semantic KVP model. */
@@ -5002,13 +5560,25 @@ export interface TextClassificationParameters {
 }
 export namespace TextClassificationParameters {
   export namespace Constants {
-    /** If OCR should be used when processing a document. An empty value allows the service to select the best option for your processing mode. - `enabled`: OCR is run on embedded images, OCR is only run if no programmatic text could be extracted from the area. - `disabled`: OCR is not run, no information is extracted from images or scanned documents. - `forced`: WDU will take a picture of the page and run OCR across it, this applies to all documents even purely programmatic ones. */
+    /**
+     * If OCR should be used when processing a document. An empty value allows the service to select
+     * the best option for your processing mode. - `enabled`: OCR is run on embedded images, OCR is
+     * only run if no programmatic text could be extracted from the area. - `disabled`: OCR is not
+     * run, no information is extracted from images or scanned documents.
+     *
+     * - `forced`: WDU will take a picture of the page and run OCR across it, this applies to all
+     *   documents even purely programmatic ones.
+     */
     export enum OcrMode {
       DISABLED = 'disabled',
       ENABLED = 'enabled',
       FORCED = 'forced',
     }
-    /** The classification mode. The value `exact` gives the exact schema name the the document is classified to. The option `binary`` only gives whether the document is classified to a known schema or not. */
+    /**
+     * The classification mode. The value `exact` gives the exact schema name the the document is
+     * classified to. The option `binary`` only gives whether the document is classified to a known
+     * schema or not.
+     */
     export enum ClassificationMode {
       EXACT = 'exact',
       BINARY = 'binary',
@@ -5016,9 +5586,7 @@ export namespace TextClassificationParameters {
   }
 }
 
-/**
- * The text classification resource.
- */
+/** The text classification resource. */
 export interface TextClassificationResource {
   /** Common metadata for a resource where `project_id` or `space_id` must be present. */
   metadata?: TextExtractionMetadata;
@@ -5026,9 +5594,7 @@ export interface TextClassificationResource {
   entity?: TextClassificationResourceEntity;
 }
 
-/**
- * The document details for the text classification.
- */
+/** The document details for the text classification. */
 export interface TextClassificationResourceEntity {
   /** A reference to data. */
   document_reference: TextClassificationDataReference;
@@ -5040,12 +5606,11 @@ export interface TextClassificationResourceEntity {
   results: TextClassificationResults;
 }
 
-/**
- * A paginated list of resources.
- */
+/** A paginated list of resources. */
 export interface TextClassificationResources {
-  /** The total number of resources. Computed explicitly only when `total_count=true` query parameter is present.
-   *  This is in order to avoid performance penalties.
+  /**
+   * The total number of resources. Computed explicitly only when `total_count=true` query parameter
+   * is present. This is in order to avoid performance penalties.
    */
   total_count?: number;
   /** The number of items to return in each page. */
@@ -5056,25 +5621,27 @@ export interface TextClassificationResources {
   next?: PaginationNext;
   /** A list of resources. */
   resources?: TextClassificationResource[];
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
-/**
- * The text classification response.
- */
+/** The text classification response. */
 export interface TextClassificationResponse {
   /** Common metadata for a resource where `project_id` or `space_id` must be present. */
   metadata?: TextExtractionMetadata;
   /** The document details for the text classification. */
   entity?: TextClassificationResourceEntity;
-  /** Optional details coming from the service and related to the API call or the associated resource. */
+  /**
+   * Optional details coming from the service and related to the API call or the associated
+   * resource.
+   */
   system?: SystemDetails;
 }
 
-/**
- * The current status of the text extraction.
- */
+/** The current status of the text extraction. */
 export interface TextClassificationResults {
   /** The status of the request. */
   status: TextClassificationResults.Constants.Status | string;
@@ -5104,13 +5671,14 @@ export namespace TextClassificationResults {
   }
 }
 
-/**
- * Additional configuration settings for the Semantic KVP model.
- */
+/** Additional configuration settings for the Semantic KVP model. */
 export interface TextClassificationSemanticConfig {
   /** Sets the merge strategy of the predefined and user defined input schemas. */
   schemas_merge_strategy?: TextClassificationSemanticConfig.Constants.SchemasMergeStrategy | string;
-  /** Specifies custom schemas that should be used for semantic KVP extraction, outside the predefined schemas. */
+  /**
+   * Specifies custom schemas that should be used for semantic KVP extraction, outside the
+   * predefined schemas.
+   */
   schemas?: TextExtractionSchema[];
 }
 export namespace TextClassificationSemanticConfig {
@@ -5123,36 +5691,38 @@ export namespace TextClassificationSemanticConfig {
   }
 }
 
-/**
- * A custom schemas.
- */
+/** A custom schemas. */
 export interface TextExtractionSchema {
   /** Should be a short one or two word title like Passport or Bill Of Lading. */
   document_type: string;
   /** Should be one or two sentences to ensure the LLM gets an accurate understanding. */
   document_description: string;
-  /** Specifies if the input image should be downscaled. Defaults to the value defined in the `semantic_config`
-   *  section.
+  /**
+   * Specifies if the input image should be downscaled. Defaults to the value defined in the
+   * `semantic_config` section.
    */
   target_image_width?: number;
-  /** Determines whether to use text hints when extracting values for this schema and the generic KVPs. Defaults
-   *  to the value defined in the `semantic_config` section.
+  /**
+   * Determines whether to use text hints when extracting values for this schema and the generic
+   * KVPs. Defaults to the value defined in the `semantic_config` section.
    */
   enable_text_hints?: boolean;
-  /** Deprecated: Indicates whether to perform generic Key-Value Pair (KVP) extraction and output the generic KVPs
-   *  along with the semantic KVPs extracted with this custom schema. Defaults to the value defined in the
-   *  `semantic_config` section.
+  /**
+   * Deprecated: Indicates whether to perform generic Key-Value Pair (KVP) extraction and output the
+   * generic KVPs along with the semantic KVPs extracted with this custom schema. Defaults to the
+   * value defined in the `semantic_config` section.
    */
   enable_generic_kvp?: boolean;
-  /** A mapping of fields to identify within the schema, where each key is the short-form name of the field, and
-   *  the corresponding value is an object is a schema as defined below.
+  /**
+   * A mapping of fields to identify within the schema, where each key is the short-form name of the
+   * field, and the corresponding value is an object is a schema as defined below.
    */
   fields?: TextExtractionSemanticKvpField;
 }
 
 /**
- * A mapping of fields to identify within the schema, where each key is the short-form name of the field, and the
- * corresponding value is an object is a schema as defined below.
+ * A mapping of fields to identify within the schema, where each key is the short-form name of the
+ * field, and the corresponding value is an object is a schema as defined below.
  */
 export interface TextExtractionSemanticKvpField {
   /** Description of the field to identify. */

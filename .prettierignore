@@ -1,3 +1,5 @@
 .yalc
 coverage
 dist
+*.md
+*.yaml

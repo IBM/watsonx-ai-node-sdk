@@ -1,13 +1,13 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - tune model
- * - deploy model
- * - infer tuned model
- * This example may have extended duration (~5 minutes) because of the training time and initialization of the deployment.
+ *
+ * - Initialize SDK
+ * - Tune model
+ * - Deploy model
+ * - Infer tuned model This example may have extended duration (~5 minutes) because of the training
+ *   time and initialization of the deployment.
  */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-await-in-loop */
+
 /* eslint-disable no-useless-catch */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';

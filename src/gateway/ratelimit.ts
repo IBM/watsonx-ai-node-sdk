@@ -1,33 +1,29 @@
 /**
- * (C) Copyright IBM Corp. 2025.
+ * (C) Copyright IBM Corp. 2025-2026.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
-
-/* eslint-disable import/prefer-default-export */
 
 import { ENDPOINTS } from '../config';
 import { GatewayResource } from './resources';
-import {
+import type {
   CreateRateLimitParams,
   DeleteRateLimitParams,
   GetRateLimitParams,
   ListRateLimitsParams,
   UpdateRateLimitParams,
 } from './types/ratelimit/request';
-import { ListRateLimitResponse } from './types/ratelimit/response';
-import { EmptyObject } from './types';
-import { Response } from '../base';
+import type { ListRateLimitResponse } from './types/ratelimit/response';
+import type { EmptyObject } from '../types/common';
+import type { Response } from '../base';
 import { validateRequestParams } from '../helpers/validators';
 
 /**
@@ -35,10 +31,11 @@ import { validateRequestParams } from '../helpers/validators';
  *
  * @param {Object} params - The validation parameters.
  * @param {string} params.type - The type of rate limit: "tenant", "provider", or "model".
- * @param {string} [params.providerId] - The UUID of the provider (required when type is "provider").
+ * @param {string} [params.providerId] - The UUID of the provider (required when type is
+ *   "provider").
  * @param {string} [params.modelId] - The UUID of the model (required when type is "model").
- * @returns {Error | undefined} Returns an Error object with a descriptive message if validation fails, or undefined if validation passes.
- *
+ * @returns {Error | undefined} Returns an Error object with a descriptive message if validation
+ *   fails, or undefined if validation passes.
  */
 function validateIdForType({
   type,
@@ -61,8 +58,8 @@ function validateIdForType({
 }
 
 /**
- * Class representing the RateLimits resource.
- * This class provides methods to manage rate limit configurations for the ML Gateway.
+ * Class representing the RateLimits resource. This class provides methods to manage rate limit
+ * configurations for the ML Gateway.
  */
 export class RateLimits extends GatewayResource {
   /**
@@ -72,13 +69,16 @@ export class RateLimits extends GatewayResource {
    *
    * @param {Object} params - The parameters to send to the service.
    * @param {string} params.type - The type of rate limit: "tenant", "provider", or "model".
-   * @param {string} [params.providerId] - The UUID of the provider this rate limit applies to (required when type is "provider").
-   * @param {string} [params.modelId] - The UUID of the model this rate limit applies to (required when type is "model").
+   * @param {string} [params.providerId] - The UUID of the provider this rate limit applies to
+   *   (required when type is "provider").
+   * @param {string} [params.modelId] - The UUID of the model this rate limit applies to (required
+   *   when type is "model").
    * @param {RateLimitItem} [params.token] - Token rate limiting settings.
    * @param {RateLimitItem} [params.request] - Request rate limiting settings.
    * @param {AbortSignal} [params.signal] - Signal from AbortController
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<Response<Record<string, any>>>} - A promise that resolves with the created rate limit configuration.
+   * @returns {Promise<Response<Record<string, any>>>} - A promise that resolves with the created
+   *   rate limit configuration.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
   create(params: CreateRateLimitParams): Promise<Response<Record<string, any>>> {
@@ -116,13 +116,16 @@ export class RateLimits extends GatewayResource {
    *
    * @param {Object} params - The parameters to send to the service.
    * @param {string} params.type - The type of rate limit: "tenant", "provider", or "model".
-   * @param {string} [params.providerId] - The UUID of the provider this rate limit applies to (required when type is "provider").
-   * @param {string} [params.modelId] - The UUID of the model this rate limit applies to (required when type is "model").
+   * @param {string} [params.providerId] - The UUID of the provider this rate limit applies to
+   *   (required when type is "provider").
+   * @param {string} [params.modelId] - The UUID of the model this rate limit applies to (required
+   *   when type is "model").
    * @param {RateLimitItem} [params.token] - Token rate limiting settings.
    * @param {RateLimitItem} [params.request] - Request rate limiting settings.
    * @param {AbortSignal} [params.signal] - Signal from AbortController
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<Response<Record<string, any>>>} - A promise that resolves with the updated rate limit configuration.
+   * @returns {Promise<Response<Record<string, any>>>} - A promise that resolves with the updated
+   *   rate limit configuration.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
   update(params: UpdateRateLimitParams): Promise<Response<Record<string, any>>> {
@@ -159,13 +162,20 @@ export class RateLimits extends GatewayResource {
   /**
    * Get Rate Limit Details.
    *
-   * Retrieves details of a specific rate limit configuration by UUID, or lists all rate limit configurations.
+   * Retrieves details of a specific rate limit configuration by UUID, or lists all rate limit
+   * configurations.
    *
-   * @param {GetRateLimitParams | ListRateLimitsParams} [params] - The parameters to send to the service.
-   * @param {string} [params.rateLimitId] - The UUID of the rate limit configuration to retrieve. If not provided, lists all rate limits.
+   * @param {GetRateLimitParams | ListRateLimitsParams} [params]
+   *
+   *   - The parameters to send to the service.
+   *
+   * @param {string} [params.rateLimitId] - The UUID of the rate limit configuration to retrieve. If
+   *   not provided, lists all rate limits.
    * @param {AbortSignal} [params.signal] - Signal from AbortController
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<Response<Record<string, any> | ListRateLimitResponse>>} - A promise that resolves with the rate limit details or list.
+   * @returns {Promise<Response<Record<string, any> | ListRateLimitResponse>>} -
+   *
+   *   A promise that resolves with the rate limit details or list.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
   getDetails(params?: ListRateLimitsParams): Promise<Response<ListRateLimitResponse>>;
@@ -209,7 +219,8 @@ export class RateLimits extends GatewayResource {
    * @param {ListRateLimitsParams} [params] - The parameters to send to the service.
    * @param {AbortSignal} [params.signal] - Signal from AbortController
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<Record<string, any>[]>} - A promise that resolves with an array of rate limit configurations.
+   * @returns {Promise<Record<string, any>[]>} - A promise that resolves with an array of rate limit
+   *   configurations.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
   async list(params: ListRateLimitsParams = {}): Promise<Record<string, any>[]> {
@@ -233,7 +244,8 @@ export class RateLimits extends GatewayResource {
    * @param {string} params.rateLimitId - The UUID of the rate limit configuration to delete.
    * @param {AbortSignal} [params.signal] - Signal from AbortController
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
-   * @returns {Promise<Record<string, any>>} - A promise that resolves with an empty object on success.
+   * @returns {Promise<Record<string, any>>} - A promise that resolves with an empty object on
+   *   success.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
   delete(params: DeleteRateLimitParams): Promise<Record<string, any>> {

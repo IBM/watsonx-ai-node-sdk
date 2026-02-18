@@ -1,8 +1,9 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - create messages for chat conversation with history
- * - request with messages and retrive a response
+ *
+ * - Initialize SDK
+ * - Create messages for chat conversation with history
+ * - Request with messages and retrive a response
  */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';

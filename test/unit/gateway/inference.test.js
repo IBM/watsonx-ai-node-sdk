@@ -151,6 +151,7 @@ describe('Completions instances', () => {
 
     test('Init Chat instance', () => {
       const chat = new Chat(client);
+
       expect(chat).toBeInstanceOf(Chat);
       expect(chat.completion).toBeInstanceOf(ChatCompletions);
       expect(chat.completion.create).toBeDefined();
@@ -158,6 +159,7 @@ describe('Completions instances', () => {
 
     test('Init Embeddings instance', () => {
       const embeddings = new Embeddings(client);
+
       expect(embeddings).toBeInstanceOf(Embeddings);
       expect(embeddings.completion).toBeInstanceOf(EmbeddingCompletions);
       expect(embeddings.completion.create).toBeDefined();
@@ -165,6 +167,7 @@ describe('Completions instances', () => {
 
     test('Init GenerateTextCompletions instance', () => {
       const generateText = new GenerateTextCompletions(client);
+
       expect(generateText).toBeInstanceOf(GenerateTextCompletions);
       expect(generateText.create).toBeDefined();
     });
@@ -247,6 +250,7 @@ describe('Completions instances', () => {
           method: 'POST',
           version,
         });
+
         expect(response).toBeInstanceOf(Promise);
       });
 
@@ -266,6 +270,7 @@ describe('Completions instances', () => {
           method: 'POST',
           version,
         });
+
         expect(response).toBeInstanceOf(Promise);
       });
 
@@ -360,6 +365,7 @@ describe('Completions instances', () => {
           method: 'POST',
           version,
         });
+
         expect(response).toBeInstanceOf(Promise);
       });
 
@@ -380,6 +386,7 @@ describe('Completions instances', () => {
           method: 'POST',
           version,
         });
+
         expect(response).toBeInstanceOf(Promise);
       });
     });

@@ -1,9 +1,10 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - list all available embedding models
- * - generate embedding vectors for input using two different models
- * - compare generated embedding vectors
+ *
+ * - Initialize SDK
+ * - List all available embedding models
+ * - Generate embedding vectors for input using two different models
+ * - Compare generated embedding vectors
  */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
@@ -50,9 +51,9 @@ const textEmbeddingParameters1 = {
   spaceId,
 };
 const embedding1 = await watsonxAIService.embedText(textEmbeddingParameters1);
-const embedding_vector1 = embedding1.result.results;
+
 console.log('\n\n***** EMBEDDING VECTOR FROM 1ST MODEL *****');
-console.log(embedding_vector1);
+console.log(embedding1.result.results);
 
 // Tokenize input data on 2nd model
 const textEmbeddingParameters2 = {
@@ -62,6 +63,6 @@ const textEmbeddingParameters2 = {
   spaceId,
 };
 const embedding2 = await watsonxAIService.embedText(textEmbeddingParameters2);
-const embedding_vector2 = embedding2.result.results;
+
 console.log('\n\n***** EMBEDDING VECTOR FROM 2ND MODEL *****');
-console.log(embedding_vector2);
+console.log(embedding2.result.results);

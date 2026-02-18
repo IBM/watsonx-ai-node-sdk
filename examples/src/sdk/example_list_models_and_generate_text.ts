@@ -1,10 +1,10 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - list available models
- * - infer one of available models
+ *
+ * - Initialize SDK
+ * - List available models
+ * - Infer one of available models
  */
-/* eslint-disable import/prefer-default-export */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';

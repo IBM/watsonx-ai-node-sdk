@@ -454,6 +454,7 @@ describe('Resources', () => {
           version,
           exceptions,
         });
+
         expect(response).toBeInstanceOf(Promise);
       });
 
@@ -469,6 +470,7 @@ describe('Resources', () => {
 
     describe('List methods', () => {
       let createRequestMock;
+
       beforeEach(async () => {
         createRequestMocker.mock(Promise.resolve({ result: { data: [{}, {}] } }));
         createRequestMock = createRequestMocker.functionMock;
@@ -518,15 +520,18 @@ describe('Resources', () => {
 
       test.each(methods)('$name', async ({ callableMethod, params }) => {
         const response = callableMethod(params);
+
         expect(response).toBeInstanceOf(Promise);
 
         const data = await response;
+
         expect(data).toBeInstanceOf(Array);
       });
     });
 
     describe('Get details via list methods', () => {
       let createRequestMock;
+
       beforeEach(async () => {
         createRequestMocker.mock(
           Promise.resolve({

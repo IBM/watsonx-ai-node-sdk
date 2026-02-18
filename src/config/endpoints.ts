@@ -1,25 +1,23 @@
 /**
- * (C) Copyright IBM Corp. 2025.
+ * (C) Copyright IBM Corp. 2025-2026.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 /**
  * Centralized URL and endpoint configuration for WatsonX AI ML SDK
  *
- * This file contains all base URLs, platform URL mappings, and API endpoint paths
- * used throughout the SDK. It provides a single source of truth for all URL-related
- * constants to improve maintainability and consistency.
+ * This file contains all base URLs, platform URL mappings, and API endpoint paths used throughout
+ * the SDK. It provides a single source of truth for all URL-related constants to improve
+ * maintainability and consistency.
  */
 
 // ============================================================================
@@ -27,8 +25,8 @@
 // ============================================================================
 
 /**
- * Base parameterized URL template for ML cloud services
- * Replace {region} with the appropriate region identifier
+ * Base parameterized URL template for ML cloud services Replace {region} with the appropriate
+ * region identifier
  */
 export const ML_CLOUD_BASE_URL = 'https://{region}.ml.cloud.ibm.com';
 
@@ -37,8 +35,8 @@ export const ML_CLOUD_BASE_URL = 'https://{region}.ml.cloud.ibm.com';
 // ============================================================================
 
 /**
- * Maps ML cloud URLs to their corresponding data platform URLs
- * Used for converting between ML service URLs and watsonx service URLs
+ * Maps ML cloud URLs to their corresponding data platform URLs Used for converting between ML
+ * service URLs and watsonx service URLs
  */
 export const PLATFORM_URL_MAPPINGS: Record<string, string> = {
   // DAllas
@@ -89,7 +87,10 @@ export const DEPLOYMENT_ENDPOINTS = {
   /** Generate text from deployment - POST /ml/v1/deployments/{id_or_name}/text/generation */
   TEXT_GENERATION: '/ml/v1/deployments/{id_or_name}/text/generation',
 
-  /** Stream text generation from deployment - POST /ml/v1/deployments/{id_or_name}/text/generation_stream */
+  /**
+   * Stream text generation from deployment - POST
+   * /ml/v1/deployments/{id_or_name}/text/generation_stream
+   */
   TEXT_GENERATION_STREAM: '/ml/v1/deployments/{id_or_name}/text/generation_stream',
 
   /** Chat with deployment - POST /ml/v1/deployments/{id_or_name}/text/chat */
@@ -98,7 +99,10 @@ export const DEPLOYMENT_ENDPOINTS = {
   /** Stream chat with deployment - POST /ml/v1/deployments/{id_or_name}/text/chat_stream */
   CHAT_STREAM: '/ml/v1/deployments/{id_or_name}/text/chat_stream',
 
-  /** Time series forecast from deployment - POST /ml/v1/deployments/{id_or_name}/time_series/forecast */
+  /**
+   * Time series forecast from deployment - POST
+   * /ml/v1/deployments/{id_or_name}/time_series/forecast
+   */
   TIME_SERIES_FORECAST: '/ml/v1/deployments/{id_or_name}/time_series/forecast',
 } as const;
 
@@ -161,7 +165,10 @@ export const PROMPT_SESSION_ENDPOINTS = {
   /** Get/Delete session entry - GET/DELETE /v1/prompt_sessions/{session_id}/entries/{entry_id} */
   ENTRY_BY_ID: '/v1/prompt_sessions/{session_id}/entries/{entry_id}',
 
-  /** Get/Update entry chat items - GET/PUT /v1/prompt_sessions/{session_id}/entries/{entry_id}/chat_items */
+  /**
+   * Get/Update entry chat items - GET/PUT
+   * /v1/prompt_sessions/{session_id}/entries/{entry_id}/chat_items
+   */
   ENTRY_CHAT_ITEMS: '/v1/prompt_sessions/{session_id}/entries/{entry_id}/chat_items',
 } as const;
 
@@ -307,10 +314,10 @@ export const UTILITY_AGENT_TOOL_ENDPOINTS = {
 } as const;
 
 // ============================================================================
-// SPACE ENDPOINTS
+// SPACES ENDPOINTS
 // ============================================================================
 
-export const SPACE_ENDPOINTS = {
+export const SPACES_ENDPOINTS = {
   /** List/Create spaces - GET/POST /v2/spaces */
   BASE: '/v2/spaces',
 
@@ -386,7 +393,10 @@ export const GATEWAY_PROVIDER_ENDPOINTS = {
   /** Update provider - PUT /ml/gateway/v1/providers/{provider_id}/{provider_name} */
   UPDATE: '/ml/gateway/v1/providers/{provider_id}/{provider_name}',
 
-  /** List available models for provider - GET /ml/gateway/v1/providers/{provider_id}/models/available */
+  /**
+   * List available models for provider - GET
+   * /ml/gateway/v1/providers/{provider_id}/models/available
+   */
   LIST_AVAILABLE_MODELS: '/ml/gateway/v1/providers/{provider_id}/models/available',
 } as const;
 
@@ -406,9 +416,7 @@ export const GATEWAY_RATE_LIMIT_ENDPOINTS = {
 // EXPORTS
 // ============================================================================
 
-/**
- * All endpoint constants grouped by category for easy access
- */
+/** All endpoint constants grouped by category for easy access */
 export const ENDPOINTS = {
   DEPLOYMENT: DEPLOYMENT_ENDPOINTS,
   FOUNDATION_MODEL: FOUNDATION_MODEL_ENDPOINTS,
@@ -423,7 +431,7 @@ export const ENDPOINTS = {
   TAXONOMY: TAXONOMY_ENDPOINTS,
   MODEL: MODEL_ENDPOINTS,
   UTILITY_AGENT_TOOL: UTILITY_AGENT_TOOL_ENDPOINTS,
-  SPACE: SPACE_ENDPOINTS,
+  SPACES: SPACES_ENDPOINTS,
   AUDIO: AUDIO_ENDPOINTS,
   GATEWAY: {
     COMPLETION: GATEWAY_COMPLETION_ENDPOINTS,

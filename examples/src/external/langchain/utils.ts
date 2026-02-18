@@ -1,10 +1,5 @@
-import {
-  AIMessage,
-  BaseMessage,
-  HumanMessage,
-  SystemMessage,
-  ToolMessage,
-} from '@langchain/core/messages';
+import type { BaseMessage } from '@langchain/core/messages';
+import { AIMessage, HumanMessage, SystemMessage, ToolMessage } from '@langchain/core/messages';
 
 const printNested = (obj: { [key: string]: any }, indent = 1) => {
   for (const key of Object.keys(obj)) {

@@ -1,8 +1,9 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - tokenize input on two chosen models
- * - compare how input is split into tokens between two models
+ *
+ * - Initialize SDK
+ * - Tokenize input on two chosen models
+ * - Compare how input is split into tokens between two models
  */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';

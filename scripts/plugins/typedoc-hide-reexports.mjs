@@ -1,6 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable import/no-unresolved */
 import { ReflectionKind, Converter } from 'typedoc';
 
 export function load({ application }) {

@@ -1,20 +1,16 @@
 /**
  * (C) Copyright IBM Corp. 2025.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
-
-/* eslint-disable no-await-in-loop */
 
 const nock = require('nock');
 const sdkCorePackage = require('ibm-cloud-sdk-core');
@@ -152,6 +148,7 @@ describe('WatsonXAI', () => {
     describe('positive tests', () => {
       test('construct service with global params', () => {
         const serviceObj = new WatsonXAI(watsonxAIServiceOptions);
+
         expect(serviceObj).not.toBeNull();
         expect(serviceObj.version).toEqual(watsonxAIServiceOptions.version);
       });
@@ -264,6 +261,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.online).toEqual(online);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
@@ -383,6 +381,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -464,6 +463,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -570,6 +570,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json-patch+json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body).toEqual(jsonPatch);
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -667,6 +668,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -807,6 +809,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.document_reference).toEqual(documentReference);
         expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
         expect(mockRequestOptions.body.steps).toEqual(steps);
@@ -911,6 +914,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -987,9 +991,12 @@ describe('WatsonXAI', () => {
         const pager = new WatsonXAI.TextExtractionsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
+
           expect(nextPage).not.toBeNull();
+
           allResults.push(...nextPage);
         }
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -1002,6 +1009,7 @@ describe('WatsonXAI', () => {
         };
         const pager = new WatsonXAI.TextExtractionsPager(watsonxAIService, params);
         const allResults = await pager.getAll();
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -1038,6 +1046,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -1136,6 +1145,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -1332,6 +1342,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.moderations).toEqual(moderations);
@@ -1529,6 +1540,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.moderations).toEqual(moderations);
@@ -1692,6 +1704,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.messages).toEqual(messages);
         expect(mockRequestOptions.body.tools).toEqual(tools);
         expect(mockRequestOptions.body.tool_choice_option).toEqual(toolChoiceOption);
@@ -1717,6 +1730,7 @@ describe('WatsonXAI', () => {
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.path.id_or_name).toEqual(idOrName);
       }
+
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
         __deploymentsTextChatTest();
@@ -1751,6 +1765,7 @@ describe('WatsonXAI', () => {
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
+
     describe('negative tests', () => {
       test('should enforce required parameters', async () => {
         let err;
@@ -1775,6 +1790,7 @@ describe('WatsonXAI', () => {
       });
     });
   });
+
   describe('deploymentsTextChatStream', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
@@ -1877,6 +1893,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.messages).toEqual(messages);
         expect(mockRequestOptions.body.tools).toEqual(tools);
         expect(mockRequestOptions.body.tool_choice_option).toEqual(toolChoiceOption);
@@ -1902,6 +1919,7 @@ describe('WatsonXAI', () => {
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.path.id_or_name).toEqual(idOrName);
       }
+
       test('should pass the right params to createRequest with enable and disable retries', () => {
         // baseline test
         __deploymentsTextChatStreamTest();
@@ -1996,6 +2014,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
@@ -2072,9 +2091,12 @@ describe('WatsonXAI', () => {
         const pager = new WatsonXAI.FoundationModelSpecsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
+
           expect(nextPage).not.toBeNull();
+
           allResults.push(...nextPage);
         }
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -2087,6 +2109,7 @@ describe('WatsonXAI', () => {
         };
         const pager = new WatsonXAI.FoundationModelSpecsPager(watsonxAIService, params);
         const allResults = await pager.getAll();
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -2123,6 +2146,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
@@ -2195,9 +2219,12 @@ describe('WatsonXAI', () => {
         const pager = new WatsonXAI.FoundationModelTasksPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
+
           expect(nextPage).not.toBeNull();
+
           allResults.push(...nextPage);
         }
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -2208,6 +2235,7 @@ describe('WatsonXAI', () => {
         };
         const pager = new WatsonXAI.FoundationModelTasksPager(watsonxAIService, params);
         const allResults = await pager.getAll();
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -2342,6 +2370,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.prompt).toEqual(prompt);
         expect(mockRequestOptions.body.description).toEqual(description);
@@ -2447,6 +2476,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.restrict_model_parameters).toEqual(restrictModelParameters);
@@ -2607,6 +2637,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.prompt).toEqual(prompt);
         expect(mockRequestOptions.body.id).toEqual(id);
@@ -2713,6 +2744,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.path.prompt_id).toEqual(promptId);
@@ -2941,9 +2973,12 @@ describe('WatsonXAI', () => {
         const pager = new WatsonXAI.ListPromptsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
+
           expect(nextPage).not.toBeNull();
+
           allResults.push(...nextPage);
         }
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -2956,6 +2991,7 @@ describe('WatsonXAI', () => {
         };
         const pager = new WatsonXAI.ListPromptsPager(watsonxAIService, params);
         const allResults = await pager.getAll();
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -3000,6 +3036,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.locked).toEqual(locked);
         expect(mockRequestOptions.body.lock_type).toEqual(lockType);
         expect(mockRequestOptions.body.locked_by).toEqual(lockedBy);
@@ -3099,6 +3136,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.prompt_id).toEqual(promptId);
@@ -3196,6 +3234,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.prompt_variables).toEqual(promptVariables);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -3305,6 +3344,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body).toEqual(chatItem);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -3476,6 +3516,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.id).toEqual(id);
         expect(mockRequestOptions.body.description).toEqual(description);
@@ -3576,6 +3617,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.prefetch).toEqual(prefetch);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
@@ -3672,6 +3714,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.description).toEqual(description);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -3765,6 +3808,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
       }
@@ -3914,6 +3958,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.created_at).toEqual(createdAt);
         expect(mockRequestOptions.body.prompt).toEqual(prompt);
@@ -4024,6 +4069,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.bookmark).toEqual(bookmark);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
@@ -4135,6 +4181,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body).toEqual(chatItem);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
@@ -4241,6 +4288,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.locked).toEqual(locked);
         expect(mockRequestOptions.body.lock_type).toEqual(lockType);
         expect(mockRequestOptions.body.locked_by).toEqual(lockedBy);
@@ -4339,6 +4387,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
       }
@@ -4437,6 +4486,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
         expect(mockRequestOptions.path.entry_id).toEqual(entryId);
@@ -4538,6 +4588,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.path.session_id).toEqual(sessionId);
         expect(mockRequestOptions.path.entry_id).toEqual(entryId);
@@ -4753,6 +4804,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.messages).toEqual(messages);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -4992,6 +5044,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.messages).toEqual(messages);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -5135,6 +5188,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.inputs).toEqual(inputs);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -5336,6 +5390,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -5536,6 +5591,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -5653,6 +5709,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.input).toEqual(input);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -5721,6 +5778,7 @@ describe('WatsonXAI', () => {
       });
     });
   });
+
   describe('timeSeriesForecast', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
@@ -5777,6 +5835,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.model_id).toEqual(modelId);
         expect(mockRequestOptions.body.data).toEqual(data);
         expect(mockRequestOptions.body.schema).toEqual(schema);
@@ -5949,6 +6008,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -6060,6 +6120,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
@@ -6142,9 +6203,12 @@ describe('WatsonXAI', () => {
         const pager = new WatsonXAI.TrainingsListPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
+
           expect(nextPage).not.toBeNull();
+
           allResults.push(...nextPage);
         }
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -6160,6 +6224,7 @@ describe('WatsonXAI', () => {
         };
         const pager = new WatsonXAI.TrainingsListPager(watsonxAIService, params);
         const allResults = await pager.getAll();
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -6196,6 +6261,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -6292,6 +6358,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -6455,6 +6522,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.training_data_references).toEqual(trainingDataReferences);
         expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
@@ -6506,6 +6574,7 @@ describe('WatsonXAI', () => {
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
+
     describe('negative tests', () => {
       test('should enforce required parameters', async () => {
         let err;
@@ -6514,8 +6583,10 @@ describe('WatsonXAI', () => {
         } catch (e) {
           err = e;
         }
+
         expect(err.message).toMatch(/Missing required parameters/);
       });
+
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
@@ -6523,6 +6594,7 @@ describe('WatsonXAI', () => {
         } catch (e) {
           err = e;
         }
+
         expect(err.message).toMatch(/Missing required parameters/);
       });
     });
@@ -6568,6 +6640,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.start).toEqual(start);
         expect(mockRequestOptions.qs.limit).toEqual(limit);
@@ -6871,9 +6944,12 @@ describe('WatsonXAI', () => {
         const pager = new WatsonXAI.FineTuningListPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
+
           expect(nextPage).not.toBeNull();
+
           allResults.push(...nextPage);
         }
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -6890,6 +6966,7 @@ describe('WatsonXAI', () => {
         };
         const pager = new WatsonXAI.FineTuningListPager(watsonxAIService, params);
         const allResults = await pager.getAll();
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -6926,6 +7003,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -6964,6 +7042,7 @@ describe('WatsonXAI', () => {
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
+
     describe('negative tests', () => {
       test('should enforce required parameters', async () => {
         let err;
@@ -6972,8 +7051,10 @@ describe('WatsonXAI', () => {
         } catch (e) {
           err = e;
         }
+
         expect(err.message).toMatch(/Missing required parameters/);
       });
+
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
@@ -6981,6 +7062,7 @@ describe('WatsonXAI', () => {
         } catch (e) {
           err = e;
         }
+
         expect(err.message).toMatch(/Missing required parameters/);
       });
     });
@@ -7018,6 +7100,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -7057,6 +7140,7 @@ describe('WatsonXAI', () => {
         checkMediaHeaders(createRequestMock, userAccept, userContentType);
       });
     });
+
     describe('negative tests', () => {
       test('should enforce required parameters', async () => {
         let err;
@@ -7065,8 +7149,10 @@ describe('WatsonXAI', () => {
         } catch (e) {
           err = e;
         }
+
         expect(err.message).toMatch(/Missing required parameters/);
       });
+
       test('should reject promise when required params are not given', async () => {
         let err;
         try {
@@ -7074,6 +7160,7 @@ describe('WatsonXAI', () => {
         } catch (e) {
           err = e;
         }
+
         expect(err.message).toMatch(/Missing required parameters/);
       });
     });
@@ -7131,6 +7218,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.document_references).toEqual(documentReferences);
         expect(mockRequestOptions.body.results_reference).toEqual(resultsReference);
@@ -7232,6 +7320,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -7306,6 +7395,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -7404,6 +7494,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -7527,6 +7618,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
@@ -7623,6 +7715,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -7698,6 +7791,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -7796,6 +7890,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -7910,6 +8005,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.description).toEqual(description);
         expect(mockRequestOptions.body.space_id).toEqual(spaceId);
@@ -8004,6 +8100,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -8077,6 +8174,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -8173,6 +8271,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
@@ -8237,6 +8336,7 @@ describe('WatsonXAI', () => {
       });
     });
   });
+
   describe('createModel', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
@@ -8747,6 +8847,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.body.name).toEqual(name);
         expect(mockRequestOptions.body.type).toEqual(type);
         expect(mockRequestOptions.body.project_id).toEqual(projectId);
@@ -8874,6 +8975,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -8954,9 +9056,12 @@ describe('WatsonXAI', () => {
         const pager = new WatsonXAI.ModelsListPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
+
           expect(nextPage).not.toBeNull();
+
           allResults.push(...nextPage);
         }
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -8971,6 +9076,7 @@ describe('WatsonXAI', () => {
         };
         const pager = new WatsonXAI.ModelsListPager(watsonxAIService, params);
         const allResults = await pager.getAll();
+
         expect(allResults).not.toBeNull();
         expect(allResults).toHaveLength(2);
       });
@@ -9009,6 +9115,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -9104,6 +9211,7 @@ describe('WatsonXAI', () => {
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
         checkAxiosOptions(createRequestMock, signal);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -9167,6 +9275,7 @@ describe('WatsonXAI', () => {
       });
     });
   });
+
   describe('listUtilityAgentTools', () => {
     describe('positive tests', () => {
       function __getUtilityAgentToolsTest() {
@@ -9253,6 +9362,7 @@ describe('WatsonXAI', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+
         expect(mockRequestOptions.path.tool_id).toEqual(toolId);
       }
 
@@ -9348,6 +9458,7 @@ describe('WatsonXAI', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+
         expect(mockRequestOptions.body).toEqual(wxUtilityAgentToolsRunRequest);
       }
 
@@ -9448,6 +9559,7 @@ describe('WatsonXAI', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+
         expect(mockRequestOptions.body).toEqual(wxUtilityAgentToolsRunRequest);
         expect(mockRequestOptions.path.tool_id).toEqual(toolId);
       }
@@ -9568,6 +9680,7 @@ describe('WatsonXAI', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'application/json';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+
         expect(mockRequestOptions.body.data).toEqual(data);
         expect(mockRequestOptions.body.schema).toEqual(schema);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
@@ -9638,6 +9751,7 @@ describe('WatsonXAI', () => {
           watsonxAIService.transcribeAudio(transcribeAudioParams);
 
         expectToBePromise(transcribeAudioPromiseResult);
+
         expect(createRequestMock).toHaveBeenCalledTimes(1);
 
         const mockRequestOptions = getOptions(createRequestMock);
@@ -9646,6 +9760,7 @@ describe('WatsonXAI', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = 'multipart/form-data';
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+
         expect(mockRequestOptions.body).toBeInstanceOf(FormData);
       }
 
@@ -9698,6 +9813,7 @@ describe('WatsonXAI', () => {
       });
     });
   });
+
   describe('createTextClassification', () => {
     describe('positive tests', () => {
       // Request models needed by this operation.
@@ -9783,6 +9899,7 @@ describe('WatsonXAI', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = expectedAccept;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+
         expect(mockRequestOptions.body.document_reference).toEqual(documentReference);
         expect(mockRequestOptions.body.parameters).toEqual(parameters);
         expect(mockRequestOptions.body.custom).toEqual(custom);
@@ -9868,6 +9985,7 @@ describe('WatsonXAI', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -9944,7 +10062,9 @@ describe('WatsonXAI', () => {
         const pager = new WatsonXAI.TextClassificationsPager(watsonxAIService, params);
         while (pager.hasNext()) {
           const nextPage = await pager.getNext();
+
           expect(nextPage).not.toBeNull();
+
           allResults.push(...nextPage);
         }
 
@@ -9994,6 +10114,7 @@ describe('WatsonXAI', () => {
         const expectedAccept = 'application/json';
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);
@@ -10075,6 +10196,7 @@ describe('WatsonXAI', () => {
         const expectedAccept = undefined;
         const expectedContentType = undefined;
         checkMediaHeaders(createRequestMock, expectedAccept, expectedContentType);
+
         expect(mockRequestOptions.qs.version).toEqual(watsonxAIServiceOptions.version);
         expect(mockRequestOptions.qs.space_id).toEqual(spaceId);
         expect(mockRequestOptions.qs.project_id).toEqual(projectId);

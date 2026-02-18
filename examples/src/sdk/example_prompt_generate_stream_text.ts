@@ -1,12 +1,12 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - store prompt in project
- * - get stored prompt
- * - deploy stored prompt
- * - generate text stream based on deployed prompt
+ *
+ * - Initialize SDK
+ * - Store prompt in project
+ * - Get stored prompt
+ * - Deploy stored prompt
+ * - Generate text stream based on deployed prompt
  */
-/* eslint-disable no-restricted-syntax */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';
@@ -111,7 +111,9 @@ try {
     console.log(line);
   }
 } catch (e) {
-  throw e;
+  throw new Error(
+    `Failed to run example: ${(e as Error).message}. Proceeding to clean up the environemnt.`
+  );
 } finally {
   // All resources will be deleted after this example. If you want to use them afterward, please comment out the lines below.
   if (createdDeployId)

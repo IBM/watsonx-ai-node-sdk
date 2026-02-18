@@ -7,6 +7,7 @@ const {
   ChatCompletions,
 } = require('../../../dist/gateway/completions.js');
 const { modelCleanup, providerCleanup } = require('./utils.js');
+const { expectSuccessResponse } = require('../../utils/utils.js');
 
 // testcase timeout value (20s).
 const timeout = 20000;
@@ -30,11 +31,13 @@ describe('Completions', () => {
   describe('Init instances', () => {
     test('GenerateText init', async () => {
       const providers = new GenerateTextCompletions(client);
+
       expect(providers).toBeInstanceOf(GenerateTextCompletions);
     });
 
     test('Chat init', async () => {
       const chat = new Chat(client);
+
       expect(chat).toBeInstanceOf(Chat);
       expect(chat.completion).toBeInstanceOf(ChatCompletions);
     });
@@ -157,6 +160,7 @@ describe('Completions', () => {
       });
 
       expect(res).toBeDefined();
+
       for await (const chunk of res) {
         expect(typeof chunk).toBe('string');
       }
@@ -170,6 +174,7 @@ describe('Completions', () => {
       });
 
       expect(res).toBeDefined();
+
       for await (const chunk of res) {
         expect(chunk.data).toBeDefined();
       }
@@ -184,6 +189,7 @@ describe('Embeddings', () => {
   describe('Init embeddings instances', () => {
     test('Embeddings init', async () => {
       const embeddings = new Embeddings(client);
+
       expect(embeddings).toBeInstanceOf(Embeddings);
       expect(embeddings.completion).toBeDefined();
     });

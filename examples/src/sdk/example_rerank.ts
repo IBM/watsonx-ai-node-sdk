@@ -1,16 +1,18 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - imports and splits some document
- * - reranks documents and retrievs result
+ *
+ * - Initialize SDK
+ * - Imports and splits some document
+ * - Reranks documents and retrievs result
  */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
-import axios, { AxiosResponse } from 'axios';
+import type { AxiosResponse } from 'axios';
+import axios from 'axios';
 import '../utils/config.ts';
 
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
-const spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
+const _spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
 
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 

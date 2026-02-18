@@ -1,9 +1,6 @@
 /* This test suit is not executed on the Tekton pipeline. Anytime changes are made regarding InstructLab */
 /* These tests should be run on your local machine. Especially the main flow test. Command: `npm run test-ilab` */
 
-/* eslint-disable no-console */
-/* eslint-disable no-await-in-loop */
-
 const path = require('path');
 const { WatsonXAI } = require('../../dist/vml_v1');
 const authHelper = require('../resources/auth-helper.js');
@@ -45,6 +42,7 @@ const deleteSpaceAfterTests = async (spaceId) => {
     const res = await watsonxInstance.deleteSpace({
       spaceId,
     });
+
     expect(res.status).toBe(202);
   } catch (e) {
     console.error(e);
@@ -78,6 +76,7 @@ describe('Repository methods tests', () => {
         expect(res.result.entity.status.state).toBe('preparing');
         expect(res.result.entity.name).toBe(name);
         expect(res.result.metadata).toBeDefined();
+
         createdSpaceId = res.result.metadata.id;
       });
     });
@@ -94,11 +93,13 @@ describe('Repository methods tests', () => {
             resource_crn: process.env.WATSONX_AI_COS_CRN_ID,
           },
         });
+
         expect(res.status).toBe(202);
         expect(res.result.entity).toBeDefined();
         expect(res.result.entity.status.state).toBe('preparing');
         expect(res.result.entity.name).toBe(name);
         expect(res.result.metadata).toBeDefined();
+
         createdSpaceId = res.result.metadata.id;
       });
 
@@ -112,6 +113,7 @@ describe('Repository methods tests', () => {
             spaceId: createdSpaceId,
           });
         const res = await checkIfJobFinshed(getter);
+
         expect(res.result.entity).toBeDefined();
         expect(res.result.entity.status.state).toBe('active');
         expect(res.result.entity.name).toBe(name);
@@ -133,6 +135,7 @@ describe('Repository methods tests', () => {
         expect(res.status).toBe(200);
         expect(res.result.entity.name).toBe(updatedName);
         expect(res.result.metadata).toBeDefined();
+
         name = updatedName;
       });
 
@@ -140,6 +143,7 @@ describe('Repository methods tests', () => {
         const res = await watsonxInstance.listSpaces({
           name,
         });
+
         expect(res.result.resources).toHaveLength(1);
       });
 
@@ -160,6 +164,7 @@ describe('Repository methods tests', () => {
         };
         const pager = new WatsonXAI.ListSpacesPager(watsonxInstance, params);
         const result = await pager.getAll();
+
         expect(result).toBeInstanceOf(Array);
         expect(result.length).toBeGreaterThanOrEqual(1);
       });
@@ -168,8 +173,10 @@ describe('Repository methods tests', () => {
         const res = await watsonxInstance.deleteSpace({
           spaceId: createdSpaceId,
         });
+
         expect(res.status).toBe(202);
         expect(res.statusText).toBe('Accepted');
+
         createdSpaceId = null;
       });
     });

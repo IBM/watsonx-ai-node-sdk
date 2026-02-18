@@ -8,7 +8,7 @@ const credentialsPath = path.join(__dirname, '/../../../credentials/watsonx_ai_m
 config({ path: credentialsPath });
 
 /**
- * This is an alternative authentication method. To use it, please remove the following properties from the Watsonx instance initialization:
- * watsonxAIApikey, watsonxAIAuthType
- * */
+ * This is an alternative authentication method. To use it, please remove the following properties
+ * from the Watsonx instance initialization: watsonxAIApikey, watsonxAIAuthType
+ */
 // process.env.IBM_CREDENTIALS_FILE = path.join(__dirname, '/../../../credentials/watsonx_ai_ml_vml_v1.env')

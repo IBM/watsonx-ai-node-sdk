@@ -1,9 +1,10 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - retrieve data for the example
- * - change data to expected format
- * - perform time series calculations and print result
+ *
+ * - Initialize SDK
+ * - Retrieve data for the example
+ * - Change data to expected format
+ * - Perform time series calculations and print result
  */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
@@ -19,13 +20,13 @@ const credentialsPath = path.join(__dirname, '/../../../credentials/watsonx_ai_m
 config({ path: credentialsPath });
 
 /**
- * This is another option of authentication. For this to work please remove following properties from Watsonx instance initialization
- * watsonxAIApikey, watsonxAIAuthType
- * */
+ * This is another option of authentication. For this to work please remove following properties
+ * from Watsonx instance initialization watsonxAIApikey, watsonxAIAuthType
+ */
 // process.env.IBM_CREDENTIALS_FILE = path.join(__dirname, '/../../../credentials/watsonx_ai_ml_vml_v1.env')
 
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
-const spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
+const _spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
 
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 

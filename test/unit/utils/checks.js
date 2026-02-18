@@ -5,6 +5,7 @@ const { getOptions, checkUrlAndMethod, checkMediaHeaders } = unitTestUtils;
 
 function checkAxiosOptions(createRequestMock, signal) {
   const { axiosOptions } = createRequestMock.mock.calls[0][0].defaultOptions;
+
   expect(axiosOptions.signal).toEqual(signal);
 }
 const checkRequest = ({ request, method, version, requestMock, exceptions }) => {

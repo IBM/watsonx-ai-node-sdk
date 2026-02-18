@@ -1,29 +1,72 @@
-// eslint.config.mjs
+const eslint = require('@eslint/js');
+const tseslint = require('@typescript-eslint/eslint-plugin');
+const tsparser = require('@typescript-eslint/parser');
+const prettier = require('eslint-plugin-prettier');
+const jest = require('eslint-plugin-jest');
+const jsdoc = require('eslint-plugin-jsdoc');
+const importPlugin = require('eslint-plugin-import');
+const prettierConfig = require('eslint-config-prettier');
 
-import eslint from '@eslint/js';
-import tseslint from '@typescript-eslint/eslint-plugin';
-import tsparser from '@typescript-eslint/parser';
-import prettier from 'eslint-plugin-prettier';
-import jest from 'eslint-plugin-jest';
-import jsdoc from 'eslint-plugin-jsdoc';
-import importPlugin from 'eslint-plugin-import';
-import prettierConfig from 'eslint-config-prettier';
-import globals from 'globals';
-
-export default [
+module.exports = [
+  // Global ignores
   {
     ignores: [
       'node_modules/**',
       'dist/**',
       'coverage/**',
       '.nyc_output/**',
+      'examples/**',
+      'test/langchain/**',
       '*.min.js',
       '.eslintcache',
-      '.yalc/**',
+      '.eslintrc.js',
     ],
   },
+
+  // JavaScript files
   {
-    files: ['**/*.test.ts', '**/*.test.tsx', 'test/**/*.ts'],
+    files: ['**/*.js', '**/*.jsx'],
+    languageOptions: {
+      ecmaVersion: 2021,
+      sourceType: 'commonjs',
+      globals: {
+        require: 'readonly',
+        module: 'readonly',
+        exports: 'writable',
+        process: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        console: 'readonly',
+        Buffer: 'readonly',
+        setTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearTimeout: 'readonly',
+        clearInterval: 'readonly',
+        URL: 'readonly',
+        AbortController: 'readonly',
+      },
+    },
+    plugins: {
+      jest,
+      prettier,
+    },
+    rules: {
+      ...eslint.configs.recommended.rules,
+      ...jest.configs.recommended.rules,
+      'jest/padding-around-all': 'error',
+      'camelcase': 'off',
+      'no-template-curly-in-string': 'off',
+      'no-underscore-dangle': 'off',
+      'prefer-const': 'error',
+      'prettier/prettier': 'error',
+      'no-self-assign': 'off',
+      'require-yield': 'off',
+    },
+  },
+
+  // JavaScript test files
+  {
+    files: ['**/*.test.js', '**/*.test.jsx', 'test/**/*.js'],
     languageOptions: {
       globals: {
         describe: 'readonly',
@@ -48,6 +91,8 @@ export default [
       'no-unused-vars': 'off',
     },
   },
+
+  // TypeScript files
   {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
@@ -58,7 +103,17 @@ export default [
         ecmaVersion: 'latest',
       },
       globals: {
-        ...globals.node,
+        require: 'readonly',
+        module: 'readonly',
+        process: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        console: 'readonly',
+        Buffer: 'readonly',
+        setTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearTimeout: 'readonly',
+        clearInterval: 'readonly',
         AsyncIterable: 'readonly',
       },
     },
@@ -84,11 +139,7 @@ export default [
       'spaced-comment': ['error', 'always', { exceptions: ['*'] }],
       'no-shadow': 'off',
       'no-use-before-define': 'off',
-      'no-console': 'off',
-      'no-restricted-syntax': 'off',
-      'prefer-template': 'off',
-      'no-await-in-loop': 'off',
-
+      // TypeScript-specific rule replacements
       '@typescript-eslint/naming-convention': [
         'error',
         {
@@ -111,15 +162,9 @@ export default [
           format: ['camelCase', 'UPPER_CASE'],
         },
         { selector: ['typeLike'], format: ['PascalCase'] },
-        {
-          selector: 'variable',
-          modifiers: ['const'],
-          format: ['camelCase', 'UPPER_CASE'],
-          leadingUnderscore: 'allowSingleOrDouble',
-          trailingUnderscore: 'allowSingleOrDouble',
-        },
+        { selector: 'variable', modifiers: ['const'], format: ['camelCase', 'UPPER_CASE'] },
       ],
-      '@typescript-eslint/no-unused-vars': ['error', {varsIgnorePattern: "^_"}],
+      '@typescript-eslint/no-unused-vars': ['error'],
       '@typescript-eslint/no-shadow': ['error'],
       '@typescript-eslint/no-use-before-define': ['error'],
       '@typescript-eslint/consistent-type-imports': 'error',
@@ -139,11 +184,6 @@ export default [
       'import/resolver': {
         typescript: {}, // fixes TS import resolution
       },
-      jest: {
-        version: 29,
-      },
     },
   },
 ];
-
-// Made with Bob

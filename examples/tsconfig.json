@@ -21,5 +21,6 @@
     "allowJs": true,
     "skipLibCheck": true
   },
-  "include": ["src/sdk/**/*", "src/external/**/*", "test/**/*", "eslint.config.js"]
+  "include": ["src/sdk/**/*", "src/external/**/*", "test/**/*", "jest.config.ts"],
+  "exclude": ["node_modules", "dist", "eslint.config.js"]
 }

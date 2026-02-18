@@ -65,9 +65,8 @@ const documentExtractionParams = {
   projectId: process.env.WATSONX_AI_PROJECT_ID,
 };
 
-const documentExtractionRes = await watsonxAIService.createDocumentExtraction(
-  documentExtractionParams
-);
+const documentExtractionRes =
+  await watsonxAIService.createDocumentExtraction(documentExtractionParams);
 const docExtId = documentExtractionRes.result.metadata?.id;
 if (!docExtId) throw new Error('No docExtId provided');
 

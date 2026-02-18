@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest",
-    "test-install": "yalc add @ibm-cloud/watsonx-ai && npm install && npm install @langchain/community@latest",
+    "test-install": "yalc add @ibm-cloud/watsonx-ai && npm install && npm install @langchain/community@latest @langchain/core@latest @langchain/langgraph@latest",
     "test-regression": "npm run test-install && tsc --noEmit && npm test"
   },
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
-    "@langchain/community": "^1.0.0",
-    "@langchain/core": "^1.1.11",
-    "@langchain/langgraph": "^1.0.1",
+    "@langchain/community": "^1.1.15",
+    "@langchain/core": "^1.1.22",
+    "@langchain/langgraph": "^1.1.4",
+    "@swc/core": "^1.15.11",
     "@swc/jest": "^0.2.39",
     "axios": "^1.7.7",
     "zod": "^3.25.76 || ^4"

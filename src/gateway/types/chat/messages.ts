@@ -1,20 +1,18 @@
 /**
- * (C) Copyright IBM Corp. 2025.
+ * (C) Copyright IBM Corp. 2025-2026.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
-import { FunctionCall, ChatsToolCall } from './tools';
+import type { FunctionCall, ChatsToolCall } from './tools';
 
 export interface ChatsMessagesInput {
   /** Name of a function to call or a participant of conversation to establish difference */
@@ -25,9 +23,7 @@ export interface ChatsMessagesInput {
   role: string;
 }
 
-/**
- * A message of a supported type for a chat completion.
- */
+/** A message of a supported type for a chat completion. */
 export type ChatsMessage =
   | ChatsUserMessage
   | ChatsDeveloperMessage
@@ -39,23 +35,23 @@ export type ChatsMessage =
 
 /**
  * An object specifying the format that the model must output.
- * - Setting to `{ "type": "json_schema", "json_schema": {...} }` enables [Structured Outputs] which ensures the model
- * will match your supplied JSON schema.
- * - Setting to `{ "type": "json_object" }` enables JSON mode, which ensures the message the model generates is valid
- * JSON.
  *
- * Important: when using JSON mode, you must also instruct the model to produce JSON yourself via a system or user
- * message. Without this, the model may generate an unending stream of whitespace until the generation reaches the
- * token limit, resulting in a long-running and seemingly "stuck" request. Also note that the message content may be
- * partially cut off if `"finish_reason"` is set to `"length"`, which indicates the generation exceeded `max_tokens`
- * or the conversation exceeded the max context length.
+ * - Setting to `{ "type": "json_schema", "json_schema": {...} }` enables [Structured
+ *   Outputs][Structured Outputs] which ensures the model will match your supplied JSON schema.
+ * - Setting to `{ "type": "json_object" }` enables JSON mode, which ensures the message the model
+ *   generates is valid JSON.
+ *
+ * Important: when using JSON mode, you must also instruct the model to produce JSON yourself via a
+ * system or user message. Without this, the model may generate an unending stream of whitespace
+ * until the generation reaches the token limit, resulting in a long-running and seemingly "stuck"
+ * request. Also note that the message content may be partially cut off if `"finish_reason"` is set
+ * to `"length"`, which indicates the generation exceeded `max_tokens` or the conversation exceeded
+ * the max context length.
  *
  * [Structured Outputs]: https://platform.openai.com/docs/guides/structured-outputs.
  */
 
-/**
- * A content part with type "input_audio" that represents input audio in a chat request message.
- */
+/** A content part with type "input_audio" that represents input audio in a chat request message. */
 export interface ChatsUserContentAudio {
   /** Type of the content part, in this case should always be "input_audio". */
   type: 'audio';
@@ -63,9 +59,7 @@ export interface ChatsUserContentAudio {
   input_audio: string;
 }
 
-/**
- * A content part with type "input_url" that represents inout url in a request message.
- */
+/** A content part with type "input_url" that represents inout url in a request message. */
 export interface ChatsUserContentImage {
   /** ImageURL is the URL of the image. */
   type: 'image';
@@ -73,9 +67,7 @@ export interface ChatsUserContentImage {
   input_url: string;
 }
 
-/**
- * A content part with type "text" that represents text content in a request or response message.
- */
+/** A content part with type "text" that represents text content in a request or response message. */
 export interface ChatsUserContentText {
   /** Type of the content part, in this case should always be "text". */
   type: 'text';
@@ -84,32 +76,31 @@ export interface ChatsUserContentText {
 }
 
 /**
- * An array of content parts that makes up the content of an assistant message. Can be one or more of type "text", "image", or "audio".
+ * An array of content parts that makes up the content of an assistant message. Can be one or more
+ * of type "text", "image", or "audio".
  */
 
-/**
- * Part of content for a user chat message.
- */
+/** Part of content for a user chat message. */
 export type ChatsUserContent =
   | string
   | ChatsUserContentAudio[]
   | ChatsUserContentImage[]
   | ChatsUserContentText[];
-/**
- * An assistant message in a chat.
- */
+/** An assistant message in a chat. */
 export interface ChatsAssistantMessage {
   /** Data about a previous audio response from the model. */
   audio?: ChatsAssistantAudio;
   /** Content of an assistant message. Required unless `tool_calls` or `function_call` are specified. */
   content?: string | ChatsTextContentPart[];
-  /** The name and arguments of a function that should be called, as generated by the model.
+  /**
+   * The name and arguments of a function that should be called, as generated by the model.
    *
-   *  Deprecated: `function_call` has been deprecated by OpenAI and replaced by `tool_calls`.
+   * Deprecated: `function_call` has been deprecated by OpenAI and replaced by `tool_calls`.
    */
   function_call?: FunctionCall;
-  /** Name for the participant. Provides the model information to differentiate between participants of the same
-   *  role.
+  /**
+   * Name for the participant. Provides the model information to differentiate between participants
+   * of the same role.
    */
   name?: string;
   /** Refusal message by the assistant. */
@@ -120,14 +111,13 @@ export interface ChatsAssistantMessage {
   tool_calls?: ChatsToolCall[];
 }
 
-/**
- * A developer message in a chat.
- */
+/** A developer message in a chat. */
 export interface ChatsDeveloperMessage {
   /** Content of a developer message. */
   content: string | ChatsTextContentPart[];
-  /** Name for the participant. Provides the model information to differentiate between participants of the same
-   *  role.
+  /**
+   * Name for the participant. Provides the model information to differentiate between participants
+   * of the same role.
    */
   name?: string;
   /** Role of the messages author, in this case should always be `"developer"`. */
@@ -148,23 +138,20 @@ export interface ChatsFunctionMessage {
   role: 'function';
 }
 
-/**
- * A system message in a chat.
- */
+/** A system message in a chat. */
 export interface ChatsSystemMessage {
   /** Content of a system message. */
   content: string | ChatsTextContentPart[];
-  /** Name for the participant. Provides the model information to differentiate between participants of the same
-   *  role.
+  /**
+   * Name for the participant. Provides the model information to differentiate between participants
+   * of the same role.
    */
   name?: string;
   /** Role of the messages author, in this case should always be `"system"`. */
   role: 'system';
 }
 
-/**
- * A tool message in a chat.
- */
+/** A tool message in a chat. */
 export interface ChatsToolMessage {
   /** Content of a tool message. */
   content: string | ChatsTextContentPart[];
@@ -174,14 +161,13 @@ export interface ChatsToolMessage {
   tool_call_id: string;
 }
 
-/**
- * A user message in a chat.
- */
+/** A user message in a chat. */
 export interface ChatsUserMessage {
   /** Content of a user message. */
   content: ChatsUserContent;
-  /** Name for the participant. Provides the model information to differentiate between participants of the same
-   *  role.
+  /**
+   * Name for the participant. Provides the model information to differentiate between participants
+   * of the same role.
    */
   name?: string;
   /** Role of the messages author, in this case should always be `"user"`. */
@@ -193,9 +179,7 @@ export interface ChatsAssistantAudio {
   id: string;
 }
 
-/**
- * The audio input for an audio content part.
- */
+/** The audio input for an audio content part. */
 export interface ChatsAudioInput {
   /** The base64 encoded audio data. */
   data: string;
@@ -212,15 +196,14 @@ export namespace ChatsAudioInput {
   }
 }
 
-/**
- * The URL of an image.
- */
+/** The URL of an image. */
 export interface ChatsImageURL {
-  /** Detail specifies the detail level of an image.
+  /**
+   * Detail specifies the detail level of an image.
    *
-   *  See [OpenAI's Vision
-   *  guide](https://platform.openai.com/docs/guides/vision#low-or-high-fidelity-image-understanding) for more
-   *  information.
+   * See [OpenAI's Vision
+   * guide](https://platform.openai.com/docs/guides/vision#low-or-high-fidelity-image-understanding)
+   * for more information.
    */
   detail?: ChatsImageURL.Constants.Detail;
   /** URL is either a URL of the image or the base64 encoded image data. */
@@ -228,9 +211,11 @@ export interface ChatsImageURL {
 }
 export namespace ChatsImageURL {
   export namespace Constants {
-    /** Detail specifies the detail level of an image.
-     * See [OpenAI's Vision guide](https://platform.openai.com/docs/guides/vision#low-or-high-fidelity-image-understanding)
-     * for more information. */
+    /**
+     * Detail specifies the detail level of an image. See [OpenAI's Vision
+     * guide](https://platform.openai.com/docs/guides/vision#low-or-high-fidelity-image-understanding)
+     * for more information.
+     */
     export enum Detail {
       AUTO = 'auto',
       LOW = 'low',
@@ -239,9 +224,7 @@ export namespace ChatsImageURL {
   }
 }
 
-/**
- * Part of a message's content that contains text.
- */
+/** Part of a message's content that contains text. */
 export interface ChatsTextContentPart {
   /** Text content of this part of the message. */
   text: string;

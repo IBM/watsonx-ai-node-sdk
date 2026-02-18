@@ -1,10 +1,11 @@
 /**
  * The following example flow:
- * - initialize SDK
- * - store prompt in space
- * - get stored prompt
- * - deploy stored prompt
- * - generate text based on deployed prompt
+ *
+ * - Initialize SDK
+ * - Store prompt in space
+ * - Get stored prompt
+ * - Deploy stored prompt
+ * - Generate text based on deployed prompt
  */
 
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
@@ -108,7 +109,9 @@ try {
   console.log('\n\n***** TEXT RESPONSE FROM MODEL *****');
   console.log(inferDeployedPrompt.result.results[0].generated_text);
 } catch (e) {
-  throw e;
+  throw new Error(
+    `Failed to run example: ${(e as Error).message}. Proceeding to clean up the environemnt.`
+  );
 } finally {
   // All resources will be deleted after this example. If you want to use them afterward, please comment out the lines below.
   if (createdDeployId)

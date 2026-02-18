@@ -1,13 +1,12 @@
 import { WatsonxEmbeddings } from '@langchain/community/embeddings/ibm';
-import { pull } from 'langchain/hub';
-import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { ChatWatsonx } from '@langchain/community/chat_models/ibm';
-import { Document } from '@langchain/core/documents';
+import type { Document } from '@langchain/core/documents';
 import { createAgent } from 'langchain';
 import * as z from 'zod/v3';
 import { tool } from '@langchain/core/tools';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
-import { Milvus, MilvusLibArgs } from '@langchain/community/vectorstores/milvus';
+import type { MilvusLibArgs } from '@langchain/community/vectorstores/milvus';
+import { Milvus } from '@langchain/community/vectorstores/milvus';
 import { DataType } from '@zilliz/milvus2-sdk-node';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
@@ -67,7 +66,7 @@ const schema = [
 const milvus = new Milvus(embeddings, authParams);
 
 try {
-  const res = await milvus.client.createCollection({
+  await milvus.client.createCollection({
     collection_name: collectionName,
     fields: schema,
     auto_id: true,
@@ -140,7 +139,9 @@ try {
     console.log('Expected answer: ' + answer + '\n');
   }
 } catch (e) {
-  throw e;
+  throw new Error(
+    `Failed to run example: ${(e as Error).message}. Proceeding to clean up the environemnt.`
+  );
 } finally {
   await milvus.client.dropCollection({ collection_name: collectionName });
 }
