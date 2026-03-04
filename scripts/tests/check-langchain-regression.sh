@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # Install and build
+export NVM_DIR="$HOME/.nvm"
+source "$NVM_DIR/nvm.sh"
+
 npm install
 
 npm run build
@@ -35,12 +38,16 @@ fi
     echo Latest release is: "$LATEST_FULL_TAG"
     git checkout $LATEST_FULL_TAG
     git pull
+    unset npm_config_prefix # unseting this parameter since it breakes nvm but is not used in this job
     pnpm install
+    nvm install
+    nvm use
     cd libs/langchain-core && pnpm install && pnpm build
     cd ../langchain-community && pnpm add ../../../dist/$PACKAGE_PATH
     pnpm install
     pnpm build
     pnpm test:single ibm.test.ts
+    nvm use 20
 )
 SUBSHELL_EXIT=$?
 rm -rf langchainjs

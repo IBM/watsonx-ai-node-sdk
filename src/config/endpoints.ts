@@ -71,6 +71,11 @@ export const PLATFORM_URL_MAPPINGS: Record<string, string> = {
   'https://wxai-qa.ml.cloud.ibm.com': 'https://api.dai.test.cloud.ibm.com',
   'https://wml-mcsp-dev.ml.test.cloud.ibm.com': 'https://api.dai.dev.cloud.ibm.com',
   'https://private.wml-mcsp-dev.ml.test.cloud.ibm.com': 'https://private.api.dai.dev.cloud.ibm.com',
+  // AWS
+  'https://ap-south-1.aws.wxai.ibm.com': 'https://api.ap-south-1.aws.data.ibm.com/wx',
+  'https://private.ap-south-1.aws.wxai.ibm.com': 'https://api.ap-south-1.aws.data.ibm.com',
+  'https://us-east-1.aws.wxai.ibm.com': 'https://api.us-east-1.aws.data.ibm.com',
+  'https://private.us-east-1.aws.wxai.ibm.com': 'https://api.us-east-1.aws.data.ibm.com',
 };
 
 // ============================================================================

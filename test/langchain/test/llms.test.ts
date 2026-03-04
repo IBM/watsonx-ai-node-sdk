@@ -175,11 +175,12 @@ describe('Regression tests regarding langchain llms', () => {
               serviceUrl,
               model,
               temperature: 0,
-              stopSequence: ['Hello'],
+              stopSequence: ['hello'],
               maxNewTokens: 100,
             });
             const result = await llms.generate(['Print hello world!']);
-            expect(result.generations[0][0].text.endsWith('Hello')).toBe(true);
+
+            expect(result.generations[0][0].text.endsWith('hello')).toBe(true);
           });
           test('with remaining options', async () => {
             const llms = new WatsonxLLM({

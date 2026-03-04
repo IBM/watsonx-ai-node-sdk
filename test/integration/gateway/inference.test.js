@@ -49,8 +49,8 @@ describe('Completions', () => {
 
     const textCompletions = new GenerateTextCompletions(client);
     const chat = new Chat(client);
-    const modelAlias = 'ibm/granite-3-3-8b-instruct';
-    const modelName = 'ibm/granite-3-3-8b-instruct';
+    const modelAlias = 'ibm/granite-3-8b-instruct-intel';
+    const modelName = 'ibm/granite-3-8b-instruct-intel';
 
     beforeAll(async () => {
       const timestamp = Date.now();

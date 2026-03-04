@@ -11,7 +11,7 @@ import { DataType } from '@zilliz/milvus2-sdk-node';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
 
-const modelName = 'ibm/granite-3-3-8b-instruct';
+const modelName = 'ibm/granite-3-8b-instruct-intel';
 const embeddingsModelName = 'ibm/slate-125m-english-rtrvr-v2';
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];

@@ -34,6 +34,7 @@ import type {
   Certificates,
   TokenAuthenticationOptions,
 } from './types/base';
+import { PLATFORM_URL_MAPPINGS } from '../config';
 
 /**
  * WatsonxBaseService class extends BaseService and provides common functionalities for Watsonx
@@ -59,18 +60,7 @@ export class WatsonxBaseService extends BaseService {
 
   httpsAgentMap: HttpsAgentMap = { service: undefined, dataplatform: undefined };
 
-  static PLATFORM_URLS_MAP = {
-    'https://ca-tor.ml.cloud.ibm.com': 'https://api.ca-tor.dai.cloud.ibm.com/wx',
-    'https://jp-tok.ml.cloud.ibm.com': 'https://api.jp-tok.dataplatform.cloud.ibm.com/wx',
-    'https://eu-gb.ml.cloud.ibm.com': 'https://api.eu-gb.dataplatform.cloud.ibm.com/wx',
-    'https://eu-de.ml.cloud.ibm.com': 'https://api.eu-de.dataplatform.cloud.ibm.com/wx',
-    'https://us-south.ml.cloud.ibm.com': 'https://api.dataplatform.cloud.ibm.com/wx',
-    'https://private.ca-tor.ml.cloud.ibm.com': 'https://private.api.ca-tor.dai.cloud.ibm.com/wx',
-    'https://private.jp-tok.ml.cloud.ibm.com': 'https://api.jp-tok.dataplatform.cloud.ibm.com/wx',
-    'https://private.eu-gb.ml.cloud.ibm.com': 'https://api.eu-gb.dataplatform.cloud.ibm.com/wx',
-    'https://private.eu-de.ml.cloud.ibm.com': 'https://api.eu-de.dataplatform.cloud.ibm.com/wx',
-    'https://private.us-south.ml.cloud.ibm.com': 'https://api.dataplatform.cloud.ibm.com/wx',
-  };
+  static PLATFORM_URLS_MAP = PLATFORM_URL_MAPPINGS;
 
   /**
    * Constructs an instance of WatsonxBaseService with passed in options and external configuration.

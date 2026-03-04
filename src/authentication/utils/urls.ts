@@ -20,6 +20,7 @@ export const GOVCLOUD_PROD_TOKEN_URL =
 
 export const AUTH_AWS_URLS: Record<string, string> = {
   'https://ap-south-1.aws.wxai.ibm.com': AWS_PROD_TOKEN_URL,
+  'https://us-east-1.aws.wxai.ibm.com': AWS_PROD_TOKEN_URL,
   'https://private.ap-south-1.aws.wxai.ibm.com': AWS_PROD_TOKEN_URL,
   'https://private.dev.aws.wxai.ibm.com': AWS_TEST_TOKEN_URL,
   'https://private.test.aws.wxai.ibm.com': AWS_TEST_TOKEN_URL,
