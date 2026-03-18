@@ -12,13 +12,10 @@
  * the License.
  */
 
-const path = require('path');
-const { createReadStream } = require('fs');
-const authHelper = require('../resources/auth-helper.js');
-const { WatsonXAI } = require('../../dist/index');
-
-// testcase timeout value (200s).
-const timeout = 200000;
+import path from 'path';
+import { createReadStream } from 'fs';
+import { WatsonXAI } from '../../src/index';
+import * as authHelper from '../resources/auth-helper';
 
 // Location of our config file.
 const configFile = path.resolve(__dirname, '../../credentials/watsonx_ai_ml_vml_v1.env');

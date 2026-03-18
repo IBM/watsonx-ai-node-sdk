@@ -12,7 +12,7 @@
  * the License.
  */
 
-export {
+export type {
   ChatsMessagesInput,
   ChatsMessage,
   ChatsUserContentAudio,
@@ -26,41 +26,41 @@ export {
   ChatsToolMessage,
   ChatsUserMessage,
   ChatsAssistantAudio,
-  ChatsAudioInput,
-  ChatsImageURL,
-  ChatsTextContentPart,
 } from './chat/messages';
+export { ChatsAudioInput, ChatsImageURL, ChatsTextContentPart } from './chat/messages';
+export type {
+  CreateChatCompletionsParams,
+  ChatsResponseFormat,
+  ChatsJSONSchema,
+} from './chat/request';
 export {
   CreateChatCompletionsConstants,
-  CreateChatCompletionsParams,
   ChatsPrediction,
-  ChatsResponseFormat,
   ChatsResponseFormatJSON,
-  ChatsJSONSchema,
   ChatsResponseFormatJSONSchema,
   ChatsResponseFormatText,
 } from './chat/request';
-export {
+export type {
   ChatsLogProb,
   ChatsTopLogProbs,
   ChatsLogProbs,
   ChatsMessageResponse,
   ChatsPromptFilterResult,
-  ChatsChoice,
   ChatsResponse,
 } from './chat/response';
-export {
+export { ChatsChoice } from './chat/response';
+export type {
   ChatsToolCall,
   ChatsToolChoice,
   FunctionCall,
-  ChatsRequestTool,
   ChoiceFunction,
   ChatsFunctionCall,
 } from './chat/tools';
-export { EmbeddingsInput, CreateEmbeddingsParams } from './embeddings/request';
+export { ChatsRequestTool } from './chat/tools';
+export type { EmbeddingsInput, CreateEmbeddingsParams } from './embeddings/request';
 export { Embedding, EmbeddingResponse } from './embeddings/response';
-export { CreateRequestFunction, CompletionsOptions, StreamOptions, Metadata } from './gateway';
-export {
+export type { CreateRequestFunction, CompletionsOptions, StreamOptions, Metadata } from './gateway';
+export type {
   ListAllModelsParams,
   GetModelParams,
   DeleteModelParams,
@@ -71,16 +71,18 @@ export {
   DeleteProviderModelParams,
   ListProviderAvailableModelsParams,
 } from './models/request';
-export { Model, ModelCollection, ModelRouter } from './models/response';
-export {
+export type { Model, ModelCollection } from './models/response';
+export { ModelRouter } from './models/response';
+export type {
   ListPolicyParams,
   CreatePolicyParams,
-  CreatePolicyConstants,
   GetPolicyParams,
   DeletePolicyParams,
 } from './policy/request';
-export { TenantPolicy, TenantPolicyCollection } from './policy/response';
-export {
+export { CreatePolicyConstants } from './policy/request';
+export { TenantPolicy } from './policy/response';
+export type { TenantPolicyCollection } from './policy/response';
+export type {
   WatsonxaiConfig,
   AnthropicConfig,
   AWSBedrockConfig,
@@ -110,14 +112,14 @@ export {
   UpdateProviderParams,
   ProviderConfig,
 } from './providers/request';
-export {
+export type {
   Provider,
   ProviderCollection,
   ProviderResponse,
   AvailableModel,
   AvailableModelCollection,
 } from './providers/response';
-export {
+export type {
   RateLimitItem,
   RateLimitTenant,
   RateLimitModel,
@@ -130,26 +132,26 @@ export {
   DeleteRateLimitParams,
   ListRateLimitsParams,
 } from './ratelimit/request';
-export { RateLimitResponse, ListRateLimitResponse } from './ratelimit/response';
-export {
+export type { RateLimitResponse, ListRateLimitResponse } from './ratelimit/response';
+export type {
   GetCurrentTenantParams,
   CreateTenantParams,
   ReplaceCurrentTenantParams,
   UpdateCurrentTenantParams,
   DeleteTenantParams,
 } from './tentant/request';
-export {
+export type {
   RemoteCredentialStore,
   RemoteCredentialStoreIBMCloudSecretManager,
   Tenant,
 } from './tentant/response';
-export {
+export type {
   CreateCompletionsParams,
   CreateBasicCompletionsParams,
   CreateStreamCompletionsParams,
 } from './text_completions/request';
-export { CompletionsChoice, CompletionsResponse } from './text_completions/response';
-export {
+export type { CompletionsChoice, CompletionsResponse } from './text_completions/response';
+export type {
   Usage,
   CompletionTokensDetails,
   PromptTokensDetails,

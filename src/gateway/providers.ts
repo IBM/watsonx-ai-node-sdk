@@ -105,7 +105,7 @@ export class Providers extends GatewayResource {
    * @throws {Error} If validation fails or an error occurs during the request.
    */
   getDetails(params: GetProviderParams): Promise<Response<Provider>>;
-  getDetails(params: ListProvidersParams): Promise<Response<ProviderCollection>>;
+  getDetails(params?: ListProvidersParams): Promise<Response<ProviderCollection>>;
 
   getDetails(
     params: GetProviderParams | ListProvidersParams = {}

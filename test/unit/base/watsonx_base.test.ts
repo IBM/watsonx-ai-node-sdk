@@ -1,10 +1,11 @@
-const { NoAuthAuthenticator } = require('ibm-cloud-sdk-core');
-const { WatsonxBaseService } = require('../../../dist/base/base');
-const get_authenticator_from_environment = require('../../../dist/authentication/utils/get-authenticator-from-environment');
+import type { UserOptions } from 'ibm-cloud-sdk-core';
+import { NoAuthAuthenticator } from 'ibm-cloud-sdk-core';
+import { WatsonxBaseService } from '../../../src/base';
+import * as getAuthenticatorFromEnvironment from '../../../src/authentication/utils/get-authenticator-from-environment';
 
 describe('WatsonxBaseService', () => {
-  let service;
-  let options;
+  let service: WatsonxBaseService;
+  let options: UserOptions;
 
   beforeEach(() => {
     options = {
@@ -17,7 +18,9 @@ describe('WatsonxBaseService', () => {
 
   test('Set default service URL if not provided', () => {
     expect(service.serviceUrl).toBe(
-      WatsonxBaseService.PLATFORM_URLS_MAP[WatsonxBaseService.DEFAULT_SERVICE_URL].split('/wx')[0]
+      WatsonxBaseService.PLATFORM_URLS_MAP[
+        WatsonxBaseService.DEFAULT_SERVICE_URL as keyof typeof WatsonxBaseService.PLATFORM_URLS_MAP
+      ].split('/wx')[0]
     );
   });
 
@@ -39,17 +42,16 @@ describe('WatsonxBaseService', () => {
     options.authenticator = mockAuthenticator;
     const serviceWithMockAuth = new WatsonxBaseService(options);
 
-    expect(serviceWithMockAuth.authenticator).toBe(mockAuthenticator);
+    expect(serviceWithMockAuth['authenticator']).toBe(mockAuthenticator);
 
     options.authenticator = undefined;
     const getAuthenticatorMock = jest.spyOn(
-      get_authenticator_from_environment,
+      getAuthenticatorFromEnvironment,
       'getAuthenticatorFromEnvironment'
     );
     getAuthenticatorMock.mockImplementation(() => new NoAuthAuthenticator());
-    const serviceFromEnv = new WatsonxBaseService(options);
 
-    expect(serviceWithMockAuth.authenticator).toBeDefined();
+    expect(serviceWithMockAuth['authenticator']).toBeDefined();
   });
 
   test('Set wxServiceUrl and serviceUrl correctly based on options and defaults', () => {

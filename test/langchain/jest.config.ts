@@ -1,18 +1,20 @@
 import type { Config } from 'jest';
-import global from '../../jest.global.config.js';
+import path from 'path';
 
 const config: Config = {
-  ...global,
+  testEnvironment: path.resolve('../../jest-silent-env.js'),
+  testEnvironmentOptions: {
+    logPassedTests: false,
+  },
+  verbose: true,
   roots: ['<rootDir>/test'],
   testMatch: ['**/?(*.)+(spec|test).[jt]s'],
   collectCoverage: true,
-  testEnvironment: '../../jest-silent-env.js',
   preset: 'ts-jest/presets/default-esm',
   moduleFileExtensions: ['ts', 'js'],
   testTimeout: 20000,
   testNamePattern: 'test',
   collectCoverageFrom: ['**/src/**/*.{js,ts}', '!**/.yalc/**', '!**/dist/**', '!**/coverage/**'],
-  verbose: true,
   modulePathIgnorePatterns: ['dist/', 'docs/'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',

@@ -28,6 +28,7 @@ import type {
 } from './messages';
 import type { EncryptionParams } from './encryption';
 import type { JsonObject, DefaultParams } from './common';
+import type { ReadStream } from 'fs';
 
 /** Options for the `WatsonXAI` constructor. */
 export interface Options extends UserOptions {
@@ -1308,7 +1309,7 @@ export interface FineTuningListParams extends DefaultParams {
    */
   projectId?: string;
   /** The type of Fine Tuning training. The type is set to ilab for InstructLab training. */
-  type: string;
+  type?: string;
 }
 
 /** Parameters for the `getFineTuning` operation. */
@@ -1814,7 +1815,7 @@ export type SpacePatchOperation = 'add' | 'remove' | 'replace' | 'move' | 'copy'
 
 export interface SpacePatchParams extends DefaultParams {
   spaceId: string;
-  jsonPatch: JsonPatchOperation;
+  jsonPatch: JsonPatchOperation[];
 }
 
 /** Parameters for `transcribeAudio` method */
@@ -1822,7 +1823,7 @@ export interface TranscribeAudioParams extends DefaultParams {
   /** The model to use for audio transcriptions. */
   model: string;
   /** The path to a mp3 or wav audio file to transcribe. */
-  file: string;
+  file: string | ReadStream;
   /**
    * The space that contains the resource. Either `space_id` or `project_id` query parameter has to
    * be given.

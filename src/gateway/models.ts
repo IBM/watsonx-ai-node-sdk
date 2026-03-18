@@ -193,7 +193,7 @@ export class Models extends GatewayResource {
    * @returns {Promise<EmptyObject>} - A promise that resolves with an empty object.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  delete(params: DeleteModelParams): Promise<EmptyObject> {
+  delete(params: DeleteModelParams): Promise<Response<EmptyObject>> {
     const requiredParams = ['modelId'];
     const validParams: string[] = [];
     const validationErrors = validateRequestParams(params, requiredParams, validParams);

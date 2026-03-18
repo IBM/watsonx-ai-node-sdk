@@ -12,22 +12,23 @@
  * the License.
  */
 
-const { Readable, addAbortSignal } = require('node:stream');
-const { readExternalSources } = require('ibm-cloud-sdk-core');
-const path = require('path');
-const { WatsonXAI } = require('../../dist/vml_v1.js');
-const authHelper = require('../resources/auth-helper.js');
-const testHelper = require('../resources/test-helper.js');
-const { Stream } = require('../../dist/lib/common.js');
-const { expectSuccessResponse, testPagerPattern } = require('../utils/utils.js');
-const {
-  CHAT_MODEL_IBM: chatModel,
+import { Readable, addAbortSignal } from 'node:stream';
+import { readExternalSources } from 'ibm-cloud-sdk-core';
+import path from 'path';
+import type { RequestParametersWithoutHeaders, Response } from '../../src/vml_v1';
+import { WatsonXAI } from '../../src/vml_v1';
+import * as authHelper from '../resources/auth-helper';
+import * as testHelper from '../resources/test-helper';
+import { Stream } from '../../src/lib/common';
+import { expectSuccessResponse, testPagerPattern } from '../utils/utils';
+import {
+  CHAT_MODEL_IBM as chatModel,
   CHAT_MODEL_MISTRAL,
   CHAT_MODEL_META,
-  EMBEDDING_MODEL_IBM: embeddingModel,
-  TIME_SERIES_MODEL_IBM_512_96: timeSeriesModelId,
+  EMBEDDING_MODEL_IBM as embeddingModel,
+  TIME_SERIES_MODEL_IBM_512_96 as timeSeriesModelId,
   CHAT_MODEL_GPT_OOS,
-} = require('./config.js');
+} from './config';
 
 // testcase timeout value (200s).
 const timeout = 200000;
@@ -39,26 +40,24 @@ const describe = authHelper.prepareTests(configFile);
 authHelper.loadEnv();
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 
-const checkAborting = async (requestFnc, params) =>
+const checkAborting = async (
+  requestFnc: (params: Record<string, any>) => Promise<any>,
+  params: Record<string, any>
+) =>
   test(`Aborting function: ${requestFnc}`, async () => {
     const controller = new AbortController();
     const { signal } = controller;
-    try {
-      const promise = requestFnc({ ...params, signal });
-      await new Promise((resolve) => setTimeout(resolve, 10));
-      controller.abort();
-      await promise;
-    } catch (e) {
-      expect(e).toBeInstanceOf(Error);
-      expect(e.message).toBe('canceled');
-    }
+    const promise = requestFnc({ ...params, signal });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    controller.abort();
+    expect(promise).rejects.toThrow('canceled');
   });
 
 describe('WatsonXAI_integration', () => {
   jest.setTimeout(timeout);
 
   // Service instance
-  let watsonxAIService;
+  let watsonxAIService: WatsonXAI;
   // Generate and log the time series data
   const timeSeriesData = testHelper.generateTimeSeries();
   const tsForecastInputSchemaModel = {
@@ -275,52 +274,6 @@ describe('WatsonXAI_integration', () => {
         chat: chatTextGenPropertiesModel,
       };
 
-      // TextModeration
-      const textModerationModel = {
-        enabled: true,
-        threshold: 0,
-      };
-
-      // MaskProperties
-      const maskPropertiesModel = {
-        remove_entity_value: false,
-      };
-
-      // ModerationHapProperties
-      const moderationHapPropertiesModel = {
-        input: textModerationModel,
-        output: textModerationModel,
-        mask: maskPropertiesModel,
-      };
-
-      // ModerationPiiProperties
-      const moderationPiiPropertiesModel = {
-        input: textModerationModel,
-        output: textModerationModel,
-        mask: maskPropertiesModel,
-      };
-
-      // ModerationTextRange
-      const moderationTextRangeModel = {
-        start: 0,
-        end: 10,
-      };
-
-      // ModerationProperties
-      const moderationPropertiesModel = {
-        input: textModerationModel,
-        output: textModerationModel,
-        foo: 'testString',
-      };
-
-      // Moderations
-      const moderationsModel = {
-        hap: moderationHapPropertiesModel,
-        pii: moderationPiiPropertiesModel,
-        input_ranges: [moderationTextRangeModel],
-        foo: moderationPropertiesModel,
-      };
-
       const res = await watsonxAIService.generateTextStream({
         input:
           'Generate a marketing email advertising a new sale with the following characteristics:\n\nCompany: Swimwear Unlimited\n\nOffer Keywords: {Select customers only, mid-summer fun, swimwear sale}\n\nOffer End Date: July 15\n\nAdvertisement Tone: Exciting!\n\nInclude no URLs.\n\nInclude no telephone numbers.\n',
@@ -415,7 +368,7 @@ describe('WatsonXAI_integration', () => {
       });
 
       expect(res.status).toBe(200);
-      expect(res.result.usage.completion_tokens).toBe(10);
+      expect(res.result.usage?.completion_tokens).toBe(10);
     });
 
     test('textChat with reasoning', async () => {
@@ -432,7 +385,7 @@ describe('WatsonXAI_integration', () => {
       });
 
       expect(res.status).toBe(200);
-      expect(res.result.choices[0].message.reasoning_content).toBeDefined();
+      expect(res.result.choices[0].message?.reasoning_content).toBeDefined();
     });
 
     test('textChatStream', async () => {
@@ -476,7 +429,7 @@ describe('WatsonXAI_integration', () => {
         lastChunk = chunk;
       }
 
-      expect(lastChunk.data.usage.completion_tokens).toBe(5);
+      expect(lastChunk?.data.usage?.completion_tokens).toBe(5);
     });
 
     test('textChatStream as string', async () => {
@@ -535,7 +488,7 @@ describe('WatsonXAI_integration', () => {
         const controller = new AbortController();
         const readable = Readable.from(stream);
         addAbortSignal(controller.signal, readable);
-        for await (const chunk of readable) {
+        for await (const _chunk of readable) {
           controller.abort();
         }
       };
@@ -559,7 +512,7 @@ describe('WatsonXAI_integration', () => {
           modelId: chatModel,
           projectId,
         });
-        for await (const chunk of stream) {
+        for await (const _chunk of stream) {
           stream.controller.abort();
         }
       };
@@ -580,19 +533,18 @@ describe('WatsonXAI_integration', () => {
       });
       let i = 0;
       const n = 10;
-      const chunks = [];
+      const chunks: string[] = [];
       const controller = new AbortController();
       const readable = Readable.from(stream);
       const rdb = addAbortSignal(controller.signal, readable);
-      try {
+
+      await expect(async () => {
         for await (const chunk of rdb) {
           chunks.push(chunk);
           i += 1;
           if (i === n) controller.abort();
         }
-      } catch (e) {
-        expect(e.message).toBe('The operation was aborted');
-      }
+      }).rejects.toThrow('The operation was aborted');
 
       expect(chunks).toHaveLength(n);
     });
@@ -610,17 +562,15 @@ describe('WatsonXAI_integration', () => {
       });
       let i = 0;
       const n = 10;
-      const chunks = [];
-      try {
+      const chunks: string[] = [];
+
+      await expect(async () => {
         for await (const chunk of stream) {
           chunks.push(chunk);
           i += 1;
           if (i === n) stream.controller.abort();
         }
-      } catch (e) {
-        expect(e.message).toBe('The operation was aborted');
-      }
-
+      }).rejects.toThrow('The operation was aborted');
       expect(chunks).toHaveLength(n);
     });
 
@@ -638,7 +588,7 @@ describe('WatsonXAI_integration', () => {
         returnObject: true,
       });
 
-      const result = {};
+      const result: Record<string, any> = {};
       for await (const chunk of stream) {
         const message = chunk.data.choices[0];
         if (message && message.delta) {
@@ -695,7 +645,7 @@ describe('WatsonXAI_integration', () => {
       const res = await watsonxAIService.timeSeriesForecast(params);
       expectSuccessResponse(res, 200);
 
-      expect(res.result.results[0].target).toHaveLength(38);
+      expect(res.result.results?.[0].target).toHaveLength(38);
     });
 
     test('timeSeriesForecast without prediction_length', async () => {
@@ -709,18 +659,18 @@ describe('WatsonXAI_integration', () => {
       const res = await watsonxAIService.timeSeriesForecast(params);
       expectSuccessResponse(res, 200);
 
-      expect(res.result.results[0].target).toHaveLength(96);
+      expect(res.result.results?.[0].target).toHaveLength(96);
     });
   });
 
   describe('Callback tests', () => {
-    const assertRequestCallback = (req) => {
+    const assertRequestCallback = (req: RequestParametersWithoutHeaders) => {
       expect(req).toBeDefined();
       expect(req.options).toBeDefined();
       expect(req.defaultOptions).toBeDefined();
       expect(req.defaultOptions.headers).toBeUndefined();
     };
-    const assertResponseCallback = (res) => {
+    const assertResponseCallback = (res: Response<any>) => {
       expect(res.result).toBeDefined();
       expect(res.status).toBeDefined();
       expect(res.statusText).toBeDefined();
@@ -735,8 +685,8 @@ describe('WatsonXAI_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          assertRequestCallback,
-          assertResponseCallback,
+          requestCallback: assertRequestCallback,
+          responseCallback: assertResponseCallback,
         }
       );
 
@@ -751,8 +701,8 @@ describe('WatsonXAI_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          assertRequestCallback,
-          assertResponseCallback,
+          requestCallback: assertRequestCallback,
+          responseCallback: assertResponseCallback,
         }
       );
 
@@ -767,8 +717,8 @@ describe('WatsonXAI_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          assertRequestCallback,
-          assertResponseCallback,
+          requestCallback: assertRequestCallback,
+          responseCallback: assertResponseCallback,
         }
       );
 
@@ -783,8 +733,8 @@ describe('WatsonXAI_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          assertRequestCallback,
-          assertResponseCallback,
+          requestCallback: assertRequestCallback,
+          responseCallback: assertResponseCallback,
         }
       );
 
@@ -799,8 +749,8 @@ describe('WatsonXAI_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          assertRequestCallback,
-          assertResponseCallback,
+          requestCallback: assertRequestCallback,
+          responseCallback: assertResponseCallback,
         }
       );
 
@@ -815,7 +765,7 @@ describe('WatsonXAI_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          assertRequestCallback,
+          requestCallback: assertRequestCallback,
         }
       );
 
@@ -830,7 +780,7 @@ describe('WatsonXAI_integration', () => {
           projectId: process.env.WATSONX_AI_PROJECT_ID,
         },
         {
-          assertResponseCallback,
+          responseCallback: assertResponseCallback,
         }
       );
 
@@ -841,7 +791,7 @@ describe('WatsonXAI_integration', () => {
   describe('Crypto parameter support', () => {
     const YP_QA_URL = 'https://yp-qa.ml.cloud.ibm.com';
     const cryptoConfig = {
-      key_ref: process.env.WATSONX_AI_CRYPTO_KEY_REF,
+      key_ref: process.env.WATSONX_AI_CRYPTO_KEY_REF as string,
     };
 
     const watsonxAIServiceYPQA = WatsonXAI.newInstance({
@@ -962,7 +912,11 @@ describe('WatsonXAI_integration', () => {
   });
 
   describe('Aborting', () => {
-    const testArray = [
+    interface AbortingParams {
+      params: any;
+      res: (params: any) => Promise<any>;
+    }
+    const testArray: AbortingParams[] = [
       {
         params: {
           input: 'Hi. I will abort this request anyway',

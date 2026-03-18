@@ -121,34 +121,28 @@ The following code examples authenticate with the environment variables.
 Please set environment variables before proceeding with examples:
 It is mandatory to set `projectId` or `spaceId` unless you are working with lightweight engine.
 ```ts
-const { WatsonXAI } = require('@ibm-cloud/watsonx-ai');
+import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 
 // Service instance
-const watsonxAIService = WatsonXAI.newInstance({
-    version: '2024-05-31',
-    serviceUrl: 'https://us-south.ml.cloud.ibm.com',
+const watsonxAIService = new WatsonXAI({
+  version: '2024-05-31',
+  serviceUrl: 'https://us-south.ml.cloud.ibm.com',
 });
 
-const textGenRequestParametersModel = {
-    max_new_tokens: 100,
-};
-
 const params = {
-    input: 'Generate a short greeting for project kick-off meeting.',
-    modelId: 'ibm/granite-13b-chat-v2',
-    projectId: '<YOUR_PROJECT_ID>',
-    parameters: textGenRequestParametersModel,
+  messages: [{ role: 'user', content: 'Generate a short greeting for project kick-off meeting.' }],
+  modelId: 'ibm/granite-4-h-small',
+  projectId: '<YOUR_PROJECT_ID>',
+  maxTokens: 200,
 };
 
 try {
-    const textGeneration = watsonxAIService
-    .generateText(params)
-    .then((res) => {
-        console.log("\n\n***** TEXT RESPONSE FROM MODEL *****");
-        console.log(res.result.results[0].generated_text);
-    })
+  const textGeneration = await watsonxAIService.textChat(params);
+
+  console.log('\n\n***** TEXT RESPONSE FROM MODEL *****');
+  console.log(textGeneration.result.choices[0].message?.content);
 } catch (err) {
-    console.warn(err);
+  console.warn(err);
 }
 ```
 
@@ -162,26 +156,24 @@ Welcome to the project kick-off meeting. I'm glad you could make it.
 For a watsonx.ai lightweight engine, you do not need to provide a `projectId` or `spaceId`. Remember to set environment variables (`IBM watsonx.ai software authentication`) before proceeding.
 
 ```ts
-const { WatsonXAI } = require('@ibm-cloud/watsonx-ai');
+import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 
 // Service instance
-const watsonxAIService = WatsonXAI.newInstance({
+const watsonxAIService = new WatsonXAI({
     version: '2024-05-31',
     serviceUrl: process.env.SERVICE_URL,
 });
 
 const params = {
-    input: 'Generate a short greeting for project kick-off meeting.',
-    modelId: 'mistralai/ministral-8b-instruct',
+  messages: [{ role: 'user', content: 'Generate a short greeting for project kick-off meeting.' }],
+  modelId: 'ibm/granite-4-h-small',
 };
 
 try {
-    const textGeneration = watsonxAIService
-    .generateText(params)
-    .then((res) => {
-        console.log("\n\n***** TEXT RESPONSE FROM MODEL *****");
-        console.log(res.result.results[0].generated_text);
-    })
+    const textGeneration = await watsonxAIService.textChat(params);
+
+    console.log('\n\n***** TEXT RESPONSE FROM MODEL *****');
+    console.log(textGeneration.result.choices[0].message?.content);
 } catch (err) {
     console.warn(err);
 }

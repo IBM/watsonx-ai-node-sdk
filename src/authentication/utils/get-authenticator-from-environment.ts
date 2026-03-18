@@ -61,7 +61,7 @@ export function getAuthenticatorFromEnvironment({
   // construct the credentials object from the environment
   const credentials = readExternalSources(serviceName);
 
-  if (credentials === null) {
+  if (Object.keys(credentials).length === 0) {
     throw new Error('Unable to create an authenticator from the environment.');
   }
 
@@ -89,7 +89,7 @@ export function getAuthenticatorFromEnvironment({
     authType = credentials.authtype;
   }
   if (!authType || typeof authType !== 'string') {
-    authType = credentials.apikey ? Authenticator.AUTHTYPE_IAM : Authenticator.AUTHTYPE_CONTAINER;
+    authType = credentials.apikey ? Authenticator.AUTHTYPE_IAM : null;
   }
 
   // Create and return the appropriate authenticator.
@@ -97,12 +97,17 @@ export function getAuthenticatorFromEnvironment({
 
   // Compare the authType against our constants case-insensitively to
   // determine which authenticator type needs to be constructed.
+  if (!authType)
+    throw new Error(
+      'authType and apiKey cannot be undefined! Please specify an authType or an apikey'
+    );
   authType = authType.toLowerCase();
   if (requestToken && authType !== JWTRequestBaseAuthenticator.AUTHTYPE_ZEN) {
     throw new Error('requestToken function is only valid for zen authentication');
   }
+
   switch (authType) {
-    case Authenticator.AUTHTYPE_NOAUTH:
+    case Authenticator.AUTHTYPE_NOAUTH.toLowerCase():
       authenticator = new NoAuthAuthenticator();
       break;
     case Authenticator.AUTHTYPE_BASIC:

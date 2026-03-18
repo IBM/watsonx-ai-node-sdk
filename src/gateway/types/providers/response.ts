@@ -12,7 +12,7 @@
  * the License.
  */
 
-import type { JsonObject, Collection } from '../../../types/common';
+import type { JsonObject, Collection, DataReference } from '../../../types';
 import type { Model } from '../models/response';
 
 /** A model provider configured for a tenant. */
@@ -27,6 +27,7 @@ export interface Provider {
   type: string;
   /** The ID of the provider. */
   uuid: string;
+  data_reference: DataReference;
 }
 
 /** A list of model providers. */

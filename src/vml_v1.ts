@@ -4445,7 +4445,7 @@ class WatsonXAI extends WatsonxBaseService {
    *   to fine-tuning resources
    */
   public listFineTunings(
-    params: WatsonXAI.FineTuningListParams
+    params: WatsonXAI.FineTuningListParams = {}
   ): Promise<WatsonXAI.Response<WatsonXAI.FineTuningResources>> {
     const requiredParams: string[] = [];
     const validParams = [
@@ -7080,26 +7080,28 @@ namespace WatsonXAI {
   export import CreateFineTuningConstants = Types.CreateFineTuningConstants;
   // === AUTO-GENERATED TYPES END ===
   /** Pager classes */
-  /** FoundationModelSpecsPager can be used to simplify the use of listFoundationModelSpecs(). */
-  export class FoundationModelSpecsPager {
+  /**
+   * Abstract base class for all pager implementations. Provides common pagination functionality for
+   * list operations.
+   *
+   * @abstract
+   * @template TResource - The type of resource being paginated
+   * @template TParams - The type of parameters for the list operation
+   */
+  export abstract class Pager<TResource, TParams extends { start?: string }> {
     protected hasNextPage: boolean;
-
-    protected pageContext: any;
-
+    protected pageContext: { next: string | undefined };
     protected client: WatsonXAI;
-
-    protected params: WatsonXAI.ListFoundationModelSpecsParams;
+    protected params: TParams;
 
     /**
-     * Construct a FoundationModelSpecsPager object.
+     * Construct a Pager object.
      *
-     * @class
-     * @param {WatsonXAI} client - The service client instance used to invoke
-     *   listFoundationModelSpecs()
-     * @param {Object} [params] - The parameters to be passed to listFoundationModelSpecs()
-     * @returns {FoundationModelSpecsPager} A new FoundationModelSpecsPager instance
+     * @param {WatsonXAI} client - The service client instance
+     * @param {TParams} [params] - The parameters to be passed to the list operation
+     * @throws {Error} If params.start is set (pagination should be handled internally)
      */
-    constructor(client: WatsonXAI, params?: WatsonXAI.ListFoundationModelSpecsParams) {
+    constructor(client: WatsonXAI, params?: TParams) {
       if (params && params.start) {
         throw new Error(`the params.start field should not be set`);
       }
@@ -7107,7 +7109,7 @@ namespace WatsonXAI {
       this.hasNextPage = true;
       this.pageContext = { next: undefined };
       this.client = client;
-      this.params = JSON.parse(JSON.stringify(params || {}));
+      this.params = JSON.parse(JSON.stringify(params || {})) as TParams;
     }
 
     /**
@@ -7117,6 +7119,48 @@ namespace WatsonXAI {
      */
     public hasNext(): boolean {
       return this.hasNextPage;
+    }
+
+    /**
+     * Abstract method to fetch the next page of results. Must be implemented by concrete pager
+     * classes.
+     *
+     * @abstract
+     * @returns {Promise<TResource[]>} A Promise that resolves to an array of resources
+     * @throws {Error} If no more results are available
+     */
+    public abstract getNext(): Promise<TResource[]>;
+
+    /**
+     * Returns all results by repeatedly invoking getNext() until all pages of results have been
+     * retrieved.
+     *
+     * @returns {Promise<TResource[]>} A Promise that resolves to an array of all resources
+     */
+    public async getAll(): Promise<TResource[]> {
+      const results: TResource[] = [];
+      while (this.hasNext()) {
+        const nextPage = await this.getNext();
+        results.push(...nextPage);
+      }
+      return results;
+    }
+  }
+
+  /** FoundationModelSpecsPager can be used to simplify the use of listFoundationModelSpecs(). */
+  export class FoundationModelSpecsPager extends Pager<
+    WatsonXAI.FoundationModel,
+    WatsonXAI.ListFoundationModelSpecsParams
+  > {
+    /**
+     * Construct a FoundationModelSpecsPager object.
+     *
+     * @param {WatsonXAI} client - The service client instance used to invoke
+     *   listFoundationModelSpecs()
+     * @param {Object} [params] - The parameters to be passed to listFoundationModelSpecs()
+     */
+    constructor(client: WatsonXAI, params?: WatsonXAI.ListFoundationModelSpecsParams) {
+      super(client, params);
     }
 
     /**
@@ -7149,61 +7193,22 @@ namespace WatsonXAI {
       if (!result.resources) throw new Error('Something went wrong when retrieving results.');
       return result.resources;
     }
-
-    /**
-     * Returns all results by invoking listFoundationModelSpecs() repeatedly until all pages of
-     * results have been retrieved.
-     *
-     * @returns {Promise<WatsonXAI.FoundationModel[]>} A Promise that resolves to an array of
-     *   foundation models
-     */
-    public async getAll(): Promise<WatsonXAI.FoundationModel[]> {
-      const results: FoundationModel[] = [];
-      while (this.hasNext()) {
-        const nextPage = await this.getNext();
-        results.push(...nextPage);
-      }
-      return results;
-    }
   }
 
   /** FoundationModelTasksPager can be used to simplify the use of listFoundationModelTasks(). */
-  export class FoundationModelTasksPager {
-    protected hasNextPage: boolean;
-
-    protected pageContext: any;
-
-    protected client: WatsonXAI;
-
-    protected params: WatsonXAI.ListFoundationModelTasksParams;
-
+  export class FoundationModelTasksPager extends Pager<
+    WatsonXAI.FoundationModelTask,
+    WatsonXAI.ListFoundationModelTasksParams
+  > {
     /**
      * Construct a FoundationModelTasksPager object.
      *
-     * @class
      * @param {WatsonXAI} client - The service client instance used to invoke
      *   listFoundationModelTasks()
      * @param {Object} [params] - The parameters to be passed to listFoundationModelTasks()
-     * @returns {FoundationModelTasksPager} A new FoundationModelTasksPager instance
      */
     constructor(client: WatsonXAI, params?: WatsonXAI.ListFoundationModelTasksParams) {
-      if (params && params.start) {
-        throw new Error(`the params.start field should not be set`);
-      }
-
-      this.hasNextPage = true;
-      this.pageContext = { next: undefined };
-      this.client = client;
-      this.params = JSON.parse(JSON.stringify(params || {}));
-    }
-
-    /**
-     * Returns true if there are potentially more results to be retrieved by invoking getNext().
-     *
-     * @returns {boolean} True if there are more results available, false otherwise
-     */
-    public hasNext(): boolean {
-      return this.hasNextPage;
+      super(client, params);
     }
 
     /**
@@ -7236,60 +7241,21 @@ namespace WatsonXAI {
       if (!result.resources) throw new Error('Something went wrong when retrieving results.');
       return result.resources;
     }
-
-    /**
-     * Returns all results by invoking listFoundationModelTasks() repeatedly until all pages of
-     * results have been retrieved.
-     *
-     * @returns {Promise<WatsonXAI.FoundationModelTask[]>} A Promise that resolves to an array of
-     *   foundation model tasks
-     */
-    public async getAll(): Promise<WatsonXAI.FoundationModelTask[]> {
-      const results: FoundationModelTask[] = [];
-      while (this.hasNext()) {
-        const nextPage = await this.getNext();
-        results.push(...nextPage);
-      }
-      return results;
-    }
   }
 
   /** TextExtractionsPager can be used to simplify the use of listTextExtractions(). */
-  export class TextExtractionsPager {
-    protected hasNextPage: boolean;
-
-    protected pageContext: any;
-
-    protected client: WatsonXAI;
-
-    protected params: WatsonXAI.ListTextExtractionsParams;
-
+  export class TextExtractionsPager extends Pager<
+    WatsonXAI.TextExtractionResource,
+    WatsonXAI.ListTextExtractionsParams
+  > {
     /**
      * Construct a TextExtractionsPager object.
      *
-     * @class
      * @param {WatsonXAI} client - The service client instance used to invoke listTextExtractions()
      * @param {Object} [params] - The parameters to be passed to listTextExtractions()
-     * @returns {TextExtractionsPager} A new TextExtractionsPager instance
      */
     constructor(client: WatsonXAI, params?: WatsonXAI.ListTextExtractionsParams) {
-      if (params && params.start) {
-        throw new Error(`the params.start field should not be set`);
-      }
-
-      this.hasNextPage = true;
-      this.pageContext = { next: undefined };
-      this.client = client;
-      this.params = JSON.parse(JSON.stringify(params || {}));
-    }
-
-    /**
-     * Returns true if there are potentially more results to be retrieved by invoking getNext().
-     *
-     * @returns {boolean} True if there are more results available, false otherwise
-     */
-    public hasNext(): boolean {
-      return this.hasNextPage;
+      super(client, params);
     }
 
     /**
@@ -7322,60 +7288,21 @@ namespace WatsonXAI {
       if (!result.resources) throw new Error('Something went wrong when retrieving results.');
       return result.resources;
     }
-
-    /**
-     * Returns all results by invoking listTextExtractions() repeatedly until all pages of results
-     * have been retrieved.
-     *
-     * @returns {Promise<WatsonXAI.TextExtractionResource[]>} A Promise that resolves to an array of
-     *   text extraction resources
-     */
-    public async getAll(): Promise<WatsonXAI.TextExtractionResource[]> {
-      const results: TextExtractionResource[] = [];
-      while (this.hasNext()) {
-        const nextPage = await this.getNext();
-        results.push(...nextPage);
-      }
-      return results;
-    }
   }
 
   /** TrainingsListPager can be used to simplify the use of listTrainings(). */
-  export class TrainingsListPager {
-    protected hasNextPage: boolean;
-
-    protected pageContext: any;
-
-    protected client: WatsonXAI;
-
-    protected params: WatsonXAI.TrainingsListParams;
-
+  export class TrainingsListPager extends Pager<
+    WatsonXAI.TrainingResource,
+    WatsonXAI.TrainingsListParams
+  > {
     /**
      * Construct a TrainingsListPager object.
      *
-     * @class
      * @param {WatsonXAI} client - The service client instance used to invoke listTrainings()
      * @param {Object} [params] - The parameters to be passed to listTrainings()
-     * @returns {TrainingsListPager} A new TrainingsListPager instance
      */
     constructor(client: WatsonXAI, params?: WatsonXAI.TrainingsListParams) {
-      if (params && params.start) {
-        throw new Error(`the params.start field should not be set`);
-      }
-
-      this.hasNextPage = true;
-      this.pageContext = { next: undefined };
-      this.client = client;
-      this.params = JSON.parse(JSON.stringify(params || {}));
-    }
-
-    /**
-     * Returns true if there are potentially more results to be retrieved by invoking getNext().
-     *
-     * @returns {boolean} True if there are more results available, false otherwise
-     */
-    public hasNext(): boolean {
-      return this.hasNextPage;
+      super(client, params);
     }
 
     /**
@@ -7408,59 +7335,21 @@ namespace WatsonXAI {
       if (!result.resources) throw new Error('Something went wrong when retrieving results.');
       return result.resources;
     }
-
-    /**
-     * Returns all results by invoking listTrainings() repeatedly until all pages of results have
-     * been retrieved.
-     *
-     * @returns {Promise<WatsonXAI.TrainingResource[]>} A Promise that resolves to an array of
-     *   training resources
-     */
-    public async getAll(): Promise<WatsonXAI.TrainingResource[]> {
-      const results: TrainingResource[] = [];
-      while (this.hasNext()) {
-        const nextPage = await this.getNext();
-        results.push(...nextPage);
-      }
-      return results;
-    }
   }
 
   /** FineTuningListPager can be used to simplify the use of fineTuningList(). */
-  export class FineTuningListPager {
-    protected hasNextPage: boolean;
-
-    protected pageContext: any;
-
-    protected client: WatsonXAI;
-
-    protected params: WatsonXAI.FineTuningListParams;
-
+  export class FineTuningListPager extends Pager<
+    WatsonXAI.FineTuningResource,
+    WatsonXAI.FineTuningListParams
+  > {
     /**
      * Construct a FineTuningListPager object.
      *
-     * @class
      * @param {WatsonXAI} client - The service client instance used to invoke fineTuningList()
      * @param {Object} [params] - The parameters to be passed to fineTuningList()
      */
     constructor(client: WatsonXAI, params?: WatsonXAI.FineTuningListParams) {
-      if (params && params.start) {
-        throw new Error(`the params.start field should not be set`);
-      }
-
-      this.hasNextPage = true;
-      this.pageContext = { next: undefined };
-      this.client = client;
-      this.params = JSON.parse(JSON.stringify(params || {}));
-    }
-
-    /**
-     * Returns true if there are potentially more results to be retrieved by invoking getNext().
-     *
-     * @returns {boolean} True if there are more results available, false otherwise
-     */
-    public hasNext(): boolean {
-      return this.hasNextPage;
+      super(client, params);
     }
 
     /**
@@ -7493,60 +7382,18 @@ namespace WatsonXAI {
       if (!result.resources) throw new Error('Something went wrong when retrieving results.');
       return result.resources;
     }
-
-    /**
-     * Returns all results by invoking fineTuningList() repeatedly until all pages of results have
-     * been retrieved.
-     *
-     * @returns {Promise<WatsonXAI.FineTuningResource[]>} A Promise that resolves to an array of
-     *   fine-tuning resources
-     */
-    public async getAll(): Promise<WatsonXAI.FineTuningResource[]> {
-      const results: FineTuningResource[] = [];
-      while (this.hasNext()) {
-        const nextPage = await this.getNext();
-        results.push(...nextPage);
-      }
-      return results;
-    }
   }
 
   /** ModelsListPager can be used to simplify the use of modelsList(). */
-  export class ModelsListPager {
-    protected hasNextPage: boolean;
-
-    protected pageContext: any;
-
-    protected client: WatsonXAI;
-
-    protected params: WatsonXAI.ModelsListParams;
-
+  export class ModelsListPager extends Pager<WatsonXAI.ModelResource, WatsonXAI.ModelsListParams> {
     /**
      * Construct a ModelsListPager object.
      *
-     * @class
      * @param {WatsonXAI} client - The service client instance used to invoke modelsList()
      * @param {Object} [params] - The parameters to be passed to modelsList()
-     * @returns {ModelsListPager} A new ModelsListPager instance
      */
     constructor(client: WatsonXAI, params?: WatsonXAI.ModelsListParams) {
-      if (params && params.start) {
-        throw new Error(`the params.start field should not be set`);
-      }
-
-      this.hasNextPage = true;
-      this.pageContext = { next: undefined };
-      this.client = client;
-      this.params = JSON.parse(JSON.stringify(params || {}));
-    }
-
-    /**
-     * Returns true if there are potentially more results to be retrieved by invoking getNext().
-     *
-     * @returns {boolean} True if there are more results available, false otherwise
-     */
-    public hasNext(): boolean {
-      return this.hasNextPage;
+      super(client, params);
     }
 
     /**
@@ -7578,22 +7425,6 @@ namespace WatsonXAI {
       }
       if (!result.resources) throw new Error('Something went wrong when retrieving results.');
       return result.resources;
-    }
-
-    /**
-     * Returns all results by invoking modelsList() repeatedly until all pages of results have been
-     * retrieved.
-     *
-     * @returns {Promise<WatsonXAI.ModelResource[]>} A Promise that resolves to an array of model
-     *   resources
-     */
-    public async getAll(): Promise<WatsonXAI.ModelResource[]> {
-      const results: ModelResource[] = [];
-      while (this.hasNext()) {
-        const nextPage = await this.getNext();
-        results.push(...nextPage);
-      }
-      return results;
     }
   }
 
@@ -7745,41 +7576,19 @@ namespace WatsonXAI {
   }
 
   /** TextClassificationsPager can be used to simplify the use of listTextClassifications(). */
-  export class TextClassificationsPager {
-    protected hasNextPage: boolean;
-
-    protected pageContext: any;
-
-    protected client: WatsonXAI;
-
-    protected params: WatsonXAI.ListTextClassificationsParams;
-
+  export class TextClassificationsPager extends Pager<
+    WatsonXAI.TextClassificationResource,
+    WatsonXAI.ListTextClassificationsParams
+  > {
     /**
      * Construct a TextClassificationsPager object.
      *
-     * @class
      * @param {WatsonXAI} client - The service client instance used to invoke
      *   listTextClassifications()
      * @param {Object} [params] - The parameters to be passed to listTextClassifications()
      */
     constructor(client: WatsonXAI, params?: WatsonXAI.ListTextClassificationsParams) {
-      if (params && params.start) {
-        throw new Error(`the params.start field should not be set`);
-      }
-
-      this.hasNextPage = true;
-      this.pageContext = { next: undefined };
-      this.client = client;
-      this.params = params || {};
-    }
-
-    /**
-     * Returns true if there are potentially more results to be retrieved by invoking getNext().
-     *
-     * @returns {boolean} True if there are more results available, false otherwise
-     */
-    public hasNext(): boolean {
-      return this.hasNextPage;
+      super(client, params);
     }
 
     /**
@@ -7799,7 +7608,7 @@ namespace WatsonXAI {
       const response = await this.client.listTextClassifications(this.params);
       const { result } = response;
 
-      const next = result?.next?.href ? getQueryParam(result.next.href, 'start') : null;
+      const next = result?.next?.href ? getQueryParam(result.next.href, 'start') : undefined;
 
       this.pageContext.next = next;
       if (!next) {
@@ -7807,22 +7616,6 @@ namespace WatsonXAI {
       }
       if (!result.resources) throw new Error('No `resources` in the response.');
       return result.resources;
-    }
-
-    /**
-     * Returns all results by invoking listTextClassifications() repeatedly until all pages of
-     * results have been retrieved.
-     *
-     * @returns {Promise<WatsonXAI.TextClassificationResource[]>} A Promise that resolves to an
-     *   array of text classification resources
-     */
-    public async getAll(): Promise<WatsonXAI.TextClassificationResource[]> {
-      const results: TextClassificationResource[] = [];
-      while (this.hasNext()) {
-        const nextPage = await this.getNext();
-        results.push(...nextPage);
-      }
-      return results;
     }
   }
 
@@ -7883,7 +7676,7 @@ namespace WatsonXAI {
 
 export { WatsonXAI };
 export default WatsonXAI;
-// Reimports to perserve backwards compatibility
+// Reimports to preserve backwards compatibility
 export {
   TokenAuthenticationOptions,
   Certificates,
@@ -7892,7 +7685,7 @@ export {
   Response,
   Callback,
 } from './base';
-export {
+export type {
   Options,
   EmptyObject,
   JsonObject,

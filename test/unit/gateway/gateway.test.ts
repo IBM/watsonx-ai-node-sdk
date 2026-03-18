@@ -1,9 +1,9 @@
-const { NoAuthAuthenticator } = require('ibm-cloud-sdk-core');
-const { Gateway, Chat, Embeddings } = require('../../../dist/gateway/gateway');
-const { GenerateTextCompletions } = require('../../../dist/gateway/completions');
-const { Models } = require('../../../dist/gateway/models');
-const { Providers } = require('../../../dist/gateway/providers');
-const { Policies } = require('../../../dist/gateway/policies');
+import { NoAuthAuthenticator } from 'ibm-cloud-sdk-core';
+import { Gateway, Chat, Embeddings } from '../../../src/gateway';
+import { GenerateTextCompletions } from '../../../src/gateway/completions';
+import { Models } from '../../../src/gateway/models';
+import { Providers } from '../../../src/gateway';
+import { Policies } from '../../../src/gateway';
 
 const url = 'https://us-south.ml.cloud.ibm.com';
 const version = '2023-07-07';

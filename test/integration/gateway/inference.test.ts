@@ -1,13 +1,9 @@
-const path = require('path');
-const { Gateway, Chat, Embeddings } = require('../../../dist/gateway/gateway.js');
-const { APIBaseService } = require('../../../dist/base/base.js');
-const authHelper = require('../../resources/auth-helper.js');
-const {
-  GenerateTextCompletions,
-  ChatCompletions,
-} = require('../../../dist/gateway/completions.js');
-const { modelCleanup, providerCleanup } = require('./utils.js');
-const { expectSuccessResponse } = require('../../utils/utils.js');
+import path from 'path';
+import { Gateway, Chat, Embeddings } from '../../../src/gateway/gateway';
+import { APIBaseService } from '../../../src/base/base';
+import { GenerateTextCompletions, ChatCompletions } from '../../../src/gateway/completions';
+import * as authHelper from '../../resources/auth-helper';
+import { modelCleanup, providerCleanup } from './utils';
 
 // testcase timeout value (20s).
 const timeout = 20000;
@@ -44,8 +40,8 @@ describe('Completions', () => {
   });
 
   describe('Inference', () => {
-    let providerId;
-    let modelId;
+    let providerId: string | undefined;
+    let modelId: string | undefined;
 
     const textCompletions = new GenerateTextCompletions(client);
     const chat = new Chat(client);
@@ -63,7 +59,7 @@ describe('Completions', () => {
         providerName: 'watsonxai',
         name: `wx-nodejs-test-${timestamp}`,
         dataReference: {
-          resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID,
+          resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID as string,
         },
       });
       providerId = provider.result.uuid;
@@ -83,7 +79,6 @@ describe('Completions', () => {
         version,
         serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
       });
-
       await modelCleanup(gateway.models, modelId);
       await providerCleanup(gateway.providers, providerId);
     });
@@ -196,9 +191,9 @@ describe('Embeddings', () => {
   });
 
   describe('Inference embeddings', () => {
-    let providerId;
-    let modelId;
-    let embeddings;
+    let providerId: string | undefined;
+    let modelId: string | undefined;
+    let embeddings: Embeddings;
 
     beforeAll(async () => {
       const timestamp = Date.now();
@@ -211,7 +206,7 @@ describe('Embeddings', () => {
         providerName: 'watsonxai',
         name: `wx-nodejs-test-${timestamp}`,
         dataReference: {
-          resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID,
+          resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID as string,
         },
       });
       providerId = provider.result.uuid;

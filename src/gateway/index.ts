@@ -13,13 +13,11 @@
  */
 
 /** @module gateway */
-export {
-  GenerateTextCompletions,
+export { GenerateTextCompletions, ChatCompletions, EmbeddingCompletions } from './completions';
+
+export type {
   TextCompletionStream,
   ChatObjectStream,
-  Completions,
-  ChatCompletions,
-  EmbeddingCompletions,
   CompletionResult,
   ChatCompletionResult,
 } from './completions';
@@ -28,4 +26,5 @@ export { Gateway, Chat, Embeddings } from './gateway';
 export { Models } from './models';
 export { Providers } from './providers';
 export { Policies } from './policies';
+export { RateLimits } from './ratelimit';
 export * from './types/index';

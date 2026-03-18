@@ -1,13 +1,13 @@
-const path = require('path');
-const { Models } = require('../../../dist/gateway/models.js');
-const { Gateway } = require('../../../dist/gateway/gateway.js');
-const { APIBaseService } = require('../../../dist/base/base.js');
-const authHelper = require('../../resources/auth-helper.js');
-const { Providers } = require('../../../dist/gateway/providers.js');
-const { modelCleanup, providerCleanup, rateLimitCleanup } = require('./utils.js');
-const { Policies } = require('../../../dist/gateway/policies.js');
-const { RateLimits } = require('../../../dist/gateway/ratelimit.js');
-const { expectSuccessResponse } = require('../../utils/utils.js');
+import path from 'path';
+import { Models } from '../../../src/gateway/models';
+import { Gateway } from '../../../src/gateway/gateway';
+import { APIBaseService } from '../../../src/base/base';
+import { Policies } from '../../../src/gateway/policies';
+import { RateLimits } from '../../../src/gateway/ratelimit';
+import { Providers } from '../../../src/gateway/providers';
+import * as authHelper from '../../resources/auth-helper';
+import { modelCleanup, providerCleanup, rateLimitCleanup } from './utils';
+import { expectSuccessResponse } from '../../utils/utils';
 
 // testcase timeout value (20s).
 const timeout = 20000;
@@ -52,7 +52,7 @@ describe('Resources', () => {
       const providers = new Providers(client);
 
       describe('Creation of provider', () => {
-        let providerId;
+        let providerId: string | undefined;
 
         afterAll(async () => {
           await providerCleanup(providers, providerId);
@@ -63,14 +63,14 @@ describe('Resources', () => {
             providerName: 'watsonxai',
             name: `wx-nodejs-test-${timestamp}`,
             dataReference: {
-              resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID,
+              resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID as string,
             },
           });
           providerId = provider.result.uuid;
 
-          expect(providerId).toBeDefined();
+          expect(typeof providerId).toBe('string');
 
-          const providerResponse = await providers.getDetails({ providerId });
+          const providerResponse = await providers.getDetails({ providerId: providerId as string });
 
           expect(providerResponse.result.data_reference.resource).toBe(
             process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID
@@ -79,7 +79,7 @@ describe('Resources', () => {
       });
 
       describe('Providers manipulation methods', () => {
-        let providerId;
+        let providerId: string | undefined | null;
         const name = `wx-nodejs-test-${timestamp}`;
 
         beforeAll(async () => {
@@ -87,7 +87,7 @@ describe('Resources', () => {
             providerName: 'watsonxai',
             name,
             dataReference: {
-              resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID,
+              resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID as string,
             },
           });
           providerId = provider.result.uuid;
@@ -107,7 +107,8 @@ describe('Resources', () => {
 
         describe('Get details', () => {
           test('Get details with providerId', async () => {
-            const res = await providers.getDetails({ providerId });
+            expect(typeof providerId).toBe('string');
+            const res = await providers.getDetails({ providerId: providerId as string });
 
             expectSuccessResponse(res, 200);
 
@@ -124,7 +125,11 @@ describe('Resources', () => {
           });
 
           test('Get available model details', async () => {
-            const res = await providers.getAvailableModelsDetails({ providerId });
+            expect(typeof providerId).toBe('string');
+
+            const res = await providers.getAvailableModelsDetails({
+              providerId: providerId as string,
+            });
 
             expectSuccessResponse(res, 200);
 
@@ -142,7 +147,9 @@ describe('Resources', () => {
           });
 
           test('List available provider`s models', async () => {
-            const res = await providers.listAvailableModels({ providerId });
+            expect(typeof providerId).toBe('string');
+
+            const res = await providers.listAvailableModels({ providerId: providerId as string });
 
             expect(res).toBeInstanceOf(Array);
             expect(res.length).toBeGreaterThanOrEqual(1);
@@ -151,8 +158,10 @@ describe('Resources', () => {
 
         describe('Delete provider', () => {
           test('Delete', async () => {
+            expect(typeof providerId).toBe('string');
+
             const res = await providers.delete({
-              providerId,
+              providerId: providerId as string,
             });
 
             expectSuccessResponse(res, 204);
@@ -178,7 +187,7 @@ describe('Resources', () => {
     });
 
     describe('Models methods', () => {
-      let providerId;
+      let providerId: string | undefined;
       const timestamp = Date.now();
 
       const client = new APIBaseService({
@@ -197,7 +206,7 @@ describe('Resources', () => {
           providerName: 'watsonxai',
           name: `wx-nodejs-test-${timestamp}`,
           dataReference: {
-            resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID,
+            resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID as string,
           },
         });
         providerId = provider.result.uuid;
@@ -212,15 +221,17 @@ describe('Resources', () => {
       });
 
       describe('Model creation', () => {
-        let modelId;
+        let modelId: string | undefined;
 
         afterAll(async () => {
           await modelCleanup(models, modelId);
         });
 
         test('Create model', async () => {
+          expect(typeof providerId).toBe('string');
+
           const params = {
-            providerId,
+            providerId: providerId as string,
             modelId: modelName,
             alias: modelAlias,
             'metadata': {
@@ -236,11 +247,13 @@ describe('Resources', () => {
       });
 
       describe('Model manipulation methods', () => {
-        let modelId;
+        let modelId: string | undefined;
 
         beforeAll(async () => {
+          expect(typeof providerId).toBe('string');
+
           const params = {
-            providerId,
+            providerId: providerId as string,
             modelId: modelName,
             alias: modelAlias,
             'metadata': {
@@ -254,12 +267,14 @@ describe('Resources', () => {
 
         afterAll(async () => {
           await modelCleanup(models, modelId);
-          modelId = null;
+          modelId = undefined;
         });
 
         describe('Get details', () => {
           test('Get model details by modelId', async () => {
-            const res = await models.getDetails({ modelId });
+            expect(typeof modelId).toBe('string');
+
+            const res = await models.getDetails({ modelId: modelId as string });
 
             expectSuccessResponse(res, 200);
           });
@@ -300,10 +315,12 @@ describe('Resources', () => {
         });
 
         test('Delete model', async () => {
-          const res = await models.delete({ modelId });
+          expect(typeof modelId).toBe('string');
+
+          const res = await models.delete({ modelId: modelId as string });
 
           expectSuccessResponse(res, 204);
-          modelId = null;
+          modelId = undefined;
         });
       });
     });
@@ -337,7 +354,7 @@ describe('Resources', () => {
       };
 
       describe('Creation', () => {
-        let policyId;
+        let policyId: string;
 
         afterAll(async () => {
           try {
@@ -356,7 +373,7 @@ describe('Resources', () => {
       });
 
       describe('Manipulation methods', () => {
-        let policyId;
+        let policyId: string;
 
         beforeAll(async () => {
           const { result } = await policies.create(data);
@@ -411,9 +428,9 @@ describe('Resources', () => {
       const rateLimit = new RateLimits(client);
 
       describe('Creation', () => {
-        let rateLimitId;
-        let providerId;
-        let modelId;
+        let rateLimitId: string | undefined;
+        let providerId: string | undefined;
+        let modelId: string | undefined;
         const timestamp = Date.now();
 
         beforeAll(async () => {
@@ -421,13 +438,15 @@ describe('Resources', () => {
             providerName: 'watsonxai',
             name: `wx-nodejs-test-${timestamp}`,
             dataReference: {
-              resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID,
+              resource: process.env.WATSONX_AI_SECRETS_MANAGER_CRN_ID as string,
             },
           });
 
           providerId = provider.result.uuid;
+          expect(typeof providerId).toBe('string');
+
           const params = {
-            providerId,
+            providerId: providerId as string,
             modelId: modelName,
             alias: modelAlias,
           };
@@ -478,7 +497,7 @@ describe('Resources', () => {
       });
 
       describe('Manipulation methods', () => {
-        let rateLimitId;
+        let rateLimitId: string | undefined;
 
         beforeAll(async () => {
           const res = await rateLimit.create({
@@ -516,12 +535,13 @@ describe('Resources', () => {
         });
 
         test('delete ratelimit', async () => {
+          expect(typeof rateLimitId).toBe('string');
           const res = await rateLimit.delete({
-            rateLimitId,
+            rateLimitId: rateLimitId as string,
           });
 
           expectSuccessResponse(res, 204);
-          rateLimitId = null;
+          rateLimitId = undefined;
         });
       });
     });

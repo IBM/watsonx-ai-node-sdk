@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "exclude": [
+    "./test/**/*",
+    "./examples/**/*",
+    "./dist/**/*",
+    "./node_modules/**/*",
+    "./src/types/@ibm-cloud__sdk-test-utilities.d.ts"
+  ],
+  "include": ["src/**/*"]
+}

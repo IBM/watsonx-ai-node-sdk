@@ -39,34 +39,28 @@ export const ML_CLOUD_BASE_URL = 'https://{region}.ml.cloud.ibm.com';
  * service URLs and watsonx service URLs
  */
 export const PLATFORM_URL_MAPPINGS: Record<string, string> = {
-  // DAllas
-  'https://us-south.ml.cloud.ibm.com': 'https://us-south.dataplatform.cloud.ibm.com',
+  // Dallas
+  'https://us-south.ml.cloud.ibm.com': 'https://api.dataplatform.cloud.ibm.com',
   'https://private.us-south.ml.cloud.ibm.com': 'https://private.api.dataplatform.cloud.ibm.com',
   // Frankfurt
-  'https://eu-de.ml.cloud.ibm.com': 'https://eu-de.dataplatform.cloud.ibm.com',
+  'https://eu-de.ml.cloud.ibm.com': 'https://api.eu-de.dataplatform.cloud.ibm.com',
   'https://private.eu-de.ml.cloud.ibm.com': 'https://private.api.eu-de.dataplatform.cloud.ibm.com',
-  // Lonfon
-  'https://eu-gb.ml.cloud.ibm.com': 'https://eu-gb.dataplatform.cloud.ibm.com',
+  // London
+  'https://eu-gb.ml.cloud.ibm.com': 'https://api.eu-gb.dataplatform.cloud.ibm.com',
   'https://private.eu-gb.ml.cloud.ibm.com': 'https://private.api.eu-gb.dataplatform.cloud.ibm.com',
   // Tokyo
-  'https://jp-tok.ml.cloud.ibm.com': 'https://jp-tok.dataplatform.cloud.ibm.com',
+  'https://jp-tok.ml.cloud.ibm.com': 'https://api.jp-tok.dataplatform.cloud.ibm.com',
   'https://private.jp-tok.ml.cloud.ibm.com':
     'https://private.api.jp-tok.dataplatform.cloud.ibm.com',
   // Sydney
-  'https://au-syd.ml.cloud.ibm.com': 'https://au-syd.dataplatform.cloud.ibm.com',
+  'https://au-syd.ml.cloud.ibm.com': 'https://api.au-syd.dai.cloud.ibm.com',
   'https://private.au-syd.ml.cloud.ibm.com': 'https://private.api.au-syd.dai.cloud.ibm.com',
   // Toronto
-  'https://ca-tor.ml.cloud.ibm.com': 'https://ca-tor.dataplatform.cloud.ibm.com',
+  'https://ca-tor.ml.cloud.ibm.com': 'https://api.ca-tor.dai.cloud.ibm.com',
   'https://private.ca-tor.ml.cloud.ibm.com': 'https://private.api.ca-tor.dai.cloud.ibm.com',
   // YP-QA
   'https://yp-qa.ml.cloud.ibm.com': 'https://api.dataplatform.test.cloud.ibm.com',
   'https://private.yp-qa.ml.cloud.ibm.com': 'https://private.api.dataplatform.test.cloud.ibm.com',
-  // Legacy
-  'https://br-sao.ml.cloud.ibm.com': 'https://br-sao.dataplatform.cloud.ibm.com',
-  'https://eu-es.ml.cloud.ibm.com': 'https://eu-es.dataplatform.cloud.ibm.com',
-  'https://eu-fr2.ml.cloud.ibm.com': 'https://eu-fr2.dataplatform.cloud.ibm.com',
-  'https://in-che.ml.cloud.ibm.com': 'https://in-che.dataplatform.cloud.ibm.com',
-  'https://jp-osa.ml.cloud.ibm.com': 'https://jp-osa.dataplatform.cloud.ibm.com',
   // MCSP
   'https://wxai-qa.ml.cloud.ibm.com': 'https://api.dai.test.cloud.ibm.com',
   'https://wml-mcsp-dev.ml.test.cloud.ibm.com': 'https://api.dai.dev.cloud.ibm.com',

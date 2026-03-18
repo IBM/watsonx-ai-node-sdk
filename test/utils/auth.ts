@@ -12,11 +12,11 @@
  * the License.
  */
 
-const jwt = require('jsonwebtoken');
+import * as jwt from 'jsonwebtoken';
 
 const SECRET_KEY = 'your-very-secure-secret-key';
 
-const generateJWT = (payload, validationTime) =>
+const generateJWT = (payload: { userId: number; role: string }, validationTime: string) =>
   jwt.sign(payload, SECRET_KEY, { expiresIn: validationTime });
 
 const requestAdminToken = async ({ time = '1m', tokenName = 'access_token' } = {}) => ({
@@ -25,4 +25,4 @@ const requestAdminToken = async ({ time = '1m', tokenName = 'access_token' } = {
   },
 });
 
-module.exports = { generateJWT, requestAdminToken };
+export { generateJWT, requestAdminToken };

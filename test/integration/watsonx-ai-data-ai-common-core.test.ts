@@ -1,9 +1,9 @@
 /* This test suit is not executed on the Tekton pipeline. Anytime changes are made regarding InstructLab */
 /* These tests should be run on your local machine. Especially the main flow test. Command: `npm run test-ilab` */
 
-const path = require('path');
-const { WatsonXAI } = require('../../dist/vml_v1');
-const authHelper = require('../resources/auth-helper.js');
+import path from 'path';
+import { WatsonXAI } from '../../src/vml_v1';
+import * as authHelper from '../resources/auth-helper';
 
 // testcase timeout value (200s).
 const timeout = 200000;
@@ -15,7 +15,11 @@ const version = '2023-07-07';
 
 authHelper.loadEnv();
 
-const checkIfJobFinshed = async (getter, retries = 10, delay = 10000) => {
+const checkIfJobFinshed = async (
+  getter: { (): Promise<WatsonXAI.Response<WatsonXAI.SpaceResource>> },
+  retries = 10,
+  delay = 10000
+) => {
   for (let i = 0; i < retries; i += 1) {
     const res = await getter();
     if (res.result.entity.status.state === 'active') {
@@ -23,7 +27,7 @@ const checkIfJobFinshed = async (getter, retries = 10, delay = 10000) => {
     }
     if (res.result.entity.status.state === 'failed') {
       throw new Error(
-        `Failed to create space. ${res.result.entity.status.failure.errors[0].message}`
+        `Failed to create space. ${res.result.entity.status.failure?.errors[0].message}`
       );
     }
     await new Promise((resolve) => setTimeout(resolve, delay));
@@ -37,7 +41,7 @@ const watsonxInstance = WatsonXAI.newInstance({
   version,
 });
 
-const deleteSpaceAfterTests = async (spaceId) => {
+const deleteSpaceAfterTests = async (spaceId: string) => {
   try {
     const res = await watsonxInstance.deleteSpace({
       spaceId,
@@ -55,7 +59,7 @@ describe('Repository methods tests', () => {
 
   describe('Space', () => {
     describe('Creation', () => {
-      let createdSpaceId;
+      let createdSpaceId: string;
 
       afterAll(async () => {
         if (createdSpaceId) await deleteSpaceAfterTests(createdSpaceId);
@@ -67,7 +71,7 @@ describe('Repository methods tests', () => {
         const res = await watsonxInstance.createSpace({
           name,
           storage: {
-            resource_crn: process.env.WATSONX_AI_COS_CRN_ID,
+            resource_crn: process.env.WATSONX_AI_COS_CRN_ID as string,
           },
         });
 
@@ -82,7 +86,7 @@ describe('Repository methods tests', () => {
     });
 
     describe('Operations on existing space', () => {
-      let createdSpaceId;
+      let createdSpaceId: string | undefined;
       const timestamp = Date.now();
       let name = `test-node-js-${timestamp}`;
 
@@ -90,7 +94,7 @@ describe('Repository methods tests', () => {
         const res = await watsonxInstance.createSpace({
           name,
           storage: {
-            resource_crn: process.env.WATSONX_AI_COS_CRN_ID,
+            resource_crn: process.env.WATSONX_AI_COS_CRN_ID as string,
           },
         });
 
@@ -110,8 +114,11 @@ describe('Repository methods tests', () => {
       test('getSpace()', async () => {
         const getter = () =>
           watsonxInstance.getSpace({
-            spaceId: createdSpaceId,
+            spaceId: createdSpaceId as string,
           });
+
+        expect(typeof createdSpaceId).toBe('string');
+
         const res = await checkIfJobFinshed(getter);
 
         expect(res.result.entity).toBeDefined();
@@ -121,14 +128,17 @@ describe('Repository methods tests', () => {
       });
 
       test('updateSpace()', async () => {
+        expect(typeof createdSpaceId).toBe('string');
+
         const updatedName = `${name}-updated`;
         const patch = {
           'op': 'replace',
           'path': '/name',
           'value': updatedName,
         };
+
         const res = await watsonxInstance.updateSpace({
-          spaceId: createdSpaceId,
+          spaceId: createdSpaceId as string,
           jsonPatch: [patch],
         });
 
@@ -170,14 +180,16 @@ describe('Repository methods tests', () => {
       });
 
       test('deleteSpace()', async () => {
+        expect(typeof createdSpaceId).toBe('string');
+
         const res = await watsonxInstance.deleteSpace({
-          spaceId: createdSpaceId,
+          spaceId: createdSpaceId as string,
         });
 
         expect(res.status).toBe(202);
         expect(res.statusText).toBe('Accepted');
 
-        createdSpaceId = null;
+        createdSpaceId = undefined;
       });
     });
   });

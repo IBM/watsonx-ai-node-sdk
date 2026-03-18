@@ -1,16 +1,15 @@
-const sdkCorePackage = require('ibm-cloud-sdk-core');
-const { APIBaseService } = require('../../../dist/base/base');
-const { Chat, Embeddings } = require('../../../dist/gateway/gateway');
-const { checkRequest } = require('../utils/checks');
-const {
+import { NoAuthAuthenticator } from 'ibm-cloud-sdk-core';
+import { APIBaseService } from '../../../src/base/base';
+import { Chat, Embeddings } from '../../../src/gateway';
+import {
   ChatCompletions,
   EmbeddingCompletions,
   GenerateTextCompletions,
-} = require('../../../dist/gateway/completions');
-const { MockingRequest } = require('../../utils/utils');
-const { convertKeysToSnakeCase } = require('../utils/helpers');
-
-const { NoAuthAuthenticator } = sdkCorePackage;
+} from '../../../src/gateway';
+import { checkRequest } from '../utils/checks';
+import { MockingRequest } from '../../utils/utils';
+import { convertKeysToSnakeCase } from '../utils/helpers';
+import type { MethodsSimpleParams } from './types';
 
 const chatCompletions = {
   messages: [
@@ -139,7 +138,7 @@ const version = '2023-07-07';
 
 describe('Completions instances', () => {
   describe('Init instance', () => {
-    let client;
+    let client: APIBaseService;
 
     beforeAll(() => {
       client = new APIBaseService({
@@ -183,11 +182,11 @@ describe('Completions instances', () => {
     const embeddings = new Embeddings(client);
     const generateText = new GenerateTextCompletions(client);
 
-    const createRequestMocker = new MockingRequest(client, 'createRequest');
-    let createRequestMock;
+    const createRequestMocker = new MockingRequest(client, 'createRequest' as any); // private method
+    let createRequestMock: jest.SpyInstance;
 
     describe('Sync methods', () => {
-      const methods = [
+      const methods: MethodsSimpleParams[] = [
         {
           name: 'Test chat completions create request',
           req: {
@@ -215,12 +214,13 @@ describe('Completions instances', () => {
       ];
 
       beforeEach(async () => {
-        createRequestMocker.mock(Promise.resolve());
-        createRequestMock = createRequestMocker.functionMock;
+        createRequestMocker.mock(() => Promise.resolve());
+        if (createRequestMocker.functionMock) createRequestMock = createRequestMocker.functionMock;
+        else throw new Error('Unable to mock request. Please check your implementation');
       });
 
       afterEach(async () => {
-        createRequestMocker.clearMock({});
+        createRequestMocker.clearMock();
       });
 
       afterAll(async () => {
@@ -275,13 +275,14 @@ describe('Completions instances', () => {
       });
 
       test.each(methods)('$name without payload', async ({ callableMethod }) => {
+        // @ts-expect-error required parameters
         await expect(callableMethod()).rejects.toThrow(/Missing required parameters/);
         await expect(callableMethod({})).rejects.toThrow(/Missing required parameters/);
       });
     });
 
     describe('Stream methods', () => {
-      const methods = [
+      const methods: MethodsSimpleParams[] = [
         {
           name: 'Test chat completions create request with streaming',
           req: {
@@ -322,7 +323,7 @@ describe('Completions instances', () => {
       ];
 
       beforeEach(async () => {
-        createRequestMocker.mock(
+        createRequestMocker.mock(() =>
           Promise.resolve({
             result: [
               'id: 1\nevent: message\ndata: {}\n\n',
@@ -331,7 +332,8 @@ describe('Completions instances', () => {
             ][Symbol.iterator](),
           })
         );
-        createRequestMock = createRequestMocker.functionMock;
+        if (createRequestMocker.functionMock) createRequestMock = createRequestMocker.functionMock;
+        else throw new Error('Unable to mock request. Please check your implementation');
       });
 
       afterEach(async () => {

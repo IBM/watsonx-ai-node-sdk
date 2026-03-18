@@ -64,9 +64,9 @@ module.exports = [
     },
   },
 
-  // JavaScript test files
+  // JavaScript and TypeScript test files
   {
-    files: ['**/*.test.js', '**/*.test.jsx', 'test/**/*.js'],
+    files: ['**/*.test.js', '**/*.test.ts', '**/*.test.jsx'],
     languageOptions: {
       globals: {
         describe: 'readonly',
@@ -162,9 +162,13 @@ module.exports = [
           format: ['camelCase', 'UPPER_CASE'],
         },
         { selector: ['typeLike'], format: ['PascalCase'] },
-        { selector: 'variable', modifiers: ['const'], format: ['camelCase', 'UPPER_CASE'] },
+        {
+          selector: 'variable',
+          modifiers: ['const'],
+          format: ['camelCase', 'UPPER_CASE'],
+          leadingUnderscore: 'allow',
+        },
       ],
-      '@typescript-eslint/no-unused-vars': ['error'],
       '@typescript-eslint/no-shadow': ['error'],
       '@typescript-eslint/no-use-before-define': ['error'],
       '@typescript-eslint/consistent-type-imports': 'error',
@@ -179,6 +183,20 @@ module.exports = [
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-duplicate-enum-values': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
+
+      // Unused variables configuration
+      // Note: Underscore-prefixed variables (_variable, _param, _error) are allowed
+      // to indicate intentionally unused variables in callbacks, destructuring, or
+      // error handlers where the variable must be declared but isn't used.
+      // Example: const [_first, second] = array; or catch(_error) { ... }
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          varsIgnorePattern: '^_',
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
     settings: {
       'import/resolver': {

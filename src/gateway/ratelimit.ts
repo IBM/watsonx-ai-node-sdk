@@ -248,7 +248,7 @@ export class RateLimits extends GatewayResource {
    *   success.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  delete(params: DeleteRateLimitParams): Promise<Record<string, any>> {
+  delete(params: DeleteRateLimitParams): Promise<Response<Record<string, any>>> {
     const requiredParams = ['rateLimitId'];
     const validParams: string[] = [];
 

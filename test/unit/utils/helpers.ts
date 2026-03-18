@@ -4,7 +4,7 @@
  * @param {string} str - The input camelCase string.
  * @returns {string} The converted snake_case string.
  */
-const camelToSnake = (str) => str.replace(/([A-Z])/g, '_$1').toLowerCase();
+const camelToSnake = (str: string) => str.replace(/([A-Z])/g, '_$1').toLowerCase();
 
 /**
  * Converts keys of an object (and nested objects) to snake_case.
@@ -12,7 +12,7 @@ const camelToSnake = (str) => str.replace(/([A-Z])/g, '_$1').toLowerCase();
  * @param {Object} obj - The object to convert.
  * @returns {Object} The object with converted keys.
  */
-const convertKeysToSnakeCase = (obj) => {
+const convertKeysToSnakeCase = (obj: Record<string, any>): Record<string, any> | undefined => {
   if (!obj) return undefined;
   if (Array.isArray(obj)) {
     return obj.map(convertKeysToSnakeCase);
@@ -31,7 +31,7 @@ const convertKeysToSnakeCase = (obj) => {
  * @param {Object} obj - The object to modify.
  * @param {Object<string, string>} exceptions - Mapping of old keys to new keys.
  */
-const convertExceptions = (obj, exceptions) => {
+const convertExceptions = (obj: Record<string, any>, exceptions: Record<string, any>) => {
   for (const [oldKey, newKey] of Object.entries(exceptions)) {
     if (oldKey in obj) {
       obj[newKey] = obj[oldKey];
@@ -40,4 +40,4 @@ const convertExceptions = (obj, exceptions) => {
   }
 };
 
-module.exports = { convertKeysToSnakeCase, convertExceptions };
+export { convertKeysToSnakeCase, convertExceptions };

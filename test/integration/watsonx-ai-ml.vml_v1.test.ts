@@ -12,19 +12,19 @@
  * the License.
  */
 
-const { Readable, addAbortSignal } = require('node:stream');
-const { readExternalSources } = require('ibm-cloud-sdk-core');
-const path = require('path');
-const { WatsonXAI } = require('../../dist/vml_v1');
-const authHelper = require('../resources/auth-helper.js');
-const { Stream } = require('../../dist/lib/common.js');
-const { CHAT_MODEL_IBM: chatModel } = require('./config.js');
-const {
+import { Readable, addAbortSignal } from 'node:stream';
+import { readExternalSources } from 'ibm-cloud-sdk-core';
+import path from 'path';
+import { WatsonXAI } from '../../src';
+import { Stream } from '../../src/lib/common';
+import * as authHelper from '../resources/auth-helper';
+import { CHAT_MODEL_IBM as chatModel } from './config';
+import {
   expectSuccessResponse,
   pollUntilCondition,
   testPagerPattern,
   createCosReference,
-} = require('../utils/utils.js');
+} from '../utils/utils';
 
 const configFile = path.resolve(__dirname, '../../credentials/watsonx_ai_ml_vml_v1.env');
 const describe = authHelper.prepareTests(configFile);
@@ -35,7 +35,12 @@ authHelper.loadEnv();
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const cosId = process.env.WATSONX_AI_COS_ID;
 
-const checkIfDeploymentIsReady = async (service, args = [], maxAttempts = 5, delay = 150000) =>
+const checkIfDeploymentIsReady = async (
+  service: WatsonXAI,
+  args: any = {},
+  maxAttempts = 5,
+  delay = 150000
+) =>
   pollUntilCondition(
     () => service.getDeployment(args),
     (result) => result.result.entity.status.state === 'ready',
@@ -49,13 +54,13 @@ describe('WatsonXAI_integration', () => {
   jest.setTimeout(TIMEOUT);
 
   // Service instance
-  let watsonxAIService;
-  let promptId;
-  let sessionId;
-  let entryId;
-  let modelId;
-  let promptDeploymentId;
-  let textExtId;
+  let watsonxAIService: WatsonXAI;
+  let promptId: string | undefined;
+  let sessionId: string | undefined;
+  let entryId: string | undefined;
+  let modelId: string;
+  let promptDeploymentId: string | undefined;
+  let textExtId: string | undefined;
 
   beforeAll(async () => {
     watsonxAIService = WatsonXAI.newInstance({
@@ -130,8 +135,9 @@ describe('WatsonXAI_integration', () => {
       });
 
       test('getPrompt', async () => {
+        expect(typeof promptId).toBe('string');
         const params = {
-          promptId,
+          promptId: promptId as string,
           projectId,
           restrictModelParameters: 'true',
         };
@@ -142,6 +148,8 @@ describe('WatsonXAI_integration', () => {
       });
 
       test('updatePrompt', async () => {
+        expect(typeof promptId).toBe('string');
+
         // PromptData
         const promptDataModel = {
           instruction: 'testString',
@@ -157,7 +165,7 @@ describe('WatsonXAI_integration', () => {
         };
 
         const params = {
-          promptId,
+          promptId: promptId as string,
           name: 'WXAI Node.js SDK Example Prompt',
           prompt: promptModel,
           description: 'My Updated First Prompt',
@@ -190,8 +198,10 @@ describe('WatsonXAI_integration', () => {
       });
 
       test('updatePromptLock', async () => {
+        expect(typeof promptId).toBe('string');
+
         const params = {
-          promptId,
+          promptId: promptId as string,
           locked: false,
           projectId,
           force: true,
@@ -203,8 +213,10 @@ describe('WatsonXAI_integration', () => {
       });
 
       test('getPromptLock', async () => {
+        expect(typeof promptId).toBe('string');
+
         const params = {
-          promptId,
+          promptId: promptId as string,
           projectId,
         };
 
@@ -214,8 +226,10 @@ describe('WatsonXAI_integration', () => {
       });
 
       test('getPromptInput', async () => {
+        expect(typeof promptId).toBe('string');
+
         const params = {
-          promptId,
+          promptId: promptId as string,
           projectId,
         };
 
@@ -225,6 +239,7 @@ describe('WatsonXAI_integration', () => {
       });
 
       test('createPromptChatItem', async () => {
+        expect(typeof promptId).toBe('string');
         // Request models needed by this operation.
 
         // ChatItem
@@ -245,7 +260,7 @@ describe('WatsonXAI_integration', () => {
         };
 
         const params = {
-          promptId,
+          promptId: promptId as string,
           chatItem: [chatItemModelQuestion, chatItemModelAnswer],
           projectId,
         };
@@ -256,6 +271,7 @@ describe('WatsonXAI_integration', () => {
       });
 
       test('createPromptDeployment', async () => {
+        expect(typeof promptId).toBe('string');
         const hardwareRequestModel = {
           size: 'gpu_s',
           num_nodes: 5,
@@ -270,7 +286,7 @@ describe('WatsonXAI_integration', () => {
         };
 
         const promptTemplate = {
-          id: promptId,
+          id: promptId as string,
         };
 
         const params = {
@@ -288,12 +304,13 @@ describe('WatsonXAI_integration', () => {
         const res = await watsonxAIService.createDeployment(params);
 
         expectSuccessResponse(res, 202);
-        promptDeploymentId = res.result.metadata.id;
+        promptDeploymentId = res.result.metadata?.id;
       }, 800000);
 
       test('getPromptDeployment', async () => {
+        expect(typeof promptDeploymentId).toBe('string');
         const params = {
-          deploymentId: promptDeploymentId,
+          deploymentId: promptDeploymentId as string,
           projectId,
         };
         const res = await checkIfDeploymentIsReady(watsonxAIService, params);
@@ -303,8 +320,8 @@ describe('WatsonXAI_integration', () => {
     });
 
     describe('Prompt deployment chat inference', () => {
-      let chatMessage;
-      let deploymentsTextChatParams;
+      let chatMessage: { role: string; content: string };
+      let deploymentsTextChatParams: { idOrName: string; messages: any[] };
 
       beforeEach(() => {
         chatMessage = {
@@ -312,7 +329,7 @@ describe('WatsonXAI_integration', () => {
           content: 'Who won the world series in 2020?',
         };
         deploymentsTextChatParams = {
-          idOrName: promptDeploymentId,
+          idOrName: promptDeploymentId as string,
           messages: [chatMessage],
         };
       });
@@ -381,27 +398,29 @@ describe('WatsonXAI_integration', () => {
 
     describe('Delete resources', () => {
       test('deletePromptDeployment', async () => {
+        expect(typeof promptDeploymentId).toBe('string');
         const params = {
-          deploymentId: promptDeploymentId,
+          deploymentId: promptDeploymentId as string,
           projectId,
         };
 
         const res = await watsonxAIService.deleteDeployment(params);
 
         expectSuccessResponse(res, 204);
-        promptDeploymentId = null;
+        promptDeploymentId = undefined;
       });
 
       test('deletePrompt', async () => {
+        expect(typeof promptId).toBe('string');
         const params = {
-          promptId,
+          promptId: promptId as string,
           projectId,
         };
 
         const res = await watsonxAIService.deletePrompt(params);
 
         expectSuccessResponse(res, 204);
-        promptId = null;
+        promptId = undefined;
       });
     });
   });
@@ -446,8 +465,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('getPromptSession', async () => {
+      expect(typeof sessionId).toBe('string');
       const params = {
-        sessionId,
+        sessionId: sessionId as string,
         projectId,
         prefetch: true,
       };
@@ -458,8 +478,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('updatePromptSession', async () => {
+      expect(typeof sessionId).toBe('string');
       const params = {
-        sessionId,
+        sessionId: sessionId as string,
         name: 'WXAI Node.js SDK Example Prompt Session Update',
         description: 'My First Prompt Session',
         projectId,
@@ -471,6 +492,7 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('createPromptSessionEntry', async () => {
+      expect(typeof sessionId).toBe('string');
       const promptDataModel = {
         instruction: 'testString',
         input_prefix: 'testString',
@@ -483,7 +505,7 @@ describe('WatsonXAI_integration', () => {
       };
 
       const params = {
-        sessionId,
+        sessionId: sessionId as string,
         name: 'WXAI Node.js SDK Example Prompt Session Entry',
         createdAt: 1711504485261,
         prompt: promptModel,
@@ -498,9 +520,11 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('getPromptSessionEntry', async () => {
+      expect(typeof entryId).toBe('string');
+      expect(typeof sessionId).toBe('string');
       const params = {
-        entryId,
-        sessionId,
+        entryId: entryId as string,
+        sessionId: sessionId as string,
         projectId,
       };
 
@@ -510,8 +534,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('listPromptSessionEntries', async () => {
+      expect(typeof sessionId).toBe('string');
       const params = {
-        sessionId,
+        sessionId: sessionId as string,
         projectId,
       };
 
@@ -519,8 +544,10 @@ describe('WatsonXAI_integration', () => {
 
       expectSuccessResponse(res, 200);
     });
-    // eslint-disable-next-line
+
     test.skip('postPromptSessionEntryChatItem', async () => {
+      expect(typeof sessionId).toBe('string');
+      expect(typeof entryId).toBe('string');
       const chatItemModelQuestion = {
         type: 'question',
         content: 'Some question',
@@ -536,8 +563,8 @@ describe('WatsonXAI_integration', () => {
         token_count: 6,
       };
       const params = {
-        sessionId,
-        entryId,
+        sessionId: sessionId as string,
+        entryId: entryId as string,
         chatItem: [chatItemModelQuestion, chatItemModelAnswer],
         projectId,
       };
@@ -548,8 +575,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('updatePromptSessionLock', async () => {
+      expect(typeof sessionId).toBe('string');
       const params = {
-        sessionId,
+        sessionId: sessionId as string,
         locked: false,
         projectId,
         force: true,
@@ -561,8 +589,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('getPromptSessionLock', async () => {
+      expect(typeof sessionId).toBe('string');
       const params = {
-        sessionId,
+        sessionId: sessionId as string,
         projectId,
       };
 
@@ -572,8 +601,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('deletePromptSession', async () => {
+      expect(typeof sessionId).toBe('string');
       const params = {
-        sessionId,
+        sessionId: sessionId as string,
         projectId,
       };
 
@@ -624,8 +654,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('getModel()', async () => {
+      expect(typeof modelId).toBe('string');
       const params = {
-        modelId,
+        modelId: modelId as string,
         projectId,
       };
 
@@ -635,8 +666,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('deleteModel()', async () => {
+      expect(typeof modelId).toBe('string');
       const params = {
-        modelId,
+        modelId: modelId as string,
         projectId,
       };
 
@@ -647,7 +679,7 @@ describe('WatsonXAI_integration', () => {
   });
 
   describe('Text extraction', () => {
-    const checkIfExtractionIsReady = async (parameters, maxAttempts = 5, delay = 10000) =>
+    const checkIfExtractionIsReady = async (parameters: any, maxAttempts = 5, delay = 10000) =>
       pollUntilCondition(
         () => watsonxAIService.getTextExtraction(parameters),
         (res) => res.result.entity.results.status === 'completed',
@@ -658,16 +690,17 @@ describe('WatsonXAI_integration', () => {
       );
 
     test('createTextExtraction()', async () => {
+      expect(typeof cosId).toBe('string');
       const textExtractionDataReferenceModel = createCosReference(
         'experienced.pdf',
         'wx-nodejs-test-text-extraction',
-        cosId
+        cosId as string
       );
 
       const textExtractionResultReferenceModel = createCosReference(
         'experienced.md',
         'wx-nodejs-test-text-extraction',
-        cosId
+        cosId as string
       );
 
       const textExtractionStepOcrModel = {
@@ -692,7 +725,7 @@ describe('WatsonXAI_integration', () => {
       };
 
       const res = await watsonxAIService.createTextExtraction(params);
-      textExtId = res.result.metadata.id;
+      textExtId = res.result.metadata?.id;
 
       expectSuccessResponse(res, 201);
     });
@@ -718,8 +751,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('getTextExtraction()', async () => {
+      expect(typeof textExtId).toBe('string');
       const params = {
-        id: textExtId,
+        id: textExtId as string,
         projectId,
       };
 
@@ -729,8 +763,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('deleteTextExtraction()', async () => {
+      expect(typeof textExtId).toBe('string');
       const params = {
-        id: textExtId,
+        id: textExtId as string,
         projectId,
         hardDelete: true,
       };
@@ -794,13 +829,14 @@ describe('WatsonXAI_integration', () => {
   });
 
   describe('Text classification (WDU)', () => {
-    let textClassificationID;
+    let textClassificationID: string | undefined;
 
     test('createTextClassification()', async () => {
+      expect(typeof cosId).toBe('string');
       const textExtractionDataReferenceModel = createCosReference(
         'experienced.pdf',
         'wx-nodejs-test-text-extraction',
-        cosId
+        cosId as string
       );
 
       const textClassificationParametersModel = {
@@ -817,7 +853,7 @@ describe('WatsonXAI_integration', () => {
 
       const res = await watsonxAIService.createTextClassification(params);
       expectSuccessResponse(res, 201);
-      textClassificationID = res.result.metadata.id;
+      textClassificationID = res.result.metadata?.id;
     });
 
     test('listTextClassifications()', async () => {
@@ -840,8 +876,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('getTextClassification()', async () => {
+      expect(typeof textClassificationID).toBe('string');
       const params = {
-        id: textClassificationID,
+        id: textClassificationID as string,
         projectId,
       };
 
@@ -850,8 +887,9 @@ describe('WatsonXAI_integration', () => {
     });
 
     test('deleteTextClassification()', async () => {
+      expect(typeof textClassificationID).toBe('string');
       const params = {
-        id: textClassificationID,
+        id: textClassificationID as string,
         projectId,
         hardDelete: true,
       };

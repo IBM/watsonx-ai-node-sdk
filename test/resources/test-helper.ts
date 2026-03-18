@@ -13,8 +13,8 @@
  */
 
 // Helper function to format date to 'YYYY-MM-DD HH:mm:ss'
-function formatDate(date) {
-  const pad = (n) => n.toString().padStart(2, '0');
+function formatDate(date: Date) {
+  const pad = (n: number) => n.toString().padStart(2, '0');
   return (
     `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ` +
     `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
@@ -22,7 +22,7 @@ function formatDate(date) {
 }
 
 // Function to generate time series data
-module.exports.generateTimeSeries = () => {
+function generateTimeSeries() {
   const startDate = new Date(2023, 0, 1, 0, 0, 0); // Starting date: Jan 1, 2023, 00:00:00
   const numberOfElements = 512;
 
@@ -40,4 +40,6 @@ module.exports.generateTimeSeries = () => {
   }
 
   return { date, target };
-};
+}
+
+export { generateTimeSeries };

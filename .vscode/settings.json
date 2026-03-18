@@ -1,15 +1,15 @@
 {
-  "jest.jestCommandLine": "npm run test --",
+  "jest.jestCommandLine": "npm run jest --",
   "jest.virtualFolders": [
     {
       "name": "unit-tests",
       "rootPath": "test/unit",
-      "jestCommandLine": "cd ../../ && jest -c test/unit/jest.unit.config.js" // this is needed to be done like this in order to keep right setup in testing extension in vsc and to be able to use coverage option
+      "jestCommandLine": "cd ../../ && npx jest -c test/unit/jest.unit.config.ts" // this is needed to be done like this in order to keep right setup in testing extension in vsc and to be able to use coverage option
     },
     {
       "name": "integration-tests",
       "rootPath": "test/integration",
-      "jestCommandLine": "cd ../../ && jest -c test/integration/jest.int.config.js" // as above
+      "jestCommandLine": "cd ../../ && npx jest -c test/integration/jest.int.config.ts" // as above
     },
     { "name": "example-tests", "rootPath": "examples/test" },
     {

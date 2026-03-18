@@ -1,6 +1,6 @@
 {
   "name": "@ibm-cloud/watsonx-ai",
-  "version": "1.7.9",
+  "version": "1.7.10",
   "description": "IBM watsonx.ai Node.js SDK",
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
     "generate-types-reexports": "node scripts/utils/generate-types-reexports.cjs",
     "install-package-regression": "npm run local-publish && cd ./test/langchain && npm run test-install",
     "install-package-examples": "npm run local-publish && cd ./examples && npm run test-install",
-    "jest": "jest --verbose",
+    "jest": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --",
     "test": "npm run build && npm run lint && jest",
     "test-all": "npm run build && npm run lint && jest test/",
     "test-unit": "npm run build && npm run lint && jest test/unit/",
@@ -56,11 +56,14 @@
     "@types/node": "^18.0.0",
     "extend": "3.0.2",
     "form-data": "^4.0.4",
-    "ibm-cloud-sdk-core": "^5.4.5"
+    "ibm-cloud-sdk-core": "^5.4.5",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@ibm-cloud/sdk-test-utilities": "^1.0.0",
     "@masterodin/publisher": "^0.10.0",
+    "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.10",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
     "@typescript-eslint/parser": "^8.54.0",
     "dotenv": "^8.2.0",
@@ -76,6 +79,7 @@
     "nock": "^13.2.4",
     "prettier": "^3.8.1",
     "prettier-plugin-jsdoc": "^1.8.0",
+    "ts-jest": "^29.4.6",
     "tsc-multi": "https://github.com/stainless-api/tsc-multi/releases/download/v1.1.9/tsc-multi.tgz",
     "typedoc": "^0.25.13",
     "typescript": "^4.9.5"

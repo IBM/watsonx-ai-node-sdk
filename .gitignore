@@ -2,6 +2,9 @@
 # tsc outputs
 **/*.d.ts
 **/*.js.map
+# Custom types module
+!src/types/@ibm-cloud__sdk-test-utilities.d.ts
+
 
 # service-specific tsc outputs (js files)
 # example-service/*.js

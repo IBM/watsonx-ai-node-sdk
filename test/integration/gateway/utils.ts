@@ -1,13 +1,7 @@
-const setupSecretManager = async (gateway) => {
-  try {
-    await gateway.setSecretsManager({ secretsManager: process.env.WATSONX_AI_SECRETS_MANAGER });
-  } catch (e) {
-    expect(e.code).toBe(400);
-    expect(e.result.error.message).toBe('tenant already exists');
-  }
-};
+import type { Models, Providers } from '../../../src/gateway';
+import type { RateLimits } from '../../../src/gateway/ratelimit';
 
-const providerCleanup = async (providers, providerId) => {
+const providerCleanup = async (providers: Providers, providerId: string | undefined) => {
   if (!providerId) return;
   try {
     await providers.delete({
@@ -18,7 +12,7 @@ const providerCleanup = async (providers, providerId) => {
   }
 };
 
-const modelCleanup = async (models, modelId) => {
+const modelCleanup = async (models: Models, modelId: string | undefined) => {
   if (!modelId) return;
   try {
     await models.delete({ modelId });
@@ -26,7 +20,7 @@ const modelCleanup = async (models, modelId) => {
     console.error(`Unable to delete model with id: ${modelId}\n`, e);
   }
 };
-const rateLimitCleanup = async (rateLimits, rateLimitId) => {
+const rateLimitCleanup = async (rateLimits: RateLimits, rateLimitId: string | undefined) => {
   if (!rateLimitId) return;
   try {
     await rateLimits.delete({ rateLimitId });
@@ -34,4 +28,4 @@ const rateLimitCleanup = async (rateLimits, rateLimitId) => {
     console.error(`Unable to delete rateLimit with id: ${rateLimitId}\n`, e);
   }
 };
-module.exports = { setupSecretManager, providerCleanup, modelCleanup, rateLimitCleanup };
+export { providerCleanup, modelCleanup, rateLimitCleanup };

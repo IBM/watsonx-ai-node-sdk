@@ -1,13 +1,13 @@
-const { NoAuthAuthenticator } = require('ibm-cloud-sdk-core');
-const { Models } = require('../../../dist/gateway/models');
-const { Providers } = require('../../../dist/gateway/providers');
-const { checkRequest } = require('../utils/checks');
-const { convertKeysToSnakeCase, convertModelToId } = require('../utils/helpers');
-const { MockingRequest } = require('../../utils/utils');
-const { APIBaseService } = require('../../../dist/base');
-const { Policies } = require('../../../dist/gateway/policies');
-
-const { RateLimits } = require('../../../dist/gateway/ratelimit');
+import { NoAuthAuthenticator } from 'ibm-cloud-sdk-core';
+import { Models } from '../../../src/gateway';
+import { Providers } from '../../../src/gateway';
+import { Policies } from '../../../src/gateway';
+import { APIBaseService } from '../../../src/base';
+import { checkRequest } from '../utils/checks';
+import { convertKeysToSnakeCase } from '../utils/helpers';
+import { MockingRequest } from '../../utils/utils';
+import { RateLimits } from '../../../src/gateway';
+import type { MethodsInvalidParams, MethodsParams } from './types';
 
 const serviceUrl = 'https://us-south.ml.cloud.ibm.com';
 const version = '2023-07-07';
@@ -16,7 +16,7 @@ const requestHeaders = {
   'GET': { 'Accept': 'application/json' },
   'POST': { 'Accept': 'application/json', 'Content-Type': 'application/json' },
   'PUT': { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-};
+} as const;
 
 describe('Resources', () => {
   describe('Init instance', () => {
@@ -71,14 +71,14 @@ describe('Resources', () => {
       serviceUrl,
       authenticator: new NoAuthAuthenticator(),
     });
-    const createRequestMocker = new MockingRequest(client, 'createRequest');
+    const createRequestMocker = new MockingRequest(client, 'createRequest' as any);
     const models = new Models(client);
     const providers = new Providers(client);
     const policies = new Policies(client);
     const rateLimit = new RateLimits(client);
 
     describe('Basic methods', () => {
-      const methods = [
+      const methods: MethodsParams<keyof typeof requestHeaders>[] = [
         {
           name: 'Create model',
           req: {
@@ -297,7 +297,7 @@ describe('Resources', () => {
               type: 'model',
               request: { duration: '1m', amount: 10, capacity: 100 },
               modelId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7',
-              providerId: undefined,
+              providerId: '12312312312',
             },
           },
           callableMethod: (params) => rateLimit.update(params),
@@ -319,8 +319,10 @@ describe('Resources', () => {
           method: 'DELETE',
         },
       ];
-      const negativeMethods = [
+      const negativeMethods: MethodsInvalidParams[] = [
+        // @ts-expect-error invalid params
         { name: 'Create model without data', callableMethod: () => models.create() },
+        // @ts-expect-error invalid params
         { name: 'Delete model without data', callableMethod: () => models.delete() },
         {
           name: 'Get model details with invalidId',
@@ -337,12 +339,12 @@ describe('Resources', () => {
           params: { invalidId: '', providerId: '1' },
           callableMethod: (params) => models.getDetails(params),
         },
-
+        // @ts-expect-error invalid params
         { name: 'Create provider without data', callableMethod: () => providers.create() },
         {
           name: 'Create provider with data and dataReference',
           callableMethod: (params) => providers.create(params),
-          param: {
+          params: {
             data: {
               'project_id': '550e8400-e29b-41d4-a716-446655440000',
               'space_id': '550e8400-e29b-41d4-a716-446655440000',
@@ -356,7 +358,9 @@ describe('Resources', () => {
             },
           },
         },
+        // @ts-expect-error invalid params
         { name: 'Delete provider without data', callableMethod: () => providers.delete() },
+        // @ts-expect-error invalid params
         { name: 'Update provider without data', callableMethod: () => providers.update() },
         {
           name: 'List providers with invalidId',
@@ -376,15 +380,19 @@ describe('Resources', () => {
 
         {
           name: 'List available models for provider',
+          // @ts-expect-error invalid params
           callableMethod: () => providers.listAvailableModels(),
         },
+        // @ts-expect-error invalid params
         { name: 'Create policy without data', callableMethod: () => policies.create() },
+        // @ts-expect-error invalid params
         { name: 'Delete policy without data', callableMethod: () => policies.delete() },
         {
           name: 'List policies without data',
           params: { invalidId: '' },
           callableMethod: (params) => policies.list(params),
         },
+        // @ts-expect-error invalid params
         { name: 'Update policy without data', callableMethod: () => policies.getDetails() },
         {
           name: 'Create rate limit for type model without modelId',
@@ -414,12 +422,48 @@ describe('Resources', () => {
             type: 'provider',
           },
         },
+        {
+          name: 'Create rate limit for type model without type',
+          callableMethod: (params) => rateLimit.create(params),
+          params: {
+            modelId: 'model_id',
+          },
+        },
+        {
+          name: 'Update rate limit for type model without type',
+          callableMethod: (params) => rateLimit.update(params),
+          params: {
+            modelId: 'model_id',
+          },
+        },
+        {
+          name: 'Get details of rate limit with invalid id',
+          callableMethod: (params) => rateLimit.getDetails(params),
+          params: {
+            invalidId: 'model_id',
+          },
+        },
+        {
+          name: 'List rate limits with invalid data',
+          callableMethod: (params) => rateLimit.list(params),
+          params: {
+            invalidId: 'model_id',
+          },
+        },
+        {
+          name: 'Delete rate limit without valid id',
+          callableMethod: (params) => rateLimit.delete(params),
+          params: {
+            invalidId: 'model_id',
+          },
+        },
       ];
-      let createRequestMock;
+      let createRequestMock: jest.SpyInstance;
 
       beforeEach(async () => {
-        createRequestMocker.mock(Promise.resolve({}));
-        createRequestMock = createRequestMocker.functionMock;
+        createRequestMocker.mock(() => Promise.resolve({}));
+        if (createRequestMocker.functionMock) createRequestMock = createRequestMocker.functionMock;
+        else throw new Error('Unable to mock request. Please check your implementation');
       });
 
       afterEach(async () => {
@@ -430,33 +474,40 @@ describe('Resources', () => {
         createRequestMocker.unmock();
       });
 
-      test.each(methods)('$name', async ({ req, callableMethod, method, exceptions }) => {
-        const { signal } = new AbortController();
-        const { params, url } = req;
-        const response = callableMethod({ signal, ...params });
-        const {
-          headers = {
-            'Accept': requestHeaders[method].Accept,
-            'Content-Type': requestHeaders[method]['Content-Type'],
-          },
-          ...restParams
-        } = params;
-
-        checkRequest({
-          request: {
-            signal,
-            headers,
-            url,
-            params: convertKeysToSnakeCase(restParams),
-          },
-          requestMock: createRequestMock,
+      test.each(methods)(
+        '$name',
+        async ({
+          req,
+          callableMethod,
           method,
-          version,
           exceptions,
-        });
+        }: {
+          req: any;
+          callableMethod: (params: any) => any;
+          method: keyof typeof requestHeaders;
+          exceptions?: Record<string, any> | undefined;
+        }) => {
+          const { signal } = new AbortController();
+          const { params, url } = req;
+          const response = callableMethod({ signal, ...params });
+          const { headers = requestHeaders[method], ...restParams } = params;
 
-        expect(response).toBeInstanceOf(Promise);
-      });
+          checkRequest({
+            request: {
+              signal,
+              headers,
+              url,
+              params: convertKeysToSnakeCase(restParams),
+            },
+            requestMock: createRequestMock,
+            method,
+            version,
+            exceptions,
+          });
+
+          expect(response).toBeInstanceOf(Promise);
+        }
+      );
 
       test.each(negativeMethods)('$name without payload', async ({ callableMethod, params }) => {
         if (params) {
@@ -469,11 +520,8 @@ describe('Resources', () => {
     });
 
     describe('List methods', () => {
-      let createRequestMock;
-
       beforeEach(async () => {
-        createRequestMocker.mock(Promise.resolve({ result: { data: [{}, {}] } }));
-        createRequestMock = createRequestMocker.functionMock;
+        createRequestMocker.mock(() => Promise.resolve({ result: { data: [{}, {}] } }));
       });
 
       afterEach(async () => {
@@ -484,7 +532,13 @@ describe('Resources', () => {
         createRequestMocker.unmock();
       });
 
-      const methods = [
+      interface MethodsListParams {
+        name: string;
+        params?: Record<string, any>;
+        callableMethod: (params?: any) => Promise<any>;
+      }
+
+      const methods: MethodsListParams[] = [
         {
           name: 'List models',
           callableMethod: () => models.list(),
@@ -530,20 +584,17 @@ describe('Resources', () => {
     });
 
     describe('Get details via list methods', () => {
-      let createRequestMock;
-
       beforeEach(async () => {
-        createRequestMocker.mock(
+        createRequestMocker.mock(() =>
           Promise.resolve({
             result: {
               data: [
-                { id: 1, uuid: 1 },
-                { id: 2, uuid: 2 },
+                { id: 1, uuid: '1' },
+                { id: 2, uuid: '2' },
               ],
             },
           })
         );
-        createRequestMock = createRequestMocker.functionMock;
       });
 
       afterEach(async () => {
@@ -555,14 +606,14 @@ describe('Resources', () => {
       });
 
       test('Get policies details', async () => {
-        const params = { policyId: 1 };
+        const params = { policyId: '1' };
         const response = await policies.getDetails(params);
 
-        expect(typeof response.id).toBe('number');
+        expect(typeof response.uuid).toBe('string');
       });
 
       test('Get policies details with not existing id', async () => {
-        const params = { policyId: 3 };
+        const params = { policyId: '3' };
         const response = policies.getDetails(params);
 
         await expect(response).rejects.toThrow(

@@ -1,5 +1,5 @@
 import type { Config } from 'jest';
-import global from '../jest.global.config.js';
+import global from '../jest.global.config';
 
 const config: Config = {
   ...global,

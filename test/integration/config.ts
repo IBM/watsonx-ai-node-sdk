@@ -7,7 +7,7 @@ const EMBEDDING_MODEL_IBM = 'ibm/slate-125m-english-rtrvr-v2';
 
 const TIME_SERIES_MODEL_IBM_512_96 = 'ibm/granite-ttm-512-96-r2';
 
-module.exports = {
+export {
   CHAT_MODEL_IBM,
   CHAT_MODEL_MISTRAL,
   CHAT_MODEL_META,

@@ -12,22 +12,22 @@
  * the License.
  */
 
-const fs = require('fs');
-const dotenv = require('dotenv');
-const path = require('path');
+import fs from 'fs';
+import dotenv from 'dotenv';
+import path from 'path';
 
 // this variable will either hold the normal `describe` method from `jest`
 // or will be an alias for `describe.skip` from `jest` (skipping all tests)
-let describeToUse;
+let describeToUse: jest.Describe;
 
 // this variable holds the name of the file passed into prepareTests.
-let configFilename;
+let configFilename: string;
 
-let configFileExists;
+let configFileExists: any;
 
 // `filename` is the location of the credentials file
 // returns the appropriate "describe" to be used for the tests.
-module.exports.prepareTests = (filename) => {
+function prepareTests(filename: string) {
   // Save off the name of the config file.
   configFilename = filename;
 
@@ -45,31 +45,36 @@ module.exports.prepareTests = (filename) => {
   }
 
   return describeToUse;
-};
+}
 
-module.exports.getDescribe = () => describeToUse;
+const getDescribe = () => describeToUse;
 
 // This function will load the contents of "configFilename" and
 // set the properties as environment variables.
-module.exports.loadEnv = () => {
+function loadEnv() {
   if (configFileExists) {
     dotenv.config({ path: path.resolve(process.cwd(), configFilename) });
   }
-};
+}
 
 // This function will load the contents of "configFilename" and return the
 // property/value pairs in an object.
-module.exports.loadConfig = () => {
+function loadConfig() {
   if (configFileExists) {
     return dotenv.parse(fs.readFileSync(configFilename));
   }
   return {};
-};
+}
 
-module.exports.checkCPD = () => {
-  if (process.env.WATSONX_AI_SERVICE_URL.includes('cloud.ibm.com')) {
+function checkCPD() {
+  if (
+    process.env.WATSONX_AI_SERVICE_URL &&
+    process.env.WATSONX_AI_SERVICE_URL.includes('cloud.ibm.com')
+  ) {
     describeToUse = describe.skip.bind(describe);
     describeToUse.skip = describeToUse;
   }
   return describeToUse;
-};
+}
+
+export { checkCPD, loadConfig, loadEnv, getDescribe, prepareTests };

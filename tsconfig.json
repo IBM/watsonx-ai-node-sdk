@@ -16,7 +16,7 @@
     "alwaysStrict": true /* Parse in strict mode and emit "use strict" for each source file. */,
     /* Module Resolution Options */
     "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
-    "types": ["node"] /* Type declaration files to be included in compilation. */,
+    "types": ["node", "jest"] /* Type declaration files to be included in compilation. */,
     "esModuleInterop": true
   },
   "exclude": ["./test/langchain", "./dist/**/*", "./examples/**/*"]
