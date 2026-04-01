@@ -12,4 +12,23 @@
  * the License.
  */
 
-export const VERSION = '1.7.11';
+export type {
+  UploadBatchFileParams,
+  ListFilesParams,
+  GetFileContentParams,
+  DeleteFileParams,
+  DownloadFileContentParams,
+  CreateBatchParams,
+  ListAllBatchesParams,
+  GetBatchParams,
+  CancelBatchParams,
+} from './request';
+
+export type {
+  UploadedFile,
+  DeletedFile,
+  UploadedFileCollection,
+  RequestCounts,
+  Batch,
+  BatchCollection,
+} from './response';

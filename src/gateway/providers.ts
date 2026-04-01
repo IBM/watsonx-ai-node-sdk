@@ -31,8 +31,7 @@ import type {
   ProviderResponse,
 } from './types/providers/response';
 import type { Response } from '../base/types/base';
-import { validateRequiredOneOf } from './utils/utils';
-import { validateRequestParams } from '../helpers/validators';
+import { validateRequestParams, validateRequiredOneOf } from '../helpers/validators';
 
 /**
  * Class representing the Providers resource. This class provides methods to interact with ML

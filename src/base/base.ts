@@ -151,7 +151,6 @@ export class WatsonxBaseService extends BaseService {
 
     // Read platformUrl from environment variables
     options.platformUrl ??= readExternalSources(options.serviceName).platformUrl;
-
     // Set platformUrl depending on user given urls
     if (options.platformUrl) {
       this.wxServiceUrl = options.platformUrl.concat('/wx');
@@ -159,12 +158,10 @@ export class WatsonxBaseService extends BaseService {
     } else if (
       Object.keys(WatsonxBaseService.PLATFORM_URLS_MAP).includes(this.baseOptions.serviceUrl)
     ) {
-      this.wxServiceUrl =
+      const platformUrl =
         WatsonxBaseService.PLATFORM_URLS_MAP[this.baseOptions.serviceUrl as PlatformURLKeys];
-      [this.serviceUrl] =
-        WatsonxBaseService.PLATFORM_URLS_MAP[this.baseOptions.serviceUrl as PlatformURLKeys].split(
-          '/wx'
-        );
+      this.wxServiceUrl = platformUrl.concat('/wx');
+      this.serviceUrl = platformUrl;
     } else {
       this.wxServiceUrl = this.baseOptions.serviceUrl.concat('/wx');
       this.serviceUrl = this.baseOptions.serviceUrl;

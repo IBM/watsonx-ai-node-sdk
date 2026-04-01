@@ -43,7 +43,7 @@ fi
     nvm install
     nvm use
     cd libs/langchain-core && pnpm install && pnpm build
-    cd ../langchain-community && pnpm add ../../../dist/$PACKAGE_PATH
+    cd ../community/langchain-community && pnpm add ../../../dist/$PACKAGE_PATH
     pnpm install
     pnpm build
     pnpm test:single ibm.test.ts

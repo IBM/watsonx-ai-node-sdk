@@ -66,10 +66,10 @@ describe('WatsonxBaseService', () => {
     const defaultUrl = 'https://us-south.ml.cloud.ibm.com';
 
     expect(defaultPlatformService.wxServiceUrl).toBe(
-      WatsonxBaseService.PLATFORM_URLS_MAP[defaultUrl]
+      WatsonxBaseService.PLATFORM_URLS_MAP[defaultUrl] + '/wx'
     );
     expect(defaultPlatformService.serviceUrl).toBe(
-      WatsonxBaseService.PLATFORM_URLS_MAP[defaultUrl].split('/wx')[0]
+      WatsonxBaseService.PLATFORM_URLS_MAP[defaultUrl]
     );
   });
 });

@@ -1534,6 +1534,7 @@ class WatsonXAI extends WatsonxBaseService {
       'sort',
       'include',
       'skip',
+      'include_total_rows',
     ];
     const validationErrors = validateRequestParams(params, requiredParams, validParams);
     if (validationErrors) {

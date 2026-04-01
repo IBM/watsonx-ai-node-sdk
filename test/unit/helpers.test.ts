@@ -16,8 +16,7 @@ import {
   convertUtilityToolToWatsonxTool,
   convertWatsonxToolCallToUtilityToolCall,
 } from '../../src';
-import { validateRequestParams } from '../../src/helpers/validators';
-import { validateRequiredOneOf } from '../../src/gateway/utils/utils';
+import { validateRequestParams, validateRequiredOneOf } from '../../src/helpers/validators';
 import type WatsonXAI from '../../src/vml_v1';
 
 describe('Helpers Tests', () => {

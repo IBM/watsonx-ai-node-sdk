@@ -188,12 +188,24 @@ tasks:
 
             source scripts/utils.sh
 
-            TAG="$(jq -r '.version' package.json)"
-
             setup-git enterprise
 
+            TAG="$(jq -r '.version' package.json)"
             git tag "${TAG}"
             git push origin tag "${TAG}"
+
+            BRANCH_NAME="$(get_env branch)"
+            # if branch is master, then it means that it is regular release and development should include the merge commit for consistency
+            if [[ $BRANCH_NAME == "main" ]]; then
+              echo "Attempting to move main's content into development branch"
+              git fetch origin
+              git checkout development
+              git rebase origin/main
+              if ! git push origin HEAD --force-with-lease; then
+                echo "⚠️  WARNING: Failed to push to development branch. Continuing with release process..."
+              fi
+              git checkout -
+            fi
 
             NODE_VERSION="$(get_env node-version)"
             if ! command -v npm &> /dev/null; then

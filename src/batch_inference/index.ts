@@ -1,5 +1,5 @@
 /**
- * (C) Copyright IBM Corp. 2025-2026.
+ * (C) Copyright IBM Corp. 2026.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -12,4 +12,22 @@
  * the License.
  */
 
-export const VERSION = '1.7.11';
+export { BatchInference } from './batch_inference';
+export { Files } from './files';
+export type {
+  UploadBatchFileParams,
+  ListFilesParams,
+  GetFileContentParams,
+  DeleteFileParams,
+  DownloadFileContentParams,
+  CreateBatchParams,
+  ListAllBatchesParams,
+  GetBatchParams,
+  CancelBatchParams,
+  UploadedFile,
+  DeletedFile,
+  UploadedFileCollection,
+  RequestCounts,
+  Batch,
+  BatchCollection,
+} from './types';

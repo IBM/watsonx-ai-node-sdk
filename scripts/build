@@ -34,7 +34,7 @@ rm -rf ${NODE_PATH}/src
 # Ensuring backwards compatibility with cjs and dist
 cp ${NODE_PATH}/vml_v1.* ${NODE_PATH}/dist/watsonx-ai-ml
 
-for pkg in @ibm-cloud/watsonx-ai @ibm-cloud/watsonx-ai/gateway; do
+for pkg in @ibm-cloud/watsonx-ai @ibm-cloud/watsonx-ai/gateway @ibm-cloud/watsonx-ai/base @ibm-cloud/watsonx-ai/batch_inference @ibm-cloud/watsonx-ai/authentication; do
 (cd ${NODE_PATH} && node -e "require('${pkg}')")
 (cd ${NODE_PATH} && node -e "import('${pkg}')" --input-type=module)
 done

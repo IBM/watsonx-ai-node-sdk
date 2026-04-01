@@ -7,7 +7,7 @@ import z from 'zod/v3';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
 
-const modelName = 'ibm/granite-3-8b-instruct-intel';
+const modelName = 'ibm/granite-3-8b-instruct';
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
   for (let i = 0; i < array.length; i += size) {

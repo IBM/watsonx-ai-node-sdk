@@ -279,6 +279,83 @@ function createCosReference(fileName: string, bucket: string, connectionId: stri
   };
 }
 
+/**
+ * Test helper to enforce required parameters validation
+ *
+ * @param {(params?: any) => Promise<any>} methodFn - The method to test
+ * @returns {void}
+ */
+export function testRequiredParams(methodFn: (params?: any) => Promise<any>) {
+  test('enforces required parameters – empty object', async () => {
+    await expect(methodFn({ projectId: 'test-project-id' })).rejects.toThrow(
+      /Missing required parameters/
+    );
+  });
+  test('enforces required parameters – undefined', async () => {
+    await expect(methodFn()).rejects.toThrow(
+      /One of the following parameters is required: projectId,spaceId/
+    );
+  });
+}
+
+/**
+ * Test helper to validate invalid parameters are rejected
+ *
+ * @param {(params?: any) => Promise<any>} methodFn - The method to test
+ * @param {Record<string, any>} [minParams] - Minimum valid parameters
+ * @returns {void}
+ */
+export function testInvalidParams(
+  methodFn: (params?: any) => Promise<any>,
+  minParams?: Record<string, any>
+) {
+  test('fails with invalid params passed', () => {
+    expect(methodFn({ ...minParams, invalidParams: 'invalidParam' })).rejects.toThrow(
+      /Found invalid parameters: invalidParams/
+    );
+  });
+}
+
+/**
+ * Test helper to run tests with retries enabled and disabled
+ *
+ * @param {() => void} testFn - The test function to run
+ * @param {any} service - The service instance with enableRetries/disableRetries methods
+ * @param {jest.SpyInstance} [createRequestMock] - Optional mock to clear between runs
+ * @returns {void}
+ */
+export function testWithRetries(
+  testFn: () => void,
+  service: any,
+  createRequestMock?: jest.SpyInstance
+) {
+  testFn();
+  createRequestMock?.mockClear();
+  service.enableRetries();
+  testFn();
+  createRequestMock?.mockClear();
+  service.disableRetries();
+  testFn();
+}
+
+export async function testAsyncWithRetries(
+  testFn: () => Promise<void>,
+  service: any,
+  createRequestMock?: jest.SpyInstance
+) {
+  await testFn();
+  createRequestMock?.mockClear();
+  service.enableRetries();
+  await testFn();
+  createRequestMock?.mockClear();
+  service.disableRetries();
+  await testFn();
+}
+
+export const getDefaultHeadersFromMock = (mock: jest.Mock | jest.SpyInstance) => {
+  return mock.mock.calls[0][0].defaultOptions.headers;
+};
+
 export {
   wait,
   MockingRequest,

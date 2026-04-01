@@ -38,3 +38,25 @@ export const validateRequestParams = (
   // @ts-expect-error validateParams has invalid typing
   return validateParams(params, requiredParams, validParamsWithCommon);
 };
+
+/**
+ * Checks if exactly one of the required parameters is provided.
+ *
+ * @param {Record<string, any>} params - Object containing parameters.
+ * @param {string[]} requiredParams - Array of required parameters.
+ * @throws {Error} If more than one required parameter is provided or none.
+ */
+export const validateRequiredOneOf = (
+  params: Record<string, any> = {},
+  requiredParams: string[]
+): void => {
+  const isParam = requiredParams.reduce((acc, curr) => {
+    if (params[curr] && !acc) return true;
+    if (params[curr] && acc)
+      throw new Error(`Only one of the following parameters is allowed: ${requiredParams}`);
+    return acc;
+  }, false);
+
+  if (isParam === false)
+    throw new Error(`One of the following parameters is required: ${requiredParams}`);
+};

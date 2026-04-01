@@ -45,8 +45,8 @@ describe('Completions', () => {
 
     const textCompletions = new GenerateTextCompletions(client);
     const chat = new Chat(client);
-    const modelAlias = 'ibm/granite-3-8b-instruct-intel';
     const modelName = 'ibm/granite-3-8b-instruct-intel';
+    const modelAlias = 'nodejs-sdk/' + modelName;
 
     beforeAll(async () => {
       const timestamp = Date.now();

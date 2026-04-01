@@ -13,6 +13,7 @@
     "src/index.ts",
     "src/gateway/index.ts",
     "src/base/index.ts",
-    "src/authentication/index.ts"
+    "src/authentication/index.ts",
+    "src/batch_inference/index.ts"
   ]
 }

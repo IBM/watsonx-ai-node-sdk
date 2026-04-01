@@ -412,6 +412,26 @@ export const GATEWAY_RATE_LIMIT_ENDPOINTS = {
 } as const;
 
 // ============================================================================
+// BATCH INFERENCE ENDPOINTS
+// ============================================================================
+
+export const BATCH_INFERENCE_ENDPOINTS = {
+  BASE: '/ml/v1/batches',
+  BY_ID: '/ml/v1/batches/{batch_id}',
+  CANCEL_BY_ID: '/ml/v1/batches/{batch_id}/cancel',
+} as const;
+
+// ============================================================================
+// FILES ENDPOINTS
+// ============================================================================
+
+export const FILES_ENDPOINTS = {
+  BASE: '/ml/v1/files',
+  BY_ID: '/ml/v1/files/{file_id}',
+  CONTENT_BY_ID: '/ml/v1/files/{file_id}/content',
+} as const;
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 
@@ -439,6 +459,8 @@ export const ENDPOINTS = {
     PROVIDER: GATEWAY_PROVIDER_ENDPOINTS,
     RATE_LIMIT: GATEWAY_RATE_LIMIT_ENDPOINTS,
   },
+  BATCH_INFERENCE: BATCH_INFERENCE_ENDPOINTS,
+  FILES: FILES_ENDPOINTS,
 } as const;
 
 // Made with Bob

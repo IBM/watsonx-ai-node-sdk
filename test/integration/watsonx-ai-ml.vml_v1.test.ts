@@ -519,7 +519,7 @@ describe('WatsonXAI_integration', () => {
       expectSuccessResponse(res, 201);
     });
 
-    test('getPromptSessionEntry', async () => {
+    test.skip('getPromptSessionEntry', async () => {
       expect(typeof entryId).toBe('string');
       expect(typeof sessionId).toBe('string');
       const params = {

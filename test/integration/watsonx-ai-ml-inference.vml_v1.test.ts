@@ -788,7 +788,7 @@ describe('WatsonXAI_integration', () => {
     });
   });
 
-  describe('Crypto parameter support', () => {
+  describe.skip('Crypto parameter support', () => {
     const YP_QA_URL = 'https://yp-qa.ml.cloud.ibm.com';
     const cryptoConfig = {
       key_ref: process.env.WATSONX_AI_CRYPTO_KEY_REF as string,

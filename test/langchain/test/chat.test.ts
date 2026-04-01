@@ -210,17 +210,17 @@ describe.each(Object.values(CHAT_MODELS))(
                 name: 'add',
                 description: 'Adds a and b.',
                 schema: z.object({
-                  a: z.number(),
-                  b: z.number(),
+                  a: z.string(),
+                  b: z.string(),
                 }),
               });
 
-              const multiplyTool = tool(async (input) => input.a * input.b, {
+              const multiplyTool = tool(async (input) => Number(input.a) * Number(input.b), {
                 name: 'multiply',
                 description: 'Multiplies a and b.',
                 schema: z.object({
-                  a: z.number(),
-                  b: z.number(),
+                  a: z.string(),
+                  b: z.string(),
                 }),
               });
               const tools = [addTool, multiplyTool];
