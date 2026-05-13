@@ -7,9 +7,13 @@ export interface MethodsSimpleParams {
   callableMethod: (params: any) => Promise<any>;
 }
 
-export interface MethodsParams<T> extends MethodsSimpleParams {
-  method: T;
+export interface MethodsParams extends MethodsSimpleParams {
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   exceptions?: Record<string, any>;
+  expectedPath?: Record<string, any>;
+  expectedBody?: Record<string, any>;
+  expectedQs?: Record<string, any>;
+  customHeaders?: Record<string, any>;
 }
 
 export interface MethodsInvalidParams {

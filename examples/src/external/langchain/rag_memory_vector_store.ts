@@ -1,5 +1,5 @@
 import { WatsonxEmbeddings } from '@langchain/community/embeddings/ibm';
-import { ChatWatsonx } from '@langchain/community/chat_models/ibm';
+import { ChatWatsonx } from '@langchain/ibm';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { MemoryVectorStore } from '@langchain/classic/vectorstores/memory';
 import { createAgent, tool } from 'langchain';
@@ -7,7 +7,7 @@ import z from 'zod/v3';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
 
-const modelName = 'ibm/granite-3-8b-instruct';
+const modelName = 'ibm/granite-4-h-small';
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
   for (let i = 0; i < array.length; i += size) {

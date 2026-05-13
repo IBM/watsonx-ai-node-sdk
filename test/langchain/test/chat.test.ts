@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 
-import { ChatWatsonx } from '@langchain/community/chat_models/ibm';
+import { ChatWatsonx } from '@langchain/ibm';
 import { ToolCall } from '@langchain/core/messages/tool';
 import { concat } from '@langchain/core/utils/stream';
 import { HumanMessage, AIMessageChunk, AIMessage, BaseMessage } from '@langchain/core/messages';

@@ -208,6 +208,34 @@ export const TEXT_ENDPOINTS = {
 
   /** Get/Delete classification result - GET/DELETE /ml/v1/text/classifications/{id} */
   CLASSIFICATION_BY_ID: '/ml/v1/text/classifications/{id}',
+
+  /** Schema management endpoints */
+  SCHEMAS: {
+    CREATE: {
+      /** List/Create schema - GET/POST /ml/v1/text/schemas/create */
+      BASE: '/ml/v1/text/schemas/create',
+      /** Get/Delete create schema - GET/DELETE /ml/v1/text/schemas/create/{id} */
+      BY_ID: '/ml/v1/text/schemas/create/{id}',
+    },
+    IMPROVE: {
+      /** List/Create improve schema - GET/POST /ml/v1/text/schemas/improve */
+      BASE: '/ml/v1/text/schemas/improve',
+      /** Get/Delete improve schema - GET/DELETE /ml/v1/text/schemas/improve/{id} */
+      BY_ID: '/ml/v1/text/schemas/improve/{id}',
+    },
+    MERGE: {
+      /** List/Create merge schema - GET/POST /ml/v1/text/schemas/merge */
+      BASE: '/ml/v1/text/schemas/merge',
+      /** Get/Delete merge schema - GET/DELETE /ml/v1/text/schemas/merge/{id} */
+      BY_ID: '/ml/v1/text/schemas/merge/{id}',
+    },
+    CLUSTER: {
+      /** List/Create cluster schema - GET/POST /ml/v1/text/schemas/cluster */
+      BASE: '/ml/v1/text/schemas/cluster',
+      /** Get/Delete cluster schema - GET/DELETE /ml/v1/text/schemas/cluster/{id} */
+      BY_ID: '/ml/v1/text/schemas/cluster/{id}',
+    },
+  },
 } as const;
 
 // ============================================================================

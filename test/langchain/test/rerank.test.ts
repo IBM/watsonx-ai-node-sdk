@@ -1,4 +1,4 @@
-import { WatsonxRerank } from '@langchain/community/document_compressors/ibm';
+import { WatsonxRerank } from '@langchain/ibm';
 import { Document } from '@langchain/core/documents';
 import { config } from 'dotenv';
 import { CROSS_ENCODER_MODEL } from './config.ts';

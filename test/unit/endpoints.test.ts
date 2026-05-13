@@ -158,5 +158,3 @@ describe('Platform URL Mappings Tests', () => {
     });
   });
 });
-
-// Made with Bob

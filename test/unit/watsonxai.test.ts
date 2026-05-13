@@ -15,18 +15,13 @@
 import unitTestUtils from '@ibm-cloud/sdk-test-utilities';
 import { NoAuthAuthenticator, BaseService } from 'ibm-cloud-sdk-core';
 import fs from 'fs';
-import { StreamTransform } from '../../src/lib/common';
 import * as getAuthenticatorFromEnvironment from '../../src/authentication/utils/get-authenticator-from-environment';
 import { WatsonXAI } from '../../src';
-import { checkAxiosOptions, checkRequest } from './utils/checks';
+import { checkAxiosOptions } from './utils/checks';
+import { testWithRetries } from '../utils/utils';
+import { createMockSetup, createDescribeMethod } from './utils';
 
-const {
-  getOptions,
-  checkUrlAndMethod,
-  checkMediaHeaders,
-  expectToBePromise,
-  checkForSuccessfulExecution,
-} = unitTestUtils;
+const { getOptions, checkUrlAndMethod, checkMediaHeaders, expectToBePromise } = unitTestUtils;
 
 // ─── Service Setup ────────────────────────────────────────────────────────────
 
@@ -39,16 +34,36 @@ const serviceOptions = {
   version: VERSION,
 };
 
-const stream = new StreamTransform();
-const service = new WatsonXAI(serviceOptions);
+const streamResult = [
+  'id: 1\nevent: message\ndata: {}\n\n',
+  'id: 2\nevent: message\ndata: {}\n\n',
+  'id: 3\nevent: message\ndata: {}\n\n',
+];
+const FAKE_ACCEPT = 'fake/accept';
+const FAKE_CONTENT_TYPE = 'fake/content-type';
+const INSTANCE_PROJECT_ID = 'a234fd6a-4749-496f-8060-411529db690f';
+
+const service = new WatsonXAI({ ...serviceOptions, projectId: INSTANCE_PROJECT_ID });
 
 // ─── Mock Setup ───────────────────────────────────────────────────────────────
 
-let createRequestMock: jest.SpyInstance;
+const mockSetup = createMockSetup({
+  target: BaseService.prototype,
+  method: 'createRequest' as any,
+  returnValue: Promise.resolve(),
+});
 
-function getMock(): jest.SpyInstance {
-  return createRequestMock;
+function runWithRetries(testFn: () => void) {
+  testWithRetries(testFn, service, mockSetup.getMock());
 }
+
+const describeMethod = createDescribeMethod(service, mockSetup.getMock, '', {
+  version: VERSION,
+  streamResult,
+  headerOverride: { Accept: FAKE_ACCEPT, 'Content-Type': FAKE_CONTENT_TYPE },
+  assertAuthHeader: false,
+  testRetryModes: true,
+});
 
 const getAuthenticatorMock = jest.spyOn(
   getAuthenticatorFromEnvironment,
@@ -145,14 +160,16 @@ const AUDIO_FILE_PATH = 'test/data/sample_audio_file.mp3';
  * sharedChatUndefinedFields so that any new optional fields added there are automatically reflected
  * in both the non-stream and stream variants.
  */
-function deploymentChatExpectedParams(
-  extra: Record<string, unknown> = {}
-): Record<string, unknown> {
+function deploymentChatExpectedParams(extra: Record<string, unknown> = {}) {
   return {
-    id_or_name: DEPLOYMENT_ID,
-    messages: [chatMessage],
-    ...sharedChatUndefinedFields,
-    ...extra,
+    expectedBody: {
+      messages: [chatMessage],
+      ...sharedChatUndefinedFields,
+      ...extra,
+    },
+    expectedPath: {
+      id_or_name: DEPLOYMENT_ID,
+    },
   };
 }
 
@@ -161,360 +178,28 @@ function deploymentChatExpectedParams(
  * (which extends sharedChatUndefinedFields) so that both the non-stream and stream variants stay in
  * sync automatically.
  */
-function textChatExpectedParams(extra: Record<string, unknown> = {}): Record<string, unknown> {
+function textChatExpectedParams(extra: Record<string, unknown> = {}) {
   return {
-    model_id: MODEL_ID,
-    messages: [chatMessage],
-    space_id: SPACE_ID,
-    project_id: PROJECT_ID,
-    ...textChatUndefinedFields,
-    ...extra,
+    expectedBody: {
+      model_id: MODEL_ID,
+      messages: [chatMessage],
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+      ...textChatUndefinedFields,
+      ...extra,
+    },
   };
-}
-
-// ─── Sentinel values for header-override tests ────────────────────────────────
-
-const FAKE_ACCEPT = 'fake/accept';
-const FAKE_CONTENT_TYPE = 'fake/contentType';
-
-// ─── Test Helpers ─────────────────────────────────────────────────────────────
-
-/** Runs a test function three times: baseline, retries enabled, retries disabled. */
-function testWithRetries(testFn: () => void) {
-  testFn();
-  createRequestMock?.mockClear();
-  service.enableRetries();
-  testFn();
-  createRequestMock?.mockClear();
-  service.disableRetries();
-  testFn();
-}
-
-/** Runs a stream method test three times, setting up the stream mock each time. */
-function testWithRetriesStream(testFn: () => void) {
-  const setupStreamMock = () =>
-    createRequestMock?.mockImplementation(() => Promise.resolve({ result: stream }));
-
-  const variants: Array<() => void> = [
-    () => {},
-    () => service.enableRetries(),
-    () => service.disableRetries(),
-  ];
-
-  for (const configure of variants) {
-    setupStreamMock();
-    configure();
-    testFn();
-    createRequestMock?.mockClear();
-  }
-}
-
-/** Adds negative tests asserting that a method rejects when required params are missing. */
-function testRequiredParams(methodFn: (params?: any) => Promise<any>) {
-  test('enforces required parameters – empty object', async () => {
-    await expect(methodFn({})).rejects.toThrow(/Missing required parameters/);
-  });
-  test('enforces required parameters – undefined', async () => {
-    await expect(methodFn()).rejects.toThrow(/Missing required parameters/);
-  });
-}
-
-function testInvalidParams(methodFn: (params?: any) => Promise<any>) {
-  test('fails with invalid params passed', () => {
-    expect(methodFn({ invalidParams: 'invalidParam' })).rejects.toThrow(
-      /Found invalid parameters: invalidParams/
-    );
-  });
-}
-
-// ─── Additional Test Helpers ──────────────────────────────────────────────────
-
-interface RawBodyRequestExpectations {
-  url: string;
-  httpMethod: string;
-  acceptHeader: string | undefined;
-  /** Content-Type header expected on the request. Omit for GET/DELETE methods that send no body. */
-  contentTypeHeader?: string;
-  signal: AbortSignal;
-  body: unknown;
-  expectedQs: Record<string, unknown>;
-  expectedPath?: Record<string, unknown>;
-}
-
-/** Validates all request options for a raw-body method call. */
-function validateRawBodyRequest(
-  mockRequestOptions: ReturnType<typeof getOptions>,
-  expected: RawBodyRequestExpectations
-): void {
-  checkUrlAndMethod(mockRequestOptions, expected.url, expected.httpMethod);
-  // Only assert Content-Type when the spec declares one; GET/DELETE methods legitimately omit it.
-  checkMediaHeaders(getMock(), expected.acceptHeader, expected.contentTypeHeader);
-  checkAxiosOptions(getMock(), expected.signal);
-  expect(mockRequestOptions.body).toEqual(expected.body);
-  Object.entries(expected.expectedQs).forEach(([k, v]) =>
-    expect(mockRequestOptions.qs[k]).toEqual(v)
-  );
-  if (expected.expectedPath) {
-    Object.entries(expected.expectedPath).forEach(([k, v]) =>
-      expect(mockRequestOptions.path[k]).toEqual(v)
-    );
-  }
-}
-
-interface RawBodyMethodOpts<P extends Record<string, unknown>> {
-  /**
-   * The service method under test. Typed as `(params: any)` so that concrete SDK method wrappers
-   * (e.g. `(p) => service.updateDeployment(p)`) are assignable here regardless of their strict
-   * param types, while `params` and `minParams` still enforce the shape of the test fixtures via
-   * `P`.
-   */
-  method: (params: any) => Promise<unknown>;
-  params: P;
-  minParams: Partial<P>;
-  url: string;
-  httpMethod: string;
-  acceptHeader: string | undefined;
-  contentTypeHeader: string;
-  bodyKey: keyof P;
-  expectedQs: Record<string, unknown>;
-  expectedPath?: Record<string, unknown>;
-}
-
-/**
- * Generates a describe block for methods that use a raw array body (e.g. JSON Patch). These cannot
- * use checkRequest because the body is not merged into qs/path/body object.
- */
-function describeRawBodyMethod<P extends Record<string, unknown>>(
-  name: string,
-  opts: RawBodyMethodOpts<P>
-) {
-  const {
-    method,
-    params,
-    minParams,
-    url,
-    httpMethod,
-    acceptHeader,
-    contentTypeHeader,
-    bodyKey,
-    expectedQs,
-    expectedPath,
-  } = opts;
-
-  const runCheck = () => {
-    const { signal } = new AbortController();
-    const result = method({ ...params, signal });
-    expectToBePromise(result);
-    expect(createRequestMock).toHaveBeenCalledTimes(1);
-    const mockRequestOptions = getOptions(getMock());
-    validateRawBodyRequest(mockRequestOptions, {
-      url,
-      httpMethod,
-      acceptHeader,
-      contentTypeHeader,
-      signal,
-      body: params[bodyKey],
-      expectedQs,
-      expectedPath,
-    });
-  };
-
-  describe(name, () => {
-    test('sends correct request params', () => {
-      testWithRetries(runCheck);
-    });
-
-    test('prioritizes user-given headers', () => {
-      method({
-        ...minParams,
-        headers: { Accept: FAKE_ACCEPT, 'Content-Type': FAKE_CONTENT_TYPE },
-      });
-      checkMediaHeaders(getMock(), FAKE_ACCEPT, FAKE_CONTENT_TYPE);
-    });
-    describe('negative tests', () => {
-      testRequiredParams(method);
-      testInvalidParams(method);
-    });
-  });
-}
-
-// ─── Method Test Descriptor ───────────────────────────────────────────────────
-
-interface MethodTestSpec {
-  /** The service method to call, bound to `service`. */
-  method: (params: any) => Promise<any>;
-  /** Full params object (camelCase) passed to the method. */
-  callParams: Record<string, any>;
-  /** Minimal required params for the user-headers override test. */
-  minParams: Record<string, any>;
-  /** Expected URL template. */
-  url: string;
-  /** HTTP method. */
-  httpMethod: string;
-  /**
-   * Expected request headers. Provide the headers that the method is expected to send. GET/DELETE
-   * methods typically only set Accept; POST/PUT/PATCH methods also set Content-Type. Both fields
-   * are optional at the type level because not every method sends both, but describeMethod will
-   * assert whichever values are present.
-   */
-  headers: { Accept?: string; 'Content-Type'?: string };
-  /**
-   * Expected flattened params (snake_case) compared via checkRequest (includes version). Mutually
-   * exclusive with expectedQs / expectedPath / expectedBody.
-   */
-  expectedParams?: Record<string, any>;
-  /**
-   * When provided, assertions are made directly against qs/path/body without appending version. Use
-   * for methods whose URL does not include the `version` query parameter.
-   */
-  expectedQs?: Record<string, any>;
-  /** Expected path params (snake_case). Used together with expectedQs. */
-  expectedPath?: Record<string, any>;
-  /** Expected body fields. Used together with expectedQs. */
-  expectedBody?: Record<string, any>;
-  /** Whether this is a streaming method (uses testWithRetriesStream). */
-  isStream?: boolean;
-  /** Whether the method has no required params (skip testRequiredParams). */
-  noRequiredParams?: boolean;
-  /** Whether to add a "succeeds with no parameters" test. */
-  testNoParams?: boolean;
-}
-
-/**
- * Generates a full describe block for a service method:
- *
- * - "sends correct request params" (with retries)
- * - "prioritizes user-given headers"
- * - Negative required-param tests (unless noRequiredParams)
- * - "succeeds with no parameters" (if testNoParams)
- *
- * When `expectedQs` is provided the check is done via direct assertions (no version appended). When
- * `expectedParams` is provided the check is done via checkRequest (version appended).
- */
-function describeMethod(name: string, spec: MethodTestSpec) {
-  const {
-    method,
-    callParams,
-    minParams,
-    url,
-    httpMethod,
-    headers,
-    expectedParams,
-    expectedQs,
-    expectedPath,
-    expectedBody,
-    isStream = false,
-    noRequiredParams = false,
-    testNoParams = false,
-  } = spec;
-
-  // Enforce mutual exclusion: callers must use either expectedParams (standard SDK path, version
-  // appended by checkRequest) or expectedQs (raw-body/prompt-style path, no version appended).
-  // Supplying both would silently ignore expectedParams and produce a false-positive test.
-  if (expectedParams !== undefined && expectedQs !== undefined) {
-    throw new Error(
-      `describeMethod('${name}'): expectedParams and expectedQs are mutually exclusive. ` +
-        'Use expectedParams for standard SDK methods or expectedQs for raw-body/prompt-style methods.'
-    );
-  }
-
-  const { Accept: expectedAccept, 'Content-Type': expectedContentType } = headers;
-
-  describe(name, () => {
-    // Dispatch helper: wraps fn with the appropriate retry harness depending on whether the method
-    // under test is a streaming method. Non-stream methods are run through testWithRetries (baseline
-    // + retries-enabled + retries-disabled). Stream methods use testWithRetriesStream which also
-    // re-installs the stream mock before each variant.
-    const runWithRetries = (fn: () => void) =>
-      isStream ? testWithRetriesStream(fn) : testWithRetries(fn);
-
-    // A single AbortController is created per test invocation so that each retry variant receives
-    // a fresh, non-aborted signal. The signal is captured in the closure and asserted against the
-    // value forwarded by the SDK, verifying that the SDK does not substitute its own signal.
-    const runCheck = () => {
-      const { signal } = new AbortController();
-      const result = method({ ...callParams, signal });
-      if (!isStream) expectToBePromise(result);
-      else expect(result).toBeInstanceOf(Promise);
-      expect(createRequestMock).toHaveBeenCalledTimes(1);
-
-      if (expectedQs !== undefined) {
-        // Raw-body / prompt-style path: these endpoints do NOT include the SDK 'version' query
-        // parameter, so we assert qs/path/body directly instead of delegating to checkRequest
-        // (which always appends version to the expected params).
-        // When the spec declares a body (expectedBody is set), Content-Type must also be provided
-        // so the assertion is meaningful. GET/DELETE methods that use expectedQs for path routing
-        // but send no body legitimately omit Content-Type.
-        if (expectedBody !== undefined && expectedContentType === undefined) {
-          throw new Error(
-            `describeMethod('${name}'): headers must include 'Content-Type' when expectedBody is provided.`
-          );
-        }
-        const mockRequestOptions = getOptions(getMock());
-        validateRawBodyRequest(mockRequestOptions, {
-          url,
-          httpMethod,
-          acceptHeader: expectedAccept,
-          contentTypeHeader: expectedContentType,
-          signal,
-          body: expectedBody,
-          expectedQs,
-          expectedPath,
-        });
-      } else {
-        // Standard SDK path: checkRequest merges qs/path/body and appends version before comparing.
-        checkRequest({
-          request: { url, params: expectedParams, signal, headers },
-          method: httpMethod,
-          version: VERSION,
-          requestMock: getMock(),
-        });
-      }
-    };
-
-    test('sends correct request params', () => {
-      runWithRetries(runCheck);
-    });
-
-    test('prioritizes user-given headers', () => {
-      const checkHeaders = () => {
-        method({
-          ...minParams,
-          headers: { Accept: FAKE_ACCEPT, 'Content-Type': FAKE_CONTENT_TYPE },
-        });
-        checkMediaHeaders(getMock(), FAKE_ACCEPT, FAKE_CONTENT_TYPE);
-      };
-      runWithRetries(checkHeaders);
-    });
-
-    if (testNoParams) {
-      test('succeeds with no parameters', () => {
-        method({});
-        checkForSuccessfulExecution(getMock());
-      });
-    }
-    describe('negative tests', () => {
-      if (!noRequiredParams) {
-        testRequiredParams(method);
-      }
-      testInvalidParams(method);
-    });
-  });
 }
 
 // ─── Suite ────────────────────────────────────────────────────────────────────
 
 describe('WatsonXAI', () => {
-  beforeAll(() => {
-    createRequestMock = jest.spyOn(BaseService.prototype, 'createRequest' as keyof BaseService);
-  });
-
-  beforeEach(() => {
-    createRequestMock.mockImplementation(() => Promise.resolve());
+  beforeAll(async () => {
+    await mockSetup.setup();
   });
 
   afterEach(() => {
-    createRequestMock.mockReset();
+    mockSetup.reset();
     getAuthenticatorMock.mockClear();
   });
 
@@ -553,6 +238,91 @@ describe('WatsonXAI', () => {
     test('uses default service url', () => {
       const opts = { authenticator: new NoAuthAuthenticator(), version: VERSION };
       expect(new WatsonXAI(opts)['baseOptions'].serviceUrl).toBe(WatsonXAI.DEFAULT_SERVICE_URL);
+    });
+
+    describe('projectId/spaceId validation', () => {
+      test('allows neither projectId nor spaceId', () => {
+        expect(() => {
+          new WatsonXAI({
+            ...serviceOptions,
+            // No projectId or spaceId
+          });
+        }).not.toThrow();
+      });
+
+      test('allows only projectId', () => {
+        const instance = new WatsonXAI({
+          ...serviceOptions,
+          projectId: PROJECT_ID,
+        });
+        expect(instance.projectId).toBe(PROJECT_ID);
+        expect(instance.spaceId).toBeUndefined();
+      });
+
+      test('allows only spaceId', () => {
+        const instance = new WatsonXAI({
+          ...serviceOptions,
+          spaceId: SPACE_ID,
+        });
+        expect(instance.spaceId).toBe(SPACE_ID);
+        expect(instance.projectId).toBeUndefined();
+      });
+
+      test('rejects both projectId and spaceId', () => {
+        expect(() => {
+          new WatsonXAI({
+            ...serviceOptions,
+            projectId: PROJECT_ID,
+            spaceId: SPACE_ID,
+          });
+        }).toThrow(/Only one of the following parameters is allowed: projectId,spaceId/);
+      });
+    });
+
+    describe('projectId and spaceId parameter override behavior', () => {
+      test('param projectId overrides instance spaceId', async () => {
+        const instanceWithSpaceId = new WatsonXAI({
+          ...serviceOptions,
+          spaceId: SPACE_ID,
+        });
+
+        const params = {
+          input: 'Hello world',
+          modelId: MODEL_ID,
+          projectId: PROJECT_ID, // This should override instance spaceId
+        };
+
+        const result = instanceWithSpaceId.generateText(params);
+        const requestMock = mockSetup.getMock();
+
+        expectToBePromise(result);
+
+        const options = getOptions(requestMock);
+        expect(options.body.project_id).toBe(PROJECT_ID);
+        expect(options.body.space_id).toBeUndefined();
+      });
+
+      test('param spaceId overrides instance projectId', async () => {
+        const instanceWithProjectId = new WatsonXAI({
+          ...serviceOptions,
+          projectId: PROJECT_ID,
+        });
+
+        const params = {
+          input: 'Hello world',
+          modelId: MODEL_ID,
+          spaceId: SPACE_ID, // This should override instance projectId
+        };
+
+        const result = instanceWithProjectId.generateText(params);
+        const requestMock = mockSetup.getMock();
+
+        expectToBePromise(result);
+
+        const options = getOptions(requestMock);
+        expect(options.body.space_id).toBe(SPACE_ID);
+        expect(options.body.project_id).toBeUndefined();
+      });
     });
   });
 
@@ -599,7 +369,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v4/deployments',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       name: 'text_classification',
       online: onlineDeployment,
       space_id: SPACE_ID,
@@ -612,6 +382,7 @@ describe('WatsonXAI', () => {
       asset: { id: RESOURCE_ID, rev: '1' },
       base_model_id: MODEL_ID,
     },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('listDeployments', {
@@ -632,7 +403,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v4/deployments',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: {
+    expectedQs: {
       space_id: SPACE_ID,
       project_id: PROJECT_ID,
       serving_name: 'classification',
@@ -646,6 +417,7 @@ describe('WatsonXAI', () => {
     },
     noRequiredParams: true,
     testNoParams: true,
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('getDeployment', {
@@ -655,16 +427,19 @@ describe('WatsonXAI', () => {
     url: '/ml/v4/deployments/{deployment_id}',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: {
+    expectedPath: {
       deployment_id: DEPLOYMENT_ID,
+    },
+    expectedQs: {
       space_id: SPACE_ID,
       project_id: PROJECT_ID,
     },
+    instanceProjectId: service.projectId,
   });
 
-  describeRawBodyMethod('updateDeployment', {
+  describeMethod('updateDeployment', {
     method: (p) => service.updateDeployment(p),
-    params: {
+    callParams: {
       deploymentId: DEPLOYMENT_ID,
       jsonPatch: [jsonPatchOperation],
       spaceId: SPACE_ID,
@@ -673,11 +448,14 @@ describe('WatsonXAI', () => {
     minParams: { deploymentId: DEPLOYMENT_ID, jsonPatch: [jsonPatchOperation] },
     url: '/ml/v4/deployments/{deployment_id}',
     httpMethod: 'PATCH',
-    acceptHeader: 'application/json',
-    contentTypeHeader: 'application/json-patch+json',
-    bodyKey: 'jsonPatch',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json-patch+json',
+    },
+    expectedBody: [jsonPatchOperation],
     expectedQs: { version: VERSION, space_id: SPACE_ID, project_id: PROJECT_ID },
     expectedPath: { deployment_id: DEPLOYMENT_ID },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('deleteDeployment', {
@@ -686,12 +464,14 @@ describe('WatsonXAI', () => {
     minParams: { deploymentId: DEPLOYMENT_ID },
     url: '/ml/v4/deployments/{deployment_id}',
     httpMethod: 'DELETE',
-    headers: {},
-    expectedParams: {
+    expectedPath: {
       deployment_id: DEPLOYMENT_ID,
+    },
+    expectedQs: {
       space_id: SPACE_ID,
       project_id: PROJECT_ID,
     },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('deploymentGenerateText', {
@@ -706,11 +486,13 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/deployments/{id_or_name}/text/generation',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
-      id_or_name: DEPLOYMENT_ID,
+    expectedBody: {
       input: 'What is AI?',
       parameters: { max_new_tokens: 100 },
       moderations: {},
+    },
+    expectedPath: {
+      id_or_name: DEPLOYMENT_ID,
     },
   });
 
@@ -726,11 +508,13 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/deployments/{id_or_name}/text/generation_stream',
     httpMethod: 'POST',
     headers: { Accept: 'text/event-stream', 'Content-Type': 'application/json' },
-    expectedParams: {
-      id_or_name: DEPLOYMENT_ID,
+    expectedBody: {
       input: 'What is AI?',
       parameters: { max_new_tokens: 100 },
       moderations: {},
+    },
+    expectedPath: {
+      id_or_name: DEPLOYMENT_ID,
     },
     isStream: true,
   });
@@ -747,7 +531,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/deployments/{id_or_name}/text/chat',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: deploymentChatExpectedParams({ temperature: 0.7, max_tokens: 200 }),
+    ...deploymentChatExpectedParams({ temperature: 0.7, max_tokens: 200 }),
   });
 
   describeMethod('deploymentsTextChatStream', {
@@ -762,7 +546,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/deployments/{id_or_name}/text/chat_stream',
     httpMethod: 'POST',
     headers: { Accept: 'text/event-stream', 'Content-Type': 'application/json' },
-    expectedParams: deploymentChatExpectedParams({ temperature: 0.7, max_tokens: 200 }),
+    ...deploymentChatExpectedParams({ temperature: 0.7, max_tokens: 200 }),
     isStream: true,
   });
 
@@ -783,12 +567,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/deployments/{id_or_name}/time_series/forecast',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
-      id_or_name: DEPLOYMENT_ID,
+    expectedBody: {
       data: { timestamp: ['2024-01-01', '2024-01-02'], value: [1.0, 2.0] },
       schema: { timestamp_column: 'timestamp', target_columns: ['value'] },
       parameters: { prediction_length: 10 },
       future_data: { timestamp: ['2024-01-03'], exog: [3.0] },
+    },
+    expectedPath: {
+      id_or_name: DEPLOYMENT_ID,
     },
   });
 
@@ -801,7 +587,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/foundation_model_specs',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: {
+    expectedQs: {
       start: 'token',
       limit: 50,
       filters: 'task_summarization',
@@ -818,7 +604,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/foundation_model_tasks',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { start: 'token', limit: 20 },
+    expectedQs: { start: 'token', limit: 20 },
     noRequiredParams: true,
     testNoParams: true,
   });
@@ -826,290 +612,508 @@ describe('WatsonXAI', () => {
   // ─── Prompts ───────────────────────────────────────────────────────────────
   // Prompt methods use wxServiceUrl and do NOT include `version` in qs.
 
-  describeMethod('createPrompt', {
-    method: (p) => service.createPrompt(p),
-    callParams: {
-      name: 'My Prompt',
-      prompt: promptObj,
-      description: 'A test prompt',
-      projectId: PROJECT_ID,
-      spaceId: SPACE_ID,
+  describeMethod(
+    'createPrompt',
+    {
+      method: (p) => service.createPrompt(p),
+      callParams: {
+        name: 'My Prompt',
+        prompt: promptObj,
+        description: 'A test prompt',
+        projectId: PROJECT_ID,
+        spaceId: SPACE_ID,
+      },
+      minParams: { name: 'My Prompt', prompt: promptObj },
+      url: '/v1/prompts',
+      httpMethod: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      expectedBody: {
+        name: 'My Prompt',
+        prompt: promptObj,
+        description: 'A test prompt',
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+        space_id: SPACE_ID,
+      },
     },
-    minParams: { name: 'My Prompt', prompt: promptObj },
-    url: '/v1/prompts',
-    httpMethod: 'POST',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedQs: { project_id: PROJECT_ID, space_id: SPACE_ID },
-    expectedBody: { name: 'My Prompt', prompt: promptObj, description: 'A test prompt' },
-  });
+    { version: undefined }
+  );
 
-  describeMethod('getPrompt', {
-    method: (p) => service.getPrompt(p),
-    callParams: { promptId: PROMPT_ID, projectId: PROJECT_ID, spaceId: SPACE_ID },
-    minParams: { promptId: PROMPT_ID },
-    url: '/v1/prompts/{prompt_id}',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedQs: { project_id: PROJECT_ID, space_id: SPACE_ID },
-    expectedPath: { prompt_id: PROMPT_ID },
-  });
+  describeMethod(
+    'getPrompt',
+    {
+      method: (p) => service.getPrompt(p),
+      callParams: { promptId: PROMPT_ID, projectId: PROJECT_ID, spaceId: SPACE_ID },
+      minParams: { promptId: PROMPT_ID },
+      url: '/v1/prompts/{prompt_id}',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      expectedPath: {
+        prompt_id: PROMPT_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+        space_id: SPACE_ID,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
 
   // listPrompts uses serviceUrl (not wxServiceUrl) and has hardcoded body query
-  describeMethod('listPrompts', {
-    method: (p) => service.listPrompts(p),
-    callParams: { projectId: PROJECT_ID, spaceId: SPACE_ID, limit: '50' },
-    minParams: {},
-    url: '/v2/asset_types/wx_prompt/search',
-    httpMethod: 'POST',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedQs: { project_id: PROJECT_ID, space_id: SPACE_ID },
-    expectedBody: { query: 'asset.asset_type:wx_prompt', limit: '50' },
-    noRequiredParams: true,
-    testNoParams: true,
-  });
-
-  describeMethod('updatePrompt', {
-    method: (p) => service.updatePrompt(p),
-    callParams: {
-      promptId: PROMPT_ID,
-      name: 'Updated Prompt',
-      prompt: promptObj,
-      description: 'Updated',
-      projectId: PROJECT_ID,
-      spaceId: SPACE_ID,
+  describeMethod(
+    'listPrompts',
+    {
+      method: (p) => service.listPrompts(p),
+      callParams: { projectId: PROJECT_ID, spaceId: SPACE_ID, limit: '50' },
+      minParams: {},
+      url: '/v2/asset_types/wx_prompt/search',
+      httpMethod: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      expectedBody: {
+        query: 'asset.asset_type:wx_prompt',
+        limit: '50',
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+        space_id: SPACE_ID,
+      },
+      noRequiredParams: true,
+      testNoParams: true,
+      instanceProjectId: service.projectId,
     },
-    minParams: { promptId: PROMPT_ID, name: 'Updated Prompt', prompt: promptObj },
-    url: '/v1/prompts/{prompt_id}',
-    httpMethod: 'PATCH',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedQs: { project_id: PROJECT_ID, space_id: SPACE_ID },
-    expectedPath: { prompt_id: PROMPT_ID },
-    expectedBody: { name: 'Updated Prompt', prompt: promptObj, description: 'Updated' },
-  });
+    { version: undefined }
+  );
 
-  describeMethod('deletePrompt', {
-    method: (p) => service.deletePrompt(p),
-    callParams: { promptId: PROMPT_ID, projectId: PROJECT_ID, spaceId: SPACE_ID },
-    minParams: { promptId: PROMPT_ID },
-    url: '/v1/prompts/{prompt_id}',
-    httpMethod: 'DELETE',
-    headers: {},
-    expectedQs: { project_id: PROJECT_ID, space_id: SPACE_ID },
-    expectedPath: { prompt_id: PROMPT_ID },
-  });
-
-  describeMethod('updatePromptLock', {
-    method: (p) => service.updatePromptLock(p),
-    callParams: {
-      promptId: PROMPT_ID,
-      locked: true,
-      lockType: 'edit',
-      projectId: PROJECT_ID,
-      spaceId: SPACE_ID,
-      force: false,
+  describeMethod(
+    'updatePrompt',
+    {
+      method: (p) => service.updatePrompt(p),
+      callParams: {
+        promptId: PROMPT_ID,
+        name: 'Updated Prompt',
+        prompt: promptObj,
+        description: 'Updated',
+        projectId: PROJECT_ID,
+        spaceId: SPACE_ID,
+      },
+      minParams: { promptId: PROMPT_ID, name: 'Updated Prompt', prompt: promptObj },
+      url: '/v1/prompts/{prompt_id}',
+      httpMethod: 'PATCH',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      expectedBody: {
+        name: 'Updated Prompt',
+        prompt: promptObj,
+        description: 'Updated',
+      },
+      expectedPath: {
+        prompt_id: PROMPT_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+        space_id: SPACE_ID,
+      },
+      instanceProjectId: service.projectId,
     },
-    minParams: { promptId: PROMPT_ID, locked: true },
-    url: '/v1/prompts/{prompt_id}/lock',
-    httpMethod: 'PUT',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedQs: { project_id: PROJECT_ID, space_id: SPACE_ID, force: false },
-    expectedPath: { prompt_id: PROMPT_ID },
-    expectedBody: { locked: true, lock_type: 'edit' },
-  });
+    { version: undefined }
+  );
 
-  describeMethod('getPromptLock', {
-    method: (p) => service.getPromptLock(p),
-    callParams: { promptId: PROMPT_ID, projectId: PROJECT_ID, spaceId: SPACE_ID },
-    minParams: { promptId: PROMPT_ID },
-    url: '/v1/prompts/{prompt_id}/lock',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedQs: { project_id: PROJECT_ID, space_id: SPACE_ID },
-    expectedPath: { prompt_id: PROMPT_ID },
-  });
-
-  describeMethod('getPromptInput', {
-    method: (p) => service.getPromptInput(p),
-    callParams: {
-      promptId: PROMPT_ID,
-      input: 'What is AI?',
-      promptVariables: { topic: 'AI' },
-      projectId: PROJECT_ID,
-      spaceId: SPACE_ID,
+  describeMethod(
+    'deletePrompt',
+    {
+      method: (p) => service.deletePrompt(p),
+      callParams: { promptId: PROMPT_ID, projectId: PROJECT_ID, spaceId: SPACE_ID },
+      minParams: { promptId: PROMPT_ID },
+      url: '/v1/prompts/{prompt_id}',
+      httpMethod: 'DELETE',
+      headers: {},
+      expectedPath: {
+        prompt_id: PROMPT_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+        space_id: SPACE_ID,
+      },
+      instanceProjectId: service.projectId,
     },
-    minParams: { promptId: PROMPT_ID },
-    url: '/v1/prompts/{prompt_id}/input',
-    httpMethod: 'POST',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedQs: { project_id: PROJECT_ID, space_id: SPACE_ID },
-    expectedPath: { prompt_id: PROMPT_ID },
-    expectedBody: { input: 'What is AI?', prompt_variables: { topic: 'AI' } },
-  });
+    { version: undefined }
+  );
+
+  describeMethod(
+    'updatePromptLock',
+    {
+      method: (p) => service.updatePromptLock(p),
+      callParams: {
+        promptId: PROMPT_ID,
+        locked: true,
+        lockType: 'edit',
+        projectId: PROJECT_ID,
+        spaceId: SPACE_ID,
+        force: false,
+      },
+      minParams: { promptId: PROMPT_ID, locked: true },
+      url: '/v1/prompts/{prompt_id}/lock',
+      httpMethod: 'PUT',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      expectedBody: {
+        locked: true,
+        lock_type: 'edit',
+      },
+      expectedPath: {
+        prompt_id: PROMPT_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+        space_id: SPACE_ID,
+        force: false,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
+
+  describeMethod(
+    'getPromptLock',
+    {
+      method: (p) => service.getPromptLock(p),
+      callParams: { promptId: PROMPT_ID, projectId: PROJECT_ID, spaceId: SPACE_ID },
+      minParams: { promptId: PROMPT_ID },
+      url: '/v1/prompts/{prompt_id}/lock',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      expectedPath: {
+        prompt_id: PROMPT_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+        space_id: SPACE_ID,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
+
+  describeMethod(
+    'getPromptInput',
+    {
+      method: (p) => service.getPromptInput(p),
+      callParams: {
+        promptId: PROMPT_ID,
+        input: 'What is AI?',
+        promptVariables: { topic: 'AI' },
+        projectId: PROJECT_ID,
+        spaceId: SPACE_ID,
+      },
+      minParams: { promptId: PROMPT_ID },
+      url: '/v1/prompts/{prompt_id}/input',
+      httpMethod: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      expectedBody: {
+        input: 'What is AI?',
+        prompt_variables: { topic: 'AI' },
+      },
+      expectedPath: {
+        prompt_id: PROMPT_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+        space_id: SPACE_ID,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
 
   // createPromptChatItem sends a raw array body
-  describeRawBodyMethod('createPromptChatItem', {
-    method: (p) => service.createPromptChatItem(p),
-    params: { promptId: PROMPT_ID, chatItem: [chatItem], projectId: PROJECT_ID, spaceId: SPACE_ID },
-    minParams: { promptId: PROMPT_ID, chatItem: [chatItem] },
-    url: '/v1/prompts/{prompt_id}/chat_items',
-    httpMethod: 'POST',
-    acceptHeader: undefined,
-    contentTypeHeader: 'application/json',
-    bodyKey: 'chatItem',
-    expectedQs: { project_id: PROJECT_ID, space_id: SPACE_ID },
-    expectedPath: { prompt_id: PROMPT_ID },
-  });
+  describeMethod(
+    'createPromptChatItem',
+    {
+      method: (p) => service.createPromptChatItem(p),
+      callParams: {
+        promptId: PROMPT_ID,
+        chatItem: [chatItem, chatItem],
+        projectId: PROJECT_ID,
+        spaceId: SPACE_ID,
+      },
+      minParams: { promptId: PROMPT_ID, chatItem: [chatItem] },
+      url: '/v1/prompts/{prompt_id}/chat_items',
+      httpMethod: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      expectedBody: [chatItem, chatItem],
+      expectedQs: { project_id: PROJECT_ID, space_id: SPACE_ID },
+      expectedPath: { prompt_id: PROMPT_ID },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
 
   // ─── Prompt Sessions ───────────────────────────────────────────────────────
 
-  describeMethod('createPromptSession', {
-    method: (p) => service.createPromptSession(p),
-    callParams: { name: 'My Session', description: 'A test session', projectId: PROJECT_ID },
-    minParams: { name: 'My Session' },
-    url: '/v1/prompt_sessions',
-    httpMethod: 'POST',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedQs: { project_id: PROJECT_ID },
-    expectedBody: { name: 'My Session', description: 'A test session' },
-  });
-
-  describeMethod('getPromptSession', {
-    method: (p) => service.getPromptSession(p),
-    callParams: { sessionId: SESSION_ID, projectId: PROJECT_ID, prefetch: true },
-    minParams: { sessionId: SESSION_ID },
-    url: '/v1/prompt_sessions/{session_id}',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedQs: { project_id: PROJECT_ID, prefetch: true },
-    expectedPath: { session_id: SESSION_ID },
-  });
-
-  describeMethod('updatePromptSession', {
-    method: (p) => service.updatePromptSession(p),
-    callParams: {
-      sessionId: SESSION_ID,
-      name: 'Updated Session',
-      description: 'Updated',
-      projectId: PROJECT_ID,
+  describeMethod(
+    'createPromptSession',
+    {
+      method: (p) => service.createPromptSession(p),
+      callParams: { name: 'My Session', description: 'A test session', projectId: PROJECT_ID },
+      minParams: { name: 'My Session' },
+      url: '/v1/prompt_sessions',
+      httpMethod: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      expectedBody: {
+        name: 'My Session',
+        description: 'A test session',
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+      },
+      instanceProjectId: service.projectId,
     },
-    minParams: { sessionId: SESSION_ID },
-    url: '/v1/prompt_sessions/{session_id}',
-    httpMethod: 'PATCH',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedQs: { project_id: PROJECT_ID },
-    expectedPath: { session_id: SESSION_ID },
-    expectedBody: { name: 'Updated Session', description: 'Updated' },
-  });
+    { version: undefined }
+  );
 
-  describeMethod('deletePromptSession', {
-    method: (p) => service.deletePromptSession(p),
-    callParams: { sessionId: SESSION_ID, projectId: PROJECT_ID },
-    minParams: { sessionId: SESSION_ID },
-    url: '/v1/prompt_sessions/{session_id}',
-    httpMethod: 'DELETE',
-    headers: {},
-    expectedQs: { project_id: PROJECT_ID },
-    expectedPath: { session_id: SESSION_ID },
-  });
-
-  describeMethod('createPromptSessionEntry', {
-    method: (p) => service.createPromptSessionEntry(p),
-    callParams: {
-      sessionId: SESSION_ID,
-      name: 'Entry 1',
-      createdAt: 1700000000,
-      prompt: promptObj,
-      projectId: PROJECT_ID,
+  describeMethod(
+    'getPromptSession',
+    {
+      method: (p) => service.getPromptSession(p),
+      callParams: { sessionId: SESSION_ID, projectId: PROJECT_ID, prefetch: true },
+      minParams: { sessionId: SESSION_ID },
+      url: '/v1/prompt_sessions/{session_id}',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      expectedPath: {
+        session_id: SESSION_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+        prefetch: true,
+      },
+      instanceProjectId: service.projectId,
     },
-    minParams: { sessionId: SESSION_ID, name: 'Entry 1', createdAt: 1700000000, prompt: promptObj },
-    url: '/v1/prompt_sessions/{session_id}/entries',
-    httpMethod: 'POST',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedQs: { project_id: PROJECT_ID },
-    expectedPath: { session_id: SESSION_ID },
-    expectedBody: { name: 'Entry 1', created_at: 1700000000, prompt: promptObj },
-  });
+    { version: undefined }
+  );
 
-  describeMethod('listPromptSessionEntries', {
-    method: (p) => service.listPromptSessionEntries(p),
-    callParams: { sessionId: SESSION_ID, projectId: PROJECT_ID, bookmark: 'bm1', limit: '10' },
-    minParams: { sessionId: SESSION_ID },
-    url: '/v1/prompt_sessions/{session_id}/entries',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedQs: { project_id: PROJECT_ID, bookmark: 'bm1', limit: '10' },
-    expectedPath: { session_id: SESSION_ID },
-  });
+  describeMethod(
+    'updatePromptSession',
+    {
+      method: (p) => service.updatePromptSession(p),
+      callParams: {
+        sessionId: SESSION_ID,
+        name: 'Updated Session',
+        description: 'Updated',
+        projectId: PROJECT_ID,
+      },
+      minParams: { sessionId: SESSION_ID },
+      url: '/v1/prompt_sessions/{session_id}',
+      httpMethod: 'PATCH',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      expectedBody: {
+        name: 'Updated Session',
+        description: 'Updated',
+      },
+      expectedPath: {
+        session_id: SESSION_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
+
+  describeMethod(
+    'deletePromptSession',
+    {
+      method: (p) => service.deletePromptSession(p),
+      callParams: { sessionId: SESSION_ID, projectId: PROJECT_ID },
+      minParams: { sessionId: SESSION_ID },
+      url: '/v1/prompt_sessions/{session_id}',
+      httpMethod: 'DELETE',
+      expectedPath: {
+        session_id: SESSION_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
+
+  describeMethod(
+    'createPromptSessionEntry',
+    {
+      method: (p) => service.createPromptSessionEntry(p),
+      callParams: {
+        sessionId: SESSION_ID,
+        name: 'Entry 1',
+        createdAt: 1700000000,
+        prompt: promptObj,
+        projectId: PROJECT_ID,
+      },
+      minParams: {
+        sessionId: SESSION_ID,
+        name: 'Entry 1',
+        createdAt: 1700000000,
+        prompt: promptObj,
+      },
+      url: '/v1/prompt_sessions/{session_id}/entries',
+      httpMethod: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      expectedBody: {
+        name: 'Entry 1',
+        created_at: 1700000000,
+        prompt: promptObj,
+      },
+      expectedPath: {
+        session_id: SESSION_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
+
+  describeMethod(
+    'listPromptSessionEntries',
+    {
+      method: (p) => service.listPromptSessionEntries(p),
+      callParams: { sessionId: SESSION_ID, projectId: PROJECT_ID, bookmark: 'bm1', limit: '10' },
+      minParams: { sessionId: SESSION_ID },
+      url: '/v1/prompt_sessions/{session_id}/entries',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      expectedPath: {
+        session_id: SESSION_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+        bookmark: 'bm1',
+        limit: '10',
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
 
   // createPromptSessionEntryChatItem sends a raw array body
-  describeRawBodyMethod('createPromptSessionEntryChatItem', {
-    method: (p) => service.createPromptSessionEntryChatItem(p),
-    params: {
-      sessionId: SESSION_ID,
-      entryId: ENTRY_ID,
-      chatItem: [chatItem],
-      projectId: PROJECT_ID,
+  describeMethod(
+    'createPromptSessionEntryChatItem',
+    {
+      method: (p) => service.createPromptSessionEntryChatItem(p),
+      callParams: {
+        sessionId: SESSION_ID,
+        entryId: ENTRY_ID,
+        chatItem: [chatItem],
+        projectId: PROJECT_ID,
+      },
+      minParams: { sessionId: SESSION_ID, entryId: ENTRY_ID, chatItem: [chatItem] },
+      url: '/v1/prompt_sessions/{session_id}/entries/{entry_id}/chat_items',
+      httpMethod: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      expectedBody: [chatItem],
+      expectedQs: { project_id: PROJECT_ID },
+      expectedPath: { session_id: SESSION_ID, entry_id: ENTRY_ID },
+      instanceProjectId: service.projectId,
     },
-    minParams: { sessionId: SESSION_ID, entryId: ENTRY_ID, chatItem: [chatItem] },
-    url: '/v1/prompt_sessions/{session_id}/entries/{entry_id}/chat_items',
-    httpMethod: 'POST',
-    acceptHeader: undefined,
-    contentTypeHeader: 'application/json',
-    bodyKey: 'chatItem',
-    expectedQs: { project_id: PROJECT_ID },
-    expectedPath: { session_id: SESSION_ID, entry_id: ENTRY_ID },
-  });
+    { version: undefined }
+  );
 
-  describeMethod('updatePromptSessionLock', {
-    method: (p) => service.updatePromptSessionLock(p),
-    callParams: {
-      sessionId: SESSION_ID,
-      locked: true,
-      lockType: 'edit',
-      projectId: PROJECT_ID,
-      force: false,
+  describeMethod(
+    'updatePromptSessionLock',
+    {
+      method: (p) => service.updatePromptSessionLock(p),
+      callParams: {
+        sessionId: SESSION_ID,
+        locked: true,
+        lockType: 'edit',
+        projectId: PROJECT_ID,
+        force: false,
+      },
+      minParams: { sessionId: SESSION_ID, locked: true },
+      url: '/v1/prompt_sessions/{session_id}/lock',
+      httpMethod: 'PUT',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      expectedBody: {
+        locked: true,
+        lock_type: 'edit',
+      },
+      expectedPath: {
+        session_id: SESSION_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+        force: false,
+      },
+      instanceProjectId: service.projectId,
     },
-    minParams: { sessionId: SESSION_ID, locked: true },
-    url: '/v1/prompt_sessions/{session_id}/lock',
-    httpMethod: 'PUT',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedQs: { project_id: PROJECT_ID, force: false },
-    expectedPath: { session_id: SESSION_ID },
-    expectedBody: { locked: true, lock_type: 'edit' },
-  });
+    { version: undefined }
+  );
 
-  describeMethod('getPromptSessionLock', {
-    method: (p) => service.getPromptSessionLock(p),
-    callParams: { sessionId: SESSION_ID, projectId: PROJECT_ID },
-    minParams: { sessionId: SESSION_ID },
-    url: '/v1/prompt_sessions/{session_id}/lock',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedQs: { project_id: PROJECT_ID },
-    expectedPath: { session_id: SESSION_ID },
-  });
+  describeMethod(
+    'getPromptSessionLock',
+    {
+      method: (p) => service.getPromptSessionLock(p),
+      callParams: { sessionId: SESSION_ID, projectId: PROJECT_ID },
+      minParams: { sessionId: SESSION_ID },
+      url: '/v1/prompt_sessions/{session_id}/lock',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      expectedPath: {
+        session_id: SESSION_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
 
-  describeMethod('getPromptSessionEntry', {
-    method: (p) => service.getPromptSessionEntry(p),
-    callParams: { sessionId: SESSION_ID, entryId: ENTRY_ID, projectId: PROJECT_ID },
-    minParams: { sessionId: SESSION_ID, entryId: ENTRY_ID },
-    url: '/v1/prompt_sessions/{session_id}/entries/{entry_id}',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedQs: { project_id: PROJECT_ID },
-    expectedPath: { session_id: SESSION_ID, entry_id: ENTRY_ID },
-  });
+  describeMethod(
+    'getPromptSessionEntry',
+    {
+      method: (p) => service.getPromptSessionEntry(p),
+      callParams: { sessionId: SESSION_ID, entryId: ENTRY_ID, projectId: PROJECT_ID },
+      minParams: { sessionId: SESSION_ID, entryId: ENTRY_ID },
+      url: '/v1/prompt_sessions/{session_id}/entries/{entry_id}',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      expectedPath: {
+        session_id: SESSION_ID,
+        entry_id: ENTRY_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
 
-  describeMethod('deletePromptSessionEntry', {
-    method: (p) => service.deletePromptSessionEntry(p),
-    callParams: { sessionId: SESSION_ID, entryId: ENTRY_ID, projectId: PROJECT_ID },
-    minParams: { sessionId: SESSION_ID, entryId: ENTRY_ID },
-    url: '/v1/prompt_sessions/{session_id}/entries/{entry_id}',
-    httpMethod: 'DELETE',
-    headers: {},
-    expectedQs: { project_id: PROJECT_ID },
-    expectedPath: { session_id: SESSION_ID, entry_id: ENTRY_ID },
-  });
+  describeMethod(
+    'deletePromptSessionEntry',
+    {
+      method: (p) => service.deletePromptSessionEntry(p),
+      callParams: { sessionId: SESSION_ID, entryId: ENTRY_ID, projectId: PROJECT_ID },
+      minParams: { sessionId: SESSION_ID, entryId: ENTRY_ID },
+      url: '/v1/prompt_sessions/{session_id}/entries/{entry_id}',
+      httpMethod: 'DELETE',
+      expectedPath: {
+        session_id: SESSION_ID,
+        entry_id: ENTRY_ID,
+      },
+      expectedQs: {
+        project_id: PROJECT_ID,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: undefined }
+  );
 
   // ─── Text Chat ─────────────────────────────────────────────────────────────
 
@@ -1127,7 +1131,8 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/text/chat',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: textChatExpectedParams({ temperature: 0.7, crypto: cryptoConfig }),
+    ...textChatExpectedParams({ temperature: 0.7, crypto: cryptoConfig }),
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('textChatStream', {
@@ -1143,8 +1148,9 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/text/chat_stream',
     httpMethod: 'POST',
     headers: { Accept: 'text/event-stream', 'Content-Type': 'application/json' },
-    expectedParams: textChatExpectedParams({ temperature: 0.7 }),
+    ...textChatExpectedParams({ temperature: 0.7 }),
     isStream: true,
+    instanceProjectId: service.projectId,
   });
 
   // ─── Text Embeddings ───────────────────────────────────────────────────────
@@ -1163,7 +1169,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/text/embeddings',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       model_id: MODEL_ID,
       inputs: ['Hello world'],
       space_id: SPACE_ID,
@@ -1171,6 +1177,7 @@ describe('WatsonXAI', () => {
       parameters: { truncate_input_tokens: 512 },
       crypto: cryptoConfig,
     },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Text Extraction ───────────────────────────────────────────────────────
@@ -1191,13 +1198,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/text/extractions',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       document_reference: textExtractionDataReference,
       results_reference: textExtractionDataReference,
       steps: { ocr: { process_image: true } },
       project_id: PROJECT_ID,
       space_id: SPACE_ID,
     },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('listTextExtractions', {
@@ -1207,9 +1215,10 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/text/extractions',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { space_id: SPACE_ID, project_id: PROJECT_ID, start: 'token', limit: 10 },
+    expectedQs: { space_id: SPACE_ID, project_id: PROJECT_ID, start: 'token', limit: 10 },
     noRequiredParams: true,
     testNoParams: true,
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('getTextExtraction', {
@@ -1219,7 +1228,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/text/extractions/{id}',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { id: RESOURCE_ID, space_id: SPACE_ID, project_id: PROJECT_ID },
+    expectedPath: {
+      id: RESOURCE_ID,
+    },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+    },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('deleteTextExtraction', {
@@ -1228,14 +1244,417 @@ describe('WatsonXAI', () => {
     minParams: { id: RESOURCE_ID },
     url: '/ml/v1/text/extractions/{id}',
     httpMethod: 'DELETE',
-    headers: {},
-    expectedParams: {
+    expectedPath: {
       id: RESOURCE_ID,
+    },
+    expectedQs: {
       space_id: SPACE_ID,
       project_id: PROJECT_ID,
       hard_delete: true,
     },
+    instanceProjectId: service.projectId,
   });
+
+  // ─── Schema Management ─────────────────────────────────────────────────────
+
+  // Create Schema
+  describeMethod('createSchema', {
+    method: (p) => service.runCreateSchemaJob(p),
+    callParams: {
+      documentReference: textExtractionDataReference,
+      parameters: {
+        mode: 'high_quality',
+        ocr_mode: 'enabled',
+        auto_rotation_correction: true,
+        languages: ['en', 'es'],
+        additional_prompt_instructions: 'Focus on financial data',
+        enable_grounding: true,
+        max_pages_to_process: 10,
+        semantic_config: { default_model_name: 'ibm/granite-13b-chat-v2' },
+      },
+      projectId: PROJECT_ID,
+      spaceId: SPACE_ID,
+    },
+    minParams: { documentReference: textExtractionDataReference },
+    url: '/ml/v1/text/schemas/create',
+    httpMethod: 'POST',
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    expectedBody: {
+      document_reference: textExtractionDataReference,
+      parameters: {
+        mode: 'high_quality',
+        ocr_mode: 'enabled',
+        auto_rotation_correction: true,
+        languages: ['en', 'es'],
+        additional_prompt_instructions: 'Focus on financial data',
+        enable_grounding: true,
+        max_pages_to_process: 10,
+        semantic_config: { default_model_name: 'ibm/granite-13b-chat-v2' },
+      },
+      project_id: PROJECT_ID,
+      space_id: SPACE_ID,
+    },
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('listCreateSchema', {
+    method: (p) => service.listCreateSchemaJobs(p),
+    callParams: { spaceId: SPACE_ID, projectId: PROJECT_ID, start: 'token', limit: 10 },
+    minParams: {},
+    url: '/ml/v1/text/schemas/create',
+    httpMethod: 'GET',
+    headers: { Accept: 'application/json' },
+    expectedQs: { space_id: SPACE_ID, project_id: PROJECT_ID, start: 'token', limit: 10 },
+    noRequiredParams: true,
+    testNoParams: true,
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('getCreateSchema', {
+    method: (p) => service.getCreateSchemaJob(p),
+    callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID },
+    minParams: { id: RESOURCE_ID },
+    url: '/ml/v1/text/schemas/create/{id}',
+    httpMethod: 'GET',
+    headers: { Accept: 'application/json' },
+    expectedPath: { id: RESOURCE_ID },
+    expectedQs: { space_id: SPACE_ID, project_id: PROJECT_ID },
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('deleteCreateSchema', {
+    method: (p) => service.deleteCreateSchemaJob(p),
+    callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID, hardDelete: true },
+    minParams: { id: RESOURCE_ID },
+    url: '/ml/v1/text/schemas/create/{id}',
+    httpMethod: 'DELETE',
+    headers: {},
+    expectedPath: { id: RESOURCE_ID },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+      hard_delete: true,
+    },
+    instanceProjectId: service.projectId,
+  });
+
+  // Improve Schema
+  describeMethod('improveSchema', {
+    method: (p) => service.runImproveSchemaJob(p),
+    callParams: {
+      parameters: {
+        schema: {
+          document_type: 'invoice',
+          document_description: 'Business invoice document',
+          fields: {
+            invoiceNumber: { description: 'Invoice number', example: 'INV-001' },
+            totalAmount: { description: 'Total amount', example: '$1,234.56' },
+          },
+          additional_prompt_instructions: 'Extract all financial details',
+        },
+        semantic_config: { default_model_name: 'ibm/granite-13b-chat-v2' },
+      },
+      projectId: PROJECT_ID,
+      spaceId: SPACE_ID,
+    },
+    minParams: {
+      parameters: {
+        schema: {
+          document_type: 'invoice',
+          document_description: 'Business invoice document',
+        },
+      },
+    },
+    url: '/ml/v1/text/schemas/improve',
+    httpMethod: 'POST',
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    expectedBody: {
+      parameters: {
+        schema: {
+          document_type: 'invoice',
+          document_description: 'Business invoice document',
+          fields: {
+            invoiceNumber: { description: 'Invoice number', example: 'INV-001' },
+            totalAmount: { description: 'Total amount', example: '$1,234.56' },
+          },
+          additional_prompt_instructions: 'Extract all financial details',
+        },
+        semantic_config: { default_model_name: 'ibm/granite-13b-chat-v2' },
+      },
+      project_id: PROJECT_ID,
+      space_id: SPACE_ID,
+    },
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('listImproveSchema', {
+    method: (p) => service.listImproveSchemaJobs(p),
+    callParams: { spaceId: SPACE_ID, projectId: PROJECT_ID, start: 'token', limit: 10 },
+    minParams: {},
+    url: '/ml/v1/text/schemas/improve',
+    httpMethod: 'GET',
+    headers: { Accept: 'application/json' },
+    expectedQs: { space_id: SPACE_ID, project_id: PROJECT_ID, start: 'token', limit: 10 },
+    noRequiredParams: true,
+    testNoParams: true,
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('getImproveSchema', {
+    method: (p) => service.getImproveSchemaJob(p),
+    callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID },
+    minParams: { id: RESOURCE_ID },
+    url: '/ml/v1/text/schemas/improve/{id}',
+    httpMethod: 'GET',
+    headers: { Accept: 'application/json' },
+    expectedPath: { id: RESOURCE_ID },
+    expectedQs: { space_id: SPACE_ID, project_id: PROJECT_ID },
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('deleteImproveSchema', {
+    method: (p) => service.deleteImproveSchemaJob(p),
+    callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID, hardDelete: true },
+    minParams: { id: RESOURCE_ID },
+    url: '/ml/v1/text/schemas/improve/{id}',
+    httpMethod: 'DELETE',
+    headers: {},
+    expectedPath: { id: RESOURCE_ID },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+      hard_delete: true,
+    },
+    instanceProjectId: service.projectId,
+  });
+
+  // Merge Schema
+  describeMethod('mergeSchema', {
+    method: (p) => service.runMergeSchemaJob(p),
+    callParams: {
+      parameters: {
+        schemas: [
+          {
+            document_type: 'invoice',
+            document_description: 'Invoice document',
+            fields: {
+              invoiceNumber: { description: 'Invoice number', example: 'INV-001' },
+            },
+          },
+          {
+            document_type: 'receipt',
+            document_description: 'Receipt document',
+            fields: {
+              receiptNumber: { description: 'Receipt number', example: 'REC-001' },
+            },
+          },
+        ],
+        semantic_config: { default_model_name: 'ibm/granite-13b-chat-v2' },
+      },
+      projectId: PROJECT_ID,
+      spaceId: SPACE_ID,
+    },
+    minParams: {
+      parameters: {
+        schemas: [
+          {
+            document_type: 'invoice',
+            document_description: 'Invoice document',
+          },
+        ],
+      },
+    },
+    url: '/ml/v1/text/schemas/merge',
+    httpMethod: 'POST',
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    expectedBody: {
+      parameters: {
+        schemas: [
+          {
+            document_type: 'invoice',
+            document_description: 'Invoice document',
+            fields: {
+              invoiceNumber: { description: 'Invoice number', example: 'INV-001' },
+            },
+          },
+          {
+            document_type: 'receipt',
+            document_description: 'Receipt document',
+            fields: {
+              receiptNumber: { description: 'Receipt number', example: 'REC-001' },
+            },
+          },
+        ],
+        semantic_config: { default_model_name: 'ibm/granite-13b-chat-v2' },
+      },
+      project_id: PROJECT_ID,
+      space_id: SPACE_ID,
+    },
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('listMergeSchema', {
+    method: (p) => service.listMergeSchemaJobs(p),
+    callParams: { spaceId: SPACE_ID, projectId: PROJECT_ID, start: 'token', limit: 10 },
+    minParams: {},
+    url: '/ml/v1/text/schemas/merge',
+    httpMethod: 'GET',
+    headers: { Accept: 'application/json' },
+    expectedQs: { space_id: SPACE_ID, project_id: PROJECT_ID, start: 'token', limit: 10 },
+    noRequiredParams: true,
+    testNoParams: true,
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('getMergeSchema', {
+    method: (p) => service.getMergeSchemaJob(p),
+    callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID },
+    minParams: { id: RESOURCE_ID },
+    url: '/ml/v1/text/schemas/merge/{id}',
+    httpMethod: 'GET',
+    headers: { Accept: 'application/json' },
+    expectedPath: { id: RESOURCE_ID },
+    expectedQs: { space_id: SPACE_ID, project_id: PROJECT_ID },
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('deleteMergeSchema', {
+    method: (p) => service.deleteMergeSchemaJob(p),
+    callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID, hardDelete: true },
+    minParams: { id: RESOURCE_ID },
+    url: '/ml/v1/text/schemas/merge/{id}',
+    httpMethod: 'DELETE',
+    headers: {},
+    expectedPath: { id: RESOURCE_ID },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+      hard_delete: true,
+    },
+    instanceProjectId: service.projectId,
+  });
+
+  // Cluster Schema
+  describeMethod('clusterSchema', {
+    method: (p) => service.runClusterSchemaJob(p),
+    callParams: {
+      parameters: {
+        schemas: [
+          {
+            document_name: 'invoice1.pdf',
+            schema: {
+              document_type: 'invoice',
+              document_description: 'Invoice document',
+              fields: {
+                invoiceNumber: { description: 'Invoice number', example: 'INV-001' },
+              },
+            },
+          },
+          {
+            document_name: 'invoice2.pdf',
+            schema: {
+              document_type: 'invoice',
+              document_description: 'Another invoice',
+              fields: {
+                invoiceId: { description: 'Invoice ID', example: 'INV-002' },
+              },
+            },
+          },
+        ],
+        semantic_config: { default_model_name: 'ibm/granite-13b-chat-v2' },
+      },
+      projectId: PROJECT_ID,
+      spaceId: SPACE_ID,
+    },
+    minParams: {
+      parameters: {
+        schemas: [
+          {
+            document_name: 'invoice1.pdf',
+            schema: {
+              document_type: 'invoice',
+              document_description: 'Invoice document',
+            },
+          },
+        ],
+      },
+    },
+    url: '/ml/v1/text/schemas/cluster',
+    httpMethod: 'POST',
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    expectedBody: {
+      parameters: {
+        schemas: [
+          {
+            document_name: 'invoice1.pdf',
+            schema: {
+              document_type: 'invoice',
+              document_description: 'Invoice document',
+              fields: {
+                invoiceNumber: { description: 'Invoice number', example: 'INV-001' },
+              },
+            },
+          },
+          {
+            document_name: 'invoice2.pdf',
+            schema: {
+              document_type: 'invoice',
+              document_description: 'Another invoice',
+              fields: {
+                invoiceId: { description: 'Invoice ID', example: 'INV-002' },
+              },
+            },
+          },
+        ],
+        semantic_config: { default_model_name: 'ibm/granite-13b-chat-v2' },
+      },
+      project_id: PROJECT_ID,
+      space_id: SPACE_ID,
+    },
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('listClusterSchema', {
+    method: (p) => service.listClusterSchemaJobs(p),
+    callParams: { spaceId: SPACE_ID, projectId: PROJECT_ID, start: 'token', limit: 10 },
+    minParams: {},
+    url: '/ml/v1/text/schemas/cluster',
+    httpMethod: 'GET',
+    headers: { Accept: 'application/json' },
+    expectedQs: { space_id: SPACE_ID, project_id: PROJECT_ID, start: 'token', limit: 10 },
+    noRequiredParams: true,
+    testNoParams: true,
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('getClusterSchema', {
+    method: (p) => service.getClusterSchemaJob(p),
+    callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID },
+    minParams: { id: RESOURCE_ID },
+    url: '/ml/v1/text/schemas/cluster/{id}',
+    httpMethod: 'GET',
+    headers: { Accept: 'application/json' },
+    expectedPath: { id: RESOURCE_ID },
+    expectedQs: { space_id: SPACE_ID, project_id: PROJECT_ID },
+    instanceProjectId: service.projectId,
+  });
+
+  describeMethod('deleteClusterSchema', {
+    method: (p) => service.deleteClusterSchemaJob(p),
+    callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID, hardDelete: true },
+    minParams: { id: RESOURCE_ID },
+    url: '/ml/v1/text/schemas/cluster/{id}',
+    httpMethod: 'DELETE',
+    headers: {},
+    expectedPath: { id: RESOURCE_ID },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+      hard_delete: true,
+    },
+    instanceProjectId: service.projectId,
+  });
+
   // ─── Text Generation ───────────────────────────────────────────────────────
 
   describeMethod('generateText', {
@@ -1252,7 +1671,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/text/generation',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       input: 'Hello world',
       model_id: MODEL_ID,
       space_id: SPACE_ID,
@@ -1260,6 +1679,7 @@ describe('WatsonXAI', () => {
       parameters: { max_new_tokens: 100 },
       crypto: cryptoConfig,
     },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('generateTextStream', {
@@ -1275,7 +1695,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/text/generation_stream',
     httpMethod: 'POST',
     headers: { Accept: 'text/event-stream', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       input: 'Hello world',
       model_id: MODEL_ID,
       space_id: SPACE_ID,
@@ -1283,6 +1703,7 @@ describe('WatsonXAI', () => {
       parameters: { max_new_tokens: 100 },
     },
     isStream: true,
+    instanceProjectId: service.projectId,
   });
 
   // ─── Tokenization ──────────────────────────────────────────────────────────
@@ -1301,7 +1722,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/text/tokenization',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       model_id: MODEL_ID,
       input: 'Hello world',
       space_id: SPACE_ID,
@@ -1309,6 +1730,7 @@ describe('WatsonXAI', () => {
       parameters: { return_tokens: true },
       crypto: cryptoConfig,
     },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Time Series ───────────────────────────────────────────────────────────
@@ -1330,13 +1752,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/time_series/forecast',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       model_id: MODEL_ID,
       data: { target: [[1, 2, 3]] },
       schema: { timestamp_column: 'date', target_columns: ['value'] },
       project_id: PROJECT_ID,
       space_id: SPACE_ID,
     },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Trainings ─────────────────────────────────────────────────────────────
@@ -1354,13 +1777,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v4/trainings',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       name: 'my-training',
       results_reference: trainingResultsRef,
       space_id: SPACE_ID,
       project_id: PROJECT_ID,
       description: 'A training job',
     },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('listTrainings', {
@@ -1370,8 +1794,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v4/trainings',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { space_id: SPACE_ID, project_id: PROJECT_ID, limit: 10, state: 'running' },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+      limit: 10,
+      state: 'running',
+    },
     noRequiredParams: true,
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('getTraining', {
@@ -1381,7 +1811,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v4/trainings/{training_id}',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { training_id: RESOURCE_ID, space_id: SPACE_ID, project_id: PROJECT_ID },
+    expectedPath: {
+      training_id: RESOURCE_ID,
+    },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+    },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('deleteTraining', {
@@ -1395,13 +1832,15 @@ describe('WatsonXAI', () => {
     minParams: { trainingId: RESOURCE_ID },
     url: '/ml/v4/trainings/{training_id}',
     httpMethod: 'DELETE',
-    headers: {},
-    expectedParams: {
+    expectedPath: {
       training_id: RESOURCE_ID,
+    },
+    expectedQs: {
       space_id: SPACE_ID,
       project_id: PROJECT_ID,
       hard_delete: true,
     },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Text Rerank ───────────────────────────────────────────────────────────
@@ -1420,7 +1859,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/text/rerank',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       model_id: MODEL_ID,
       inputs: [{ text: 'doc one' }],
       query: 'what is AI?',
@@ -1428,6 +1867,7 @@ describe('WatsonXAI', () => {
       project_id: PROJECT_ID,
       crypto: cryptoConfig,
     },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Fine Tunings ──────────────────────────────────────────────────────────
@@ -1450,7 +1890,7 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/fine_tunings',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       name: 'my-fine-tuning',
       training_data_references: fineTuningDataRef,
       results_reference: fineTuningResultsRef,
@@ -1458,6 +1898,7 @@ describe('WatsonXAI', () => {
       space_id: SPACE_ID,
       description: 'A fine tuning job',
     },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Fine Tunings (list/get/delete) ───────────────────────────────────────
@@ -1469,8 +1910,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/fine_tunings',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { space_id: SPACE_ID, project_id: PROJECT_ID, limit: 10, state: 'running' },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+      limit: 10,
+      state: 'running',
+    },
     noRequiredParams: true,
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('getFineTuning', {
@@ -1480,7 +1927,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/fine_tunings/{id}',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { id: RESOURCE_ID, space_id: SPACE_ID, project_id: PROJECT_ID },
+    expectedPath: {
+      id: RESOURCE_ID,
+    },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+    },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('deleteFineTuning', {
@@ -1489,13 +1943,15 @@ describe('WatsonXAI', () => {
     minParams: { id: RESOURCE_ID },
     url: '/ml/v1/fine_tunings/{id}',
     httpMethod: 'DELETE',
-    headers: {},
-    expectedParams: {
+    expectedPath: {
       id: RESOURCE_ID,
+    },
+    expectedQs: {
       space_id: SPACE_ID,
       project_id: PROJECT_ID,
       hard_delete: true,
     },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Document Extractions ──────────────────────────────────────────────────
@@ -1513,13 +1969,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/tuning/documents',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       name: 'my-doc-extraction',
       document_references: docRef,
       results_reference: docResultsRef,
       project_id: PROJECT_ID,
       space_id: SPACE_ID,
     },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('listDocumentExtractions', {
@@ -1529,8 +1986,12 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/tuning/documents',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { space_id: SPACE_ID, project_id: PROJECT_ID },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+    },
     noRequiredParams: true,
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('getDocumentExtraction', {
@@ -1540,7 +2001,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/tuning/documents/{id}',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { id: RESOURCE_ID, project_id: PROJECT_ID, space_id: SPACE_ID },
+    expectedPath: {
+      id: RESOURCE_ID,
+    },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+    },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('cancelDocumentExtractions', {
@@ -1549,13 +2017,15 @@ describe('WatsonXAI', () => {
     minParams: { id: RESOURCE_ID },
     url: '/ml/v1/tuning/documents/{id}',
     httpMethod: 'DELETE',
-    headers: {},
-    expectedParams: {
+    expectedPath: {
       id: RESOURCE_ID,
+    },
+    expectedQs: {
       project_id: PROJECT_ID,
       space_id: SPACE_ID,
       hard_delete: true,
     },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Synthetic Data Generation ─────────────────────────────────────────────
@@ -1572,12 +2042,13 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/tuning/synthetic_data',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       name: 'my-sdg',
       space_id: SPACE_ID,
       project_id: PROJECT_ID,
       results_reference: { type: 'container', location: { path: 'sdg-results' } },
     },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('listSyntheticDataGenerations', {
@@ -1587,8 +2058,12 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/tuning/synthetic_data',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { project_id: PROJECT_ID, space_id: SPACE_ID },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+    },
     noRequiredParams: true,
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('getSyntheticDataGeneration', {
@@ -1598,7 +2073,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/tuning/synthetic_data/{id}',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { id: RESOURCE_ID, project_id: PROJECT_ID, space_id: SPACE_ID },
+    expectedPath: {
+      id: RESOURCE_ID,
+    },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+    },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Synthetic Data Generation (cancel) ───────────────────────────────────
@@ -1609,13 +2091,15 @@ describe('WatsonXAI', () => {
     minParams: { id: RESOURCE_ID },
     url: '/ml/v1/tuning/synthetic_data/{id}',
     httpMethod: 'DELETE',
-    headers: {},
-    expectedParams: {
+    expectedPath: {
       id: RESOURCE_ID,
+    },
+    expectedQs: {
       project_id: PROJECT_ID,
       space_id: SPACE_ID,
       hard_delete: true,
     },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Taxonomies ────────────────────────────────────────────────────────────
@@ -1632,12 +2116,13 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/tuning/taxonomies_imports',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       name: 'my-taxonomy',
       space_id: SPACE_ID,
       project_id: PROJECT_ID,
       description: 'A taxonomy job',
     },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('listTaxonomies', {
@@ -1647,8 +2132,12 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/tuning/taxonomies_imports',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { project_id: PROJECT_ID, space_id: SPACE_ID },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+    },
     noRequiredParams: true,
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('getTaxonomy', {
@@ -1658,7 +2147,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v1/tuning/taxonomies_imports/{id}',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { id: RESOURCE_ID, project_id: PROJECT_ID, space_id: SPACE_ID },
+    expectedPath: {
+      id: RESOURCE_ID,
+    },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+    },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('deleteTaxonomy', {
@@ -1667,13 +2163,15 @@ describe('WatsonXAI', () => {
     minParams: { id: RESOURCE_ID },
     url: '/ml/v1/tuning/taxonomies_imports/{id}',
     httpMethod: 'DELETE',
-    headers: {},
-    expectedParams: {
+    expectedPath: {
       id: RESOURCE_ID,
+    },
+    expectedQs: {
       project_id: PROJECT_ID,
       space_id: SPACE_ID,
       hard_delete: true,
     },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Models ────────────────────────────────────────────────────────────────
@@ -1691,13 +2189,14 @@ describe('WatsonXAI', () => {
     url: '/ml/v4/models',
     httpMethod: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
+    expectedBody: {
       name: 'my-model',
       type: 'prompt_tune_1.0',
       space_id: SPACE_ID,
       project_id: PROJECT_ID,
       description: 'A model',
     },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('listModels', {
@@ -1707,8 +2206,13 @@ describe('WatsonXAI', () => {
     url: '/ml/v4/models',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { space_id: SPACE_ID, project_id: PROJECT_ID, limit: 10 },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+      limit: 10,
+    },
     noRequiredParams: true,
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('getModel', {
@@ -1718,12 +2222,19 @@ describe('WatsonXAI', () => {
     url: '/ml/v4/models/{model_id}',
     httpMethod: 'GET',
     headers: { Accept: 'application/json' },
-    expectedParams: { model_id: MODEL_ID, space_id: SPACE_ID, project_id: PROJECT_ID },
+    expectedPath: {
+      model_id: MODEL_ID,
+    },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+    },
+    instanceProjectId: service.projectId,
   });
 
-  describeRawBodyMethod('updateModel', {
+  describeMethod('updateModel', {
     method: (p) => service.updateModel(p),
-    params: {
+    callParams: {
       modelId: MODEL_ID,
       jsonPatch: [jsonPatchOperation],
       spaceId: SPACE_ID,
@@ -1732,11 +2243,14 @@ describe('WatsonXAI', () => {
     minParams: { modelId: MODEL_ID, jsonPatch: [jsonPatchOperation] },
     url: '/ml/v4/models/{model_id}',
     httpMethod: 'PATCH',
-    acceptHeader: 'application/json',
-    contentTypeHeader: 'application/json',
-    bodyKey: 'jsonPatch',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    expectedBody: [jsonPatchOperation],
     expectedQs: { version: VERSION, space_id: SPACE_ID, project_id: PROJECT_ID },
     expectedPath: { model_id: MODEL_ID },
+    instanceProjectId: service.projectId,
   });
 
   describeMethod('deleteModel', {
@@ -1745,193 +2259,282 @@ describe('WatsonXAI', () => {
     minParams: { modelId: MODEL_ID },
     url: '/ml/v4/models/{model_id}',
     httpMethod: 'DELETE',
-    headers: {},
-    expectedParams: { model_id: MODEL_ID, space_id: SPACE_ID, project_id: PROJECT_ID },
+    expectedPath: {
+      model_id: MODEL_ID,
+    },
+    expectedQs: {
+      space_id: SPACE_ID,
+      project_id: PROJECT_ID,
+    },
+    instanceProjectId: service.projectId,
   });
 
   // ─── Utility Agent Tools ───────────────────────────────────────────────────
 
-  describeMethod('listUtilityAgentTools', {
-    method: (p) => service.listUtilityAgentTools(p),
-    callParams: {},
-    minParams: {},
-    url: '/v1-beta/utility_agent_tools',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedQs: {},
-    noRequiredParams: true,
-    testNoParams: true,
-  });
+  describeMethod(
+    'listUtilityAgentTools',
+    {
+      method: (p) => service.listUtilityAgentTools(p),
+      callParams: {},
+      minParams: {},
+      url: '/v1-beta/utility_agent_tools',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      noRequiredParams: true,
+      testNoParams: true,
+    },
+    { version: undefined }
+  );
 
-  describeMethod('getUtilityAgentTool', {
-    method: (p) => service.getUtilityAgentTool(p),
-    callParams: { toolId: TOOL_ID },
-    minParams: { toolId: TOOL_ID },
-    url: '/v1-beta/utility_agent_tools/{tool_id}',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedQs: {},
-    expectedPath: { tool_id: TOOL_ID },
-  });
+  describeMethod(
+    'getUtilityAgentTool',
+    {
+      method: (p) => service.getUtilityAgentTool(p),
+      callParams: { toolId: TOOL_ID },
+      minParams: { toolId: TOOL_ID },
+      url: '/v1-beta/utility_agent_tools/{tool_id}',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      expectedPath: {
+        tool_id: TOOL_ID,
+      },
+    },
+    { version: undefined }
+  );
 
-  describeRawBodyMethod('runUtilityAgentTool', {
+  describeMethod('runUtilityAgentTool', {
     method: (p) => service.runUtilityAgentTool(p),
-    params: { wxUtilityAgentToolsRunRequest: wxUtilityAgentToolsRunRequest },
+    callParams: { wxUtilityAgentToolsRunRequest: wxUtilityAgentToolsRunRequest },
     minParams: { wxUtilityAgentToolsRunRequest: wxUtilityAgentToolsRunRequest },
     url: '/v1-beta/utility_agent_tools/run',
     httpMethod: 'POST',
-    acceptHeader: 'application/json',
-    contentTypeHeader: 'application/json',
-    bodyKey: 'wxUtilityAgentToolsRunRequest',
-    expectedQs: {},
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    expectedBody: wxUtilityAgentToolsRunRequest,
   });
 
-  describeRawBodyMethod('runUtilityAgentToolByName', {
-    method: (p) => service.runUtilityAgentToolByName(p),
-    params: {
-      toolId: TOOL_ID,
-      wxUtilityAgentToolsRunRequest: wxUtilityAgentToolsRunRequest,
+  describeMethod(
+    'runUtilityAgentToolByName',
+    {
+      method: (p) => service.runUtilityAgentToolByName(p),
+      callParams: {
+        toolId: TOOL_ID,
+        wxUtilityAgentToolsRunRequest: wxUtilityAgentToolsRunRequest,
+      },
+      minParams: {
+        toolId: TOOL_ID,
+        wxUtilityAgentToolsRunRequest: wxUtilityAgentToolsRunRequest,
+      },
+      url: '/v1-beta/utility_agent_tools/run/{tool_id}',
+      httpMethod: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      expectedBody: wxUtilityAgentToolsRunRequest,
+      expectedPath: { tool_id: TOOL_ID },
     },
-    minParams: {
-      toolId: TOOL_ID,
-      wxUtilityAgentToolsRunRequest: wxUtilityAgentToolsRunRequest,
-    },
-    url: '/v1-beta/utility_agent_tools/run/{tool_id}',
-    httpMethod: 'POST',
-    acceptHeader: 'application/json',
-    contentTypeHeader: 'application/json',
-    bodyKey: 'wxUtilityAgentToolsRunRequest',
-    expectedQs: {},
-    expectedPath: { tool_id: TOOL_ID },
-  });
+    { version: undefined }
+  );
 
   // ─── Spaces ────────────────────────────────────────────────────────────────
 
-  describeMethod('createSpace', {
-    method: (p) => service.createSpace(p),
-    callParams: { name: 'my-space', storage: spaceStorage, description: 'A space' },
-    minParams: { name: 'my-space', storage: spaceStorage },
-    url: '/v2/spaces',
-    httpMethod: 'POST',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedQs: {},
-    expectedBody: { name: 'my-space', storage: spaceStorage, description: 'A space' },
-  });
+  describeMethod(
+    'createSpace',
+    {
+      method: (p) => service.createSpace(p),
+      callParams: { name: 'my-space', storage: spaceStorage, description: 'A space' },
+      minParams: { name: 'my-space', storage: spaceStorage },
+      url: '/v2/spaces',
+      httpMethod: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      expectedBody: {
+        name: 'my-space',
+        storage: spaceStorage,
+        description: 'A space',
+      },
+      expectedPath: {
+        name: 'my-space',
+      },
+    },
+    { version: undefined }
+  );
 
-  describeMethod('getSpace', {
-    method: (p) => service.getSpace(p),
-    callParams: { spaceId: SPACE_ID, include: 'members' },
-    minParams: { spaceId: SPACE_ID },
-    url: '/v2/spaces/{space_id}',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedQs: { include: 'members' },
-    expectedPath: { space_id: SPACE_ID },
-  });
+  describeMethod(
+    'getSpace',
+    {
+      method: (p) => service.getSpace(p),
+      callParams: { spaceId: SPACE_ID, include: 'members' },
+      minParams: { spaceId: SPACE_ID },
+      url: '/v2/spaces/{space_id}',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      expectedPath: {
+        space_id: SPACE_ID,
+      },
+      expectedQs: {
+        include: 'members',
+      },
+    },
+    { version: undefined }
+  );
 
-  describeMethod('deleteSpace', {
-    method: (p) => service.deleteSpace(p),
-    callParams: { spaceId: SPACE_ID },
-    minParams: { spaceId: SPACE_ID },
-    url: '/v2/spaces/{space_id}',
-    httpMethod: 'DELETE',
-    headers: {},
-    expectedQs: {},
-    expectedPath: { space_id: SPACE_ID },
-  });
+  describeMethod(
+    'deleteSpace',
+    {
+      method: (p) => service.deleteSpace(p),
+      callParams: { spaceId: SPACE_ID },
+      minParams: { spaceId: SPACE_ID },
+      url: '/v2/spaces/{space_id}',
+      httpMethod: 'DELETE',
+      headers: {},
+      expectedPath: {
+        space_id: SPACE_ID,
+      },
+    },
+    { version: undefined }
+  );
 
-  describeRawBodyMethod('updateSpace', {
-    method: (p) => service.updateSpace(p),
-    params: { spaceId: SPACE_ID, jsonPatch: [jsonPatchOperation] },
-    minParams: { spaceId: SPACE_ID, jsonPatch: [jsonPatchOperation] },
-    url: '/v2/spaces/{space_id}',
-    httpMethod: 'PATCH',
-    acceptHeader: 'application/json',
-    contentTypeHeader: 'application/json-patch+json',
-    bodyKey: 'jsonPatch',
-    expectedQs: {},
-    expectedPath: { space_id: SPACE_ID },
-  });
+  describeMethod(
+    'updateSpace',
+    {
+      method: (p) => service.updateSpace(p),
+      callParams: { spaceId: SPACE_ID, jsonPatch: [jsonPatchOperation] },
+      minParams: { spaceId: SPACE_ID, jsonPatch: [jsonPatchOperation] },
+      url: '/v2/spaces/{space_id}',
+      httpMethod: 'PATCH',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json-patch+json',
+      },
+      expectedBody: [jsonPatchOperation],
+      expectedPath: { space_id: SPACE_ID },
+    },
+    { version: undefined }
+  );
 
-  describeMethod('listSpaces', {
-    method: (p) => service.listSpaces(p),
-    callParams: { limit: 10, name: 'my-space' },
-    minParams: {},
-    url: '/v2/spaces',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedQs: { limit: 10, name: 'my-space' },
-    noRequiredParams: true,
-    testNoParams: true,
-  });
+  describeMethod(
+    'listSpaces',
+    {
+      method: (p) => service.listSpaces(p),
+      callParams: { limit: 10, name: 'my-space' },
+      minParams: {},
+      url: '/v2/spaces',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      expectedQs: {
+        limit: 10,
+        name: 'my-space',
+      },
+      noRequiredParams: true,
+      testNoParams: true,
+    },
+    { version: undefined }
+  );
 
   // ─── Text Classification ───────────────────────────────────────────────────
 
-  describeMethod('createTextClassification', {
-    method: (p) => service.createTextClassification(p),
-    callParams: {
-      documentReference: classificationDocRef,
-      parameters: classificationParams,
-      projectId: PROJECT_ID,
-      spaceId: SPACE_ID,
+  describeMethod(
+    'createTextClassification',
+    {
+      method: (p) => service.createTextClassification(p),
+      callParams: {
+        documentReference: classificationDocRef,
+        parameters: classificationParams,
+        projectId: PROJECT_ID,
+        spaceId: SPACE_ID,
+      },
+      minParams: {
+        documentReference: classificationDocRef,
+        parameters: classificationParams,
+      },
+      url: '/ml/v1/text/classifications',
+      httpMethod: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      expectedBody: {
+        document_reference: classificationDocRef,
+        parameters: classificationParams,
+        project_id: PROJECT_ID,
+        space_id: SPACE_ID,
+      },
+      instanceProjectId: service.projectId,
     },
-    minParams: {
-      documentReference: classificationDocRef,
-      parameters: classificationParams,
-    },
-    url: '/ml/v1/text/classifications',
-    httpMethod: 'POST',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    expectedParams: {
-      document_reference: classificationDocRef,
-      parameters: classificationParams,
-      project_id: PROJECT_ID,
-      space_id: SPACE_ID,
-    },
-  });
+    { version: VERSION }
+  );
 
-  describeMethod('listTextClassifications', {
-    method: (p) => service.listTextClassifications(p),
-    callParams: { spaceId: SPACE_ID, projectId: PROJECT_ID, limit: 10 },
-    minParams: {},
-    url: '/ml/v1/text/classifications',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedParams: { space_id: SPACE_ID, project_id: PROJECT_ID, limit: 10 },
-    noRequiredParams: true,
-  });
-
-  describeMethod('getTextClassification', {
-    method: (p) => service.getTextClassification(p),
-    callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID },
-    minParams: { id: RESOURCE_ID },
-    url: '/ml/v1/text/classifications/{id}',
-    httpMethod: 'GET',
-    headers: { Accept: 'application/json' },
-    expectedParams: { id: RESOURCE_ID, space_id: SPACE_ID, project_id: PROJECT_ID },
-  });
-
-  describeMethod('deleteTextClassification', {
-    method: (p) => service.deleteTextClassification(p),
-    callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID, hardDelete: true },
-    minParams: { id: RESOURCE_ID },
-    url: '/ml/v1/text/classifications/{id}',
-    httpMethod: 'DELETE',
-    headers: {},
-    expectedParams: {
-      id: RESOURCE_ID,
-      space_id: SPACE_ID,
-      project_id: PROJECT_ID,
-      hard_delete: true,
+  describeMethod(
+    'listTextClassifications',
+    {
+      method: (p) => service.listTextClassifications(p),
+      callParams: { spaceId: SPACE_ID, projectId: PROJECT_ID, limit: 10 },
+      minParams: {},
+      url: '/ml/v1/text/classifications',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      expectedQs: {
+        space_id: SPACE_ID,
+        project_id: PROJECT_ID,
+        limit: 10,
+      },
+      noRequiredParams: true,
+      instanceProjectId: service.projectId,
     },
-  });
+    { version: VERSION }
+  );
+
+  describeMethod(
+    'getTextClassification',
+    {
+      method: (p) => service.getTextClassification(p),
+      callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID },
+      minParams: { id: RESOURCE_ID },
+      url: '/ml/v1/text/classifications/{id}',
+      httpMethod: 'GET',
+      headers: { Accept: 'application/json' },
+      expectedPath: {
+        id: RESOURCE_ID,
+      },
+      expectedQs: {
+        space_id: SPACE_ID,
+        project_id: PROJECT_ID,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: VERSION }
+  );
+
+  describeMethod(
+    'deleteTextClassification',
+    {
+      method: (p) => service.deleteTextClassification(p),
+      callParams: { id: RESOURCE_ID, spaceId: SPACE_ID, projectId: PROJECT_ID, hardDelete: true },
+      minParams: { id: RESOURCE_ID },
+      url: '/ml/v1/text/classifications/{id}',
+      httpMethod: 'DELETE',
+      expectedPath: {
+        id: RESOURCE_ID,
+      },
+      expectedQs: {
+        space_id: SPACE_ID,
+        project_id: PROJECT_ID,
+        hard_delete: true,
+      },
+      instanceProjectId: service.projectId,
+    },
+    { version: VERSION }
+  );
 
   // ─── Audio Transcription ───────────────────────────────────────────────────
   // transcribeAudio is hand-written because it enforces a custom "projectId OR spaceId"
   // constraint that cannot be expressed through the generic describeMethod helper.
   describe('transcribeAudio', () => {
+    beforeAll(() => {
+      delete service.projectId;
+    });
     test('sends correct request params with projectId', () => {
-      testWithRetries(() => {
+      runWithRetries(() => {
         const { signal } = new AbortController();
         const result = service.transcribeAudio({
           model: MODEL_ID,
@@ -1941,8 +2544,8 @@ describe('WatsonXAI', () => {
           signal,
         });
         expectToBePromise(result);
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-        const mockRequestOptions = getOptions(getMock());
+        expect(mockSetup.getMock()).toHaveBeenCalledTimes(1);
+        const mockRequestOptions = getOptions(mockSetup.getMock());
         checkUrlAndMethod(mockRequestOptions, '/ml/v1/audio/transcriptions', 'POST');
         expect(mockRequestOptions.qs.version).toEqual(VERSION);
         expect(mockRequestOptions.body).toBeDefined();
@@ -1957,8 +2560,8 @@ describe('WatsonXAI', () => {
         language: 'fr',
       });
       expectToBePromise(result);
-      expect(createRequestMock).toHaveBeenCalledTimes(1);
-      const mockRequestOptions = getOptions(getMock());
+      expect(mockSetup.getMock()).toHaveBeenCalledTimes(1);
+      const mockRequestOptions = getOptions(mockSetup.getMock());
       checkUrlAndMethod(mockRequestOptions, '/ml/v1/audio/transcriptions', 'POST');
       expect(mockRequestOptions.qs.version).toEqual(VERSION);
       expect(mockRequestOptions.body).toBeDefined();
@@ -1967,61 +2570,61 @@ describe('WatsonXAI', () => {
     test('handles file as ReadStream', () => {
       const fileStream = fs.createReadStream(AUDIO_FILE_PATH);
 
-      testWithRetries(() => {
+      runWithRetries(() => {
         const result = service.transcribeAudio({
           model: MODEL_ID,
           file: fileStream,
           projectId: PROJECT_ID,
         });
         expectToBePromise(result);
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-        const mockRequestOptions = getOptions(getMock());
+        expect(mockSetup.getMock()).toHaveBeenCalledTimes(1);
+        const mockRequestOptions = getOptions(mockSetup.getMock());
         checkUrlAndMethod(mockRequestOptions, '/ml/v1/audio/transcriptions', 'POST');
         expect(mockRequestOptions.body).toBeDefined();
       });
     });
 
     test('handles file as string path', () => {
-      testWithRetries(() => {
+      runWithRetries(() => {
         const result = service.transcribeAudio({
           model: MODEL_ID,
           file: AUDIO_FILE_PATH,
           projectId: PROJECT_ID,
         });
         expectToBePromise(result);
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-        const mockRequestOptions = getOptions(getMock());
+        expect(mockSetup.getMock()).toHaveBeenCalledTimes(1);
+        const mockRequestOptions = getOptions(mockSetup.getMock());
         expect(mockRequestOptions.body).toBeDefined();
       });
     });
 
     test('throws when neither projectId nor spaceId is provided', () => {
-      expect(() => service.transcribeAudio({ model: MODEL_ID, file: AUDIO_FILE_PATH })).toThrow(
-        'Either projectId or spaceId need to be provided'
-      );
+      expect(() =>
+        service.transcribeAudio({ model: MODEL_ID, file: AUDIO_FILE_PATH })
+      ).rejects.toThrow('Either projectId or spaceId need to be provided');
     });
 
     test('prioritizes user-given headers', () => {
-      testWithRetries(() => {
+      runWithRetries(() => {
         service.transcribeAudio({
           model: MODEL_ID,
           file: AUDIO_FILE_PATH,
           projectId: PROJECT_ID,
           headers: { Accept: 'fake/accept', 'Content-Type': 'fake/contentType' },
         });
-        checkMediaHeaders(getMock(), 'fake/accept', 'fake/contentType');
+        checkMediaHeaders(mockSetup.getMock(), 'fake/accept', 'fake/contentType');
       });
     });
 
     test('includes default headers when no custom headers provided', () => {
-      testWithRetries(() => {
+      runWithRetries(() => {
         service.transcribeAudio({
           model: MODEL_ID,
           file: AUDIO_FILE_PATH,
           projectId: PROJECT_ID,
         });
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-        const callArgs = getMock().mock.calls[0][0];
+        expect(mockSetup.getMock()).toHaveBeenCalledTimes(1);
+        const callArgs = mockSetup.getMock().mock.calls[0][0];
         expect(callArgs.defaultOptions.headers['Accept']).toBe('application/json');
         expect(callArgs.defaultOptions.headers['Content-Type']).toContain('multipart/form-data');
       });
@@ -2029,15 +2632,15 @@ describe('WatsonXAI', () => {
 
     test('handles signal parameter for request cancellation', () => {
       const { signal } = new AbortController();
-      testWithRetries(() => {
+      runWithRetries(() => {
         service.transcribeAudio({
           model: MODEL_ID,
           file: AUDIO_FILE_PATH,
           projectId: PROJECT_ID,
           signal,
         });
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
-        checkAxiosOptions(getMock(), signal);
+        expect(mockSetup.getMock()).toHaveBeenCalledTimes(1);
+        checkAxiosOptions(mockSetup.getMock(), signal);
       });
     });
 

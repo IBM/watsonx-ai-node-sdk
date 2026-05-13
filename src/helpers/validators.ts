@@ -23,40 +23,61 @@ import { validateParams } from 'ibm-cloud-sdk-core';
  *   required params.
  * @param {string[] | null} validParams - Array of valid parameter names (common params will be
  *   added automatically), or null if no valid params.
- * @returns {Error | null} Returns an Error object if validation fails, null otherwise.
+ * @throws {Error} Throws Error object if validation fails, void otherwise.
  */
 export const validateRequestParams = (
   params: Record<string, any>,
   requiredParams: string[] | null,
   validParams: string[] | null
-): Error | null => {
+) => {
   const commonParams = ['headers', 'signal'];
 
   const validParamsWithCommon = [...commonParams];
   if (requiredParams) validParamsWithCommon.push(...requiredParams);
   if (validParams) validParamsWithCommon.push(...validParams);
   // @ts-expect-error validateParams has invalid typing
-  return validateParams(params, requiredParams, validParamsWithCommon);
+  const validationResult = validateParams(params, requiredParams, validParamsWithCommon);
+  if (validationResult) throw validationResult;
 };
 
 /**
- * Checks if exactly one of the required parameters is provided.
+ * Validates that exactly one (or optionally none) of the specified parameters is provided.
  *
- * @param {Record<string, any>} params - Object containing parameters.
- * @param {string[]} requiredParams - Array of required parameters.
- * @throws {Error} If more than one required parameter is provided or none.
+ * This function enforces mutual exclusivity among a set of parameters, ensuring that only one
+ * parameter from the list is present at a time. This is useful for API methods that accept
+ * alternative parameters but not multiple simultaneously (e.g., projectId OR spaceId).
+ *
+ * @example
+ *   // Ensures exactly one of projectId or spaceId is provided
+ *   validateRequiredOneOf(params, ['projectId', 'spaceId'], true);
+ *
+ * @example
+ *   // Allows zero or one of the parameters (but not both)
+ *   validateRequiredOneOf(params, ['projectId', 'spaceId'], false);
+ *
+ * @param {Record<string, any>} [params={}] - Object containing optional parameters to validate for
+ *   mutual exclusivity. Default is `{}`
+ * @param {string[]} requiredParams - Array of parameter names to check for mutual exclusivity
+ * @param {boolean} [isAnyRequired=true] - If true, at least one parameter must be provided. If
+ *   false, all parameters can be absent (useful for optional alternative parameters). Default is
+ *   `true`
+ * @throws {Error} If more than one of the specified parameters is provided
+ * @throws {Error} If isAnyRequired is true and none of the specified parameters is provided
+ * @note When isAnyRequired=false and all parameters are absent, the function returns
+ *   without error (allows zero parameters).
  */
 export const validateRequiredOneOf = (
   params: Record<string, any> = {},
-  requiredParams: string[]
+  requiredParams: string[],
+  isAnyRequired: boolean = true
 ): void => {
-  const isParam = requiredParams.reduce((acc, curr) => {
+  const foundExactlyOne = requiredParams.reduce((acc, curr) => {
     if (params[curr] && !acc) return true;
     if (params[curr] && acc)
       throw new Error(`Only one of the following parameters is allowed: ${requiredParams}`);
     return acc;
   }, false);
 
-  if (isParam === false)
+  if (isAnyRequired && foundExactlyOne === false)
     throw new Error(`One of the following parameters is required: ${requiredParams}`);
 };

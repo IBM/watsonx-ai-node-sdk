@@ -103,15 +103,16 @@ describe('Helpers Tests', () => {
     describe('validateRequestParams', () => {
       test('returns null for valid params', () => {
         const params = { requiredField: 'value', optionalField: 'optional' };
-        const result = validateRequestParams(params, ['requiredField'], ['optionalField']);
-        expect(result).toBeNull();
+        expect(() =>
+          validateRequestParams(params, ['requiredField'], ['optionalField'])
+        ).not.toThrow();
       });
 
       test('returns error when required param missing', () => {
         const params = { optionalField: 'optional' };
-        const result = validateRequestParams(params, ['requiredField'], ['optionalField']);
-        expect(result).toBeInstanceOf(Error);
-        expect(result?.message).toContain('requiredField');
+        expect(() => validateRequestParams(params, ['requiredField'], ['optionalField'])).toThrow(
+          /Parameter validation errors:/
+        );
       });
 
       test('allows common params (headers, signal)', () => {
@@ -120,8 +121,7 @@ describe('Helpers Tests', () => {
           headers: { 'Content-Type': 'application/json' },
           signal: new AbortController().signal,
         };
-        const result = validateRequestParams(params, ['requiredField'], []);
-        expect(result).toBeNull();
+        expect(() => validateRequestParams(params, ['requiredField'], [])).not.toThrow();
       });
     });
 
@@ -148,6 +148,63 @@ describe('Helpers Tests', () => {
       test('handles falsy values correctly', () => {
         const params = { data: 0 };
         expect(() => validateRequiredOneOf(params, ['data', 'dataReference'])).toThrow();
+      });
+
+      describe('isAnyRequired parameter (third argument)', () => {
+        test('when isAnyRequired=true (default), throws if none provided', () => {
+          const params = { otherField: 'value' };
+          expect(() => validateRequiredOneOf(params, ['data', 'dataReference'], true)).toThrow(
+            'One of the following parameters is required: data,dataReference'
+          );
+        });
+
+        test('when isAnyRequired=true (default), does not throw when exactly one provided', () => {
+          const params = { data: 'some data' };
+          expect(() =>
+            validateRequiredOneOf(params, ['data', 'dataReference'], true)
+          ).not.toThrow();
+        });
+
+        test('when isAnyRequired=true (default), throws when multiple provided', () => {
+          const params = { data: 'some data', dataReference: 'ref' };
+          expect(() => validateRequiredOneOf(params, ['data', 'dataReference'], true)).toThrow(
+            'Only one of the following parameters is allowed: data,dataReference'
+          );
+        });
+
+        test('when isAnyRequired=false, does not throw if none provided', () => {
+          const params = { otherField: 'value' };
+          expect(() =>
+            validateRequiredOneOf(params, ['data', 'dataReference'], false)
+          ).not.toThrow();
+        });
+
+        test('when isAnyRequired=false, does not throw when exactly one provided', () => {
+          const params = { data: 'some data' };
+          expect(() =>
+            validateRequiredOneOf(params, ['data', 'dataReference'], false)
+          ).not.toThrow();
+        });
+
+        test('when isAnyRequired=false, throws when multiple provided', () => {
+          const params = { data: 'some data', dataReference: 'ref' };
+          expect(() => validateRequiredOneOf(params, ['data', 'dataReference'], false)).toThrow(
+            'Only one of the following parameters is allowed: data,dataReference'
+          );
+        });
+
+        test('when isAnyRequired=false, allows empty params object', () => {
+          const params = {};
+          expect(() =>
+            validateRequiredOneOf(params, ['data', 'dataReference'], false)
+          ).not.toThrow();
+        });
+
+        test('when isAnyRequired=false, allows undefined params', () => {
+          expect(() =>
+            validateRequiredOneOf(undefined, ['data', 'dataReference'], false)
+          ).not.toThrow();
+        });
       });
     });
   });

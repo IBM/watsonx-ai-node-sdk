@@ -1,62 +1,16 @@
 import unitTestUtils from '@ibm-cloud/sdk-test-utilities';
 import type { BaseService } from 'ibm-cloud-sdk-core';
-import { checkAxiosOptions } from './checks';
+import { checkRequest } from './checks';
 import {
   getDefaultHeadersFromMock,
   testRequiredParams,
   testInvalidParams,
   testWithRetries,
+  testWithRetriesStream,
 } from '../../utils/utils';
 
-const { getOptions, checkUrlAndMethod, checkMediaHeaders, expectToBePromise } = unitTestUtils;
-
-/**
- * Converts a camelCase string to snake_case. For example, "myVariableName" becomes
- * "my_variable_name".
- *
- * @param str - The input camelCase string.
- * @returns The converted snake_case string.
- */
-const camelToSnake = (str: string) => str.replace(/([A-Z])/g, '_$1').toLowerCase();
-
-/**
- * Converts keys of an object (and nested objects) to snake_case. Recursively processes nested
- * objects and arrays, transforming all keys from camelCase to snake_case format.
- *
- * @param obj - The object to convert.
- * @returns The object with converted keys, or undefined if input is falsy.
- */
-export const convertKeysToSnakeCase = (
-  obj: Record<string, any>
-): Record<string, any> | undefined => {
-  if (!obj) return undefined;
-  if (Array.isArray(obj)) {
-    return obj.map(convertKeysToSnakeCase);
-  }
-  if (obj !== null && typeof obj === 'object') {
-    return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => [camelToSnake(key), convertKeysToSnakeCase(value)])
-    );
-  }
-  return obj;
-};
-
-/**
- * Renames keys in an object based on a provided exceptions mapping. Mutates the original object by
- * replacing keys according to the exceptions map. If an old key exists in the object, it is renamed
- * to the new key and the old key is deleted.
- *
- * @param obj - The object to modify.
- * @param exceptions - Mapping of old keys to new keys.
- */
-export const convertExceptions = (obj: Record<string, any>, exceptions: Record<string, any>) => {
-  for (const [oldKey, newKey] of Object.entries(exceptions)) {
-    if (oldKey in obj) {
-      obj[newKey] = obj[oldKey];
-      delete obj[oldKey];
-    }
-  }
-};
+const { checkMediaHeaders, expectToBePromise, checkForSuccessfulExecution, getOptions } =
+  unitTestUtils;
 
 /**
  * Specification for testing a service method. Defines all parameters needed to create a
@@ -84,11 +38,24 @@ export interface MethodTestSpec {
   httpMethod: string;
   headers?: { Accept?: string; 'Content-Type'?: string };
   expectedBody?: Record<string, any>;
-  expectedQs?: Record<string, any>;
   expectedPath?: Record<string, any>;
+  expectedQs?: Record<string, any>;
   noRequiredParams?: boolean;
   requiresOneOf?: boolean;
   skipBodyCheck?: boolean;
+  isStream?: boolean;
+  testNoParams?: boolean;
+  skipInvalidParamsTest?: boolean;
+  instanceProjectId?: string;
+  instanceSpaceId?: string;
+}
+
+export interface DescribeMethodOptions {
+  version?: string;
+  streamResult?: unknown;
+  headerOverride?: { Accept: string; 'Content-Type': string };
+  assertAuthHeader?: boolean;
+  testRetryModes?: boolean;
 }
 
 /**
@@ -112,62 +79,42 @@ export interface MethodTestSpec {
  * @param apiKey - The API key used for authentication.
  * @returns A function that performs the main test check.
  */
+
 function runMainTestCheck(
   spec: MethodTestSpec,
   getRequestMock: () => jest.SpyInstance,
-  apiKey: string
+  apiKey: string,
+  version?: string,
+  assertAuthHeader = true
 ) {
-  const {
-    method,
-    callParams,
-    url,
-    httpMethod,
-    headers,
-    expectedBody,
-    expectedQs,
-    expectedPath,
-    skipBodyCheck = false,
-  } = spec;
-
-  const expectedAccept = headers?.Accept;
-  const expectedContentType = headers?.['Content-Type'];
+  const { method, callParams, url, httpMethod, headers, expectedBody, expectedPath, expectedQs } =
+    spec;
 
   return () => {
     const { signal } = new AbortController();
     const result = method({ ...callParams, signal });
+    const requestMock = getRequestMock();
+
     expectToBePromise(result);
-    expect(getRequestMock()).toHaveBeenCalledTimes(1);
+    expect(requestMock).toHaveBeenCalledTimes(1);
 
-    const mockRequestOptions = getOptions(getRequestMock());
-    checkUrlAndMethod(mockRequestOptions, url, httpMethod);
-
-    if (!skipBodyCheck && (expectedAccept !== undefined || expectedContentType !== undefined)) {
-      checkMediaHeaders(getRequestMock(), expectedAccept, expectedContentType);
+    checkRequest({
+      request: {
+        url,
+        expectedBody,
+        expectedPath,
+        expectedQs,
+        signal,
+        headers,
+      },
+      method: httpMethod,
+      version,
+      requestMock,
+    });
+    if (assertAuthHeader) {
+      const requestHeaders = getDefaultHeadersFromMock(requestMock);
+      expect(requestHeaders).toHaveProperty('authorization', `Bearer ${apiKey}`);
     }
-
-    checkAxiosOptions(getRequestMock(), signal);
-
-    if (expectedBody) {
-      Object.entries(expectedBody).forEach(([key, value]) => {
-        expect(mockRequestOptions.body[key]).toEqual(value);
-      });
-    }
-
-    if (expectedQs) {
-      Object.entries(expectedQs).forEach(([key, value]) => {
-        expect(mockRequestOptions.qs[key]).toEqual(value);
-      });
-    }
-
-    if (expectedPath) {
-      Object.entries(expectedPath).forEach(([key, value]) => {
-        expect(mockRequestOptions.path[key]).toEqual(value);
-      });
-    }
-
-    // Verify authentication headers
-    const requestHeaders = getDefaultHeadersFromMock(getRequestMock());
-    expect(requestHeaders).toHaveProperty('authorization', `Bearer ${apiKey}`);
   };
 }
 
@@ -178,7 +125,11 @@ function runMainTestCheck(
  * @param getRequestMock - Function that returns the request mock spy.
  * @returns A function that performs the header priority test.
  */
-function runHeaderPriorityTest(spec: MethodTestSpec, getRequestMock: () => jest.SpyInstance) {
+function runHeaderPriorityTest(
+  spec: MethodTestSpec,
+  getRequestMock: () => jest.SpyInstance,
+  headerOverride: { Accept: string; 'Content-Type': string }
+) {
   const { method, minParams, headers, skipBodyCheck = false } = spec;
 
   const expectedAccept = headers?.Accept;
@@ -187,12 +138,39 @@ function runHeaderPriorityTest(spec: MethodTestSpec, getRequestMock: () => jest.
   return () => {
     method({
       ...minParams,
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      headers: headerOverride,
     });
+    const requestMock = getRequestMock();
     if (!skipBodyCheck && (expectedAccept !== undefined || expectedContentType !== undefined)) {
-      checkMediaHeaders(getRequestMock(), 'application/json', 'application/json');
+      checkMediaHeaders(requestMock, headerOverride.Accept, headerOverride['Content-Type']);
     }
   };
+}
+
+/**
+ * Test helper to validate that exactly one of projectId or spaceId is required. This is a common
+ * pattern in WatsonX AI APIs
+ *
+ * @param methodFn - The method to test
+ * @param baseParams - Base parameters that include projectId or spaceId
+ */
+export function testRequiredOneOf(
+  methodFn: (params?: any) => Promise<any>,
+  baseParams: Record<string, any>
+) {
+  const { projectId: _projectId, spaceId: _spaceId, ...restParams } = baseParams;
+
+  test('requires either projectId or spaceId', async () => {
+    await expect(methodFn(restParams)).rejects.toThrow(
+      /One of the following parameters is required: projectId,spaceId/
+    );
+  });
+
+  test('rejects when both projectId and spaceId are provided', async () => {
+    await expect(
+      methodFn({ ...restParams, projectId: 'test-project-id', spaceId: 'test-space-id' })
+    ).rejects.toThrow(/Only one of the following parameters is allowed: projectId,spaceId/);
+  });
 }
 
 /**
@@ -201,16 +179,32 @@ function runHeaderPriorityTest(spec: MethodTestSpec, getRequestMock: () => jest.
  * @param spec - The method test specification.
  */
 function runNegativeTests(spec: MethodTestSpec) {
-  const { method, minParams, noRequiredParams = false, requiresOneOf = false } = spec;
+  const {
+    method,
+    minParams,
+    noRequiredParams = false,
+    requiresOneOf = false,
+    skipInvalidParamsTest = false,
+  } = spec;
 
   describe('negative tests', () => {
     if (!noRequiredParams) {
-      testRequiredParams(method);
+      // If method requires one of projectId/spaceId, pass projectId as base param
+      // so we can test other required parameters
+      const baseParams =
+        requiresOneOf && minParams?.projectId ? { projectId: minParams.projectId } : undefined;
+      testRequiredParams(
+        method,
+        /Missing required parameters/,
+        /Missing required parameters/,
+        baseParams
+      );
     }
-    testInvalidParams(method, minParams);
+    if (!skipInvalidParamsTest) {
+      testInvalidParams(method, minParams);
+    }
     if (requiresOneOf) {
-      // Test for requiresOneOf will be handled by the calling test file
-      // as it requires specific logic for projectId/spaceId validation
+      testRequiredOneOf(method, minParams);
     }
   });
 }
@@ -220,18 +214,85 @@ export function describeMethod(
   spec: MethodTestSpec,
   service: BaseService,
   getRequestMock: () => jest.SpyInstance,
-  apiKey: string
+  apiKey: string,
+  options: DescribeMethodOptions = {}
 ) {
+  const {
+    version,
+    streamResult,
+    headerOverride = { Accept: 'application/json', 'Content-Type': 'application/json' },
+    assertAuthHeader = true,
+    testRetryModes = false,
+  } = options;
+
   describe(name, () => {
+    const runCheck = runMainTestCheck(spec, getRequestMock, apiKey, version, assertAuthHeader);
+    const checkHeaders = runHeaderPriorityTest(spec, getRequestMock, headerOverride);
+
     test('sends correct request params', () => {
-      const runCheck = runMainTestCheck(spec, getRequestMock, apiKey);
-      testWithRetries(runCheck, service, getRequestMock());
+      if (testRetryModes) {
+        if (spec.isStream) {
+          testWithRetriesStream(runCheck, service, getRequestMock(), streamResult);
+        } else {
+          testWithRetries(runCheck, service, getRequestMock());
+        }
+      } else {
+        runCheck();
+      }
     });
 
     test('prioritizes user-given headers', () => {
-      const checkHeaders = runHeaderPriorityTest(spec, getRequestMock);
-      testWithRetries(checkHeaders, service, getRequestMock());
+      if (testRetryModes) {
+        if (spec.isStream) {
+          testWithRetriesStream(checkHeaders, service, getRequestMock(), streamResult);
+        } else {
+          testWithRetries(checkHeaders, service, getRequestMock());
+        }
+      } else {
+        checkHeaders();
+      }
     });
+
+    if (spec.testNoParams) {
+      test('succeeds with no parameters', () => {
+        spec.method({});
+        checkForSuccessfulExecution(getRequestMock());
+      });
+    }
+
+    // Test instance-level fallback for projectId/spaceId
+    if (spec.instanceProjectId || spec.instanceSpaceId) {
+      const { method, minParams, expectedBody } = spec;
+      if (spec.instanceProjectId) {
+        test('uses instance projectId when not in params', () => {
+          if (spec.isStream && streamResult) {
+            getRequestMock().mockImplementation(() => Promise.resolve({ result: streamResult }));
+          }
+          method(minParams);
+          const mockRequestOptions = getOptions(getRequestMock());
+          const location =
+            expectedBody && expectedBody.project_id
+              ? mockRequestOptions.body
+              : mockRequestOptions.qs;
+          expect(location?.project_id).toBe(spec.instanceProjectId);
+          expect(location?.space_id).toBeUndefined();
+        });
+      }
+
+      if (spec.instanceSpaceId) {
+        test('uses instance spaceId when not in params', () => {
+          if (spec.isStream && streamResult) {
+            getRequestMock().mockImplementation(() => Promise.resolve({ result: streamResult }));
+          }
+          method(minParams);
+          const mockRequestOptions = getOptions(getRequestMock());
+          const location =
+            expectedBody && expectedBody.space_id ? mockRequestOptions.body : mockRequestOptions.qs;
+          expect(location?.space_id).toBe(spec.instanceSpaceId);
+          expect(location?.project_id).toBeUndefined();
+        });
+      }
+    }
 
     runNegativeTests(spec);
   });

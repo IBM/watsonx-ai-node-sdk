@@ -229,11 +229,11 @@ export class ChatCompletions extends Completions {
    * @throws {Error} If validation fails or an error occurs during the request.
    */
 
-  create<S extends boolean | undefined = false, R extends boolean | undefined = undefined>(
+  async create<S extends boolean | undefined = false, R extends boolean | undefined = undefined>(
     params: CreateChatCompletionsParams & { stream?: S; returnObject?: R }
   ): Promise<ChatCompletionResult<S, R>>;
 
-  create(
+  async create(
     params: CreateChatCompletionsParams & { returnObject?: boolean }
   ): Promise<Response<ChatsResponse> | Stream<string | ChatObjectStream>> {
     const requiredParams = ['messages', 'model'];
@@ -271,10 +271,7 @@ export class ChatCompletions extends Completions {
       'returnObject',
     ];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const body = {
       'messages': params.messages,
@@ -352,14 +349,11 @@ export class EmbeddingCompletions extends Completions {
    * @returns {Promise<Response<EmbeddingResponse>>} - Embeddings response for provided text
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  create(params: CreateEmbeddingsParams): Promise<Response<EmbeddingResponse>> {
+  async create(params: CreateEmbeddingsParams): Promise<Response<EmbeddingResponse>> {
     const requiredParams = ['input', 'model'];
     const validParams = ['dimensions', 'encodingFormat', 'user'];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const body = {
       'input': params.input,
@@ -481,11 +475,11 @@ export class GenerateTextCompletions extends Completions {
    * @throws {Error} If validation fails or an error occurs during the request.
    */
 
-  create<S extends boolean | undefined = false, R extends boolean | undefined = undefined>(
+  async create<S extends boolean | undefined = false, R extends boolean | undefined = undefined>(
     params: CreateCompletionsParams & { stream?: S; returnObject?: R }
   ): Promise<CompletionResult<S, R>>;
 
-  create(
+  async create(
     params: CreateCompletionsParams & { returnObject?: boolean }
   ): Promise<Response<CompletionsResponse> | Stream<string | TextCompletionStream>> {
     const requiredParams = ['model', 'prompt'];
@@ -512,10 +506,7 @@ export class GenerateTextCompletions extends Completions {
       'returnObject',
     ];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const body = {
       'model': params.model,

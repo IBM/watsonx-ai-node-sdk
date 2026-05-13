@@ -55,14 +55,11 @@ export class Providers extends GatewayResource {
    * @returns {Promise<Response<ProviderResponse>>} Resolves with the response from the server.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  create(params: CreateProviderParams): Promise<Response<ProviderResponse>> {
+  async create(params: CreateProviderParams): Promise<Response<ProviderResponse>> {
     const requiredParams = ['name', 'providerName'];
     const validParams = ['dataReference', 'data', 'description'];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     validateRequiredOneOf(params, ['dataReference', 'data']);
 
@@ -103,19 +100,16 @@ export class Providers extends GatewayResource {
    *   server.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  getDetails(params: GetProviderParams): Promise<Response<Provider>>;
-  getDetails(params?: ListProvidersParams): Promise<Response<ProviderCollection>>;
+  async getDetails(params: GetProviderParams): Promise<Response<Provider>>;
+  async getDetails(params?: ListProvidersParams): Promise<Response<ProviderCollection>>;
 
-  getDetails(
+  async getDetails(
     params: GetProviderParams | ListProvidersParams = {}
   ): Promise<Response<Provider | ProviderCollection>> {
     if ('providerId' in params) {
       const requiredParams = ['providerId'];
       const validParams: string[] = [];
-      const validationErrors = validateRequestParams(params, requiredParams, validParams);
-      if (validationErrors) {
-        return Promise.reject(validationErrors);
-      }
+      validateRequestParams(params, requiredParams, validParams);
 
       const { providerId, signal, headers } = params;
       const path = {
@@ -133,10 +127,7 @@ export class Providers extends GatewayResource {
     }
     const requiredParams: string[] = [];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const { signal, headers } = params;
     const parameters = {
@@ -160,15 +151,12 @@ export class Providers extends GatewayResource {
    *   models' details.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  getAvailableModelsDetails(
+  async getAvailableModelsDetails(
     params: ListProviderAvailableModelsParams
   ): Promise<Response<AvailableModelCollection>> {
     const requiredParams = ['providerId'];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
     const { signal, headers, providerId } = params;
 
     const path = {
@@ -207,13 +195,10 @@ export class Providers extends GatewayResource {
    * @returns {Promise<Response<ProviderResponse>>} Resolves with the response from the server.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  update(params: UpdateProviderParams): Promise<Response<ProviderResponse>> {
+  async update(params: UpdateProviderParams): Promise<Response<ProviderResponse>> {
     const requiredParams = ['providerId', 'providerName', 'name'];
     const validParams = ['dataReference', 'data'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     validateRequiredOneOf(params, ['data', 'dataReference']);
 
@@ -252,13 +237,10 @@ export class Providers extends GatewayResource {
    * @returns {Promise<EmptyObject>} Resolves with an empty object on success.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  delete(params: DeleteProviderParams): Promise<Response<EmptyObject>> {
+  async delete(params: DeleteProviderParams): Promise<Response<EmptyObject>> {
     const requiredParams = ['providerId'];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
     const { providerId, signal, headers } = params;
 
     const path = {
@@ -285,10 +267,7 @@ export class Providers extends GatewayResource {
   async list(params: ListProvidersParams = {}): Promise<Provider[]> {
     const requiredParams: string[] = [];
     const validParams = ['providerId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const response = await this.getDetails(params);
     return response.result.data;

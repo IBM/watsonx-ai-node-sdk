@@ -379,5 +379,3 @@ describe('Namespace Exports', () => {
     });
   });
 });
-
-// Made with Bob

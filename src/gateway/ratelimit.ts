@@ -81,14 +81,11 @@ export class RateLimits extends GatewayResource {
    *   rate limit configuration.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  create(params: CreateRateLimitParams): Promise<Response<Record<string, any>>> {
+  async create(params: CreateRateLimitParams): Promise<Response<Record<string, any>>> {
     const requiredParams = ['type'];
     const validParams = ['providerId', 'modelId', 'token', 'request'];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const { type, providerId, modelId, token, request, signal, headers } = params;
 
@@ -128,14 +125,11 @@ export class RateLimits extends GatewayResource {
    *   rate limit configuration.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  update(params: UpdateRateLimitParams): Promise<Response<Record<string, any>>> {
+  async update(params: UpdateRateLimitParams): Promise<Response<Record<string, any>>> {
     const requiredParams = ['type'];
     const validParams = ['providerId', 'modelId', 'token', 'request'];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const { type, providerId, modelId, rateLimitId, token, request, signal, headers } = params;
 
@@ -178,18 +172,15 @@ export class RateLimits extends GatewayResource {
    *   A promise that resolves with the rate limit details or list.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  getDetails(params?: ListRateLimitsParams): Promise<Response<ListRateLimitResponse>>;
-  getDetails(params: GetRateLimitParams): Promise<Response<Record<string, any>>>;
-  getDetails(
+  async getDetails(params?: ListRateLimitsParams): Promise<Response<ListRateLimitResponse>>;
+  async getDetails(params: GetRateLimitParams): Promise<Response<Record<string, any>>>;
+  async getDetails(
     params: GetRateLimitParams = {}
   ): Promise<Response<Record<string, any> | ListRateLimitResponse>> {
     const requiredParams: string[] = [];
     const validParams = ['rateLimitId'];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const { rateLimitId, signal, headers } = params;
     if (rateLimitId) {
@@ -227,10 +218,7 @@ export class RateLimits extends GatewayResource {
     const requiredParams: string[] = [];
     const validParams: string[] = [];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
     const response = await this.getDetails(params);
     return response.result.data;
   }
@@ -248,14 +236,11 @@ export class RateLimits extends GatewayResource {
    *   success.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  delete(params: DeleteRateLimitParams): Promise<Response<Record<string, any>>> {
+  async delete(params: DeleteRateLimitParams): Promise<Response<Record<string, any>>> {
     const requiredParams = ['rateLimitId'];
     const validParams: string[] = [];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const { rateLimitId, signal, headers } = params;
 

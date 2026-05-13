@@ -13,10 +13,10 @@
  */
 
 import unitTestUtils from '@ibm-cloud/sdk-test-utilities';
-import { NoAuthAuthenticator, BaseService } from 'ibm-cloud-sdk-core';
+import { NoAuthAuthenticator } from 'ibm-cloud-sdk-core';
 import { ReadableStream } from 'stream/web';
-import { BatchInference } from '../../../src/batch_inference/batch_inference';
-import { Files } from '../../../src/batch_inference/files';
+import { BatchInference } from '../../../src/batch_inference';
+import { Files } from '../../../src/batch_inference';
 import { checkAxiosOptions } from '../utils/checks';
 import fs, { constants } from 'fs';
 import { writeFile, access } from 'fs/promises';
@@ -27,8 +27,8 @@ import {
   testWithRetries,
   testAsyncWithRetries,
 } from '../../utils/utils';
-import type { MethodTestSpec } from '../utils/helpers';
-import { describeMethod } from '../utils/helpers';
+import { createRequestMockSetup, createDescribeMethod } from '../utils';
+import { testContainerIdHeaders } from '../gateway/helpers';
 
 const { getOptions, checkUrlAndMethod, expectToBePromise } = unitTestUtils;
 
@@ -50,11 +50,7 @@ const filesService = batchInferenceService.files;
 
 // ─── Mock Setup ───────────────────────────────────────────────────────────────
 
-let createRequestMock: jest.SpyInstance;
-
-function getRequestMock(): jest.SpyInstance {
-  return createRequestMock;
-}
+const mockSetup = createRequestMockSetup();
 
 // Mock fs module
 jest.mock('fs');
@@ -66,26 +62,23 @@ const PROJECT_ID = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
 const FILE_ID = 'file_abc123';
 const FILE_PATH = '/path/to/file.jsonl';
 
-// ─── Test Helpers ─────────────────────────────────────────────────────────────
-
-// Helper wrapper to use the shared describeMethod with local context
-function describeFilesMethod(name: string, spec: MethodTestSpec) {
-  describeMethod(name, spec, batchInferenceService, getRequestMock, API_KEY);
-}
+const describeMethod = createDescribeMethod(batchInferenceService, mockSetup.getMock, API_KEY, {
+  version: VERSION,
+});
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('Files', () => {
   beforeAll(() => {
-    createRequestMock = jest.spyOn(BaseService.prototype, 'createRequest' as keyof BaseService);
+    mockSetup.setup();
   });
 
   beforeEach(() => {
-    createRequestMock.mockImplementation(() => Promise.resolve({ result: {} }));
+    mockSetup.getMock().mockImplementation(() => Promise.resolve({ result: {} }));
   });
 
   afterEach(() => {
-    createRequestMock.mockReset();
+    mockSetup.reset();
     jest.clearAllMocks();
   });
 
@@ -120,19 +113,19 @@ describe('Files', () => {
         });
         expectToBePromise(result);
         await result;
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
+        expect(mockSetup.getMock()).toHaveBeenCalledTimes(1);
 
-        const mockRequestOptions = getOptions(getRequestMock());
+        const mockRequestOptions = getOptions(mockSetup.getMock());
         checkUrlAndMethod(mockRequestOptions, '/ml/v1/files', 'POST');
-        checkAxiosOptions(getRequestMock(), signal);
+        checkAxiosOptions(mockSetup.getMock(), signal);
 
         // Verify authentication headers
-        const requestHeaders = getDefaultHeadersFromMock(getRequestMock());
+        const requestHeaders = getDefaultHeadersFromMock(mockSetup.getMock());
         expect(requestHeaders).toHaveProperty('authorization', `Bearer ${API_KEY}`);
-        expect(requestHeaders).toHaveProperty('X-IBM-Project-ID', PROJECT_ID);
+        expect(requestHeaders).toHaveProperty('X-IBM-PROJECT-ID', PROJECT_ID);
       };
 
-      testAsyncWithRetries(runCheck, batchInferenceService, createRequestMock);
+      testAsyncWithRetries(runCheck, batchInferenceService, mockSetup.getMock());
     });
 
     test('uploads file from ReadableStream', () => {
@@ -147,24 +140,29 @@ describe('Files', () => {
           signal,
         });
         expectToBePromise(result);
-        expect(createRequestMock).toHaveBeenCalledTimes(1);
+        expect(mockSetup.getMock()).toHaveBeenCalledTimes(1);
 
-        const mockRequestOptions = getOptions(getRequestMock());
+        const mockRequestOptions = getOptions(mockSetup.getMock());
         checkUrlAndMethod(mockRequestOptions, '/ml/v1/files', 'POST');
-        checkAxiosOptions(getRequestMock(), signal);
+        checkAxiosOptions(mockSetup.getMock(), signal);
       };
 
-      testWithRetries(runCheck, batchInferenceService, createRequestMock);
+      testWithRetries(runCheck, batchInferenceService, mockSetup.getMock());
     });
 
     describe('negative tests', () => {
-      testRequiredParams((p) => filesService.upload(p));
+      testRequiredParams(
+        (p) => filesService.upload(p),
+        /Missing required parameters/,
+        /Missing required parameters/,
+        { projectId: PROJECT_ID }
+      );
       testInvalidParams((p) => filesService.upload(p), { projectId: PROJECT_ID });
     });
   });
 
   describe('getDetails', () => {
-    describeFilesMethod('with fileId', {
+    describeMethod('with fileId', {
       method: (p) => filesService.getDetails(p),
       callParams: {
         fileId: FILE_ID,
@@ -183,7 +181,7 @@ describe('Files', () => {
       noRequiredParams: true,
     });
 
-    describeFilesMethod('without fileId (list all)', {
+    describeMethod('without fileId (list all)', {
       method: (p) => filesService.getDetails(p),
       callParams: {
         projectId: PROJECT_ID,
@@ -208,7 +206,7 @@ describe('Files', () => {
     });
   });
 
-  describeFilesMethod('getContent', {
+  describeMethod('getContent', {
     method: (p) => filesService.getContent(p),
     callParams: {
       fileId: FILE_ID,
@@ -224,6 +222,7 @@ describe('Files', () => {
     expectedPath: {
       file_id: FILE_ID,
     },
+    requiresOneOf: true,
   });
 
   describe('download', () => {
@@ -231,7 +230,7 @@ describe('Files', () => {
       '{"custom_id":"request-1","method":"POST","url":"/v1/chat/completions"}';
 
     beforeEach(() => {
-      createRequestMock.mockResolvedValue({
+      mockSetup.getMock().mockResolvedValue({
         result: mockFileContent,
       });
     });
@@ -247,7 +246,7 @@ describe('Files', () => {
       });
 
       expect(result).toBe('File written successfully to output.jsonl');
-      expect(createRequestMock).toHaveBeenCalledTimes(1);
+      expect(mockSetup.getMock()).toHaveBeenCalledTimes(1);
       expect(mockAccess).toHaveBeenCalledWith('output.jsonl', constants.F_OK);
     });
 
@@ -336,7 +335,12 @@ describe('Files', () => {
     });
 
     describe('negative tests', () => {
-      testRequiredParams((p) => filesService.download(p));
+      testRequiredParams(
+        (p) => filesService.download(p),
+        /Missing required parameters/,
+        /Missing required parameters/,
+        { projectId: PROJECT_ID }
+      );
       testInvalidParams((p) => filesService.download(p), { projectId: PROJECT_ID });
     });
   });
@@ -347,15 +351,56 @@ describe('Files', () => {
         { id: 'file_1', filename: 'input1.jsonl', purpose: 'batch' },
         { id: 'file_2', filename: 'input2.jsonl', purpose: 'batch' },
       ];
-      createRequestMock.mockResolvedValue({
+      mockSetup.getMock().mockResolvedValue({
         result: { data: mockFiles },
       });
 
       const result = await filesService.list({ projectId: PROJECT_ID, limit: 10 });
       expect(result).toEqual(mockFiles);
-      expect(createRequestMock).toHaveBeenCalledTimes(1);
+      expect(mockSetup.getMock()).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Container ID Headers', () => {
+    describe('Files methods', () => {
+      testContainerIdHeaders(mockSetup.getMock, API_KEY, [
+        {
+          name: 'upload',
+          method: ({ containerId, headers, svc = batchInferenceService }) =>
+            svc.files.upload({
+              file: new ReadableStream(),
+              ...containerId,
+              headers,
+            }),
+        },
+        {
+          name: 'getDetails (with fileId)',
+          method: ({ containerId, headers, svc = batchInferenceService }) =>
+            svc.files.getDetails({
+              fileId: FILE_ID,
+              ...containerId,
+              headers,
+            }),
+        },
+        {
+          name: 'getDetails (list)',
+          method: ({ containerId, headers, svc = batchInferenceService }) =>
+            svc.files.getDetails({
+              limit: 10,
+              ...containerId,
+              headers,
+            }),
+        },
+        {
+          name: 'getContent',
+          method: ({ containerId, headers, svc = batchInferenceService }) =>
+            svc.files.getContent({
+              fileId: FILE_ID,
+              ...containerId,
+              headers,
+            }),
+        },
+      ]);
     });
   });
 });
-
-// Made with Bob

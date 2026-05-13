@@ -13,7 +13,7 @@ import {
 } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';
 
-const modelName = 'ibm/granite-3-8b-instruct';
+const modelName = 'ibm/granite-4-h-small';
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 

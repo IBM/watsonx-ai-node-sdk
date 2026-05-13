@@ -46,14 +46,11 @@ export class Policies extends GatewayResource {
    * @returns {Promise<Response<EmptyObject>>} - Resolves with the response from the server.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  create(params: CreatePolicyParams): Promise<Response<TenantPolicy>> {
+  async create(params: CreatePolicyParams): Promise<Response<TenantPolicy>> {
     const requiredParams = ['action', 'effect', 'resource', 'subject'];
     const validParams: string[] = [];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const { action, effect, resource, subject, signal, headers } = params;
 
@@ -89,10 +86,7 @@ export class Policies extends GatewayResource {
   async getDetails(params: GetPolicyParams): Promise<TenantPolicy> {
     const requiredParams = ['policyId'];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
     const { policyId } = params;
     const policies = await this.list();
     const policy = policies.find((item) => item.uuid === policyId);
@@ -114,13 +108,10 @@ export class Policies extends GatewayResource {
    * @returns {Promise<EmptyObject>} Resolves with an empty object on success.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  delete(params: DeletePolicyParams): Promise<Response<EmptyObject>> {
+  async delete(params: DeletePolicyParams): Promise<Response<EmptyObject>> {
     const requiredParams = ['policyId'];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
     const { policyId, signal, headers } = params;
 
     const path = {
@@ -146,10 +137,7 @@ export class Policies extends GatewayResource {
   async list(params: ListPolicyParams = {}): Promise<TenantPolicy[]> {
     const requiredParams: string[] = [];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const { signal, headers } = params;
     const parameters = {

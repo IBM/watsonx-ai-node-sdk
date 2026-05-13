@@ -27,7 +27,7 @@ import { validateRequestParams, validateRequiredOneOf } from '../helpers/validat
 import { ENDPOINTS } from '../config';
 import type { GetParameters, PostParameters, Response } from '../base';
 import { Files } from './files';
-import type { Identifiers } from './types/request';
+import type { ContextIdentifiers } from '../types/common';
 
 /**
  * Helper function to validate batch inference request parameters.
@@ -60,9 +60,8 @@ function validateBatchParams(
   requiredParams: string[],
   validParams: string[]
 ): void {
-  validateRequiredOneOf(params, ['projectId', 'spaceId']);
-  const validationErrors = validateRequestParams(params, requiredParams, validParams);
-  if (validationErrors) throw validationErrors;
+  validateRequiredOneOf(params, ['projectId', 'spaceId'], false);
+  validateRequestParams(params, requiredParams, validParams);
 }
 
 /**
@@ -99,32 +98,22 @@ export class BatchInference extends APIBaseService {
     this.files = new Files(this);
   }
 
-  _get<T>(params: GetParameters & Identifiers): Promise<Response<T>> {
-    const { projectId, spaceId } = params;
-
-    return super._get({
-      ...params,
-      headers: {
-        ...params.headers,
+  _get<T>(params: GetParameters & ContextIdentifiers): Promise<Response<T>> {
+    return super._get(
+      this.appendDataToHeaders(params, {
         'authorization': `Bearer ${this.#apikey}`,
-        ...(projectId ? { 'X-IBM-Project-ID': `${projectId}` } : {}),
-        ...(spaceId ? { 'X-IBM-Space-ID': `${spaceId}` } : {}),
-      },
-    });
+        ...this._formContainerIdHeaders(params, true),
+      })
+    );
   }
 
-  _post<T>(params: PostParameters & Identifiers): Promise<Response<T>> {
-    const { projectId, spaceId } = params;
-
-    return super._post({
-      ...params,
-      headers: {
-        ...params.headers,
+  _post<T>(params: PostParameters & ContextIdentifiers): Promise<Response<T>> {
+    return super._post(
+      this.appendDataToHeaders(params, {
         'authorization': `Bearer ${this.#apikey}`,
-        ...(projectId ? { 'X-IBM-Project-ID': `${projectId}` } : {}),
-        ...(spaceId ? { 'X-IBM-Space-ID': `${spaceId}` } : {}),
-      },
-    });
+        ...this._formContainerIdHeaders(params, true),
+      })
+    );
   }
 
   /**

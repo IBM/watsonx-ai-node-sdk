@@ -2,6 +2,7 @@ import type { UserOptions } from 'ibm-cloud-sdk-core';
 import { NoAuthAuthenticator } from 'ibm-cloud-sdk-core';
 import { WatsonxBaseService } from '../../../src/base';
 import * as getAuthenticatorFromEnvironment from '../../../src/authentication/utils/get-authenticator-from-environment';
+import { VERSION_DATE } from '../../../src/version';
 
 describe('WatsonxBaseService', () => {
   let service: WatsonxBaseService;
@@ -31,10 +32,20 @@ describe('WatsonxBaseService', () => {
     expect(customService.serviceUrl).toBe('https://custom.url.com');
   });
 
-  test('Throw an error if required parameters are missing', () => {
+  test('Use VERSION_DATE when version parameter is not provided', () => {
     delete options.version;
+    const serviceWithoutVersion = new WatsonxBaseService(options);
 
-    expect(() => new WatsonxBaseService(options)).toThrow('Missing required parameters');
+    expect(serviceWithoutVersion.version).toBe(VERSION_DATE);
+  });
+
+  test('Use provided version parameter over VERSION_DATE', () => {
+    const providedVersion = '2023-12-01';
+
+    options.version = providedVersion;
+    const serviceWithProvidedVersion = new WatsonxBaseService(options);
+
+    expect(serviceWithProvidedVersion.version).toBe(providedVersion);
   });
 
   test('Use authenticator from options if provided, otherwise from environment', () => {

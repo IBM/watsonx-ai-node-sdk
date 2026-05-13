@@ -1,5 +1,5 @@
 /**
- * (C) Copyright IBM Corp. 2025-2026.
+ * (C) Copyright IBM Corp. 2026.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -12,5 +12,17 @@
  * the License.
  */
 
-export const VERSION = '1.7.12';
-export const VERSION_DATE = '2026-05-13';
+// Test setup utilities
+export { createTestServiceConfig, type TestServiceConfig } from './test-setup';
+
+// Test method helpers
+export { describeMethod, testRequiredOneOf, type MethodTestSpec } from './helpers';
+
+// Request validation helpers
+export { checkAxiosOptions, checkRequest } from './checks';
+
+// Mock factory utilities
+export { createMockSetup, type MockSetup, createRequestMockSetup } from './mock-factory';
+
+// Test factory utilities
+export { createDescribeMethod } from './test-factory';

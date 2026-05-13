@@ -13,10 +13,11 @@
  */
 
 import type { UserOptions } from 'ibm-cloud-sdk-core';
-import { BaseService, validateParams, readExternalSources } from 'ibm-cloud-sdk-core';
+import { BaseService, readExternalSources } from 'ibm-cloud-sdk-core';
 import { Agent } from 'https';
 import { readFileSync } from 'fs';
 import { getAuthenticatorFromEnvironment } from '../authentication/utils/get-authenticator-from-environment';
+import { VERSION_DATE } from '../version';
 import type { Stream } from '../lib/common';
 import {
   getSdkHeaders,
@@ -35,6 +36,8 @@ import type {
   TokenAuthenticationOptions,
 } from './types/base';
 import { PLATFORM_URL_MAPPINGS } from '../config';
+import { validateRequiredOneOf } from '../helpers/validators';
+import type { ContextIdentifiers } from '../types/common';
 
 /**
  * WatsonxBaseService class extends BaseService and provides common functionalities for Watsonx
@@ -49,6 +52,8 @@ export class WatsonxBaseService extends BaseService {
   /** @ignore */
   static DEFAULT_SERVICE_NAME: string = 'watsonx_ai';
 
+  static PLATFORM_URLS_MAP = PLATFORM_URL_MAPPINGS;
+
   /** The version date for the API of the form `YYYY-MM-DD`. */
   version: string;
 
@@ -60,7 +65,9 @@ export class WatsonxBaseService extends BaseService {
 
   httpsAgentMap: HttpsAgentMap = { service: undefined, dataplatform: undefined };
 
-  static PLATFORM_URLS_MAP = PLATFORM_URL_MAPPINGS;
+  projectId?: string;
+
+  spaceId?: string;
 
   /**
    * Constructs an instance of WatsonxBaseService with passed in options and external configuration.
@@ -72,15 +79,18 @@ export class WatsonxBaseService extends BaseService {
    * @param {string} [options.serviceName] - The name of the service to configure
    * @param {Authenticator} [options.authenticator] - The Authenticator object used to authenticate
    *   requests to the service
+   * @param {Certificates['caCert']} [options.caCert] - Certificate configuration for HTTPS
+   *   connections
+   * @param {string} [options.projectId] - The project ID to use for API requests
+   * @param {string} [options.spaceId] - The space ID to use for API requests
    */
-  constructor(options: UserOptions & Certificates & TokenAuthenticationOptions) {
-    const requiredParams = ['version'];
-    // @ts-expect-error validateParams has invalid type declaration, it accepts null however typing does not allow it
-    const validationErrors = validateParams(options, requiredParams, null);
-    if (validationErrors) {
-      throw validationErrors;
+  constructor(options: UserOptions & Certificates & TokenAuthenticationOptions = {}) {
+    // If version is not provided, use the VERSION_DATE from version.ts
+    if (!options.version) {
+      options.version = VERSION_DATE;
     }
-    // version is required parameter, if it is 'undefined' it will throw an error above
+
+    // version is now guaranteed to be set (either provided or from VERSION_DATE)
     options.version = options.version as string;
 
     options.serviceName ??= WatsonxBaseService.DEFAULT_SERVICE_NAME;
@@ -119,6 +129,10 @@ export class WatsonxBaseService extends BaseService {
     super(options);
 
     this.version = options.version;
+
+    validateRequiredOneOf(options, ['projectId', 'spaceId'], false);
+    this.projectId = options.projectId;
+    this.spaceId = options.spaceId;
 
     this.configureService(options.serviceName);
     // Using build-in method to ensure user-given URL is correct ex. trimming slashes
@@ -167,6 +181,43 @@ export class WatsonxBaseService extends BaseService {
       this.serviceUrl = this.baseOptions.serviceUrl;
     }
   }
+
+  /**
+   * Resolves projectId and spaceId with fallback to instance values.
+   *
+   * This method implements a priority-based resolution strategy:
+   *
+   * 1. If both instance values (this.projectId/this.spaceId) AND parameter values exist, parameter
+   *    values take absolute precedence and instance values are ignored
+   * 2. Otherwise, parameter values are used if provided, falling back to instance values
+   *
+   * This ensures that explicitly passed parameters always override instance configuration when both
+   * are present, preventing unintended mixing of project and space contexts.
+   *
+   * @private
+   * @param {Object} params - Object containing optional projectId and spaceId
+   * @param {string} [params.projectId] - The project ID to use for the request
+   * @param {string} [params.spaceId] - The space ID to use for the request
+   * @returns {Object} Resolved projectId and spaceId values
+   * @returns {string | undefined} Return.projectId - The resolved project ID (from params or
+   *   instance)
+   * @returns {string | undefined} Return.spaceId - The resolved space ID (from params or instance)
+   */
+  protected resolveContextId(params: { projectId?: string; spaceId?: string }): {
+    projectId?: string;
+    spaceId?: string;
+  } {
+    if (params.projectId !== undefined || params.spaceId !== undefined)
+      return {
+        projectId: params.projectId,
+        spaceId: params.spaceId,
+      };
+
+    return {
+      projectId: this.projectId,
+      spaceId: this.spaceId,
+    };
+  }
 }
 
 /**
@@ -175,6 +226,66 @@ export class WatsonxBaseService extends BaseService {
  * @category APIBaseService
  */
 export class APIBaseService extends WatsonxBaseService {
+  /**
+   * Forms container ID headers based on project ID or space ID.
+   *
+   * This method creates the appropriate IBM-specific headers for identifying the container (project
+   * or space) that the API request should operate within. It prioritizes parameters passed in the
+   * request over instance-level defaults.
+   *
+   * @param {ContextIdentifiers} [params={}] - Container identifiers (projectId or spaceId). Default
+   *   is `{}`
+   * @returns {{ 'X-IBM-PROJECT-ID': string } | { 'X-IBM-SPACE-ID': string } | {}} An object
+   *   containing either the project ID header, space ID header, or an empty object if neither is
+   *   provided
+   * @protected
+   */
+  protected _formContainerIdHeaders(
+    params: ContextIdentifiers = {},
+    requireContainerId: boolean = false
+  ): { 'X-IBM-PROJECT-ID': string } | { 'X-IBM-SPACE-ID': string } | {} {
+    const { projectId, spaceId } = this.resolveContextId(params);
+    if (requireContainerId) validateRequiredOneOf({ projectId, spaceId }, ['projectId', 'spaceId']);
+    return {
+      ...(projectId
+        ? {
+            'X-IBM-PROJECT-ID': projectId,
+          }
+        : {}),
+      ...(spaceId
+        ? {
+            'X-IBM-SPACE-ID': spaceId,
+          }
+        : {}),
+    };
+  }
+
+  /**
+   * Appends additional data to request headers.
+   *
+   * This utility method merges override headers with existing headers in the parameters object,
+   * ensuring that custom headers are properly combined without losing existing header data.
+   *
+   * @template T - The type of parameters, constrained to request parameter types with container
+   *   identifiers
+   * @param {T} params - The request parameters containing existing headers
+   * @param {Record<string, any>} overrides - Additional headers to merge into the request
+   * @returns {T} A new parameters object with merged headers
+   * @protected
+   */
+  protected appendDataToHeaders<
+    T extends (GetParameters | PostParameters | PutParameters | DeleteParameters) &
+      ContextIdentifiers,
+  >(params: T, overrides: Record<string, any>): T {
+    return {
+      ...params,
+      headers: {
+        ...params.headers,
+        ...overrides,
+      },
+    };
+  }
+
   /**
    * Performs a POST request to the specified URL.
    *

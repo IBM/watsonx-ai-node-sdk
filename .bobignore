@@ -1,0 +1,4 @@
+# Example .bobignore patterns
+.env
+credentials/
+*.key

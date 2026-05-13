@@ -1,4 +1,4 @@
-import { ChatWatsonx } from '@langchain/community/chat_models/ibm';
+import { ChatWatsonx } from '@langchain/ibm';
 import axios from 'axios';
 import { HumanMessage } from '@langchain/core/messages';
 import { conversationPrinter } from './utils.ts';

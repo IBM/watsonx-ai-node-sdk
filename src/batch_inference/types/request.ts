@@ -13,7 +13,7 @@
  */
 
 import type { ReadableStream } from 'stream/web';
-import type { DefaultParams } from '../../types/common';
+import type { ContextIdentifiers, DefaultParams } from '../../types/common';
 
 /** Parameters for the `uploadBatchFile` operation. */
 export interface UploadBatchFileParams extends DefaultParams {
@@ -107,9 +107,4 @@ export interface CancelBatchParams extends DefaultParams {
   spaceId?: string;
 }
 
-export interface Identifiers {
-  /** Watsonx project identifier. */
-  projectId: string | undefined;
-  /** Watsonx space identifier. */
-  spaceId: string | undefined;
-}
+export interface Identifiers extends ContextIdentifiers {}

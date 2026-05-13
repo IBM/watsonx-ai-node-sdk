@@ -1,4 +1,3 @@
-import { NoAuthAuthenticator } from 'ibm-cloud-sdk-core';
 import { APIBaseService } from '../../../src/base/base';
 import { Chat, Embeddings } from '../../../src/gateway';
 import {
@@ -6,10 +5,13 @@ import {
   EmbeddingCompletions,
   GenerateTextCompletions,
 } from '../../../src/gateway';
-import { checkRequest } from '../utils/checks';
-import { MockingRequest } from '../../utils/utils';
-import { convertKeysToSnakeCase } from '../utils/helpers';
-import type { MethodsSimpleParams } from './types';
+import { createTestServiceConfig, createRequestMockSetup } from '../utils';
+import type { MethodsParams, MethodsSimpleParams } from './types';
+import {
+  convertKeysToSnakeCase,
+  describeGatewayContractSuite,
+  describeInstanceLevelContainerIds,
+} from './helpers';
 
 const chatCompletions = {
   messages: [
@@ -124,28 +126,20 @@ const generateTextCompletions = {
   user: 'my-username',
 };
 
-const customHeaders = {
-  Accept: 'fake/accept',
-  'Content-Type': 'fake/contentType',
-};
-
 const streamChatCompletion = { ...chatCompletions, stream: true };
 
 const streamGenerateTextCompletions = { ...generateTextCompletions, stream: true };
 
-const serviceUrl = 'https://us-south.ml.cloud.ibm.com';
-const version = '2023-07-07';
+const serviceOptions = {
+  ...createTestServiceConfig(),
+};
 
 describe('Completions instances', () => {
   describe('Init instance', () => {
     let client: APIBaseService;
 
     beforeAll(() => {
-      client = new APIBaseService({
-        url: serviceUrl,
-        version,
-        authenticator: new NoAuthAuthenticator(),
-      });
+      client = new APIBaseService(serviceOptions);
     });
 
     test('Init Chat instance', () => {
@@ -173,224 +167,192 @@ describe('Completions instances', () => {
   });
 
   describe('Inference instance', () => {
-    const client = new APIBaseService({
-      version,
-      serviceUrl,
-      authenticator: new NoAuthAuthenticator(),
-    });
+    const client = new APIBaseService(serviceOptions);
     const chat = new Chat(client);
     const embeddings = new Embeddings(client);
     const generateText = new GenerateTextCompletions(client);
 
-    const createRequestMocker = new MockingRequest(client, 'createRequest' as any); // private method
-    let createRequestMock: jest.SpyInstance;
+    const mockSetup = createRequestMockSetup();
 
-    describe('Sync methods', () => {
-      const methods: MethodsSimpleParams[] = [
-        {
-          name: 'Test chat completions create request',
-          req: {
-            url: '/ml/gateway/v1/chat/completions',
-            params: { ...chatCompletions },
-          },
-          callableMethod: (params) => chat.completion.create(params),
-        },
-        {
-          name: 'Test text generation completions create request',
-          req: {
-            url: '/ml/gateway/v1/completions',
-            params: { ...generateTextCompletions },
-          },
-          callableMethod: (params) => generateText.create(params),
-        },
-        {
-          name: 'Test embeddings generation completions create request',
-          req: {
-            url: '/ml/gateway/v1/embeddings',
-            params: { ...embeddingsCompletions },
-          },
-          callableMethod: (params) => embeddings.completion.create(params),
-        },
-      ];
-
-      beforeEach(async () => {
-        createRequestMocker.mock(() => Promise.resolve());
-        if (createRequestMocker.functionMock) createRequestMock = createRequestMocker.functionMock;
-        else throw new Error('Unable to mock request. Please check your implementation');
-      });
-
-      afterEach(async () => {
-        createRequestMocker.clearMock();
-      });
-
-      afterAll(async () => {
-        createRequestMocker.unmock();
-      });
-
-      test.each(methods)('$name', async ({ req, callableMethod }) => {
-        const { params, url } = req;
-        const { signal } = new AbortController();
-        const response = callableMethod({ signal, ...params });
-        const {
-          headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          ...restParams
-        } = params;
-
-        checkRequest({
-          request: {
-            signal,
-            headers,
-            url,
-            params: convertKeysToSnakeCase(restParams),
-          },
-          requestMock: createRequestMock,
-          method: 'POST',
-          version,
-        });
-
-        expect(response).toBeInstanceOf(Promise);
-      });
-
-      test.each(methods)('$name with custom headers', async ({ req, callableMethod }) => {
-        const { params, url } = req;
-        const { signal } = new AbortController();
-        const response = callableMethod({ signal, ...params, headers: customHeaders });
-
-        checkRequest({
-          request: {
-            signal,
-            headers: customHeaders,
-            url,
-            params: convertKeysToSnakeCase(params),
-          },
-          requestMock: createRequestMock,
-          method: 'POST',
-          version,
-        });
-
-        expect(response).toBeInstanceOf(Promise);
-      });
-
-      test.each(methods)('$name without payload', async ({ callableMethod }) => {
-        // @ts-expect-error required parameters
-        await expect(callableMethod()).rejects.toThrow(/Missing required parameters/);
-        await expect(callableMethod({})).rejects.toThrow(/Missing required parameters/);
-      });
+    beforeAll(() => {
+      mockSetup.setup();
     });
 
-    describe('Stream methods', () => {
-      const methods: MethodsSimpleParams[] = [
-        {
-          name: 'Test chat completions create request with streaming',
-          req: {
-            url: '/ml/gateway/v1/chat/completions',
-            params: { ...streamChatCompletion },
-          },
-          callableMethod: (params) => chat.completion.create(params),
+    afterAll(() => {
+      mockSetup.unmock();
+    });
+
+    const syncMethodDefinitions: MethodsSimpleParams[] = [
+      {
+        name: 'Test chat completions create request',
+        req: {
+          url: '/ml/gateway/v1/chat/completions',
+          params: { ...chatCompletions },
         },
-        {
-          name: 'Test completions create request with streaming',
-          req: {
-            url: '/ml/gateway/v1/completions',
-            params: {
-              ...streamGenerateTextCompletions,
-            },
-          },
-          callableMethod: (params) => generateText.create(params),
+        callableMethod: (params) => chat.completion.create(params),
+      },
+      {
+        name: 'Test text generation completions create request',
+        req: {
+          url: '/ml/gateway/v1/completions',
+          params: { ...generateTextCompletions },
         },
-        {
-          name: 'Test chat completions create request with streaming',
-          req: {
-            url: '/ml/gateway/v1/chat/completions',
-            params: { ...streamChatCompletion, returnObject: false },
-          },
-          callableMethod: (params) => chat.completion.create(params),
+        callableMethod: (params) => generateText.create(params),
+      },
+      {
+        name: 'Test embeddings generation completions create request',
+        req: {
+          url: '/ml/gateway/v1/embeddings',
+          params: { ...embeddingsCompletions },
         },
-        {
-          name: 'Test completions create request with streaming',
-          req: {
-            url: '/ml/gateway/v1/completions',
-            params: {
-              ...streamGenerateTextCompletions,
-              returnObject: false,
-            },
-          },
-          callableMethod: (params) => generateText.create(params),
+        callableMethod: (params) => embeddings.completion.create(params),
+      },
+    ];
+
+    const syncMethods: MethodsParams[] = syncMethodDefinitions.map((method) => ({
+      ...method,
+      method: 'POST',
+      expectedBody: convertKeysToSnakeCase(method.req.params),
+    }));
+
+    const syncNegativeMethods = syncMethods.map(({ name, callableMethod }) => ({
+      name,
+      callableMethod,
+    }));
+
+    describeGatewayContractSuite({
+      describeName: 'Sync methods',
+      getRequestMock: mockSetup.getMock,
+      methods: syncMethods,
+      version: serviceOptions.version,
+      mockResponseFactory: async () => Promise.resolve(),
+      negativeMethods: syncNegativeMethods,
+      withCustomHeaders: true,
+    });
+
+    const streamMethodDefinitions: MethodsSimpleParams[] = [
+      {
+        name: 'Test chat completions create request with streaming',
+        req: {
+          url: '/ml/gateway/v1/chat/completions',
+          params: { ...streamChatCompletion },
         },
-      ];
-
-      beforeEach(async () => {
-        createRequestMocker.mock(() =>
-          Promise.resolve({
-            result: [
-              'id: 1\nevent: message\ndata: {}\n\n',
-              'id: 2\nevent: message\ndata: {}\n\n',
-              'id: 3\nevent: message\ndata: {}\n\n',
-            ][Symbol.iterator](),
-          })
-        );
-        if (createRequestMocker.functionMock) createRequestMock = createRequestMocker.functionMock;
-        else throw new Error('Unable to mock request. Please check your implementation');
-      });
-
-      afterEach(async () => {
-        createRequestMocker.clearMock();
-      });
-
-      afterAll(async () => {
-        createRequestMocker.unmock();
-      });
-
-      test.each(methods)('$name', async ({ req, callableMethod }) => {
-        const { params, url } = req;
-        const { signal } = new AbortController();
-        const response = callableMethod({ signal, ...params });
-        const {
-          headers = {
-            'Accept': 'text/event-stream',
-            'Content-Type': 'application/json',
+        callableMethod: (params) => chat.completion.create(params),
+      },
+      {
+        name: 'Test completions create request with streaming',
+        req: {
+          url: '/ml/gateway/v1/completions',
+          params: {
+            ...streamGenerateTextCompletions,
           },
-          ...restParams
-        } = params;
-
-        checkRequest({
-          request: {
-            signal,
-            headers,
-            url,
-            params: convertKeysToSnakeCase(restParams),
+        },
+        callableMethod: (params) => generateText.create(params),
+      },
+      {
+        name: 'Test chat completions create request with streaming',
+        req: {
+          url: '/ml/gateway/v1/chat/completions',
+          params: { ...streamChatCompletion, returnObject: false },
+        },
+        callableMethod: (params) => chat.completion.create(params),
+      },
+      {
+        name: 'Test completions create request with streaming',
+        req: {
+          url: '/ml/gateway/v1/completions',
+          params: {
+            ...streamGenerateTextCompletions,
+            returnObject: false,
           },
-          requestMock: createRequestMock,
-          method: 'POST',
-          version,
-        });
+        },
+        callableMethod: (params) => generateText.create(params),
+      },
+    ];
 
-        expect(response).toBeInstanceOf(Promise);
-      });
+    const streamMethods: MethodsParams[] = streamMethodDefinitions.map((method) => ({
+      ...method,
+      expectedBody: convertKeysToSnakeCase(method.req.params),
+      method: 'POST' as const,
+      customHeaders: {
+        'Content-type': 'text/event-stream',
+      },
+    }));
 
-      test.each(methods)('$name with custom headers', async ({ req, callableMethod }) => {
-        const { params, url } = req;
-        const { signal } = new AbortController();
-        const response = callableMethod({ signal, ...params, headers: customHeaders });
-        const { ...restParams } = params;
+    describeGatewayContractSuite({
+      describeName: 'Stream methods',
+      getRequestMock: mockSetup.getMock,
+      methods: streamMethods,
+      version: serviceOptions.version,
+      mockResponseFactory: async () => ({
+        result: [
+          'id: 1\nevent: message\ndata: {}\n\n',
+          'id: 2\nevent: message\ndata: {}\n\n',
+          'id: 3\nevent: message\ndata: {}\n\n',
+        ],
+      }),
+      withCustomHeaders: true,
+    });
+  });
 
-        checkRequest({
-          request: {
-            signal,
-            headers: customHeaders,
-            url,
-            params: convertKeysToSnakeCase(restParams),
-          },
-          requestMock: createRequestMock,
-          method: 'POST',
-          version,
-        });
+  describe('Instance-level Container IDs', () => {
+    const mockSetup = createRequestMockSetup();
 
-        expect(response).toBeInstanceOf(Promise);
-      });
+    beforeAll(() => {
+      mockSetup.setup();
+    });
+
+    beforeEach(() => {
+      mockSetup.getMock().mockImplementation(() => Promise.resolve({ result: {} }));
+    });
+
+    afterEach(() => {
+      mockSetup.reset();
+    });
+
+    describeInstanceLevelContainerIds({
+      describeName: 'Chat completion methods',
+      getRequestMock: mockSetup.getMock,
+      methods: [
+        {
+          name: 'create',
+          method: (gateway) =>
+            gateway.chat.completion.create({
+              messages: [{ role: 'user', content: 'Hello' }],
+              model: 'gpt-4o',
+            }),
+        },
+      ],
+    });
+
+    describeInstanceLevelContainerIds({
+      describeName: 'Embeddings completion methods',
+      getRequestMock: mockSetup.getMock,
+      methods: [
+        {
+          name: 'create',
+          method: (gateway) =>
+            gateway.embeddings.completion.create({
+              input: 'Test input',
+              model: 'text-embedding-ada-002',
+            }),
+        },
+      ],
+    });
+
+    describeInstanceLevelContainerIds({
+      describeName: 'Text completion methods',
+      getRequestMock: mockSetup.getMock,
+      methods: [
+        {
+          name: 'create',
+          method: (gateway) =>
+            gateway.completion.create({
+              prompt: 'Test prompt',
+              model: 'gpt-4o',
+            }),
+        },
+      ],
     });
   });
 });

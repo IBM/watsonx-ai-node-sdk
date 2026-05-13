@@ -12,94 +12,48 @@
  * the License.
  */
 
-import { NoAuthAuthenticator, BaseService } from 'ibm-cloud-sdk-core';
 import { BatchInference } from '../../../src/batch_inference/batch_inference';
 import { Files } from '../../../src/batch_inference/files';
-import type { MethodTestSpec } from '../utils/helpers';
-import { describeMethod } from '../utils/helpers';
+import { createTestServiceConfig, createRequestMockSetup, createDescribeMethod } from '../utils';
 
 // ─── Service Setup ────────────────────────────────────────────────────────────
 
-const SERVICE_URL = 'https://us-south.ml.cloud.ibm.com';
-const API_KEY = 'test-api-key';
-const VERSION = '2023-07-07';
-
 const serviceOptions = {
-  authenticator: new NoAuthAuthenticator(),
-  serviceUrl: SERVICE_URL,
-  apikey: API_KEY,
-  version: VERSION,
+  ...createTestServiceConfig(),
 };
+const API_KEY = serviceOptions.apikey;
 
 const service = new BatchInference(serviceOptions);
 
 // ─── Mock Setup ───────────────────────────────────────────────────────────────
 
-let createRequestMock: jest.SpyInstance;
-
-function getRequestMock(): jest.SpyInstance {
-  return createRequestMock;
-}
+const mockSetup = createRequestMockSetup();
 
 // ─── Shared Test Fixtures ─────────────────────────────────────────────────────
 
-const SPACE_ID = '63dc4cf1-252f-424b-b52d-5cdd9814987f';
 const PROJECT_ID = 'a77190a2-f52d-4f2a-be3d-7867b5f46edc';
 const BATCH_ID = 'batch_abc123';
 const INPUT_FILE_ID = 'file_abc123';
 const ENDPOINT = '/ml/v1/text/chat';
 const COMPLETION_WINDOW = '24h';
 
-// ─── Test Helpers ─────────────────────────────────────────────────────────────
-
-function testRequiredOneOf(
-  methodFn: (params?: any) => Promise<any>,
-  baseParams: Record<string, any>
-) {
-  const { projectId: _projectId, spaceId: _spaceId, ...restParams } = baseParams;
-  test('requires either projectId or spaceId', async () => {
-    await expect(methodFn(restParams)).rejects.toThrow(
-      /One of the following parameters is required: projectId,spaceId/
-    );
-  });
-
-  test('rejects when both projectId and spaceId are provided', async () => {
-    await expect(
-      methodFn({ ...restParams, projectId: PROJECT_ID, spaceId: SPACE_ID })
-    ).rejects.toThrow(/Only one of the following parameters is allowed: projectId,spaceId/);
-  });
-}
-
-// Helper wrapper to use the shared describeMethod with local context and requiresOneOf support
-function describeBatchMethod(name: string, spec: MethodTestSpec) {
-  const { requiresOneOf = false, ...restSpec } = spec;
-
-  // Use the shared describeMethod
-  describeMethod(name, restSpec, service, getRequestMock, API_KEY);
-
-  // Add requiresOneOf tests if needed
-  if (requiresOneOf) {
-    describe(name, () => {
-      describe('negative tests', () => {
-        testRequiredOneOf(spec.method, spec.minParams);
-      });
-    });
-  }
-}
+const describeMethod = createDescribeMethod(service, mockSetup.getMock, API_KEY, {
+  version: serviceOptions.version,
+});
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('BatchInference', () => {
   beforeAll(() => {
-    createRequestMock = jest.spyOn(BaseService.prototype, 'createRequest' as keyof BaseService);
+    mockSetup.setup();
   });
 
   beforeEach(() => {
-    createRequestMock.mockImplementation(() => Promise.resolve({ result: {} }));
+    mockSetup.getMock().mockImplementation(() => Promise.resolve({ result: {} }));
   });
 
   afterEach(() => {
-    createRequestMock.mockReset();
+    mockSetup.reset();
   });
 
   describe('constructor', () => {
@@ -114,15 +68,13 @@ describe('BatchInference', () => {
     test('throws error when apikey is missing', () => {
       expect(() => {
         new BatchInference({
-          authenticator: new NoAuthAuthenticator(),
-          serviceUrl: SERVICE_URL,
-          version: VERSION,
+          ...createTestServiceConfig({ apikey: undefined }),
         });
       }).toThrow('API key is required.');
     });
   });
 
-  describeBatchMethod('create', {
+  describeMethod('create', {
     method: (p) => service.create(p),
     callParams: {
       inputFileId: INPUT_FILE_ID,
@@ -150,7 +102,7 @@ describe('BatchInference', () => {
   });
 
   describe('getDetails', () => {
-    describeBatchMethod('with batchId', {
+    describeMethod('with batchId', {
       method: (p) => service.getDetails(p),
       callParams: {
         batchId: BATCH_ID,
@@ -170,7 +122,7 @@ describe('BatchInference', () => {
       noRequiredParams: true,
     });
 
-    describeBatchMethod('without batchId (list all)', {
+    describeMethod('without batchId (list all)', {
       method: (p) => service.getDetails(p),
       callParams: {
         projectId: PROJECT_ID,
@@ -195,17 +147,17 @@ describe('BatchInference', () => {
         { id: 'batch_1', status: 'completed' },
         { id: 'batch_2', status: 'in_progress' },
       ];
-      createRequestMock.mockResolvedValue({
+      mockSetup.getMock().mockResolvedValue({
         result: { data: mockBatches },
       });
 
       const result = await service.list({ projectId: PROJECT_ID, limit: 10 });
       expect(result).toEqual(mockBatches);
-      expect(createRequestMock).toHaveBeenCalledTimes(1);
+      expect(mockSetup.getMock()).toHaveBeenCalledTimes(1);
     });
   });
 
-  describeBatchMethod('cancel', {
+  describeMethod('cancel', {
     method: (p) => service.cancel(p),
     callParams: {
       batchId: BATCH_ID,
@@ -222,5 +174,180 @@ describe('BatchInference', () => {
       batch_id: BATCH_ID,
     },
     requiresOneOf: true,
+  });
+
+  describe('Container ID Headers', () => {
+    const SPACE_ID = 'test-space-123';
+
+    const getHeaders = () => mockSetup.getMock().mock.calls[0][0].defaultOptions.headers;
+    const httpMethods = [
+      { method: '_get', params: { url: '/test' } },
+      { method: '_post', params: { url: '/test', body: {} } },
+    ] as const;
+
+    beforeEach(() => {
+      mockSetup.getMock().mockClear();
+    });
+
+    describe('API methods', () => {
+      describe.each(httpMethods)('with $method method', ({ method, params }) => {
+        test('includes X-IBM-PROJECT-ID and authorization headers', async () => {
+          await service[method]({ ...params, projectId: PROJECT_ID });
+          const headers = getHeaders();
+
+          expect(headers['X-IBM-PROJECT-ID']).toBe(PROJECT_ID);
+          expect(headers['authorization']).toBe(`Bearer ${API_KEY}`);
+        });
+
+        test('includes X-IBM-SPACE-ID when spaceId provided', async () => {
+          await service[method]({ ...params, spaceId: SPACE_ID });
+          const headers = getHeaders();
+
+          expect(headers['X-IBM-SPACE-ID']).toBe(SPACE_ID);
+          expect(headers['authorization']).toBe(`Bearer ${API_KEY}`);
+        });
+
+        test('params override instance-level container IDs', async () => {
+          const instanceService = new BatchInference({
+            ...createTestServiceConfig(),
+            projectId: 'instance-project-id',
+          });
+          await instanceService[method]({
+            ...params,
+            projectId: 'param-project-id',
+          });
+          const headers = getHeaders();
+
+          expect(headers['X-IBM-PROJECT-ID']).toBe('param-project-id');
+        });
+
+        test('uses instance-level container IDs when not in params', async () => {
+          const instanceService = new BatchInference({
+            ...createTestServiceConfig(),
+            spaceId: 'instance-space-id',
+          });
+          await instanceService[method](params);
+          const headers = getHeaders();
+
+          expect(headers['X-IBM-SPACE-ID']).toBe('instance-space-id');
+        });
+
+        test('merges container ID headers with custom headers', async () => {
+          await service[method]({
+            ...params,
+            projectId: PROJECT_ID,
+            headers: { 'Custom-Header': 'custom-value' },
+          });
+          const headers = getHeaders();
+
+          expect(headers['X-IBM-PROJECT-ID']).toBe(PROJECT_ID);
+          expect(headers['Custom-Header']).toBe('custom-value');
+          expect(headers['authorization']).toBe(`Bearer ${API_KEY}`);
+        });
+      });
+    });
+
+    describe('BatchInference methods', () => {
+      const apiMethods: Array<{
+        name: string;
+        method: ({
+          containerId,
+          headers,
+          svc,
+        }: {
+          containerId?: Record<string, string>;
+          headers?: Record<string, string>;
+          svc?: BatchInference;
+        }) => Promise<any>;
+      }> = [
+        {
+          name: 'create',
+          method: ({ containerId, headers, svc = service }) =>
+            svc.create({
+              inputFileId: INPUT_FILE_ID,
+              endpoint: ENDPOINT,
+              completionWindow: COMPLETION_WINDOW,
+              ...containerId,
+              headers,
+            }),
+        },
+        {
+          name: 'getDetails (with batchId)',
+          method: ({ containerId, headers, svc = service }) =>
+            svc.getDetails({
+              batchId: BATCH_ID,
+              ...containerId,
+              headers,
+            }),
+        },
+        {
+          name: 'getDetails (list)',
+          method: ({ containerId, headers, svc = service }) =>
+            svc.getDetails({
+              limit: 10,
+              ...containerId,
+              headers,
+            }),
+        },
+        {
+          name: 'cancel',
+          method: ({ containerId, headers, svc = service }) =>
+            svc.cancel({
+              batchId: BATCH_ID,
+              ...containerId,
+              headers,
+            }),
+        },
+      ];
+
+      describe.each(apiMethods)('with $name method', ({ name, method }) => {
+        test(`${name} sends X-IBM-PROJECT-ID header`, async () => {
+          await method({ containerId: { projectId: PROJECT_ID } });
+          const headers = getHeaders();
+
+          expect(headers['X-IBM-PROJECT-ID']).toBe(PROJECT_ID);
+          expect(headers['authorization']).toBe(`Bearer ${API_KEY}`);
+        });
+
+        test(`${name} sends X-IBM-SPACE-ID header`, async () => {
+          await method({ containerId: { spaceId: SPACE_ID } });
+          const headers = getHeaders();
+
+          expect(headers['X-IBM-SPACE-ID']).toBe(SPACE_ID);
+          expect(headers['authorization']).toBe(`Bearer ${API_KEY}`);
+        });
+
+        test(`${name} uses instance-level projectId when not provided in params`, async () => {
+          const INSTANCE_PROJECT_ID = 'instance-project-123';
+          const instanceService = new BatchInference({
+            ...createTestServiceConfig(),
+            projectId: INSTANCE_PROJECT_ID,
+          });
+
+          await method({ svc: instanceService });
+          const headers = getHeaders();
+
+          expect(headers['X-IBM-PROJECT-ID']).toBe(INSTANCE_PROJECT_ID);
+          expect(headers['authorization']).toBe(`Bearer ${API_KEY}`);
+        });
+
+        test(`${name} preserve custom headers`, async () => {
+          await method({
+            containerId: {
+              projectId: PROJECT_ID,
+            },
+            headers: {
+              'X-Custom-Header': 'custom-value',
+              'X-Request-ID': 'req-123',
+            },
+          });
+          const headers = getHeaders();
+          expect(headers['X-IBM-PROJECT-ID']).toBe(PROJECT_ID);
+          expect(headers['authorization']).toBe(`Bearer ${API_KEY}`);
+          expect(headers['X-Custom-Header']).toBe('custom-value');
+          expect(headers['X-Request-ID']).toBe('req-123');
+        });
+      });
+    });
   });
 });

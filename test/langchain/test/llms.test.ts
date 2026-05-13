@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { WatsonxLLM } from '@langchain/community/llms/ibm';
+import { WatsonxLLM } from '@langchain/ibm';
 import { config } from 'dotenv';
 import { CHAT_MODELS } from './config.ts';
 
@@ -178,7 +178,7 @@ describe('Regression tests regarding langchain llms', () => {
               stopSequence: ['hello'],
               maxNewTokens: 100,
             });
-            const result = await llms.generate(['Print hello world!']);
+            const result = await llms.generate(['Console log "hello world" in javascript']);
 
             expect(result.generations[0][0].text.endsWith('hello')).toBe(true);
           });

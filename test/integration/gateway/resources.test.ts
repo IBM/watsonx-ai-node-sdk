@@ -19,7 +19,7 @@ const describe = authHelper.prepareTests(configFile);
 authHelper.loadEnv();
 
 const version = '2024-03-14';
-const modelName = 'ibm/granite-3-8b-instruct-intel';
+const modelName = 'ibm/granite-4-h-small';
 const modelAlias = 'nodejs-sdk/' + modelName;
 const serviceUrl = process.env.WATSONX_AI_GATEWAY_URL;
 

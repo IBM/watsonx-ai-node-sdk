@@ -1,7 +1,11 @@
 import { NoAuthAuthenticator } from 'ibm-cloud-sdk-core';
 import { APIBaseService, WatsonxBaseService } from '../../../src/base';
-import { MockingRequest } from '../../utils/utils';
-import { checkRequest } from '../utils/checks';
+import {
+  checkRequest,
+  createDescribeMethod,
+  createRequestMockSetup,
+  createTestServiceConfig,
+} from '../utils';
 import { WatsonXAI } from '../../../src';
 
 const methodsMap = {
@@ -27,14 +31,11 @@ const methodsMap = {
     },
   },
 };
-const serviceUrl = 'https://us-south.ml.cloud.ibm.com';
 const version = '2023-07-07';
 
 describe('APIBaseService', () => {
   const service = new APIBaseService({
-    url: serviceUrl,
-    version,
-    authenticator: new NoAuthAuthenticator(),
+    ...createTestServiceConfig(),
   });
 
   describe('constructor', () => {
@@ -59,190 +60,170 @@ describe('APIBaseService', () => {
     describe('negative tests', () => {
       test('Service url is not specified', async () => {
         expect(async () => WatsonXAI.newInstance({})).rejects.toThrow(
-          /Missing required parameters: version/
+          /Unable to create an authenticator from the environment/
         );
       });
     });
   });
 
   describe('methods', () => {
-    const createRequestMocker = new MockingRequest(service, 'createRequest' as any); // private method
-    let createRequestMock: jest.SpyInstance;
+    const mockSetup = createRequestMockSetup();
+
+    const describeMethod = createDescribeMethod(service, mockSetup.getMock, '', {
+      version,
+      assertAuthHeader: false,
+    });
+
     describe('positive tests', () => {
       describe('Sync methods', () => {
         beforeEach(async () => {
-          createRequestMocker.mock(async () => ({}));
-          if (createRequestMocker.functionMock)
-            createRequestMock = createRequestMocker.functionMock;
-          else throw new Error('Unable to mock request. Please check your implementation');
+          mockSetup.setup();
+          mockSetup.mockReturnValue();
         });
 
         afterEach(async () => {
-          createRequestMocker.clearMock();
+          mockSetup.clear();
         });
 
         afterAll(async () => {
-          createRequestMocker.unmock();
+          mockSetup.unmock();
         });
 
-        const methods = [
-          {
-            name: 'Test for _get method',
-            params: {
-              url: 'http://example.com/{test}',
-              path: { testPath: 'testString' },
-              query: { testQuery: 'testString' },
-            },
-            callableMethod: service._get.bind(service),
+        describeMethod('_get', {
+          method: (params: any) => service._get(params),
+          callParams: {
+            url: 'http://example.com/{test}',
+            path: { testPath: 'testString' },
+            query: { testQuery: 'testString' },
           },
-          {
-            name: 'Test for _put method',
-            params: {
-              url: 'http://example.com/{test}',
-              body: { testBody: 'testString' },
-              path: { testPath: 'testString' },
-              query: { testQuery: 'testString' },
-            },
-            callableMethod: service._put.bind(service),
+          minParams: {
+            url: 'http://example.com/{test}',
           },
-          {
-            name: 'Test for _delete method',
-            params: {
-              url: 'http://example.com/{test}',
-              body: { testBody: 'testString' },
-              path: { testPath: 'testString' },
-              query: { testQuery: 'testString' },
-            },
-            callableMethod: service._delete.bind(service),
-          },
-          {
-            name: 'Test for _post method',
-            params: {
-              url: 'http://example.com/{test}',
-              body: { testBody: 'testString' },
-              path: { testPath: 'testString' },
-              query: { testQuery: 'testString' },
-            },
-            callableMethod: service._post.bind(service),
-          },
-        ];
-
-        test.each(methods)('$name', async ({ params, callableMethod }) => {
-          const { signal } = new AbortController();
-          callableMethod({ signal, ...params });
-          const methodsMapsKeys = Object.keys(methodsMap);
-          const [, callableMethodName] = callableMethod.name.split(' ');
-          if (!methodsMapsKeys.includes(callableMethodName))
-            throw new Error('methodName is not a key of methodsMap');
-          const methodName = callableMethodName as keyof typeof methodsMap;
-          const { method, defaultHeaders: headers } = methodsMap[methodName];
-          const { url, ...restParams } = params;
-          const { query, path, body } = restParams;
-          // include all props
-          checkRequest({
-            request: { params: { ...query, ...path, ...body }, headers, signal, url },
-            requestMock: createRequestMock,
-            method,
-            version,
-          });
-
-          createRequestMock.mockClear();
-
-          const responseNoSignal = callableMethod({ url, headers });
-          /** Do not include optional props */
-          checkRequest({
-            request: { params: {}, headers, url },
-            requestMock: createRequestMock,
-            method,
-            version,
-          });
-
-          expect(responseNoSignal).toBeInstanceOf(Promise);
+          url: 'http://example.com/{test}',
+          httpMethod: 'GET',
+          headers: methodsMap._get.defaultHeaders,
+          expectedPath: { testPath: 'testString' },
+          expectedQs: { testQuery: 'testString' },
+          noRequiredParams: true,
+          skipInvalidParamsTest: true,
         });
 
-        test.each(methods)('$name without payload', async ({ callableMethod }) => {
-          // @ts-expect-error required input
-          await expect(callableMethod()).rejects.toThrow(/Input is required/);
+        describeMethod('_post', {
+          method: (params: any) => service._post(params),
+          callParams: {
+            url: 'http://example.com/{test}',
+            body: { testBody: 'testString' },
+            path: { testPath: 'testString' },
+            query: { testQuery: 'testString' },
+          },
+          minParams: {
+            url: 'http://example.com/{test}',
+          },
+          url: 'http://example.com/{test}',
+          httpMethod: 'POST',
+          headers: methodsMap._post.defaultHeaders,
+          expectedBody: { testBody: 'testString' },
+          expectedPath: { testPath: 'testString' },
+          expectedQs: { testQuery: 'testString' },
+          noRequiredParams: true,
+          skipInvalidParamsTest: true,
+        });
+
+        describeMethod('_put', {
+          method: (params: any) => service._put(params),
+          callParams: {
+            url: 'http://example.com/{test}',
+            body: { testBody: 'testString' },
+            path: { testPath: 'testString' },
+            query: { testQuery: 'testString' },
+          },
+          minParams: {
+            url: 'http://example.com/{test}',
+          },
+          url: 'http://example.com/{test}',
+          httpMethod: 'PUT',
+          headers: methodsMap._put.defaultHeaders,
+          expectedBody: { testBody: 'testString' },
+          expectedPath: { testPath: 'testString' },
+          expectedQs: { testQuery: 'testString' },
+          noRequiredParams: true,
+          skipInvalidParamsTest: true,
+        });
+
+        describeMethod('_delete', {
+          method: (params: any) => service._delete(params),
+          callParams: {
+            url: 'http://example.com/{test}',
+            body: { testBody: 'testString' },
+            path: { testPath: 'testString' },
+            query: { testQuery: 'testString' },
+          },
+          minParams: {
+            url: 'http://example.com/{test}',
+          },
+          url: 'http://example.com/{test}',
+          httpMethod: 'DELETE',
+          headers: methodsMap._delete.defaultHeaders,
+          expectedBody: { testBody: 'testString' },
+          expectedPath: { testPath: 'testString' },
+          expectedQs: { testQuery: 'testString' },
+          noRequiredParams: true,
+          skipInvalidParamsTest: true,
         });
       });
 
       describe('Async methods', () => {
-        beforeEach(async () => {
-          createRequestMocker.mock(async () => ({
+        beforeEach(() => {
+          mockSetup.setup();
+          mockSetup.mockReturnValue({
             result: [
               'id: 1\nevent: message\ndata: {}\n\n',
               'id: 2\nevent: message\ndata: {}\n\n',
               'id: 3\nevent: message\ndata: {}\n\n',
-            ][Symbol.iterator](),
-          }));
-          if (createRequestMocker.functionMock)
-            createRequestMock = createRequestMocker.functionMock;
-          else throw new Error('Unable to mock request. Please check your implementation');
+            ],
+          });
         });
 
-        afterEach(async () => {
-          createRequestMocker.clearMock();
+        afterEach(() => {
+          mockSetup.clear();
         });
 
         afterAll(() => {
-          createRequestMocker.unmock();
+          mockSetup.unmock();
         });
 
-        test('_postStream as object', async () => {
-          const params = {
+        describeMethod(
+          '_postStream',
+          {
+            method: (params: any) => service._postStream(params),
+            callParams: {
+              url: 'http://example.com/{test}',
+              query: { test: 'testString' },
+              body: { test: 'testString' },
+              returnObject: true,
+            },
+            minParams: {
+              url: 'http://example.com/{test}',
+            },
             url: 'http://example.com/{test}',
-            query: { test: 'testString' },
-            body: { test: 'testString' },
-            signal: new AbortController().signal,
-            returnObject: true,
-          };
-          const response = service._postStream(params);
-          const methodName = '_postStream';
-
-          const { method, defaultHeaders: headers } = methodsMap[methodName];
-          const { signal, url, ...restParams } = params;
-          const { query = {}, body = {} } = restParams;
-
-          checkRequest({
-            request: { params: { ...query, ...body }, headers, signal, url },
-            requestMock: createRequestMock,
-            method,
-            version,
-          });
-
-          expect(response).toBeInstanceOf(Promise);
-
-          const stream = await response;
-          for await (const chunk of stream) {
-            expect(chunk).toBeInstanceOf(Object);
+            httpMethod: 'POST',
+            headers: methodsMap._postStream.defaultHeaders,
+            expectedBody: { test: 'testString' },
+            expectedQs: { test: 'testString' },
+            isStream: true,
+            noRequiredParams: true,
+            skipInvalidParamsTest: true,
+          },
+          {
+            streamResult: [
+              'id: 1\nevent: message\ndata: {}\n\n',
+              'id: 2\nevent: message\ndata: {}\n\n',
+              'id: 3\nevent: message\ndata: {}\n\n',
+            ],
           }
-        });
+        );
 
-        test('_postStream without optional props ', async () => {
-          const params = {
-            url: 'http://example.com/{test}',
-          };
-          const response = service._postStream(params);
-          const methodName = '_postStream';
-
-          const { method, defaultHeaders: headers } = methodsMap[methodName];
-          const { url } = params;
-
-          checkRequest({
-            request: { headers, url },
-            requestMock: createRequestMock,
-            method,
-            version,
-          });
-
-          expect(response).toBeInstanceOf(Promise);
-
-          const stream = await response;
-          for await (const chunk of stream) {
-            expect(chunk).toBeInstanceOf(Object);
-          }
-        });
-
+        // Additional test for string stream output (returnObject: false)
         test('_postStream as string', async () => {
           const params = {
             url: 'http://example.com/{test}',
@@ -259,8 +240,14 @@ describe('APIBaseService', () => {
           const { query = {}, body = {} } = restParams;
 
           checkRequest({
-            request: { params: { ...query, ...body }, headers, signal, url },
-            requestMock: createRequestMock,
+            request: {
+              expectedBody: body,
+              expectedQs: query,
+              headers,
+              signal,
+              url,
+            },
+            requestMock: mockSetup.getMock(),
             method,
             version,
           });
@@ -271,11 +258,6 @@ describe('APIBaseService', () => {
           for await (const chunk of stream) {
             expect(typeof chunk).toBe('string');
           }
-        });
-
-        test('_postStream name without payload', async () => {
-          // @ts-expect-error required input
-          await expect(service._postStream()).rejects.toThrow(/Input is required/);
         });
       });
     });

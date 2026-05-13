@@ -3,20 +3,13 @@ import { Models } from '../../../src/gateway';
 import { Providers } from '../../../src/gateway';
 import { Policies } from '../../../src/gateway';
 import { APIBaseService } from '../../../src/base';
-import { checkRequest } from '../utils/checks';
-import { convertKeysToSnakeCase } from '../utils/helpers';
-import { MockingRequest } from '../../utils/utils';
 import { RateLimits } from '../../../src/gateway';
 import type { MethodsInvalidParams, MethodsParams } from './types';
+import { describeGatewayContractSuite, describeInstanceLevelContainerIds } from './helpers';
+import { createRequestMockSetup } from '../utils';
 
 const serviceUrl = 'https://us-south.ml.cloud.ibm.com';
 const version = '2023-07-07';
-const requestHeaders = {
-  'DELETE': {},
-  'GET': { 'Accept': 'application/json' },
-  'POST': { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-  'PUT': { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-} as const;
 
 describe('Resources', () => {
   describe('Init instance', () => {
@@ -71,14 +64,22 @@ describe('Resources', () => {
       serviceUrl,
       authenticator: new NoAuthAuthenticator(),
     });
-    const createRequestMocker = new MockingRequest(client, 'createRequest' as any);
+    const mockSetup = createRequestMockSetup();
     const models = new Models(client);
     const providers = new Providers(client);
     const policies = new Policies(client);
     const rateLimit = new RateLimits(client);
 
     describe('Basic methods', () => {
-      const methods: MethodsParams<keyof typeof requestHeaders>[] = [
+      beforeAll(() => {
+        mockSetup.setup();
+      });
+
+      afterAll(() => {
+        mockSetup.unmock();
+      });
+
+      const methods: MethodsParams[] = [
         {
           name: 'Create model',
           req: {
@@ -98,7 +99,18 @@ describe('Resources', () => {
           callableMethod: (params) => models.create(params),
           method: 'POST',
           exceptions: {
-            'id': 'model_id',
+            'model_id': 'id',
+          },
+          expectedPath: { provider_id: '550e8400-e29b-41d4-a716-446655440000' },
+          expectedBody: {
+            id: 'gpt-3.5-turbo-456723',
+            alias: 'gpt-3.5-turbo',
+            metadata: {
+              cost: 0.02,
+              model_family: 'gpt-3.5',
+              recommender_label: 'openai-gpt-4o-mini',
+              region: 'us-east-1',
+            },
           },
         },
         {
@@ -114,6 +126,7 @@ describe('Resources', () => {
           exceptions: {
             'id': 'model_id',
           },
+          expectedPath: { model_id: '550e8400-e29b-41d4-a716-446655440000' },
         },
         {
           name: 'Get model details with providerId',
@@ -125,6 +138,7 @@ describe('Resources', () => {
           },
           callableMethod: (params) => models.getDetails(params),
           method: 'GET',
+          expectedPath: { provider_id: '550e8400-e29b-41d4-a716-446655440000' },
         },
         {
           name: 'Get models details',
@@ -143,6 +157,7 @@ describe('Resources', () => {
           },
           callableMethod: (params) => models.delete(params),
           method: 'DELETE',
+          expectedPath: { model_id: '550e8400-e29b-41d4-a716-446655440000' },
         },
         {
           name: 'Create provider',
@@ -158,6 +173,13 @@ describe('Resources', () => {
           },
           callableMethod: (params) => providers.create(params),
           method: 'POST',
+          expectedPath: { provider_name: 'watsonx-ai' },
+          expectedBody: {
+            data_reference: {
+              resource: 'crn:v1:staging:public:secrets-manager...',
+            },
+            name: 'fast-llm',
+          },
         },
         {
           name: 'Create provider',
@@ -178,6 +200,18 @@ describe('Resources', () => {
           },
           callableMethod: (params) => providers.create(params),
           method: 'POST',
+          expectedPath: { provider_name: 'watsonx-ai' },
+          expectedBody: {
+            data: {
+              'project_id': '550e8400-e29b-41d4-a716-446655440000',
+              'space_id': '550e8400-e29b-41d4-a716-446655440000',
+              'api_version': '2023-07-07',
+              'apikey': 'api_key',
+              'auth_url': 'https://iam.cloud.ibm.com/identity/token',
+              'base_url': 'https://us-south.ml.cloud.ibm.com',
+            },
+            name: 'fast-llm',
+          },
         },
         {
           name: 'Get provider by id',
@@ -189,6 +223,7 @@ describe('Resources', () => {
           },
           callableMethod: (params) => providers.getDetails(params),
           method: 'GET',
+          expectedPath: { provider_id: 'q9b2d701-4592-4386-85cf-326c6b3c94c7' },
         },
         {
           name: 'Get all providers',
@@ -214,6 +249,16 @@ describe('Resources', () => {
           },
           callableMethod: (params) => providers.update(params),
           method: 'PUT',
+          expectedPath: {
+            provider_id: 'q9b2d701-4592-4386-85cf-326c6b3c94c7',
+            provider_name: 'watsonx-ai',
+          },
+          expectedBody: {
+            name: 'fast-llm',
+            data_reference: {
+              resource: 'test-test_test',
+            },
+          },
         },
         {
           name: 'Delete existing provider',
@@ -225,6 +270,7 @@ describe('Resources', () => {
           },
           callableMethod: (params) => providers.delete(params),
           method: 'DELETE',
+          expectedPath: { provider_id: 'q9b2d701-4592-4386-85cf-326c6b3c94c7' },
         },
         {
           name: 'Create policy',
@@ -239,6 +285,12 @@ describe('Resources', () => {
           },
           callableMethod: (params) => policies.create(params),
           method: 'POST',
+          expectedBody: {
+            'action': 'read',
+            'effect': 'allow',
+            'resource': 'model:62a04a11-07bf-5309-a78e-95323dbbc333',
+            'subject': 'AccessGroupId-56c5e703-80d4-4f06-a7e6-844618ec39b3',
+          },
         },
         {
           name: 'Delete existing policy',
@@ -250,6 +302,7 @@ describe('Resources', () => {
           },
           callableMethod: (params) => policies.delete(params),
           method: 'DELETE',
+          expectedPath: { policy_id: 'q9b2d701-4592-4386-85cf-326c6b3c94c7' },
         },
         {
           name: 'Create RateLimits',
@@ -267,6 +320,11 @@ describe('Resources', () => {
             'model_uuid': 'model_id',
             'provider_uuid': 'provider_id',
           },
+          expectedBody: {
+            token: { duration: '1m', amount: 10, capacity: 100 },
+            type: 'tenant',
+            request: { duration: '1m', amount: 10, capacity: 100 },
+          },
         },
         {
           name: 'Get rate limit by id',
@@ -278,6 +336,7 @@ describe('Resources', () => {
           },
           callableMethod: (params) => rateLimit.getDetails(params),
           method: 'GET',
+          expectedPath: { rate_limit_id: 'q9b2d701-4592-4386-85cf-326c6b3c94c7' },
         },
         {
           name: 'Get rate limits',
@@ -303,8 +362,15 @@ describe('Resources', () => {
           callableMethod: (params) => rateLimit.update(params),
           method: 'PUT',
           exceptions: {
-            'model_uuid': 'model_id',
-            'provider_uuid': 'provider_id',
+            'model_id': 'model_uuid',
+            'provider_id': 'provider_uuid',
+          },
+          expectedBody: {
+            token: { duration: '1m', amount: 10, capacity: 100 },
+            type: 'model',
+            request: { duration: '1m', amount: 10, capacity: 100 },
+            model_uuid: 'q9b2d701-4592-4386-85cf-326c6b3c94c7',
+            provider_uuid: '12312312312',
           },
         },
         {
@@ -317,6 +383,7 @@ describe('Resources', () => {
           },
           callableMethod: (params) => rateLimit.delete(params),
           method: 'DELETE',
+          expectedPath: { rate_limit_id: 'q9b2d701-4592-4386-85cf-326c6b3c94c7' },
         },
       ];
       const negativeMethods: MethodsInvalidParams[] = [
@@ -458,80 +525,18 @@ describe('Resources', () => {
           },
         },
       ];
-      let createRequestMock: jest.SpyInstance;
 
-      beforeEach(async () => {
-        createRequestMocker.mock(() => Promise.resolve({}));
-        if (createRequestMocker.functionMock) createRequestMock = createRequestMocker.functionMock;
-        else throw new Error('Unable to mock request. Please check your implementation');
-      });
-
-      afterEach(async () => {
-        createRequestMocker.clearMock();
-      });
-
-      afterAll(async () => {
-        createRequestMocker.unmock();
-      });
-
-      test.each(methods)(
-        '$name',
-        async ({
-          req,
-          callableMethod,
-          method,
-          exceptions,
-        }: {
-          req: any;
-          callableMethod: (params: any) => any;
-          method: keyof typeof requestHeaders;
-          exceptions?: Record<string, any> | undefined;
-        }) => {
-          const { signal } = new AbortController();
-          const { params, url } = req;
-          const response = callableMethod({ signal, ...params });
-          const { headers = requestHeaders[method], ...restParams } = params;
-
-          checkRequest({
-            request: {
-              signal,
-              headers,
-              url,
-              params: convertKeysToSnakeCase(restParams),
-            },
-            requestMock: createRequestMock,
-            method,
-            version,
-            exceptions,
-          });
-
-          expect(response).toBeInstanceOf(Promise);
-        }
-      );
-
-      test.each(negativeMethods)('$name without payload', async ({ callableMethod, params }) => {
-        if (params) {
-          await expect(callableMethod(params)).rejects.toThrow(/Parameter validation errors:/);
-        } else {
-          await expect(callableMethod()).rejects.toThrow(/Missing required parameters/);
-          await expect(callableMethod({})).rejects.toThrow(/Missing required parameters/);
-        }
+      describeGatewayContractSuite({
+        describeName: 'Request contract methods',
+        getRequestMock: mockSetup.getMock,
+        methods,
+        version,
+        mockResponseFactory: async () => ({}),
+        negativeMethods,
       });
     });
 
     describe('List methods', () => {
-      beforeEach(async () => {
-        createRequestMocker.mock(() => Promise.resolve({ result: { data: [{}, {}] } }));
-      });
-
-      afterEach(async () => {
-        createRequestMocker.clearMock();
-      });
-
-      afterAll(async () => {
-        createRequestMocker.unmock();
-      });
-
       interface MethodsListParams {
         name: string;
         params?: Record<string, any>;
@@ -572,6 +577,18 @@ describe('Resources', () => {
         },
       ];
 
+      beforeAll(() => {
+        mockSetup.setup();
+      });
+
+      beforeEach(() => {
+        mockSetup.mockReturnValue(Promise.resolve({ result: { data: [{}, {}] } }));
+      });
+
+      afterEach(() => {
+        mockSetup.reset();
+      });
+
       test.each(methods)('$name', async ({ callableMethod, params }) => {
         const response = callableMethod(params);
 
@@ -584,8 +601,12 @@ describe('Resources', () => {
     });
 
     describe('Get details via list methods', () => {
-      beforeEach(async () => {
-        createRequestMocker.mock(() =>
+      beforeAll(() => {
+        mockSetup.setup();
+      });
+
+      beforeEach(() => {
+        mockSetup.mockReturnValue(
           Promise.resolve({
             result: {
               data: [
@@ -597,12 +618,8 @@ describe('Resources', () => {
         );
       });
 
-      afterEach(async () => {
-        createRequestMocker.clearMock();
-      });
-
-      afterAll(async () => {
-        createRequestMocker.unmock();
+      afterEach(() => {
+        mockSetup.reset();
       });
 
       test('Get policies details', async () => {
@@ -626,6 +643,138 @@ describe('Resources', () => {
 
         expect(response).toBeInstanceOf(Array);
       });
+    });
+  });
+
+  describe('Instance-level Container IDs', () => {
+    const mockSetup = createRequestMockSetup();
+
+    beforeAll(() => {
+      mockSetup.setup();
+    });
+
+    beforeEach(() => {
+      mockSetup.getMock().mockImplementation(() => Promise.resolve({ result: {} }));
+    });
+
+    afterEach(() => {
+      mockSetup.reset();
+    });
+
+    describeInstanceLevelContainerIds({
+      describeName: 'Models methods',
+      getRequestMock: mockSetup.getMock,
+      methods: [
+        {
+          name: 'create',
+          method: (gateway) =>
+            gateway.models.create({
+              providerId: '550e8400-e29b-41d4-a716-446655440000',
+              modelId: 'gpt-3.5-turbo',
+            }),
+        },
+        {
+          name: 'getDetails',
+          method: (gateway) =>
+            gateway.models.getDetails({ modelId: '550e8400-e29b-41d4-a716-446655440000' }),
+        },
+        {
+          name: 'delete',
+          method: (gateway) =>
+            gateway.models.delete({ modelId: '550e8400-e29b-41d4-a716-446655440000' }),
+        },
+      ],
+    });
+
+    describeInstanceLevelContainerIds({
+      describeName: 'Providers methods',
+      getRequestMock: mockSetup.getMock,
+      methods: [
+        {
+          name: 'create',
+          method: (gateway) =>
+            gateway.providers.create({
+              providerName: 'watsonxai',
+              name: 'Test Provider',
+              data: { apiKey: 'test-key' },
+            }),
+        },
+        {
+          name: 'getDetails',
+          method: (gateway) =>
+            gateway.providers.getDetails({ providerId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7' }),
+        },
+        {
+          name: 'update',
+          method: (gateway) =>
+            gateway.providers.update({
+              providerId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7',
+              providerName: 'watsonxai',
+              name: 'Updated Provider',
+              data: { apiKey: 'new-key' },
+            }),
+        },
+        {
+          name: 'delete',
+          method: (gateway) =>
+            gateway.providers.delete({ providerId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7' }),
+        },
+      ],
+    });
+
+    describeInstanceLevelContainerIds({
+      describeName: 'Policies methods',
+      getRequestMock: mockSetup.getMock,
+      methods: [
+        {
+          name: 'create',
+          method: (gateway) =>
+            gateway.policies.create({
+              action: 'read',
+              effect: 'allow',
+              resource: 'model:test',
+              subject: 'user:test',
+            }),
+        },
+        {
+          name: 'delete',
+          method: (gateway) =>
+            gateway.policies.delete({ policyId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7' }),
+        },
+      ],
+    });
+
+    describeInstanceLevelContainerIds({
+      describeName: 'RateLimits methods',
+      getRequestMock: mockSetup.getMock,
+      methods: [
+        {
+          name: 'create',
+          method: (gateway) =>
+            gateway.rateLimit.create({
+              type: 'tenant',
+              token: { duration: '1m', amount: 10, capacity: 100 },
+            }),
+        },
+        {
+          name: 'getDetails',
+          method: (gateway) =>
+            gateway.rateLimit.getDetails({ rateLimitId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7' }),
+        },
+        {
+          name: 'update',
+          method: (gateway) =>
+            gateway.rateLimit.update({
+              type: 'tenant',
+              token: { duration: '1m', amount: 10, capacity: 100 },
+            }),
+        },
+        {
+          name: 'delete',
+          method: (gateway) =>
+            gateway.rateLimit.delete({ rateLimitId: 'q9b2d701-4592-4386-85cf-326c6b3c94c7' }),
+        },
+      ],
     });
   });
 });

@@ -117,7 +117,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<T>} Promise resolving to the API response
    * @protected
    */
-  protected createRequest<T>(
+  protected async createRequest<T>(
     parameters: CreateRequestParams,
     additionalParameters?: AdditionalCreateRequestParams
   ): Promise<T> {
@@ -143,6 +143,7 @@ class WatsonXAI extends WatsonxBaseService {
     callbackHandler?.handleResponse<T>(response);
     return response;
   }
+
   /** Deployments */
 
   /**
@@ -179,7 +180,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.DeploymentResource>>} A promise that resolves to
    *   the response with deployment's data
    */
-  public createDeployment(
+  public async createDeployment(
     params: WatsonXAI.CreateDeploymentParams
   ): Promise<WatsonXAI.Response<WatsonXAI.DeploymentResource>> {
     const requiredParams = ['name', 'online'];
@@ -196,16 +197,14 @@ class WatsonXAI extends WatsonxBaseService {
       'baseModelId',
       'baseDeploymentId',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
       'online': params.online,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
       'description': params.description,
       'tags': params.tags,
       'custom': params.custom,
@@ -296,7 +295,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.DeploymentResourceCollection>>} A Promise that
    *   resolves to a collection of deployment resources
    */
-  public listDeployments(
+  public async listDeployments(
     params: WatsonXAI.ListDeploymentsParams = {}
   ): Promise<WatsonXAI.Response<WatsonXAI.DeploymentResourceCollection>> {
     const requiredParams: string[] = [];
@@ -312,15 +311,13 @@ class WatsonXAI extends WatsonxBaseService {
       'state',
       'conflict',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'serving_name': params.servingName,
       'tag.value': params.tagValue,
       'asset_id': params.assetId,
@@ -371,20 +368,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.DeploymentResource>>} A Promise that resolves to
    *   a deployment resource
    */
-  public getDeployment(
+  public async getDeployment(
     params: WatsonXAI.DeploymentsGetParams
   ): Promise<WatsonXAI.Response<WatsonXAI.DeploymentResource>> {
     const requiredParams = ['deploymentId'];
     const validParams = ['spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -449,21 +444,19 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.DeploymentResource>>} A Promise that resolves to
    *   a deployment resource
    */
-  public updateDeployment(
+  public async updateDeployment(
     params: WatsonXAI.DeploymentsUpdateParams
   ): Promise<WatsonXAI.Response<WatsonXAI.DeploymentResource>> {
     const requiredParams = ['deploymentId', 'jsonPatch'];
     const validParams = ['spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = params.jsonPatch;
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -513,20 +506,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public deleteDeployment(
+  public async deleteDeployment(
     params: WatsonXAI.DeploymentsDeleteParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['deploymentId'];
     const validParams = ['spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -595,16 +586,13 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TextGenResponse>>} A Promise that resolves to a
    *   text generation response
    */
-  public deploymentGenerateText(
+  public async deploymentGenerateText(
     params: WatsonXAI.DeploymentsTextGenerationParams,
     callbacks?: WatsonXAI.RequestCallbacks<WatsonXAI.Response<WatsonXAI.TextGenResponse>>
   ): Promise<WatsonXAI.Response<WatsonXAI.TextGenResponse>> {
     const requiredParams = ['idOrName'];
     const validParams = ['input', 'parameters', 'moderations'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const body = {
       'input': params.input,
@@ -731,10 +719,7 @@ class WatsonXAI extends WatsonxBaseService {
   ): Promise<AsyncIterable<string | WatsonXAI.ObjectStreamed<WatsonXAI.TextGenResponse>>> {
     const requiredParams = ['idOrName'];
     const validParams = ['input', 'parameters', 'moderations', 'returnObject'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const body = {
       'input': params.input,
@@ -837,7 +822,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TextChatResponse>>} A Promise that resolves to a
    *   text chat response
    */
-  public deploymentsTextChat(
+  public async deploymentsTextChat(
     params: WatsonXAI.DeploymentsTextChatParams,
     callbacks?: WatsonXAI.RequestCallbacks<WatsonXAI.Response<WatsonXAI.TextChatResponse>>
   ): Promise<WatsonXAI.Response<WatsonXAI.TextChatResponse>> {
@@ -867,10 +852,7 @@ class WatsonXAI extends WatsonxBaseService {
       'reasoningEffort',
     ];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const body = {
       'messages': params.messages,
@@ -1030,10 +1012,7 @@ class WatsonXAI extends WatsonxBaseService {
       'returnObject',
     ];
 
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const body = {
       'messages': params.messages,
@@ -1140,15 +1119,12 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TSForecastResponse>>} A Promise that resolves to
    *   a time series forecast response
    */
-  public deploymentsTimeSeriesForecast(
+  public async deploymentsTimeSeriesForecast(
     params: WatsonXAI.DeploymentsTimeSeriesForecastParams
   ): Promise<WatsonXAI.Response<WatsonXAI.TSForecastResponse>> {
     const requiredParams = ['idOrName', 'data', 'schema'];
     const validParams = ['parameters', 'futureData'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const body = {
       'data': params.data,
@@ -1242,15 +1218,12 @@ class WatsonXAI extends WatsonxBaseService {
    *   {Promise<WatsonXAI.Response<WatsonXAI.FoundationModels>>} A Promise that resolves to a list
    *   of foundation models
    */
-  public listFoundationModelSpecs(
+  public async listFoundationModelSpecs(
     params: WatsonXAI.ListFoundationModelSpecsParams = {}
   ): Promise<WatsonXAI.Response<WatsonXAI.FoundationModels>> {
     const requiredParams: string[] = [];
     const validParams = ['start', 'limit', 'filters', 'techPreview'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const query = {
       'version': this.version,
@@ -1300,15 +1273,12 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.FoundationModelTasks>>} A Promise that resolves
    *   to a list of foundation model tasks
    */
-  public listFoundationModelTasks(
+  public async listFoundationModelTasks(
     params: WatsonXAI.ListFoundationModelTasksParams = {}
   ): Promise<WatsonXAI.Response<WatsonXAI.FoundationModelTasks>> {
     const requiredParams: string[] = [];
     const validParams = ['start', 'limit'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const query = {
       'version': this.version,
@@ -1365,7 +1335,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxPromptResponse>>} A Promise that resolves to a
    *   prompt response
    */
-  public createPrompt(
+  public async createPrompt(
     params: WatsonXAI.PostPromptParams
   ): Promise<WatsonXAI.Response<WatsonXAI.WxPromptResponse>> {
     const requiredParams = ['name', 'prompt'];
@@ -1380,11 +1350,9 @@ class WatsonXAI extends WatsonxBaseService {
       'projectId',
       'spaceId',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
       'prompt': params.prompt,
@@ -1398,8 +1366,8 @@ class WatsonXAI extends WatsonxBaseService {
     };
 
     const query = {
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const sdkHeaders = getSdkHeaders();
@@ -1447,19 +1415,17 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxPromptResponse>>} A Promise that resolves to a
    *   prompt response
    */
-  public getPrompt(
+  public async getPrompt(
     params: WatsonXAI.GetPromptParams
   ): Promise<WatsonXAI.Response<WatsonXAI.WxPromptResponse>> {
     const requiredParams = ['promptId'];
     const validParams = ['projectId', 'spaceId', 'restrictModelParameters'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
       'restrict_model_parameters': params.restrictModelParameters,
     };
 
@@ -1519,7 +1485,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.ListPromptsResponse>>} A Promise that resolves
    *   to a list of prompts
    */
-  public listPrompts(
+  public async listPrompts(
     params: WatsonXAI.PromptListParams
   ): Promise<WatsonXAI.Response<WatsonXAI.ListPromptsResponse>> {
     const requiredParams: string[] = [];
@@ -1536,14 +1502,12 @@ class WatsonXAI extends WatsonxBaseService {
       'skip',
       'include_total_rows',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const body = {
@@ -1609,7 +1573,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxPromptResponse>>} A Promise that resolves to a
    *   prompt response
    */
-  public updatePrompt(
+  public async updatePrompt(
     params: WatsonXAI.PatchPromptParams
   ): Promise<WatsonXAI.Response<WatsonXAI.WxPromptResponse>> {
     const requiredParams = ['promptId', 'name', 'prompt'];
@@ -1624,11 +1588,9 @@ class WatsonXAI extends WatsonxBaseService {
       'projectId',
       'spaceId',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
       'prompt': params.prompt,
@@ -1642,8 +1604,8 @@ class WatsonXAI extends WatsonxBaseService {
     };
 
     const query = {
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const path = {
@@ -1694,19 +1656,17 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public deletePrompt(
+  public async deletePrompt(
     params: WatsonXAI.DeletePromptParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['promptId'];
     const validParams = ['projectId', 'spaceId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const path = {
@@ -1757,16 +1717,14 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.PromptLock>>} A Promise that resolves to a
    *   prompt lock
    */
-  public updatePromptLock(
+  public async updatePromptLock(
     params: WatsonXAI.PutPromptLockParams
   ): Promise<WatsonXAI.Response<WatsonXAI.PromptLock>> {
     const requiredParams = ['promptId', 'locked'];
     const validParams = ['lockType', 'lockedBy', 'projectId', 'spaceId', 'force'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'locked': params.locked,
       'lock_type': params.lockType,
@@ -1774,8 +1732,8 @@ class WatsonXAI extends WatsonxBaseService {
     };
 
     const query = {
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
       'force': params.force,
     };
 
@@ -1827,19 +1785,17 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.PromptLock>>} A Promise that resolves to a
    *   prompt lock
    */
-  public getPromptLock(
+  public async getPromptLock(
     params: WatsonXAI.GetPromptLockParams
   ): Promise<WatsonXAI.Response<WatsonXAI.PromptLock>> {
     const requiredParams = ['promptId'];
     const validParams = ['spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -1894,24 +1850,22 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.GetPromptInputResponse>>} A Promise that
    *   resolves to prompt input data
    */
-  public getPromptInput(
+  public async getPromptInput(
     params: WatsonXAI.GetPromptInputParams
   ): Promise<WatsonXAI.Response<WatsonXAI.GetPromptInputResponse>> {
     const requiredParams = ['promptId'];
     const validParams = ['input', 'promptVariables', 'spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'input': params.input,
       'prompt_variables': params.promptVariables,
     };
 
     const query = {
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -1963,20 +1917,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public createPromptChatItem(
+  public async createPromptChatItem(
     params: WatsonXAI.PostPromptChatItemParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['promptId', 'chatItem'];
     const validParams = ['spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = params.chatItem;
     const query = {
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -2034,7 +1986,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxPromptResponse>>} A Promise that resolves to a
    *   prompt response
    */
-  public createPromptSession(
+  public async createPromptSession(
     params: WatsonXAI.PostPromptSessionParams
   ): Promise<WatsonXAI.Response<WatsonXAI.WxPromptResponse>> {
     const requiredParams = ['name'];
@@ -2049,11 +2001,9 @@ class WatsonXAI extends WatsonxBaseService {
       'prompts',
       'projectId',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
       'id': params.id,
@@ -2067,7 +2017,7 @@ class WatsonXAI extends WatsonxBaseService {
     };
 
     const query = {
-      'project_id': params.projectId,
+      'project_id': projectId,
     };
 
     const sdkHeaders = getSdkHeaders();
@@ -2112,18 +2062,16 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxPromptSession>>} A Promise that resolves to a
    *   prompt session
    */
-  public getPromptSession(
+  public async getPromptSession(
     params: WatsonXAI.GetPromptSessionParams
   ): Promise<WatsonXAI.Response<WatsonXAI.WxPromptSession>> {
     const requiredParams = ['sessionId'];
     const validParams = ['projectId', 'prefetch'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId } = this.resolveContextId(params);
     const query = {
-      'project_id': params.projectId,
+      'project_id': projectId,
       'prefetch': params.prefetch,
     };
 
@@ -2173,23 +2121,21 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxPromptSession>>} A Promise that resolves to a
    *   prompt session
    */
-  public updatePromptSession(
+  public async updatePromptSession(
     params: WatsonXAI.PatchPromptSessionParams
   ): Promise<WatsonXAI.Response<WatsonXAI.WxPromptSession>> {
     const requiredParams = ['sessionId'];
     const validParams = ['name', 'description', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
       'description': params.description,
     };
 
     const query = {
-      'project_id': params.projectId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -2238,18 +2184,16 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public deletePromptSession(
+  public async deletePromptSession(
     params: WatsonXAI.DeletePromptSessionParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['sessionId'];
     const validParams = ['projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId } = this.resolveContextId(params);
     const query = {
-      'project_id': params.projectId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -2301,7 +2245,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxPromptSessionEntry>>} A Promise that resolves
    *   to a prompt session entry
    */
-  public createPromptSessionEntry(
+  public async createPromptSessionEntry(
     params: WatsonXAI.PostPromptSessionEntryParams
   ): Promise<WatsonXAI.Response<WatsonXAI.WxPromptSessionEntry>> {
     const requiredParams = ['sessionId', 'name', 'createdAt', 'prompt'];
@@ -2313,11 +2257,9 @@ class WatsonXAI extends WatsonxBaseService {
       'inputMode',
       'projectId',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
       'created_at': params.createdAt,
@@ -2330,7 +2272,7 @@ class WatsonXAI extends WatsonxBaseService {
     };
 
     const query = {
-      'project_id': params.projectId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -2381,18 +2323,16 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxPromptSessionEntryList>>} A Promise that
    *   resolves to a list of prompt session entries
    */
-  public listPromptSessionEntries(
+  public async listPromptSessionEntries(
     params: WatsonXAI.GetPromptSessionEntriesParams
   ): Promise<WatsonXAI.Response<WatsonXAI.WxPromptSessionEntryList>> {
     const requiredParams = ['sessionId'];
     const validParams = ['projectId', 'bookmark', 'limit'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId } = this.resolveContextId(params);
     const query = {
-      'project_id': params.projectId,
+      'project_id': projectId,
       'bookmark': params.bookmark,
       'limit': params.limit,
     };
@@ -2443,19 +2383,17 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public createPromptSessionEntryChatItem(
+  public async createPromptSessionEntryChatItem(
     params: WatsonXAI.PostPromptSessionEntryChatItemParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['sessionId', 'entryId', 'chatItem'];
     const validParams = ['projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId } = this.resolveContextId(params);
     const body = params.chatItem;
     const query = {
-      'project_id': params.projectId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -2510,16 +2448,14 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.PromptLock>>} A Promise that resolves to a
    *   prompt lock
    */
-  public updatePromptSessionLock(
+  public async updatePromptSessionLock(
     params: WatsonXAI.PutPromptSessionLockParams
   ): Promise<WatsonXAI.Response<WatsonXAI.PromptLock>> {
     const requiredParams = ['sessionId', 'locked'];
     const validParams = ['lockType', 'lockedBy', 'projectId', 'force'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId } = this.resolveContextId(params);
     const body = {
       'locked': params.locked,
       'lock_type': params.lockType,
@@ -2527,7 +2463,7 @@ class WatsonXAI extends WatsonxBaseService {
     };
 
     const query = {
-      'project_id': params.projectId,
+      'project_id': projectId,
       'force': params.force,
     };
 
@@ -2577,18 +2513,16 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.PromptLock>>} A Promise that resolves to a
    *   prompt lock
    */
-  public getPromptSessionLock(
+  public async getPromptSessionLock(
     params: WatsonXAI.GetPromptSessionLockParams
   ): Promise<WatsonXAI.Response<WatsonXAI.PromptLock>> {
     const requiredParams = ['sessionId'];
     const validParams = ['projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId } = this.resolveContextId(params);
     const query = {
-      'project_id': params.projectId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -2636,18 +2570,16 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxPromptResponse>>} A Promise that resolves to a
    *   prompt response
    */
-  public getPromptSessionEntry(
+  public async getPromptSessionEntry(
     params: WatsonXAI.GetPromptSessionEntryParams
   ): Promise<WatsonXAI.Response<WatsonXAI.WxPromptResponse>> {
     const requiredParams = ['sessionId', 'entryId'];
     const validParams = ['projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId } = this.resolveContextId(params);
     const query = {
-      'project_id': params.projectId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -2696,18 +2628,16 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public deletePromptSessionEntry(
+  public async deletePromptSessionEntry(
     params: WatsonXAI.DeletePromptSessionEntryParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['sessionId', 'entryId'];
     const validParams = ['projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId } = this.resolveContextId(params);
     const query = {
-      'project_id': params.projectId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -2829,7 +2759,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TextChatResponse>>} A Promise that resolves to a
    *   text chat response
    */
-  public textChat(
+  public async textChat(
     params: WatsonXAI.TextChatParams,
     callbacks?: WatsonXAI.RequestCallbacks<WatsonXAI.Response<WatsonXAI.TextChatResponse>>
   ): Promise<WatsonXAI.Response<WatsonXAI.TextChatResponse>> {
@@ -2864,15 +2794,14 @@ class WatsonXAI extends WatsonxBaseService {
       'reasoningEffort',
       'crypto',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'model_id': params.modelId,
       'messages': params.messages,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'tools': params.tools,
       'tool_choice_option': params.toolChoiceOption,
       'tool_choice': params.toolChoice,
@@ -3089,16 +3018,14 @@ class WatsonXAI extends WatsonxBaseService {
       'reasoningEffort',
       'returnObject',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'model_id': params.modelId,
       'messages': params.messages,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'tools': params.tools,
       'tool_choice_option': params.toolChoiceOption,
       'tool_choice': params.toolChoice,
@@ -3198,22 +3125,20 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmbeddingsResponse>>} A Promise that resolves to
    *   an embeddings response
    */
-  public embedText(
+  public async embedText(
     params: WatsonXAI.TextEmbeddingsParams,
     callbacks?: WatsonXAI.RequestCallbacks<WatsonXAI.Response<WatsonXAI.EmbeddingsResponse>>
   ): Promise<WatsonXAI.Response<WatsonXAI.EmbeddingsResponse>> {
     const requiredParams = ['modelId', 'inputs'];
     const validParams = ['spaceId', 'projectId', 'parameters', 'crypto'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'model_id': params.modelId,
       'inputs': params.inputs,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'parameters': params.parameters,
     };
 
@@ -3284,16 +3209,14 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TextExtractionResponse>>} A Promise that
    *   resolves to a text extraction response
    */
-  public createTextExtraction(
+  public async createTextExtraction(
     params: WatsonXAI.TextExtractionParams
   ): Promise<WatsonXAI.Response<WatsonXAI.TextExtractionResponse>> {
     const requiredParams = ['documentReference', 'resultsReference'];
     const validParams = ['steps', 'assemblyJson', 'assemblyMd', 'custom', 'projectId', 'spaceId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'document_reference': params.documentReference,
       'results_reference': params.resultsReference,
@@ -3301,8 +3224,8 @@ class WatsonXAI extends WatsonxBaseService {
       'assembly_json': params.assemblyJson,
       'assembly_md': params.assemblyMd,
       'custom': params.custom,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const query = {
@@ -3357,20 +3280,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TextExtractionResources>>} A Promise that
    *   resolves to text extraction resources
    */
-  public listTextExtractions(
+  public async listTextExtractions(
     params: WatsonXAI.ListTextExtractionsParams = {}
   ): Promise<WatsonXAI.Response<WatsonXAI.TextExtractionResources>> {
     const requiredParams: string[] = [];
     const validParams = ['spaceId', 'projectId', 'start', 'limit'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'start': params.start,
       'limit': params.limit,
     };
@@ -3418,20 +3339,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TextExtractionResponse>>} A Promise that
    *   resolves to a text extraction response
    */
-  public getTextExtraction(
+  public async getTextExtraction(
     params: WatsonXAI.TextExtractionGetParams
   ): Promise<WatsonXAI.Response<WatsonXAI.TextExtractionResponse>> {
     const requiredParams = ['id'];
     const validParams = ['spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -3480,20 +3399,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public deleteTextExtraction(
+  public async deleteTextExtraction(
     params: WatsonXAI.TextExtractionDeleteParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['id'];
     const validParams = ['spaceId', 'projectId', 'hardDelete'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'hard_delete': params.hardDelete,
     };
 
@@ -3515,6 +3432,942 @@ class WatsonXAI extends WatsonxBaseService {
         headers: {
           ...sdkHeaders,
 
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /** Schema Management */
+
+  /**
+   * Start a create schema request.
+   *
+   * Start a request to create the custom schema for text extraction.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` has to be given.
+   * @param {TextExtractionDataReference} params.documentReference - A reference to data.
+   * @param {CreateSchemaParameters} [params.parameters] - The parameters for the create schema.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.CreateSchemaResponse>>}
+   */
+  public async runCreateSchemaJob(
+    params: Types.CreateSchemaParams
+  ): Promise<WatsonXAI.Response<Types.CreateSchemaResponse>> {
+    const requiredParams = ['documentReference'];
+    const validParams = ['projectId', 'spaceId', 'documentReference', 'parameters'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const body = {
+      'project_id': projectId,
+      'space_id': spaceId,
+      'document_reference': params.documentReference,
+      'parameters': params.parameters,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.CREATE.BASE,
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * List create schema requests.
+   *
+   * Retrieve the list of create schema requests for the specified space or project.
+   *
+   * @category Schema Management
+   * @param {Object} [params] - The parameters to send to the service.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {string} [params.start] - Token required for token-based pagination.
+   * @param {number} [params.limit] - How many resources should be returned. By default limit is
+   *   100. Max limit allowed is 200.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.CreateSchemaResources>>}
+   */
+  public async listCreateSchemaJobs(
+    params: Types.ListCreateSchemaParams = {}
+  ): Promise<WatsonXAI.Response<Types.CreateSchemaResources>> {
+    const requiredParams: string[] = [];
+    const validParams = ['spaceId', 'projectId', 'start', 'limit'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+      'start': params.start,
+      'limit': params.limit,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.CREATE.BASE,
+        method: 'GET',
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get a create schema request.
+   *
+   * Retrieve the create schema request details with the specified identifier.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the create schema request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.CreateSchemaResponse>>}
+   */
+  public async getCreateSchemaJob(
+    params: Types.GetCreateSchemaParams
+  ): Promise<WatsonXAI.Response<Types.CreateSchemaResponse>> {
+    const requiredParams = ['id'];
+    const validParams = ['spaceId', 'projectId'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+    };
+
+    const path = {
+      'id': params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.CREATE.BY_ID,
+        method: 'GET',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Delete a create schema request.
+   *
+   * Delete the create schema request with the specified identifier.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the create schema request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job or request
+   *   metadata.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>}
+   */
+  public async deleteCreateSchemaJob(
+    params: Types.DeleteCreateSchemaParams
+  ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
+    const requiredParams = ['id'];
+    const validParams = ['spaceId', 'projectId', 'hardDelete'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+      'hard_delete': params.hardDelete,
+    };
+
+    const path = {
+      'id': params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.CREATE.BY_ID,
+        method: 'DELETE',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Start an improve schema request.
+   *
+   * Start a request to improve an existing schema for text extraction.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` has to be given.
+   * @param {ImproveSchemaParameters} params.parameters - The parameters to improve schema.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.ImproveSchemaResponse>>}
+   */
+  public async runImproveSchemaJob(
+    params: Types.ImproveSchemaParams
+  ): Promise<WatsonXAI.Response<Types.ImproveSchemaResponse>> {
+    const requiredParams = ['parameters'];
+    const validParams = ['projectId', 'spaceId', 'parameters'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const body = {
+      'project_id': projectId,
+      'space_id': spaceId,
+      'parameters': params.parameters,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.IMPROVE.BASE,
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * List improve schema requests.
+   *
+   * Retrieve the list of improve schema requests for the specified space or project.
+   *
+   * @category Schema Management
+   * @param {Object} [params] - The parameters to send to the service.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {string} [params.start] - Token required for token-based pagination.
+   * @param {number} [params.limit] - How many resources should be returned. By default limit is
+   *   100. Max limit allowed is 200.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.ImproveSchemaResources>>}
+   */
+  public async listImproveSchemaJobs(
+    params: Types.ListImproveSchemaParams = {}
+  ): Promise<WatsonXAI.Response<Types.ImproveSchemaResources>> {
+    const requiredParams: string[] = [];
+    const validParams = ['spaceId', 'projectId', 'start', 'limit'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+      'start': params.start,
+      'limit': params.limit,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.IMPROVE.BASE,
+        method: 'GET',
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get an improve schema request.
+   *
+   * Retrieve the improve schema request details with the specified identifier.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the improve schema request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.ImproveSchemaResponse>>}
+   */
+  public async getImproveSchemaJob(
+    params: Types.GetImproveSchemaParams
+  ): Promise<WatsonXAI.Response<Types.ImproveSchemaResponse>> {
+    const requiredParams = ['id'];
+    const validParams = ['spaceId', 'projectId'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+    };
+
+    const path = {
+      'id': params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.IMPROVE.BY_ID,
+        method: 'GET',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Delete an improve schema request.
+   *
+   * Delete the improve schema request with the specified identifier.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the improve schema request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job or request
+   *   metadata.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>}
+   */
+  public async deleteImproveSchemaJob(
+    params: Types.DeleteImproveSchemaParams
+  ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
+    const requiredParams = ['id'];
+    const validParams = ['spaceId', 'projectId', 'hardDelete'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+      'hard_delete': params.hardDelete,
+    };
+
+    const path = {
+      'id': params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.IMPROVE.BY_ID,
+        method: 'DELETE',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Start a merge schema request.
+   *
+   * Start a request to merge multiple schemas for text extraction.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` has to be given.
+   * @param {MergeSchemaParameters} params.parameters - The parameters to merge schema.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.MergeSchemaResponse>>}
+   */
+  public async runMergeSchemaJob(
+    params: Types.MergeSchemaParams
+  ): Promise<WatsonXAI.Response<Types.MergeSchemaResponse>> {
+    const requiredParams = ['parameters'];
+    const validParams = ['projectId', 'spaceId', 'parameters'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const body = {
+      'project_id': projectId,
+      'space_id': spaceId,
+      'parameters': params.parameters,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.MERGE.BASE,
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * List merge schema requests.
+   *
+   * Retrieve the list of merge schema requests for the specified space or project.
+   *
+   * @category Schema Management
+   * @param {Object} [params] - The parameters to send to the service.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {string} [params.start] - Token required for token-based pagination.
+   * @param {number} [params.limit] - How many resources should be returned. By default limit is
+   *   100. Max limit allowed is 200.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.MergeSchemaResources>>}
+   */
+  public async listMergeSchemaJobs(
+    params: Types.ListMergeSchemaParams = {}
+  ): Promise<WatsonXAI.Response<Types.MergeSchemaResources>> {
+    const requiredParams: string[] = [];
+    const validParams = ['spaceId', 'projectId', 'start', 'limit'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+      'start': params.start,
+      'limit': params.limit,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.MERGE.BASE,
+        method: 'GET',
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get a merge schema request.
+   *
+   * Retrieve the merge schema request details with the specified identifier.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the merge schema request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.MergeSchemaResponse>>}
+   */
+  public async getMergeSchemaJob(
+    params: Types.GetMergeSchemaParams
+  ): Promise<WatsonXAI.Response<Types.MergeSchemaResponse>> {
+    const requiredParams = ['id'];
+    const validParams = ['spaceId', 'projectId'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+    };
+
+    const path = {
+      'id': params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.MERGE.BY_ID,
+        method: 'GET',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Delete a merge schema request.
+   *
+   * Delete the merge schema request with the specified identifier.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the merge schema request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job or request
+   *   metadata.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>}
+   */
+  public async deleteMergeSchemaJob(
+    params: Types.DeleteMergeSchemaParams
+  ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
+    const requiredParams = ['id'];
+    const validParams = ['spaceId', 'projectId', 'hardDelete'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+      'hard_delete': params.hardDelete,
+    };
+
+    const path = {
+      'id': params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.MERGE.BY_ID,
+        method: 'DELETE',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Start a cluster schema request.
+   *
+   * Start a request to cluster multiple schemas for text extraction.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` has to be given.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` has to be given.
+   * @param {ClusterSchemaParameters} params.parameters - The parameters to cluster schemas.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.ClusterSchemaResponse>>}
+   */
+  public async runClusterSchemaJob(
+    params: Types.ClusterSchemaParams
+  ): Promise<WatsonXAI.Response<Types.ClusterSchemaResponse>> {
+    const requiredParams = ['parameters'];
+    const validParams = ['projectId', 'spaceId', 'parameters'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const body = {
+      'project_id': projectId,
+      'space_id': spaceId,
+      'parameters': params.parameters,
+    };
+
+    const query = {
+      'version': this.version,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.CLUSTER.BASE,
+        method: 'POST',
+        body,
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * List cluster schema requests.
+   *
+   * Retrieve the list of cluster schema requests for the specified space or project.
+   *
+   * @category Schema Management
+   * @param {Object} [params] - The parameters to send to the service.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {string} [params.start] - Token required for token-based pagination.
+   * @param {number} [params.limit] - How many resources should be returned. By default limit is
+   *   100. Max limit allowed is 200.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.ClusterSchemaResources>>}
+   */
+  public async listClusterSchemaJobs(
+    params: Types.ListClusterSchemaParams = {}
+  ): Promise<WatsonXAI.Response<Types.ClusterSchemaResources>> {
+    const requiredParams: string[] = [];
+    const validParams = ['spaceId', 'projectId', 'start', 'limit'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+      'start': params.start,
+      'limit': params.limit,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.CLUSTER.BASE,
+        method: 'GET',
+        qs: query,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Get a cluster schema request.
+   *
+   * Retrieve the cluster schema request details with the specified identifier.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the cluster schema request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.ClusterSchemaResponse>>}
+   */
+  public async getClusterSchemaJob(
+    params: Types.GetClusterSchemaParams
+  ): Promise<WatsonXAI.Response<Types.ClusterSchemaResponse>> {
+    const requiredParams = ['id'];
+    const validParams = ['spaceId', 'projectId'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+    };
+
+    const path = {
+      'id': params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.CLUSTER.BY_ID,
+        method: 'GET',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
+          Accept: 'application/json',
+          ...params.headers,
+        },
+        axiosOptions: {
+          signal: params.signal,
+        },
+      },
+    };
+
+    return this.createRequest(parameters);
+  }
+
+  /**
+   * Delete a cluster schema request.
+   *
+   * Delete the cluster schema request with the specified identifier.
+   *
+   * @category Schema Management
+   * @param {Object} params - The parameters to send to the service.
+   * @param {string} params.id - The identifier of the cluster schema request.
+   * @param {string} [params.spaceId] - The space that contains the resource. Either `space_id` or
+   *   `project_id` query parameter has to be given.
+   * @param {string} [params.projectId] - The project that contains the resource. Either `space_id`
+   *   or `project_id` query parameter has to be given.
+   * @param {boolean} [params.hardDelete] - Set to true in order to also delete the job or request
+   *   metadata.
+   * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
+   * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>}
+   */
+  public async deleteClusterSchemaJob(
+    params: Types.DeleteClusterSchemaParams
+  ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
+    const requiredParams = ['id'];
+    const validParams = ['spaceId', 'projectId', 'hardDelete'];
+    validateRequestParams(params, requiredParams, validParams);
+
+    const { projectId, spaceId } = this.resolveContextId(params);
+    const query = {
+      'version': this.version,
+      'space_id': spaceId,
+      'project_id': projectId,
+      'hard_delete': params.hardDelete,
+    };
+
+    const path = {
+      'id': params.id,
+    };
+
+    const sdkHeaders = getSdkHeaders();
+
+    const parameters = {
+      options: {
+        url: ENDPOINTS.TEXT.SCHEMAS.CLUSTER.BY_ID,
+        method: 'DELETE',
+        qs: query,
+        path,
+      },
+      defaultOptions: {
+        ...this.baseOptions,
+        headers: {
+          ...sdkHeaders,
           ...params.headers,
         },
         axiosOptions: {
@@ -3563,22 +4416,20 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TextGenResponse>>} A Promise that resolves to a
    *   text generation response
    */
-  public generateText(
+  public async generateText(
     params: WatsonXAI.TextGenerationParams,
     callbacks?: WatsonXAI.RequestCallbacks<WatsonXAI.Response<WatsonXAI.TextGenResponse>>
   ): Promise<WatsonXAI.Response<WatsonXAI.TextGenResponse>> {
     const requiredParams = ['input', 'modelId'];
     const validParams = ['spaceId', 'projectId', 'parameters', 'moderations', 'crypto'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'input': params.input,
       'model_id': params.modelId,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'parameters': params.parameters,
       'moderations': params.moderations,
     };
@@ -3688,16 +4539,14 @@ class WatsonXAI extends WatsonxBaseService {
   ): Promise<AsyncIterable<string | WatsonXAI.ObjectStreamed<WatsonXAI.TextGenResponse>>> {
     const requiredParams = ['input', 'modelId'];
     const validParams = ['spaceId', 'projectId', 'parameters', 'moderations', 'returnObject'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'input': params.input,
       'model_id': params.modelId,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'parameters': params.parameters,
       'moderations': params.moderations,
     };
@@ -3770,21 +4619,19 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TextTokenizeResponse>>} A Promise that resolves
    *   to a tokenization response
    */
-  public tokenizeText(
+  public async tokenizeText(
     params: WatsonXAI.TextTokenizationParams
   ): Promise<WatsonXAI.Response<WatsonXAI.TextTokenizeResponse>> {
     const requiredParams = ['modelId', 'input'];
     const validParams = ['spaceId', 'projectId', 'parameters', 'crypto'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'model_id': params.modelId,
       'input': params.input,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'parameters': params.parameters,
     };
 
@@ -3844,22 +4691,20 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TSForecastResponse>>} A Promise that resolves to
    *   a time series forecast response
    */
-  public timeSeriesForecast(
+  public async timeSeriesForecast(
     params: WatsonXAI.TimeSeriesForecastParams
   ): Promise<WatsonXAI.Response<WatsonXAI.TSForecastResponse>> {
     const requiredParams = ['modelId', 'data', 'schema'];
     const validParams = ['projectId', 'spaceId', 'parameters'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'model_id': params.modelId,
       'data': params.data,
       'schema': params.schema,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
       'parameters': params.parameters,
     };
 
@@ -3977,7 +4822,7 @@ class WatsonXAI extends WatsonxBaseService {
    *
    * @category Trainings
    */
-  public createTraining(
+  public async createTraining(
     params: WatsonXAI.TrainingsCreateParams
   ): Promise<WatsonXAI.Response<WatsonXAI.TrainingResource>> {
     const requiredParams = ['name', 'resultsReference'];
@@ -3991,16 +4836,14 @@ class WatsonXAI extends WatsonxBaseService {
       'custom',
       'autoUpdateModel',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
       'results_reference': params.resultsReference,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'description': params.description,
       'tags': params.tags,
       'prompt_tuning': params.promptTuning,
@@ -4062,7 +4905,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TrainingResourceCollection>>} A Promise that
    *   resolves to a collection of training resources
    */
-  public listTrainings(
+  public async listTrainings(
     params: WatsonXAI.TrainingsListParams = {}
   ): Promise<WatsonXAI.Response<WatsonXAI.TrainingResourceCollection>> {
     const requiredParams: string[] = [];
@@ -4075,11 +4918,9 @@ class WatsonXAI extends WatsonxBaseService {
       'spaceId',
       'projectId',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
       'start': params.start,
@@ -4087,8 +4928,8 @@ class WatsonXAI extends WatsonxBaseService {
       'total_count': params.totalCount,
       'tag.value': params.tagValue,
       'state': params.state,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const sdkHeaders = getSdkHeaders();
@@ -4131,20 +4972,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TrainingResource>>} A Promise that resolves to a
    *   training resource
    */
-  public getTraining(
+  public async getTraining(
     params: WatsonXAI.TrainingsGetParams
   ): Promise<WatsonXAI.Response<WatsonXAI.TrainingResource>> {
     const requiredParams = ['trainingId'];
     const validParams = ['spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -4194,20 +5033,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public deleteTraining(
+  public async deleteTraining(
     params: WatsonXAI.TrainingsDeleteParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['trainingId'];
     const validParams = ['spaceId', 'projectId', 'hardDelete'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'hard_delete': params.hardDelete,
     };
 
@@ -4266,23 +5103,21 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.RerankResponse>>} A Promise that resolves to a
    *   rerank response
    */
-  public textRerank(
+  public async textRerank(
     params: WatsonXAI.TextRerankParams,
     callbacks?: WatsonXAI.RequestCallbacks<WatsonXAI.Response<WatsonXAI.RerankResponse>>
   ): Promise<WatsonXAI.Response<WatsonXAI.RerankResponse>> {
     const requiredParams = ['modelId', 'inputs', 'query'];
     const validParams = ['spaceId', 'projectId', 'parameters', 'crypto'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'model_id': params.modelId,
       'inputs': params.inputs,
       'query': params.query,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'parameters': params.parameters,
     };
 
@@ -4358,7 +5193,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.FineTuningResource>>} A Promise that resolves to
    *   a fine-tuning resource
    */
-  public createFineTuning(
+  public async createFineTuning(
     params: WatsonXAI.CreateFineTuningParams
   ): Promise<WatsonXAI.Response<WatsonXAI.FineTuningResource>> {
     const requiredParams = ['name', 'trainingDataReferences', 'resultsReference'];
@@ -4373,19 +5208,17 @@ class WatsonXAI extends WatsonxBaseService {
       'testDataReferences',
       'custom',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
       'training_data_references': params.trainingDataReferences,
       'results_reference': params.resultsReference,
       'description': params.description,
       'tags': params.tags,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
       'auto_update_model': params.autoUpdateModel,
       'parameters': params.parameters,
       'type': params.type,
@@ -4445,7 +5278,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.FineTuningResources>>} A Promise that resolves
    *   to fine-tuning resources
    */
-  public listFineTunings(
+  public async listFineTunings(
     params: WatsonXAI.FineTuningListParams = {}
   ): Promise<WatsonXAI.Response<WatsonXAI.FineTuningResources>> {
     const requiredParams: string[] = [];
@@ -4459,11 +5292,9 @@ class WatsonXAI extends WatsonxBaseService {
       'projectId',
       'type',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
       'start': params.start,
@@ -4471,8 +5302,8 @@ class WatsonXAI extends WatsonxBaseService {
       'total_count': params.totalCount,
       'tag.value': params.tagValue,
       'state': params.state,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'type': params.type,
     };
 
@@ -4516,20 +5347,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.FineTuningResource>>} A Promise that resolves to
    *   a fine-tuning resource
    */
-  public getFineTuning(
+  public async getFineTuning(
     params: WatsonXAI.GetFineTuningParams
   ): Promise<WatsonXAI.Response<WatsonXAI.FineTuningResource>> {
     const requiredParams = ['id'];
     const validParams = ['spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -4579,20 +5408,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public deleteFineTuning(
+  public async deleteFineTuning(
     params: WatsonXAI.DeleteFineTuningParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['id'];
     const validParams = ['spaceId', 'projectId', 'hardDelete'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'hard_delete': params.hardDelete,
     };
 
@@ -4646,23 +5473,21 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.DocumentExtractionResource>>} A Promise that
    *   resolves to a document extraction resource
    */
-  public createDocumentExtraction(
+  public async createDocumentExtraction(
     params: WatsonXAI.CreateDocumentExtractionParams
   ): Promise<WatsonXAI.Response<WatsonXAI.DocumentExtractionResource>> {
     const requiredParams = ['name', 'documentReferences'];
     const validParams = ['resultsReference', 'tags', 'projectId', 'spaceId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
       'document_references': params.documentReferences,
       'results_reference': params.resultsReference,
       'tags': params.tags,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const query = {
@@ -4709,20 +5534,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.DocumentExtractionResources>>} A Promise that
    *   resolves to document extraction resources
    */
-  public listDocumentExtractions(
+  public async listDocumentExtractions(
     params: WatsonXAI.ListDocumentExtractionsParams
   ): Promise<WatsonXAI.Response<WatsonXAI.DocumentExtractionResources>> {
     const requiredParams: string[] = [];
     const validParams = ['projectId', 'spaceId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const sdkHeaders = getSdkHeaders();
@@ -4765,20 +5588,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.DocumentExtractionResource>>} A Promise that
    *   resolves to a document extraction resource
    */
-  public getDocumentExtraction(
+  public async getDocumentExtraction(
     params: WatsonXAI.GetDocumentExtractionParams
   ): Promise<WatsonXAI.Response<WatsonXAI.DocumentExtractionResource>> {
     const requiredParams = ['id'];
     const validParams = ['projectId', 'spaceId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const path = {
@@ -4828,20 +5649,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public cancelDocumentExtractions(
+  public async cancelDocumentExtractions(
     params: WatsonXAI.CancelDocumentExtractionsParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['id'];
     const validParams = ['projectId', 'spaceId', 'hardDelete'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
       'hard_delete': params.hardDelete,
     };
 
@@ -4894,20 +5713,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.SyntheticDataGenerationResource>>} A Promise
    *   that resolves to a synthetic data generation resource
    */
-  public createSyntheticDataGeneration(
+  public async createSyntheticDataGeneration(
     params: WatsonXAI.CreateSyntheticDataGenerationParams
   ): Promise<WatsonXAI.Response<WatsonXAI.SyntheticDataGenerationResource>> {
     const requiredParams = ['name'];
     const validParams = ['spaceId', 'projectId', 'dataReference', 'resultsReference'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'data_reference': params.dataReference,
       'results_reference': params.resultsReference,
     };
@@ -4954,20 +5771,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.SyntheticDataGenerationResources>>} A Promise
    *   that resolves to synthetic data generation resources
    */
-  public listSyntheticDataGenerations(
+  public async listSyntheticDataGenerations(
     params: WatsonXAI.ListSyntheticDataGenerationsParams
   ): Promise<WatsonXAI.Response<WatsonXAI.SyntheticDataGenerationResources>> {
     const requiredParams: string[] = [];
     const validParams = ['projectId', 'spaceId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const sdkHeaders = getSdkHeaders();
@@ -5008,20 +5823,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.SyntheticDataGenerationResource>>} A Promise
    *   that resolves to a synthetic data generation resource
    */
-  public getSyntheticDataGeneration(
+  public async getSyntheticDataGeneration(
     params: WatsonXAI.GetSyntheticDataGenerationParams
   ): Promise<WatsonXAI.Response<WatsonXAI.SyntheticDataGenerationResource>> {
     const requiredParams = ['id'];
     const validParams = ['projectId', 'spaceId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const path = {
@@ -5071,20 +5884,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public cancelSyntheticDataGeneration(
+  public async cancelSyntheticDataGeneration(
     params: WatsonXAI.CancelSyntheticDataGenerationParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['id'];
     const validParams = ['projectId', 'spaceId', 'hardDelete'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
       'hard_delete': params.hardDelete,
     };
 
@@ -5134,7 +5945,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TaxonomyResource>>} A Promise that resolves to a
    *   taxonomy resource
    */
-  public createTaxonomy(
+  public async createTaxonomy(
     params: WatsonXAI.CreateTaxonomyParams
   ): Promise<WatsonXAI.Response<WatsonXAI.TaxonomyResource>> {
     const requiredParams = ['name'];
@@ -5145,16 +5956,14 @@ class WatsonXAI extends WatsonxBaseService {
       'dataReference',
       'resultsReference',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
       'description': params.description,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'data_reference': params.dataReference,
     };
 
@@ -5200,20 +6009,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TaxonomyResources>>} A Promise that resolves to
    *   taxonomy resources
    */
-  public listTaxonomies(
+  public async listTaxonomies(
     params: WatsonXAI.ListTaxonomiesParams = {}
   ): Promise<WatsonXAI.Response<WatsonXAI.TaxonomyResources>> {
     const requiredParams: string[] = [];
     const validParams = ['projectId', 'spaceId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const sdkHeaders = getSdkHeaders();
@@ -5254,20 +6061,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TaxonomyResource>>} A Promise that resolves to a
    *   taxonomy resource
    */
-  public getTaxonomy(
+  public async getTaxonomy(
     params: WatsonXAI.GetTaxonomyParams
   ): Promise<WatsonXAI.Response<WatsonXAI.TaxonomyResource>> {
     const requiredParams = ['id'];
     const validParams = ['projectId', 'spaceId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const path = {
@@ -5317,20 +6122,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public deleteTaxonomy(
+  public async deleteTaxonomy(
     params: WatsonXAI.DeleteTaxonomyParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['id'];
     const validParams = ['projectId', 'spaceId', 'hardDelete'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
       'hard_delete': params.hardDelete,
     };
 
@@ -5440,7 +6243,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.ModelResource>>} A Promise that resolves to a
    *   model resource
    */
-  public createModel(
+  public async createModel(
     params: WatsonXAI.ModelsCreateParams
   ): Promise<WatsonXAI.Response<WatsonXAI.ModelResource>> {
     const requiredParams = ['name', 'type'];
@@ -5471,16 +6274,14 @@ class WatsonXAI extends WatsonxBaseService {
       'contentLocation',
       'foundationModel',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'name': params.name,
       'type': params.type,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
       'description': params.description,
       'tags': params.tags,
       'software_spec': params.softwareSpec,
@@ -5560,20 +6361,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.ModelResources>>} A Promise that resolves to
    *   model resources
    */
-  public listModels(
+  public async listModels(
     params: WatsonXAI.ModelsListParams
   ): Promise<WatsonXAI.Response<WatsonXAI.ModelResources>> {
     const requiredParams: string[] = [];
     const validParams = ['spaceId', 'projectId', 'start', 'limit', 'tagValue', 'search'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'start': params.start,
       'limit': params.limit,
       'tag.value': params.tagValue,
@@ -5623,20 +6422,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.ModelResource>>} A Promise that resolves to a
    *   model resource
    */
-  public getModel(
+  public async getModel(
     params: WatsonXAI.ModelsGetParams
   ): Promise<WatsonXAI.Response<WatsonXAI.ModelResource>> {
     const requiredParams = ['modelId'];
     const validParams = ['spaceId', 'projectId', 'rev'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'rev': params.rev,
     };
 
@@ -5693,21 +6490,19 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.ModelResource>>} A Promise that resolves to a
    *   model resource
    */
-  public updateModel(
+  public async updateModel(
     params: WatsonXAI.ModelsUpdateParams
   ): Promise<WatsonXAI.Response<WatsonXAI.ModelResource>> {
     const requiredParams = ['modelId', 'jsonPatch'];
     const validParams = ['spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = params.jsonPatch;
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -5757,20 +6552,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public deleteModel(
+  public async deleteModel(
     params: WatsonXAI.ModelsDeleteParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['modelId'];
     const validParams = ['spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -5814,15 +6607,12 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxUtilityAgentToolsResponse>>} A Promise that
    *   resolves to utility agent tools response
    */
-  public listUtilityAgentTools(
+  public async listUtilityAgentTools(
     params: WatsonXAI.GetUtilityAgentToolsParams = {}
   ): Promise<WatsonXAI.Response<WatsonXAI.WxUtilityAgentToolsResponse>> {
     const requiredParams: string[] = [];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const sdkHeaders = getSdkHeaders();
 
@@ -5862,15 +6652,12 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.UtilityAgentTool>>} A Promise that resolves to a
    *   utility agent tool
    */
-  public getUtilityAgentTool(
+  public async getUtilityAgentTool(
     params: WatsonXAI.GetUtilityAgentToolParams
   ): Promise<WatsonXAI.Response<WatsonXAI.UtilityAgentTool>> {
     const requiredParams = ['toolId'];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const path = {
       'tool_id': params.toolId,
@@ -5915,15 +6702,12 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxUtilityAgentToolsRunResponse>>} A Promise that
    *   resolves to a utility agent tools run response
    */
-  public runUtilityAgentTool(
+  public async runUtilityAgentTool(
     params: WatsonXAI.PostUtilityAgentToolsRunParams
   ): Promise<WatsonXAI.Response<WatsonXAI.WxUtilityAgentToolsRunResponse>> {
     const requiredParams = ['wxUtilityAgentToolsRunRequest'];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const body = params.wxUtilityAgentToolsRunRequest;
     const sdkHeaders = getSdkHeaders();
@@ -5967,15 +6751,12 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.WxUtilityAgentToolsRunResponse>>} A Promise that
    *   resolves to a utility agent tools run response
    */
-  public runUtilityAgentToolByName(
+  public async runUtilityAgentToolByName(
     params: WatsonXAI.PostUtilityAgentToolsRunByNameParams
   ): Promise<WatsonXAI.Response<WatsonXAI.WxUtilityAgentToolsRunResponse>> {
     const requiredParams = ['toolId', 'wxUtilityAgentToolsRunRequest'];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const body = params.wxUtilityAgentToolsRunRequest;
     const path = {
@@ -6043,7 +6824,7 @@ class WatsonXAI extends WatsonxBaseService {
    *   space resource
    */
 
-  public createSpace(
+  public async createSpace(
     params: WatsonXAI.CreateSpaceParams
   ): Promise<WatsonXAI.Response<WatsonXAI.SpaceResource>> {
     const requiredParams = this.wxServiceUrl.includes('.cloud.ibm.com')
@@ -6059,10 +6840,7 @@ class WatsonXAI extends WatsonxBaseService {
       'type',
       'settings',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const path = {
       name: params.name,
@@ -6121,22 +6899,20 @@ class WatsonXAI extends WatsonxBaseService {
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.Space>>} A Promise that resolves to a space
    */
-  public getSpace(
+  public async getSpace(
     params: WatsonXAI.GetSpaceParams
   ): Promise<WatsonXAI.Response<WatsonXAI.SpaceResource>> {
     const requiredParams = ['spaceId'];
     const validParams = ['include'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { spaceId } = this.resolveContextId(params);
     const query = {
       include: params.include,
     };
 
     const path = {
-      'space_id': params.spaceId,
+      'space_id': spaceId,
     };
 
     const sdkHeaders = getSdkHeaders();
@@ -6177,15 +6953,12 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public deleteSpace(
+  public async deleteSpace(
     params: WatsonXAI.DeleteSpaceParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['spaceId'];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const path = {
       space_id: params.spaceId,
@@ -6235,15 +7008,12 @@ class WatsonXAI extends WatsonxBaseService {
    * @param {OutgoingHttpHeaders} [params.headers] - Custom request headers
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.Space>>} A Promise that resolves to a space
    */
-  public updateSpace(
+  public async updateSpace(
     params: WatsonXAI.SpacePatchParams
   ): Promise<WatsonXAI.Response<WatsonXAI.SpaceResource>> {
     const requiredParams = ['spaceId', 'jsonPatch'];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const path = {
       space_id: params.spaceId,
@@ -6325,7 +7095,7 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.SpaceResources>>} A Promise that resolves to
    *   space resources
    */
-  public listSpaces(
+  public async listSpaces(
     params: WatsonXAI.ListSpacesParams = {}
   ): Promise<WatsonXAI.Response<WatsonXAI.SpaceResources>> {
     const requiredParams: string[] = [];
@@ -6344,11 +7114,7 @@ class WatsonXAI extends WatsonxBaseService {
       'computeCrn',
       'type',
     ];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const query = {
       'start': params.start,
@@ -6411,16 +7177,15 @@ class WatsonXAI extends WatsonxBaseService {
    *   with the transcription response.
    * @throws {Error} Will throw an error if required or invalid parameters are provided.
    */
-  public transcribeAudio(
+  public async transcribeAudio(
     params: WatsonXAI.TranscribeAudioParams
   ): Promise<WatsonXAI.Response<WatsonXAI.AudioTranscriptionResult>> {
     const requiredParams = ['model', 'file'];
     const validParams = ['projectId', 'spaceId', 'language'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
     const { file } = params;
+
+    const { projectId, spaceId } = this.resolveContextId(params);
 
     const form = new FormData();
     form.append('model', params.model);
@@ -6432,10 +7197,10 @@ class WatsonXAI extends WatsonxBaseService {
       form.append('file', files);
     } else form.append('file', file);
 
-    if (params.projectId) {
-      form.append('project_id', params.projectId);
-    } else if (params.spaceId) {
-      form.append('space_id', params.spaceId);
+    if (projectId) {
+      form.append('project_id', projectId);
+    } else if (spaceId) {
+      form.append('space_id', spaceId);
     } else throw new Error('Either projectId or spaceId need to be provided');
 
     const sdkHeaders = getSdkHeaders();
@@ -6492,22 +7257,20 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TextClassificationResponse>>} A Promise that
    *   resolves to a text classification response
    */
-  public createTextClassification(
+  public async createTextClassification(
     params: WatsonXAI.TextClassificationParams
   ): Promise<WatsonXAI.Response<WatsonXAI.TextClassificationResponse>> {
     const requiredParams = ['documentReference', 'parameters'];
     const validParams = ['custom', 'projectId', 'spaceId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const body = {
       'document_reference': params.documentReference,
       'parameters': params.parameters,
       'custom': params.custom,
-      'project_id': params.projectId,
-      'space_id': params.spaceId,
+      'project_id': projectId,
+      'space_id': spaceId,
     };
 
     const query = {
@@ -6562,20 +7325,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TextClassificationResources>>} A Promise that
    *   resolves to text classification resources
    */
-  public listTextClassifications(
+  public async listTextClassifications(
     params: WatsonXAI.ListTextClassificationsParams = {}
   ): Promise<WatsonXAI.Response<WatsonXAI.TextClassificationResources>> {
     const requiredParams: string[] = [];
     const validParams = ['spaceId', 'projectId', 'start', 'limit'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'start': params.start,
       'limit': params.limit,
     };
@@ -6623,20 +7384,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.TextClassificationResponse>>} A Promise that
    *   resolves to a text classification response
    */
-  public getTextClassification(
+  public async getTextClassification(
     params: WatsonXAI.TextClassificationGetParams
   ): Promise<WatsonXAI.Response<WatsonXAI.TextClassificationResponse>> {
     const requiredParams = ['id'];
     const validParams = ['spaceId', 'projectId'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
     };
 
     const path = {
@@ -6685,20 +7444,18 @@ class WatsonXAI extends WatsonxBaseService {
    * @returns {Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>>} A Promise that resolves to an
    *   empty response object
    */
-  public deleteTextClassification(
+  public async deleteTextClassification(
     params: WatsonXAI.TextClassificationDeleteParams
   ): Promise<WatsonXAI.Response<WatsonXAI.EmptyObject>> {
     const requiredParams = ['id'];
     const validParams = ['spaceId', 'projectId', 'hardDelete'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
+    const { projectId, spaceId } = this.resolveContextId(params);
     const query = {
       'version': this.version,
-      'space_id': params.spaceId,
-      'project_id': params.projectId,
+      'space_id': spaceId,
+      'project_id': projectId,
       'hard_delete': params.hardDelete,
     };
 
@@ -7069,7 +7826,6 @@ namespace WatsonXAI {
   export import TextClassificationResults = Types.TextClassificationResults;
   export import TextClassificationSemanticConfig = Types.TextClassificationSemanticConfig;
   export import TextExtractionSchema = Types.TextExtractionSchema;
-  export import TextExtractionSemanticKvpField = Types.TextExtractionSemanticKvpField;
   export import PostPromptConstants = Types.PostPromptConstants;
   export import PatchPromptConstants = Types.PatchPromptConstants;
   export import PutPromptLockConstants = Types.PutPromptLockConstants;

@@ -20,7 +20,7 @@
     "rerank": "npm run build && npm run npm run run-ts ./src/sdk/example_rerank.ts",
     "all": "npm run build && npm run text_generation && npm run embeddings && npm run chat",
     "all-ext": "npm run build && npm run all && npm run prompt_tuning",
-    "test-install": "yalc add @ibm-cloud/watsonx-ai && npm install && npm install @langchain/community@latest @langchain/langgraph@latest",
+    "test-install": "yalc add @ibm-cloud/watsonx-ai && npm install && npm install @langchain/ibm@latest @langchain/langgraph@latest",
     "langchain-chat": "npm run build && npm run run-ts ./src/external/langchain/chat_conversation.ts",
     "langchain-chat-image": "npm run build && npm run run-ts ./src/external/langchain/chat_image.ts",
     "langchain-tools": "npm run build && npm run run-ts ./src/external/langchain/chat_tools.ts",
@@ -38,9 +38,10 @@
   },
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
-    "@langchain/community": "^1.1.24",
+    "@langchain/community": "^1.1.27",
     "@langchain/core": "^1.1.24",
-    "@langchain/langgraph": "^1.2.4",
+    "@langchain/ibm": "^0.1.0",
+    "@langchain/langgraph": "^1.3.0",
     "@zilliz/milvus2-sdk-node": "^2.5.0",
     "axios": "^1.7.8",
     "cheerio": "^1.0.0",
@@ -70,8 +71,5 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
-  },
-  "overrides": {
-    "expr-eval": "file:./stubs/expr-eval"
   }
 }

@@ -302,7 +302,6 @@ describe('WatsonXAI_integration', () => {
         };
 
         const res = await watsonxAIService.createDeployment(params);
-
         expectSuccessResponse(res, 202);
         promptDeploymentId = res.result.metadata?.id;
       }, 800000);
@@ -772,6 +771,315 @@ describe('WatsonXAI_integration', () => {
       const res = await watsonxAIService.deleteTextExtraction(params);
 
       expectSuccessResponse(res, 204);
+    });
+  });
+
+  describe('Schema Management', () => {
+    let createSchemaId: string | undefined;
+    let improveSchemaId: string | undefined;
+    let mergeSchemaId: string | undefined;
+    let clusterSchemaId: string | undefined;
+
+    describe('Create Schema', () => {
+      test('createSchema()', async () => {
+        expect(typeof cosId).toBe('string');
+        const documentReference = createCosReference(
+          'experienced.pdf',
+          'wx-nodejs-test-schema',
+          cosId as string
+        );
+
+        const params = {
+          documentReference,
+          projectId,
+          parameters: {
+            ocr_mode: 'enabled',
+            languages: ['en'],
+            mode: 'high_quality',
+            semantic_config: {
+              default_model_name: 'ibm/granite-13b-chat-v2',
+            },
+          },
+        };
+
+        const res = await watsonxAIService.runCreateSchemaJob(params);
+        createSchemaId = res.result.metadata?.id;
+
+        expectSuccessResponse(res, 201);
+      });
+
+      test('listCreateSchema()', async () => {
+        const params = {
+          projectId,
+          limit: 50,
+        };
+
+        const res = await watsonxAIService.listCreateSchemaJobs(params);
+
+        expectSuccessResponse(res, 200);
+      });
+
+      test('getCreateSchema()', async () => {
+        expect(typeof createSchemaId).toBe('string');
+        const params = {
+          id: createSchemaId as string,
+          projectId,
+        };
+
+        const res = await watsonxAIService.getCreateSchemaJob(params);
+
+        expectSuccessResponse(res, 200);
+      });
+
+      test('deleteCreateSchema()', async () => {
+        expect(typeof createSchemaId).toBe('string');
+        const params = {
+          id: createSchemaId as string,
+          projectId,
+          hardDelete: true,
+        };
+
+        const res = await watsonxAIService.deleteCreateSchemaJob(params);
+
+        expectSuccessResponse(res, 204);
+        createSchemaId = undefined;
+      });
+    });
+
+    describe('Improve Schema', () => {
+      test('improveSchema()', async () => {
+        const params = {
+          projectId,
+          parameters: {
+            schema: {
+              document_type: 'invoice',
+              document_description: 'A test invoice document for schema improvement',
+              fields: {
+                invoiceNumber: {
+                  description: 'Invoice number field',
+                  example: 'INV-12345',
+                },
+              },
+            },
+            semantic_config: {
+              default_model_name: 'ibm/granite-13b-chat-v2',
+            },
+          },
+        };
+
+        const res = await watsonxAIService.runImproveSchemaJob(params);
+        improveSchemaId = res.result.metadata?.id;
+
+        expectSuccessResponse(res, 201);
+      });
+
+      test('listImproveSchema()', async () => {
+        const params = {
+          projectId,
+          limit: 50,
+        };
+
+        const res = await watsonxAIService.listImproveSchemaJobs(params);
+
+        expectSuccessResponse(res, 200);
+      });
+
+      test('getImproveSchema()', async () => {
+        expect(typeof improveSchemaId).toBe('string');
+        const params = {
+          id: improveSchemaId as string,
+          projectId,
+        };
+
+        const res = await watsonxAIService.getImproveSchemaJob(params);
+
+        expectSuccessResponse(res, 200);
+      });
+
+      test('deleteImproveSchema()', async () => {
+        expect(typeof improveSchemaId).toBe('string');
+        const params = {
+          id: improveSchemaId as string,
+          projectId,
+          hardDelete: true,
+        };
+
+        const res = await watsonxAIService.deleteImproveSchemaJob(params);
+
+        expectSuccessResponse(res, 204);
+        improveSchemaId = undefined;
+      });
+    });
+
+    describe('Merge Schema', () => {
+      test('mergeSchema()', async () => {
+        const schema1 = {
+          document_type: 'invoice',
+          document_description: 'First invoice schema to merge',
+          fields: {
+            invoiceNumber: {
+              description: 'Invoice number field',
+              example: 'INV-12345',
+            },
+          },
+        };
+        const schema2 = {
+          document_type: 'invoice',
+          document_description: 'Second invoice schema to merge',
+          fields: {
+            invoiceDate: {
+              description: 'Invoice date field',
+              example: '2024-01-15',
+            },
+          },
+        };
+        const params = {
+          projectId,
+          parameters: {
+            schemas: [schema1, schema2],
+            semantic_config: {
+              default_model_name: 'ibm/granite-13b-chat-v2',
+            },
+          },
+        };
+
+        const res = await watsonxAIService.runMergeSchemaJob(params);
+        mergeSchemaId = res.result.metadata?.id;
+
+        expectSuccessResponse(res, 201);
+      });
+
+      test('listMergeSchema()', async () => {
+        const params = {
+          projectId,
+          limit: 50,
+        };
+
+        const res = await watsonxAIService.listMergeSchemaJobs(params);
+
+        expectSuccessResponse(res, 200);
+      });
+
+      test('getMergeSchema()', async () => {
+        expect(typeof mergeSchemaId).toBe('string');
+        const params = {
+          id: mergeSchemaId as string,
+          projectId,
+        };
+
+        const res = await watsonxAIService.getMergeSchemaJob(params);
+
+        expectSuccessResponse(res, 200);
+      });
+
+      test('deleteMergeSchema()', async () => {
+        expect(typeof mergeSchemaId).toBe('string');
+        const params = {
+          id: mergeSchemaId as string,
+          projectId,
+          hardDelete: true,
+        };
+
+        const res = await watsonxAIService.deleteMergeSchemaJob(params);
+
+        expectSuccessResponse(res, 204);
+        mergeSchemaId = undefined;
+      });
+    });
+
+    describe('Cluster Schema', () => {
+      test('clusterSchema()', async () => {
+        const clusterSchema1 = {
+          document_name: 'invoice_type_1',
+          schema: {
+            document_type: 'invoice',
+            document_description: 'First invoice type for clustering',
+            fields: {
+              invoiceNumber: {
+                description: 'Invoice number field',
+                example: 'INV-12345',
+              },
+            },
+          },
+        };
+        const clusterSchema2 = {
+          document_name: 'invoice_type_2',
+          schema: {
+            document_type: 'receipt',
+            document_description: 'Second invoice type for clustering',
+            fields: {
+              receiptNumber: {
+                description: 'Receipt number field',
+                example: 'RCP-67890',
+              },
+            },
+          },
+        };
+        const clusterSchema3 = {
+          document_name: 'invoice_type_3',
+          schema: {
+            document_type: 'bill',
+            document_description: 'Third invoice type for clustering',
+            fields: {
+              billNumber: {
+                description: 'Bill number field',
+                example: 'BILL-11111',
+              },
+            },
+          },
+        };
+        const params = {
+          projectId,
+          parameters: {
+            schemas: [clusterSchema1, clusterSchema2, clusterSchema3],
+            semantic_config: {
+              default_model_name: 'ibm/granite-13b-chat-v2',
+            },
+          },
+        };
+
+        const res = await watsonxAIService.runClusterSchemaJob(params);
+        clusterSchemaId = res.result.metadata?.id;
+
+        expectSuccessResponse(res, 201);
+      });
+
+      test('listClusterSchema()', async () => {
+        const params = {
+          projectId,
+          limit: 50,
+        };
+
+        const res = await watsonxAIService.listClusterSchemaJobs(params);
+
+        expectSuccessResponse(res, 200);
+      });
+
+      test('getClusterSchema()', async () => {
+        expect(typeof clusterSchemaId).toBe('string');
+        const params = {
+          id: clusterSchemaId as string,
+          projectId,
+        };
+
+        const res = await watsonxAIService.getClusterSchemaJob(params);
+
+        expectSuccessResponse(res, 200);
+      });
+
+      test('deleteClusterSchema()', async () => {
+        expect(typeof clusterSchemaId).toBe('string');
+        const params = {
+          id: clusterSchemaId as string,
+          projectId,
+          hardDelete: true,
+        };
+
+        const res = await watsonxAIService.deleteClusterSchemaJob(params);
+
+        expectSuccessResponse(res, 204);
+        clusterSchemaId = undefined;
+      });
     });
   });
 

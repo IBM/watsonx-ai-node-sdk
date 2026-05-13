@@ -51,9 +51,8 @@ function validateFilesParams(
   requiredParams: string[],
   validParams: string[]
 ): void {
-  validateRequiredOneOf(params, ['projectId', 'spaceId']);
-  const validationErrors = validateRequestParams(params, requiredParams, validParams);
-  if (validationErrors) throw validationErrors;
+  validateRequiredOneOf(params, ['projectId', 'spaceId'], false);
+  validateRequestParams(params, requiredParams, validParams);
 }
 
 /**

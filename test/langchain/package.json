@@ -6,14 +6,14 @@
   "scripts": {
     "jest": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest",
     "test": "npm run jest",
-    "test-install": "yalc add @ibm-cloud/watsonx-ai && npm install && npm install @langchain/community@latest @langchain/core@latest @langchain/langgraph@latest",
+    "test-install": "yalc add @ibm-cloud/watsonx-ai && npm install && npm install @langchain/ibm@latest @langchain/core@latest @langchain/langgraph@latest",
     "test-regression": "npm run test-install && tsc --noEmit && npm test"
   },
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
-    "@langchain/community": "^1.1.24",
-    "@langchain/core": "^1.1.34",
-    "@langchain/langgraph": "^1.2.4",
+    "@langchain/core": "^1.1.46",
+    "@langchain/ibm": "^0.1.0",
+    "@langchain/langgraph": "^1.3.0",
     "@swc/core": "^1.15.11",
     "@swc/jest": "^0.2.39",
     "axios": "^1.7.7",
@@ -27,8 +27,5 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
-  },
-  "overrides": {
-    "expr-eval": "file:./stubs/expr-eval"
   }
 }

@@ -12,6 +12,7 @@
  * the License.
  */
 
+import type { BaseService } from 'ibm-cloud-sdk-core';
 import type { WatsonXAI } from '../../src';
 
 type PagerConstructor<T> = new (
@@ -58,84 +59,6 @@ class PollingError extends Error {
  * @returns {Promise<void>} Promise that resolves after the timeout
  */
 const wait = (timeout: number) => new Promise((resolve) => setTimeout(resolve, timeout));
-
-type FunctionProperties<T> = {
-  [K in keyof T as T[K] extends (...args: any[]) => any ? K : never]: T[K];
-};
-
-/**
- * Helper class for mocking module functions in tests
- *
- * This class uses FunctionProperties<T> to restrict functionName to only function properties,
- * providing type safety for public methods. However, when mocking private methods (e.g.,
- * 'createRequest'), you must use 'as any' to bypass TypeScript's type checking:
- *
- * @example
- *   // Mocking a private method requires 'as any' cast
- *   const mocker = new MockingRequest(client, 'createRequest' as any);
- *
- * @template T - Type of the module instance being mocked
- */
-class MockingRequest<T extends object> {
-  functionMock: jest.SpyInstance | null;
-  moduleInstance: T;
-  functionName: keyof FunctionProperties<T>;
-
-  /**
-   * Creates a new MockingRequest instance
-   *
-   * @param {T} moduleInstance - The module instance to mock
-   * @param {string} functionName - The name of the function to mock
-   */
-
-  constructor(moduleInstance: T, functionName: keyof FunctionProperties<T>) {
-    this.functionMock = null;
-    this.moduleInstance = moduleInstance;
-    this.functionName = functionName;
-  }
-
-  /**
-   * Mocks the function with an optional implementation
-   *
-   * @param {(...args: unknown[]) => any} [implementation] - Optional function implementation for
-   *   the mocked function
-   * @returns {void}
-   */
-  mock(implementation?: (...args: any[]) => any) {
-    const spy = jest.spyOn(this.moduleInstance, this.functionName);
-
-    if (!implementation) {
-      // Just spy without changing behavior
-      this.functionMock = spy;
-    } else {
-      // Use the provided function as the implementation
-      this.functionMock = spy.mockImplementation(implementation);
-    }
-  }
-
-  /**
-   * Restores the original function implementation
-   *
-   * @returns {void}
-   */
-  unmock() {
-    if (this.functionMock) {
-      this.functionMock.mockRestore();
-      this.functionMock = null;
-    }
-  }
-
-  /**
-   * Clears the mock call history
-   *
-   * @returns {void}
-   */
-  clearMock() {
-    if (this.functionMock) {
-      this.functionMock.mockClear();
-    }
-  }
-}
 
 /**
  * Assert that a response has the expected status code and result is defined
@@ -282,19 +205,27 @@ function createCosReference(fileName: string, bucket: string, connectionId: stri
 /**
  * Test helper to enforce required parameters validation
  *
- * @param {(params?: any) => Promise<any>} methodFn - The method to test
- * @returns {void}
+ * @param methodFn - The method to test
+ * @param emptyObjectError - Expected error pattern when called with empty object (default: /Missing
+ *   required parameters/)
+ * @param undefinedError - Expected error pattern when called with undefined (default: /Missing
+ *   required parameters/)
+ * @param baseParams - Optional base parameters to merge with test params (e.g., { projectId: 'xxx'
+ *   })
  */
-export function testRequiredParams(methodFn: (params?: any) => Promise<any>) {
+export function testRequiredParams(
+  methodFn: (params?: any) => Promise<any>,
+  emptyObjectError: RegExp = /Missing required parameters/,
+  undefinedError: RegExp = /Missing required parameters/,
+  baseParams?: Record<string, any>
+) {
   test('enforces required parameters – empty object', async () => {
-    await expect(methodFn({ projectId: 'test-project-id' })).rejects.toThrow(
-      /Missing required parameters/
-    );
+    const params = baseParams ? { ...baseParams } : {};
+    await expect(methodFn(params)).rejects.toThrow(emptyObjectError);
   });
   test('enforces required parameters – undefined', async () => {
-    await expect(methodFn()).rejects.toThrow(
-      /One of the following parameters is required: projectId,spaceId/
-    );
+    const params = baseParams ? { ...baseParams } : undefined;
+    await expect(methodFn(params)).rejects.toThrow(undefinedError);
   });
 }
 
@@ -326,7 +257,7 @@ export function testInvalidParams(
  */
 export function testWithRetries(
   testFn: () => void,
-  service: any,
+  service: BaseService,
   createRequestMock?: jest.SpyInstance
 ) {
   testFn();
@@ -352,15 +283,42 @@ export async function testAsyncWithRetries(
   await testFn();
 }
 
+/**
+ * Test helper for stream methods with retry configurations. Runs a stream test function three times
+ * with different retry configurations: baseline, retries enabled, and retries disabled. Sets up the
+ * stream mock before each run.
+ *
+ * @param {() => void} testFn - The test function to run
+ * @param {any} service - The service instance with enableRetries/disableRetries methods
+ * @param {jest.SpyInstance} createRequestMock - Mock to set up and clear between runs
+ * @param {any} streamResult - The stream object to return from the mock
+ * @returns {void}
+ */
+export function testWithRetriesStream(
+  testFn: () => void,
+  service: any,
+  createRequestMock: jest.SpyInstance,
+  streamResult: any
+) {
+  const setupStreamMock = () =>
+    createRequestMock.mockImplementation(() => Promise.resolve({ result: streamResult }));
+
+  const variants: Array<() => void> = [
+    () => {},
+    () => service.enableRetries(),
+    () => service.disableRetries(),
+  ];
+
+  for (const configure of variants) {
+    setupStreamMock();
+    configure();
+    testFn();
+    createRequestMock.mockClear();
+  }
+}
+
 export const getDefaultHeadersFromMock = (mock: jest.Mock | jest.SpyInstance) => {
   return mock.mock.calls[0][0].defaultOptions.headers;
 };
 
-export {
-  wait,
-  MockingRequest,
-  expectSuccessResponse,
-  pollUntilCondition,
-  testPagerPattern,
-  createCosReference,
-};
+export { wait, expectSuccessResponse, pollUntilCondition, testPagerPattern, createCosReference };

@@ -1,4 +1,4 @@
-import { WatsonxEmbeddings } from '@langchain/community/embeddings/ibm';
+import { WatsonxEmbeddings } from '@langchain/ibm';
 import { config } from 'dotenv';
 import { EMBEDDING_MODEL_IBM } from './config.ts';
 

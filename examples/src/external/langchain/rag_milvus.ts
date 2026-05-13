@@ -1,5 +1,5 @@
 import { WatsonxEmbeddings } from '@langchain/community/embeddings/ibm';
-import { ChatWatsonx } from '@langchain/community/chat_models/ibm';
+import { ChatWatsonx } from '@langchain/ibm';
 import type { Document } from '@langchain/core/documents';
 import { createAgent } from 'langchain';
 import * as z from 'zod/v3';
@@ -11,7 +11,7 @@ import { DataType } from '@zilliz/milvus2-sdk-node';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import '../../utils/config.ts';
 
-const modelName = 'ibm/granite-3-8b-instruct';
+const modelName = 'ibm/granite-4-h-small';
 const embeddingsModelName = 'ibm/slate-125m-english-rtrvr-v2';
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];

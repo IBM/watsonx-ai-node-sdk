@@ -81,3 +81,11 @@ export interface ContentFilterResult {
    */
   severity?: string;
 }
+
+/** Container identifiers for IBM watsonx.ai API requests (mutually exclusive). */
+export interface ContextIdentifiers {
+  /** The unique identifier for an IBM watsonx.ai project. */
+  projectId?: string;
+  /** The unique identifier for an IBM watsonx.ai deployment space. */
+  spaceId?: string;
+}

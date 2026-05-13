@@ -29,7 +29,7 @@ fi
 (
     cd langchainjs
     # Find latest release tag for @langchain/community
-    LATEST_FULL_TAG=$(git tag --list "*community*" \
+    LATEST_FULL_TAG=$(git tag --list "*ibm*" \
         | awk -F'[@=]' '{print $NF " " $0}' \
         | sort -V \
         | tail -n 1 \
@@ -42,11 +42,11 @@ fi
     pnpm install
     nvm install
     nvm use
-    cd libs/langchain-core && pnpm install && pnpm build
-    cd ../community/langchain-community && pnpm add ../../../dist/$PACKAGE_PATH
+    pnpm install && pnpm build --filter @langchain/core
+    cd libs/providers/langchain-ibm && pnpm add ../../../dist/$PACKAGE_PATH
     pnpm install
     pnpm build
-    pnpm test:single ibm.test.ts
+    pnpm test
     nvm use 20
 )
 SUBSHELL_EXIT=$?

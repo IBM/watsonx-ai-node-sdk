@@ -19,6 +19,14 @@ import { Models } from './models';
 import { Providers } from './providers';
 import { Policies } from './policies';
 import { RateLimits } from './ratelimit';
+import type {
+  DeleteParameters,
+  GetParameters,
+  PostParameters,
+  PutParameters,
+  Response,
+} from '../base';
+import type { ContextIdentifiers } from '../types/common';
 
 /** Represents the chat functionality of the gateway. */
 export class Chat {
@@ -92,5 +100,27 @@ export class Gateway extends APIBaseService {
     this.providers = new Providers(this);
     this.policies = new Policies(this);
     this.rateLimit = new RateLimits(this);
+  }
+
+  private appendContainerIdToHeaders(
+    params: (GetParameters | PostParameters | PutParameters | DeleteParameters) & ContextIdentifiers
+  ) {
+    return this.appendDataToHeaders(params, this._formContainerIdHeaders(params));
+  }
+
+  _get<T>(params: GetParameters & ContextIdentifiers): Promise<Response<T>> {
+    return super._get(this.appendContainerIdToHeaders(params));
+  }
+
+  _post<T>(params: PostParameters): Promise<Response<T>> {
+    return super._post(this.appendContainerIdToHeaders(params));
+  }
+
+  _delete<T>(params: DeleteParameters): Promise<Response<T>> {
+    return super._delete(this.appendContainerIdToHeaders(params));
+  }
+
+  _put<T>(params: PutParameters): Promise<Response<T>> {
+    return super._put(this.appendContainerIdToHeaders(params));
   }
 }

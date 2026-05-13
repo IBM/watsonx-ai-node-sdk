@@ -48,13 +48,10 @@ export class Models extends GatewayResource {
    * @returns {Promise<Response<Model>>} - A promise that resolves with the created model.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  create(params: CreateModelParams): Promise<Response<Model>> {
+  async create(params: CreateModelParams): Promise<Response<Model>> {
     const requiredParams = ['providerId', 'modelId'];
     const validParams = ['alias', 'metadata'];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const body = {
       'id': params.modelId,
@@ -95,21 +92,18 @@ export class Models extends GatewayResource {
    *   A promise that resolves with the model details or collection.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  getDetails(params: GetModelParams): Promise<Response<Model>>;
-  getDetails(
+  async getDetails(params: GetModelParams): Promise<Response<Model>>;
+  async getDetails(
     params?: ListProviderModelsParams | ListAllModelsParams
   ): Promise<Response<ModelCollection>>;
-  getDetails(
+  async getDetails(
     params: GetModelParams | ListProviderModelsParams | ListAllModelsParams = {}
   ): Promise<Response<Model | ModelCollection>> {
     if ('modelId' in params) {
       const { modelId, signal, headers } = params;
       const requiredParams = ['modelId'];
       const validParams: string[] = [];
-      const validationErrors = validateRequestParams(params, requiredParams, validParams);
-      if (validationErrors) {
-        return Promise.reject(validationErrors);
-      }
+      validateRequestParams(params, requiredParams, validParams);
 
       const path = {
         'model_id': modelId,
@@ -127,10 +121,7 @@ export class Models extends GatewayResource {
       const { providerId, signal, headers } = params;
       const requiredParams = ['providerId'];
       const validParams: string[] = [];
-      const validationErrors = validateRequestParams(params, requiredParams, validParams);
-      if (validationErrors) {
-        return Promise.reject(validationErrors);
-      }
+      validateRequestParams(params, requiredParams, validParams);
 
       const path = {
         'provider_id': providerId,
@@ -147,10 +138,7 @@ export class Models extends GatewayResource {
     const { signal, headers } = params;
     const requiredParams: string[] = [];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
 
     const parameters = {
       url: ENDPOINTS.GATEWAY.MODEL.BASE,
@@ -193,13 +181,10 @@ export class Models extends GatewayResource {
    * @returns {Promise<EmptyObject>} - A promise that resolves with an empty object.
    * @throws {Error} If validation fails or an error occurs during the request.
    */
-  delete(params: DeleteModelParams): Promise<Response<EmptyObject>> {
+  async delete(params: DeleteModelParams): Promise<Response<EmptyObject>> {
     const requiredParams = ['modelId'];
     const validParams: string[] = [];
-    const validationErrors = validateRequestParams(params, requiredParams, validParams);
-    if (validationErrors) {
-      return Promise.reject(validationErrors);
-    }
+    validateRequestParams(params, requiredParams, validParams);
     const { modelId, signal, headers } = params;
     const path = {
       'model_id': modelId,
