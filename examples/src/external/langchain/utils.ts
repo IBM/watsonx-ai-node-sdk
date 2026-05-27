@@ -42,7 +42,9 @@ export const conversationPrinter = (
     } else if (message instanceof ToolMessage) {
       console.log('=================== Tool Message ===================\n');
       console.log('Tool name: ' + message.name);
-      console.log('Result: ' + message.content);
+      console.log('Result: ');
+      if (typeof message.content === 'string') console.log(message.content);
+      else console.dir(message.content, { depth: null });
     } else if (message instanceof SystemMessage) {
       console.log('=================== System Message ===================\n');
       console.log('Result: ' + message.content);

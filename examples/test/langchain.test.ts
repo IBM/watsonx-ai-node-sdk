@@ -6,6 +6,7 @@ export const examples: [string, string][] = [
   ['RAG memory vector storage', 'rag_memory_vector_store.ts'],
   ['RAG remote vector storage', 'rag_milvus.ts'],
   ['Rerank', 'rerank.ts'],
+  ['Depp agent', 'deep_agent.ts'],
 ];
 describe('Langchain example tests', () => {
   test.each(examples)('%s', async (_, path) => {

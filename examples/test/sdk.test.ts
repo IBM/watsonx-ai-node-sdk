@@ -11,7 +11,6 @@ export const examples: [string, string][] = [
   ['Basic rerank', 'example_rerank.ts'],
   ['Timeseries', 'example_time_series.ts'],
   ['Text extraction', 'example_text_extraction.ts'],
-  ['Tookit', 'example_toolkit.ts'],
 ];
 
 const longRunningExamples: [string, string][] = [
