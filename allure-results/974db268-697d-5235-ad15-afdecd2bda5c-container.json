@@ -1,0 +1,1 @@
+{"uuid":"974db268-697d-5235-ad15-afdecd2bda5c","name":"Authentication with cert getAuthenticatorFromEnvironment unit tests IAM authenticator defaults to IAM when apikey provided without auth type (0)","children":["d89ff76f-ee52-44f4-9e7a-4e796c12c499"]}

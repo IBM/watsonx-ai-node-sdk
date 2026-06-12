@@ -1,0 +1,1 @@
+{"uuid":"d6aef276-7020-5772-a30f-3f6273087790","name":"Authentication with cert getAuthenticatorFromEnvironment unit tests Error handling throws error for AWS auth without serviceUrl when url not in credentials (0)","children":["b6f8d955-4718-417b-9f43-cb6a0c18fc16"]}
