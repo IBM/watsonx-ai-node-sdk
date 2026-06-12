@@ -7,7 +7,7 @@ config({ path: '../../credentials/watsonx_ai_ml_vml_v1.env' });
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const spaceId = process.env.WATSONX_AI_SPACE_ID;
 const version = '2024-05-31';
-const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
+const serviceUrl = process.env.WATSONX_AI_SERVICE_URL as string;
 const model = CROSS_ENCODER_MODEL;
 const query = 'What is the capital of the United States?';
 const docs = [
@@ -32,6 +32,7 @@ const docs = [
       'Capital punishment (the death penalty) has existed in the United States since before the United States was a country. As of 2017, capital punishment is legal in 30 of the 50 states. The federal government (including the United States military) also uses capital punishment.',
   }),
 ];
+
 describe('Regression tests regarding langchain llms', () => {
   describe('Positive tests', () => {
     describe('Basic call', () => {
@@ -50,6 +51,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(typeof result.pageContent).toBe('string');
           });
         });
+
         test('rerank', async () => {
           const watsonxRerank = new WatsonxRerank({
             projectId,
@@ -65,6 +67,7 @@ describe('Regression tests regarding langchain llms', () => {
           });
         });
       });
+
       describe('with spaceId', () => {
         test('compressDocuments', async () => {
           const watsonxRerank = new WatsonxRerank({
@@ -80,6 +83,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(typeof result.pageContent).toBe('string');
           });
         });
+
         test('rerank', async () => {
           const watsonxRerank = new WatsonxRerank({
             spaceId,
@@ -96,6 +100,7 @@ describe('Regression tests regarding langchain llms', () => {
         });
       });
     });
+
     describe('Advanced call', () => {
       describe('with projectId', () => {
         test('rerank truncated tokens', async () => {
@@ -116,6 +121,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(typeof result.index).toBe('number');
           });
         });
+
         test('rerank return options', async () => {
           const watsonxRerank = new WatsonxRerank({
             projectId,
@@ -129,7 +135,9 @@ describe('Regression tests regarding langchain llms', () => {
           });
 
           const results = await watsonxRerank.rerank(docs, query);
+
           expect(results).toHaveLength(2);
+
           results.forEach((result) => {
             expect(typeof result.relevanceScore).toBe('number');
             expect(typeof result.index).toBe('number');
@@ -139,6 +147,7 @@ describe('Regression tests regarding langchain llms', () => {
       });
     });
   });
+
   describe('Negative tests', () => {
     test('Input content too long and not truncated with rerank', async () => {
       const watsonxRerank = new WatsonxRerank({
@@ -151,8 +160,10 @@ describe('Regression tests regarding langchain llms', () => {
         ...item,
         pageContent: item.pageContent.repeat(20),
       }));
+
       await expect(watsonxRerank.rerank(longerDocs, query)).rejects.toThrow();
     });
+
     test('Input content too long and not truncated with compressDocuments', async () => {
       const watsonxRerank = new WatsonxRerank({
         projectId,
@@ -164,6 +175,7 @@ describe('Regression tests regarding langchain llms', () => {
         ...item,
         pageContent: item.pageContent.repeat(20),
       }));
+
       await expect(watsonxRerank.compressDocuments(longerDocs, query)).rejects.toThrow();
     });
   });

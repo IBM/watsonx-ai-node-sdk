@@ -26,6 +26,16 @@ const config: Config = {
     '<rootDir>/test/integration/watsonx-ai-ml-lora_qlora.vml_v1.test.js',
     '<rootDir>/test/integration/watsonx-ai-ml-ilab.vml_v1.test.js',
   ],
+  reporters: [
+    'default',
+    [
+      'jest-allure2-reporter',
+      {
+        resultsDir: 'allure-results',
+        overwrite: false,
+      },
+    ],
+  ],
 };
 
 export default config;

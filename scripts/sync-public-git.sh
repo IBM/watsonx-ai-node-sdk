@@ -30,6 +30,8 @@ for ITEM in ${TRACKED_FILES_TO_UPLOAD} ; do
     cp -f --parents "${ITEM}" "${PUBLIC_REPO_DIR}"
 done
 
+rm -rf "${PUBLIC_REPO_DIR}/jenkins"
+
 cd "${PUBLIC_REPO_DIR}"
 TAG="$(jq -r '.version' package.json)"
 

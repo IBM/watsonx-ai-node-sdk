@@ -10,7 +10,6 @@ const config: Config = {
   roots: ['<rootDir>/test'],
   testMatch: ['**/?(*.)+(spec|test).[jt]s'],
   collectCoverage: true,
-  preset: 'ts-jest/presets/default-esm',
   moduleFileExtensions: ['ts', 'js'],
   testTimeout: 20000,
   testNamePattern: 'test',
@@ -19,11 +18,39 @@ const config: Config = {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-  transformIgnorePatterns: ['/node_modules/(?!(?:@ibm-cloud/watsonx-ai)/)', '/\\.yalc/'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!(@ibm-cloud/watsonx-ai|@langchain|langchain|deepagents|p-.*|uuid|eventemitter3|is-network-error))',
+    '/\\.yalc/',
+  ],
   extensionsToTreatAsEsm: ['.ts', '.mts'],
   transform: {
-    '^.+\\.tsx?$': ['@swc/jest', { module: { type: 'module' } }],
+    '^.+\\.(t|j)sx?$': [
+      '@swc/jest',
+      {
+        module: { type: 'es6' },
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+            tsx: false,
+            decorators: true,
+          },
+          target: 'es2022',
+        },
+      },
+    ],
   },
+  reporters: [
+    'default',
+    [
+      'jest-allure2-reporter',
+      {
+        resultsDir: '../../allure-results',
+        overwrite: false,
+      },
+    ],
+  ],
 };
 
 export default config;
+
+// Made with Bob

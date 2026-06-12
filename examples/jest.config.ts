@@ -14,6 +14,16 @@ const config: Config = {
   extensionsToTreatAsEsm: ['.ts'],
   collectCoverageFrom: ['**src/**/*.{js,ts}', '!**/.yalc/**', '!**/dist/**', '!**/coverage/**'],
   verbose: true,
+  reporters: [
+    'default',
+    [
+      'jest-allure2-reporter',
+      {
+        resultsDir: '../allure-results',
+        overwrite: false,
+      },
+    ],
+  ],
 };
 
 export default config;
