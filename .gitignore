@@ -19,6 +19,9 @@ dist/
 # apidocs folder for generated documentation
 apidocs/
 
+# allure-results folder for generated allure test results 
+allure-results/
+
 ### GitHub recommended ###
 # Logs
 logs
