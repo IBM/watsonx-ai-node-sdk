@@ -12,5 +12,5 @@
  * the License.
  */
 
-export const VERSION = '1.7.14';
-export const VERSION_DATE = '2026-06-10';
+export const VERSION = '1.7.15';
+export const VERSION_DATE = '2026-07-09';

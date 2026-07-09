@@ -13,14 +13,14 @@ PUBLIC_REPO_DIR="../public-gh"
 git clone "https://${GH_USER}:${GH_TOKEN}@${GH_URL}.git" "${PUBLIC_REPO_DIR}"
 
 # Main branch
-# Clear all files in public repo 
+# Clear all files in public repo
 cd "${PUBLIC_REPO_DIR}"
 
 setup-git public
 
 git checkout main
 TRACKED_FILES_TO_DELETE=$(git ls-files)
-echo "${TRACKED_FILES_TO_DELETE}" | xargs rm -f     # Use echo and then rm for easier debugging 
+echo "${TRACKED_FILES_TO_DELETE}" | xargs rm -f     # Use echo and then rm for easier debugging
 cd -
 
 # Upload files from enterprise repo to the public one
@@ -49,7 +49,7 @@ git push -u origin main
 # Clear all files in public repo
 git checkout gh-pages
 TRACKED_FILES_TO_DELETE=$(git ls-files)
-echo "${TRACKED_FILES_TO_DELETE}" | xargs rm -f     # Use echo and then rm for easier debugging 
+echo "${TRACKED_FILES_TO_DELETE}" | xargs rm -f     # Use echo and then rm for easier debugging
 cd -
 
 # Upload files from enterprise repo to the public one
@@ -66,5 +66,6 @@ git commit -m "release: ${TAG}" || echo "There was some issuie when commiting ch
 git push -u origin gh-pages
 
 # Create git tag in public GitHub repository
+git checkout main
 git tag "${TAG}"
 git push origin tag "${TAG}"

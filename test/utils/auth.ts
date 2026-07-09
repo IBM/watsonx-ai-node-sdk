@@ -14,7 +14,7 @@
 
 import * as jwt from 'jsonwebtoken';
 
-const SECRET_KEY = 'your-very-secure-secret-key';
+const SECRET_KEY = 'your-very-secure-secret-key'; //NOSONAR
 
 const generateJWT = (payload: { userId: number; role: string }, validationTime: string) =>
   jwt.sign(payload, SECRET_KEY, { expiresIn: validationTime });
