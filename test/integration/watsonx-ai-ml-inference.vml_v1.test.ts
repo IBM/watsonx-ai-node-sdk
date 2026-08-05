@@ -53,7 +53,7 @@ const checkAborting = async (
     expect(promise).rejects.toThrow('canceled');
   });
 
-describe('WatsonXAI_integration', () => {
+describe('Foundation Models', () => {
   jest.setTimeout(timeout);
 
   // Service instance
@@ -81,8 +81,8 @@ describe('WatsonXAI_integration', () => {
     watsonxAIService.enableRetries();
   });
 
-  describe('List resources', () => {
-    test('listFoundationModelSpecs()', async () => {
+  describe('Model Specs', () => {
+    test('list foundation model specs', async () => {
       const params = {
         limit: 50,
         filters: 'modelid_ibm/granite-13b-instruct-v2',
@@ -93,7 +93,7 @@ describe('WatsonXAI_integration', () => {
       expectSuccessResponse(res, 200);
     });
 
-    test('listFoundationModelSpecs() via FoundationModelSpecsPager', async () => {
+    test('list foundation model specs via pager', async () => {
       const params = {
         limit: 50,
         filters: 'modelid_ibm/granite-13b-instruct-v2',
@@ -103,7 +103,7 @@ describe('WatsonXAI_integration', () => {
       await testPagerPattern(WatsonXAI.FoundationModelSpecsPager, watsonxAIService, params, 0);
     });
 
-    test('listFoundationModelTasks()', async () => {
+    test('list foundation model tasks', async () => {
       const params = {
         limit: 50,
       };
@@ -112,7 +112,7 @@ describe('WatsonXAI_integration', () => {
       expectSuccessResponse(res, 200);
     });
 
-    test('listFoundationModelTasks() via FoundationModelTasksPager', async () => {
+    test('list foundation model tasks via pager', async () => {
       const params = {
         limit: 50,
       };
@@ -121,8 +121,8 @@ describe('WatsonXAI_integration', () => {
     });
   });
 
-  describe('Text generation', () => {
-    test('generateText', async () => {
+  describe('Text Generation', () => {
+    test('generate text', async () => {
       // Request models needed by this operation.
 
       // TextGenLengthPenalty
@@ -228,7 +228,7 @@ describe('WatsonXAI_integration', () => {
       expectSuccessResponse(res, 200);
     });
 
-    test('generateTextStream', async () => {
+    test('generate text stream', async () => {
       // Request models needed by this operation.
 
       // TextGenLengthPenalty
@@ -286,7 +286,7 @@ describe('WatsonXAI_integration', () => {
       expect(res).toBeInstanceOf(Stream);
     });
 
-    test('tokenizeText', async () => {
+    test('tokenize text', async () => {
       // Request models needed by this operation.
 
       // TextTokenizeParameters
@@ -307,7 +307,7 @@ describe('WatsonXAI_integration', () => {
   });
 
   describe('Embeddings', () => {
-    test('embedText', async () => {
+    test('embed text', async () => {
       // Request models needed by this operation.
 
       // EmbeddingReturnOptions
@@ -334,7 +334,7 @@ describe('WatsonXAI_integration', () => {
   });
 
   describe('Chat', () => {
-    test('textChat', async () => {
+    test('text chat', async () => {
       const res = await watsonxAIService.textChat({
         messages: [
           {
@@ -349,7 +349,7 @@ describe('WatsonXAI_integration', () => {
       expectSuccessResponse(res, 200);
     });
 
-    test('textChat favor maxCompletionTokens', async () => {
+    test('text chat favor max completion tokens', async () => {
       const res = await watsonxAIService.textChat({
         messages: [
           {
@@ -371,7 +371,7 @@ describe('WatsonXAI_integration', () => {
       expect(res.result.usage?.completion_tokens).toBe(10);
     });
 
-    test('textChat with reasoning', async () => {
+    test('text chat with reasoning', async () => {
       const res = await watsonxAIService.textChat({
         messages: [
           {
@@ -388,7 +388,7 @@ describe('WatsonXAI_integration', () => {
       expect(res.result.choices[0].message?.reasoning_content).toBeDefined();
     });
 
-    test('textChatStream', async () => {
+    test('text chat stream', async () => {
       const res = await watsonxAIService.textChatStream({
         messages: [
           {
@@ -403,7 +403,7 @@ describe('WatsonXAI_integration', () => {
       expect(res).toBeInstanceOf(Stream);
     });
 
-    test('textChatStream favor maxCompletionTokens', async () => {
+    test('text chat stream favor max completion tokens', async () => {
       const res = await watsonxAIService.textChatStream({
         messages: [
           {
@@ -432,7 +432,7 @@ describe('WatsonXAI_integration', () => {
       expect(lastChunk?.data.usage?.completion_tokens).toBe(5);
     });
 
-    test('textChatStream as string', async () => {
+    test('text chat stream as string', async () => {
       const stream = await watsonxAIService.textChatStream({
         messages: [
           {
@@ -454,7 +454,7 @@ describe('WatsonXAI_integration', () => {
       }
     });
 
-    test('textChatStream as object', async () => {
+    test('text chat stream as object', async () => {
       const stream = await watsonxAIService.textChatStream({
         messages: [
           {
@@ -473,7 +473,7 @@ describe('WatsonXAI_integration', () => {
       }
     });
 
-    test('textChatStream aborting', async () => {
+    test('text chat stream aborting', async () => {
       const abortStreaming = async () => {
         const stream = await watsonxAIService.textChatStream({
           messages: [
@@ -496,7 +496,7 @@ describe('WatsonXAI_integration', () => {
       await expect(abortStreaming()).rejects.toThrow('The operation was aborted');
     });
 
-    test('textChatStream build in aborting', async () => {
+    test('text chat stream build in aborting', async () => {
       const abortStreaming = async () => {
         const stream = await watsonxAIService.textChatStream({
           messages: [
@@ -520,7 +520,7 @@ describe('WatsonXAI_integration', () => {
       await expect(abortStreaming()).rejects.toThrow('The operation was aborted');
     });
 
-    test('textChatStream aborting chunk count', async () => {
+    test('text chat stream aborting chunk count', async () => {
       const stream = await watsonxAIService.textChatStream({
         messages: [
           {
@@ -549,7 +549,7 @@ describe('WatsonXAI_integration', () => {
       expect(chunks).toHaveLength(n);
     });
 
-    test('textChatStream build-in aborting chunk count', async () => {
+    test('text chat stream build in aborting chunk count', async () => {
       const stream = await watsonxAIService.textChatStream({
         messages: [
           {
@@ -574,7 +574,7 @@ describe('WatsonXAI_integration', () => {
       expect(chunks).toHaveLength(n);
     });
 
-    test('textChatStream with reasoning', async () => {
+    test('text chat stream with reasoning', async () => {
       const stream = await watsonxAIService.textChatStream({
         messages: [
           {
@@ -604,31 +604,28 @@ describe('WatsonXAI_integration', () => {
 
     const chatModels = [chatModel, CHAT_MODEL_META, CHAT_MODEL_MISTRAL];
 
-    test.each(chatModels)(
-      'textChatStream with returnObject returning correct object with %s',
-      async (model) => {
-        const stream = await watsonxAIService.textChatStream({
-          messages: [
-            {
-              role: 'user',
-              content: 'Hello. How are you?',
-            },
-          ],
-          modelId: model,
-          projectId,
-          returnObject: true,
-        });
-        for await (const chunk of stream) {
-          expect(chunk.id).toBeDefined();
-          expect(chunk.event).toBeDefined();
-          expect(chunk.data).toBeDefined();
-        }
+    test.each(chatModels)('test text chat stream with return object[%s]', async (model) => {
+      const stream = await watsonxAIService.textChatStream({
+        messages: [
+          {
+            role: 'user',
+            content: 'Hello. How are you?',
+          },
+        ],
+        modelId: model,
+        projectId,
+        returnObject: true,
+      });
+      for await (const chunk of stream) {
+        expect(chunk.id).toBeDefined();
+        expect(chunk.event).toBeDefined();
+        expect(chunk.data).toBeDefined();
       }
-    );
+    });
   });
 
-  describe('Time series', () => {
-    test('timeSeriesForecast with prediction_length', async () => {
+  describe('Time Series', () => {
+    test('time series forecast with prediction length', async () => {
       // TSForecastParameters
       const tsForecastParametersModel = {
         prediction_length: 38,
@@ -648,7 +645,7 @@ describe('WatsonXAI_integration', () => {
       expect(res.result.results?.[0].target).toHaveLength(38);
     });
 
-    test('timeSeriesForecast without prediction_length', async () => {
+    test('time series forecast without prediction length', async () => {
       const params = {
         modelId: timeSeriesModelId,
         data: timeSeriesData,
@@ -663,7 +660,7 @@ describe('WatsonXAI_integration', () => {
     });
   });
 
-  describe('Callback tests', () => {
+  describe('Callbacks', () => {
     const assertRequestCallback = (req: RequestParametersWithoutHeaders) => {
       expect(req).toBeDefined();
       expect(req.options).toBeDefined();
@@ -677,7 +674,7 @@ describe('WatsonXAI_integration', () => {
       expect(res.headers).toBeDefined();
     };
 
-    test('textChat with callbacks', async () => {
+    test('text chat with callbacks', async () => {
       const res = await watsonxAIService.textChat(
         {
           messages: [{ role: 'user', content: 'Hello. How are you?' }],
@@ -693,7 +690,7 @@ describe('WatsonXAI_integration', () => {
       expect(res).toBeDefined();
     });
 
-    test('textChatSteam with callbacks', async () => {
+    test('text chat stream with callbacks', async () => {
       const res = await watsonxAIService.textChatStream(
         {
           messages: [{ role: 'user', content: 'Hello. How are you?' }],
@@ -709,7 +706,7 @@ describe('WatsonXAI_integration', () => {
       expect(res).toBeDefined();
     });
 
-    test('generateText with callbacks', async () => {
+    test('generate text with callbacks', async () => {
       const res = await watsonxAIService.generateText(
         {
           input: 'Hello. How are you? Tell me a lot',
@@ -725,7 +722,7 @@ describe('WatsonXAI_integration', () => {
       expect(res).toBeDefined();
     });
 
-    test('generateTextStream with callbacks', async () => {
+    test('generate text stream with callbacks', async () => {
       const res = await watsonxAIService.generateTextStream(
         {
           input: 'Hello. How are you? Tell me a lot',
@@ -741,7 +738,7 @@ describe('WatsonXAI_integration', () => {
       expect(res).toBeDefined();
     });
 
-    test('embedText with callbacks', async () => {
+    test('embed text with callbacks', async () => {
       const res = await watsonxAIService.embedText(
         {
           inputs: ['Hello. How are you?', 'Hello world'],
@@ -757,7 +754,7 @@ describe('WatsonXAI_integration', () => {
       expect(res).toBeDefined();
     });
 
-    test('generateText with single assertRequestCallback callback', async () => {
+    test('generate text with single request callback', async () => {
       const res = await watsonxAIService.generateText(
         {
           input: 'Hello. How are you?',
@@ -772,7 +769,7 @@ describe('WatsonXAI_integration', () => {
       expect(res).toBeDefined();
     });
 
-    test('generateText with single assertResponseCallback callback', async () => {
+    test('generate text with single response callback', async () => {
       const res = await watsonxAIService.generateText(
         {
           input: 'Hello. How are you?',
@@ -788,7 +785,7 @@ describe('WatsonXAI_integration', () => {
     });
   });
 
-  describe.skip('Crypto parameter support', () => {
+  describe.skip('Crypto', () => {
     const YP_QA_URL = 'https://yp-qa.ml.cloud.ibm.com';
     const cryptoConfig = {
       key_ref: process.env.WATSONX_AI_CRYPTO_KEY_REF as string,
@@ -799,7 +796,7 @@ describe('WatsonXAI_integration', () => {
       version: '2024-03-14',
     });
 
-    test('textChat with crypto parameter', async () => {
+    test('text chat with crypto parameter', async () => {
       const textChatMessagesModel = {
         role: 'user',
         content: 'Hello, how are you?',
@@ -819,7 +816,7 @@ describe('WatsonXAI_integration', () => {
       expect(res.result).toBeDefined();
     });
 
-    test('embedText with crypto parameter', async () => {
+    test('embed text with crypto parameter', async () => {
       const embeddingParametersModel = {
         truncate_input_tokens: 1,
       };
@@ -838,7 +835,7 @@ describe('WatsonXAI_integration', () => {
       expect(res.result).toBeDefined();
     });
 
-    test('generateText with crypto parameter', async () => {
+    test('generate text with crypto parameter', async () => {
       const textGenParametersModel = {
         max_new_tokens: 50,
         min_new_tokens: 5,
@@ -858,7 +855,7 @@ describe('WatsonXAI_integration', () => {
       expect(res.result).toBeDefined();
     });
 
-    test('tokenizeText with crypto parameter', async () => {
+    test('tokenize text with crypto parameter', async () => {
       const textTokenizeParametersModel = {
         return_tokens: true,
       };
@@ -877,7 +874,7 @@ describe('WatsonXAI_integration', () => {
       expect(res.result).toBeDefined();
     });
 
-    test('textRerank with crypto parameter', async () => {
+    test('text rerank with crypto parameter', async () => {
       const result = await fetch(
         'https://raw.github.com/IBM/watson-machine-learning-samples/master/cloud/data/foundation_models/state_of_the_union.txt'
       );
@@ -911,7 +908,7 @@ describe('WatsonXAI_integration', () => {
     });
   });
 
-  describe('Aborting', () => {
+  describe('Abort Signal', () => {
     interface AbortingParams {
       params: any;
       res: (params: any) => Promise<any>;

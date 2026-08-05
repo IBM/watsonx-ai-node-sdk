@@ -23,12 +23,12 @@ const modelName = 'ibm/granite-4-h-small';
 const modelAlias = 'nodejs-sdk/' + modelName;
 const serviceUrl = process.env.WATSONX_AI_GATEWAY_URL;
 
-describe('Resources', () => {
+describe('Model Gateway', () => {
   jest.setTimeout(timeout);
 
   describe('Providers', () => {
-    describe('Providers init', () => {
-      test('Init', async () => {
+    describe('Providers Init', () => {
+      test('providers init', async () => {
         const client = new APIBaseService({
           version,
           serviceUrl,
@@ -58,7 +58,7 @@ describe('Resources', () => {
           await providerCleanup(providers, providerId);
         });
 
-        test('Create provider', async () => {
+        test('create provider', async () => {
           const provider = await providers.create({
             providerName: 'watsonxai',
             name: `wx-nodejs-test-${timestamp}`,
@@ -106,7 +106,7 @@ describe('Resources', () => {
         });
 
         describe('Get details', () => {
-          test('Get details with providerId', async () => {
+          test('get provider details by id', async () => {
             expect(typeof providerId).toBe('string');
             const res = await providers.getDetails({ providerId: providerId as string });
 
@@ -115,7 +115,7 @@ describe('Resources', () => {
             expect(res.result.name).toBe(name);
           });
 
-          test('Get details of all providers', async () => {
+          test('get all providers details', async () => {
             const res = await providers.getDetails();
 
             expectSuccessResponse(res, 200);
@@ -124,7 +124,7 @@ describe('Resources', () => {
             expect(res.result.data.length).toBeGreaterThanOrEqual(1);
           });
 
-          test('Get available model details', async () => {
+          test('get available model details', async () => {
             expect(typeof providerId).toBe('string');
 
             const res = await providers.getAvailableModelsDetails({
@@ -138,15 +138,15 @@ describe('Resources', () => {
           });
         });
 
-        describe('List provider resources', () => {
-          test('List providers', async () => {
+        describe('List Providers', () => {
+          test('list providers', async () => {
             const res = await providers.list();
 
             expect(res).toBeInstanceOf(Array);
             expect(res.length).toBeGreaterThanOrEqual(1);
           });
 
-          test('List available provider`s models', async () => {
+          test('list available provider models', async () => {
             expect(typeof providerId).toBe('string');
 
             const res = await providers.listAvailableModels({ providerId: providerId as string });
@@ -156,8 +156,8 @@ describe('Resources', () => {
           });
         });
 
-        describe('Delete provider', () => {
-          test('Delete', async () => {
+        describe('Delete Provider', () => {
+          test('delete provider', async () => {
             expect(typeof providerId).toBe('string');
 
             const res = await providers.delete({
@@ -173,8 +173,8 @@ describe('Resources', () => {
   });
 
   describe('Models', () => {
-    describe('Models init', () => {
-      test('Models instance init', async () => {
+    describe('Models Init', () => {
+      test('models instance init', async () => {
         const client = new APIBaseService({
           version,
           serviceUrl,
@@ -227,7 +227,7 @@ describe('Resources', () => {
           await modelCleanup(models, modelId);
         });
 
-        test('Create model', async () => {
+        test('create model', async () => {
           expect(typeof providerId).toBe('string');
 
           const params = {
@@ -271,7 +271,7 @@ describe('Resources', () => {
         });
 
         describe('Get details', () => {
-          test('Get model details by modelId', async () => {
+          test('get model details by model id', async () => {
             expect(typeof modelId).toBe('string');
 
             const res = await models.getDetails({ modelId: modelId as string });
@@ -279,7 +279,7 @@ describe('Resources', () => {
             expectSuccessResponse(res, 200);
           });
 
-          test('Get models details by providerId', async () => {
+          test('get models details by provider id', async () => {
             const res = await models.getDetails({ providerId });
 
             expectSuccessResponse(res, 200);
@@ -288,7 +288,7 @@ describe('Resources', () => {
             expect(res.result.data.length).toBeGreaterThanOrEqual(1);
           });
 
-          test('Get all model details', async () => {
+          test('get all model details', async () => {
             const res = await models.getDetails();
 
             expectSuccessResponse(res, 200);
@@ -298,15 +298,15 @@ describe('Resources', () => {
           });
         });
 
-        describe('List models', () => {
-          test('List all models', async () => {
+        describe('List Models', () => {
+          test('list all models', async () => {
             const res = await models.list();
 
             expect(res).toBeInstanceOf(Array);
             expect(res.length).toBeGreaterThanOrEqual(1);
           });
 
-          test('List all models by providerId', async () => {
+          test('list all models by provider id', async () => {
             const res = await models.list({ providerId });
 
             expect(res).toBeInstanceOf(Array);
@@ -314,7 +314,7 @@ describe('Resources', () => {
           });
         });
 
-        test('Delete model', async () => {
+        test('delete model', async () => {
           expect(typeof modelId).toBe('string');
 
           const res = await models.delete({ modelId: modelId as string });
@@ -327,8 +327,8 @@ describe('Resources', () => {
   });
 
   describe('Policies', () => {
-    describe('Policies init', () => {
-      test('Policies instance init', async () => {
+    describe('Policies Init', () => {
+      test('policies instance init', async () => {
         const client = new APIBaseService({
           version,
           serviceUrl,
@@ -364,7 +364,7 @@ describe('Resources', () => {
           }
         });
 
-        test('Create policy', async () => {
+        test('create policy', async () => {
           const policy = await policies.create(data);
           policyId = policy.result.uuid;
 
@@ -380,20 +380,20 @@ describe('Resources', () => {
           policyId = result.uuid;
         });
 
-        test('List policies', async () => {
+        test('list policies', async () => {
           const res = await policies.list();
 
           expect(res).toBeInstanceOf(Array);
           expect(res.length).toBeGreaterThanOrEqual(1);
         });
 
-        test('getDetails', async () => {
+        test('get policy details', async () => {
           const res = await policies.getDetails({ policyId });
 
           expect(res.uuid).toBe(policyId);
         });
 
-        test('delete', async () => {
+        test('delete policy', async () => {
           const res = await policies.delete({ policyId });
 
           expectSuccessResponse(res, 204);
@@ -403,8 +403,8 @@ describe('Resources', () => {
   });
 
   describe('RateLimits', () => {
-    describe('RateLimits init', () => {
-      test('RateLimits instance init', async () => {
+    describe('RateLimits Init', () => {
+      test('rate limits instance init', async () => {
         const client = new APIBaseService({
           version,
           serviceUrl,
@@ -463,7 +463,7 @@ describe('Resources', () => {
           await rateLimitCleanup(rateLimit, rateLimitId);
         });
 
-        test('Create rate limit with tenant', async () => {
+        test('create rate limit with tenant', async () => {
           const res = await rateLimit.create({
             token: { duration: '1m', amount: 10, capacity: 100 },
             type: 'tenant',
@@ -473,7 +473,7 @@ describe('Resources', () => {
           rateLimitId = res.result.uuid;
         });
 
-        test('Create rate limit with model', async () => {
+        test('create rate limit with model', async () => {
           const res = await rateLimit.create({
             modelId,
             token: { duration: '1m', amount: 10, capacity: 100 },
@@ -484,7 +484,7 @@ describe('Resources', () => {
           rateLimitId = res.result.uuid;
         });
 
-        test('Create rate limit with provider', async () => {
+        test('create rate limit with provider', async () => {
           const res = await rateLimit.create({
             providerId,
             token: { duration: '1m', amount: 10, capacity: 100 },
@@ -512,13 +512,13 @@ describe('Resources', () => {
           await rateLimitCleanup(rateLimit, rateLimitId);
         });
 
-        test('List ratelimits', async () => {
+        test('list rate limits', async () => {
           const res = await rateLimit.list();
 
           expect(res).toBeInstanceOf(Array);
         });
 
-        test('getDetails with rateLimit ID', async () => {
+        test('get rate limit details by id', async () => {
           const res = await rateLimit.getDetails({
             rateLimitId,
           });
@@ -526,7 +526,7 @@ describe('Resources', () => {
           expectSuccessResponse(res, 200);
         });
 
-        test('getDetails of multiple items', async () => {
+        test('get all rate limits details', async () => {
           const res = await rateLimit.getDetails();
 
           expectSuccessResponse(res, 200);
@@ -534,7 +534,7 @@ describe('Resources', () => {
           expect(res.result.data).toBeInstanceOf(Array);
         });
 
-        test('delete ratelimit', async () => {
+        test('delete rate limit', async () => {
           expect(typeof rateLimitId).toBe('string');
           const res = await rateLimit.delete({
             rateLimitId: rateLimitId as string,

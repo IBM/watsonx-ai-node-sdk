@@ -28,12 +28,12 @@ const version = '2024-05-31';
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL as string;
 
 describe.each(Object.values(CHAT_MODELS))(
-  'Regression tests regarding langchain chat for model: %s',
+  'LangChain Chat[%s]',
   (model) => {
-    describe('Positive tests', () => {
-      describe('Basic call', () => {
+    describe('Positive', () => {
+      describe('Basic', () => {
         describe('with projectId', () => {
-          test('Invoke', async () => {
+          test('invoke with project id', async () => {
             const llms = new ChatWatsonx({
               projectId,
               version,
@@ -46,7 +46,7 @@ describe.each(Object.values(CHAT_MODELS))(
             expect(typeof result.content).toBe('string');
           });
 
-          test('Generate', async () => {
+          test('generate with project id', async () => {
             const llms = new ChatWatsonx({
               projectId,
               version,
@@ -62,7 +62,7 @@ describe.each(Object.values(CHAT_MODELS))(
             expect(result.generations.length).toBe(2);
           });
 
-          test('Stream', async () => {
+          test('stream with project id', async () => {
             const llms = new ChatWatsonx({
               projectId,
               version,
@@ -77,7 +77,7 @@ describe.each(Object.values(CHAT_MODELS))(
         });
 
         describe('with spaceId', () => {
-          test('Invoke', async () => {
+          test('invoke with space id', async () => {
             const llms = new ChatWatsonx({
               spaceId,
               version,
@@ -89,7 +89,7 @@ describe.each(Object.values(CHAT_MODELS))(
             expect(typeof result.content).toBe('string');
           });
 
-          test('Generate', async () => {
+          test('generate with space id', async () => {
             const llms = new ChatWatsonx({
               spaceId,
               version,
@@ -105,7 +105,7 @@ describe.each(Object.values(CHAT_MODELS))(
             expect(result.generations.length).toBe(2);
           });
 
-          test('Stream', async () => {
+          test('stream with space id', async () => {
             const llms = new ChatWatsonx({
               spaceId,
               version,
@@ -119,10 +119,10 @@ describe.each(Object.values(CHAT_MODELS))(
           });
         });
       });
-      describe('Advanced call', () => {
+      describe('Advanced', () => {
         describe('with projectId', () => {
           describe('Invoke', () => {
-            test('with maxTokens', async () => {
+            test('invoke with max tokens', async () => {
               const llms = new ChatWatsonx({
                 projectId,
                 version,
@@ -135,7 +135,7 @@ describe.each(Object.values(CHAT_MODELS))(
               expect(result.content.length).toBeLessThan(50);
             });
 
-            test('with remaining options', async () => {
+            test('invoke with remaining options', async () => {
               const llms = new ChatWatsonx({
                 projectId,
                 version,
@@ -149,7 +149,7 @@ describe.each(Object.values(CHAT_MODELS))(
               expect(typeof result.content).toBe('string');
             });
 
-            test('with one tool call - comprehensive verification', async () => {
+            test('invoke with one tool call comprehensive verification', async () => {
               const chat = new ChatWatsonx({
                 model,
                 version,
@@ -203,7 +203,7 @@ describe.each(Object.values(CHAT_MODELS))(
               expect(assistantContent.toLowerCase()).toContain('cloud');
             });
 
-            test('with multiple tool calls - comprehensive verification', async () => {
+            test('invoke with multiple tool calls comprehensive verification', async () => {
               const chat = new ChatWatsonx({
                 model,
                 version,
@@ -275,7 +275,7 @@ describe.each(Object.values(CHAT_MODELS))(
               expect(assistantContent).toContain('Warsaw');
             });
 
-            test('calling tool with each response - sequential tool execution', async () => {
+            test('invoke calling tool with each response sequential execution', async () => {
               const chat = new ChatWatsonx({
                 model,
                 version,
@@ -381,7 +381,7 @@ describe.each(Object.values(CHAT_MODELS))(
               }
             });
 
-            test('with structured output using zod', async () => {
+            test('invoke with structured output using zod', async () => {
               const service = new ChatWatsonx({
                 model,
                 version,
@@ -404,7 +404,7 @@ describe.each(Object.values(CHAT_MODELS))(
           });
 
           describe('Generate', () => {
-            test('with maxTokens', async () => {
+            test('generate with max tokens', async () => {
               const llms = new ChatWatsonx({
                 projectId,
                 version,
@@ -420,7 +420,7 @@ describe.each(Object.values(CHAT_MODELS))(
               expect(result.generations[0][0].text.length).toBeLessThan(50);
             });
 
-            test('with remaining options', async () => {
+            test('generate with remaining options', async () => {
               const llms = new ChatWatsonx({
                 projectId,
                 version,
@@ -439,7 +439,7 @@ describe.each(Object.values(CHAT_MODELS))(
           });
 
           describe('Stream', () => {
-            test('with maxTokens', async () => {
+            test('stream with max tokens', async () => {
               const llms = new ChatWatsonx({
                 projectId,
                 version,
@@ -456,7 +456,7 @@ describe.each(Object.values(CHAT_MODELS))(
               expect(res.length).toBeLessThan(50);
             });
 
-            test('with n>1', async () => {
+            test('stream with n greater than 1', async () => {
               const llms = new ChatWatsonx({
                 projectId,
                 version,
@@ -470,7 +470,7 @@ describe.each(Object.values(CHAT_MODELS))(
               }
             });
 
-            test('with remaining options', async () => {
+            test('stream with remaining options', async () => {
               const llms = new ChatWatsonx({
                 projectId,
                 version,
@@ -485,7 +485,7 @@ describe.each(Object.values(CHAT_MODELS))(
               }
             });
 
-            test('with one tool call', async () => {
+            test('stream with one tool call', async () => {
               const chat = new ChatWatsonx({
                 model,
                 version,
@@ -520,7 +520,7 @@ describe.each(Object.values(CHAT_MODELS))(
               expect(assistantContent).not.toContain('It is rainy in Cracow');
             });
 
-            test('Passing tool to chat model and invoking the tools with stream', async () => {
+            test('stream passing tool to chat model and invoking tools', async () => {
               const service = new ChatWatsonx({
                 model,
                 version: '2024-05-31',
@@ -557,7 +557,7 @@ describe.each(Object.values(CHAT_MODELS))(
               expect(result).toBeInstanceOf(AIMessage);
             });
 
-            test('with structured output using zod and stream', async () => {
+            test('stream with structured output using zod', async () => {
               const service = new ChatWatsonx({
                 model,
                 version,
@@ -583,7 +583,7 @@ describe.each(Object.values(CHAT_MODELS))(
               expect('punchline' in object).toBe(true);
             });
 
-            test('with one tool call - comprehensive streaming verification', async () => {
+            test('stream with one tool call comprehensive streaming verification', async () => {
               const chat = new ChatWatsonx({
                 model,
                 version,
@@ -642,7 +642,7 @@ describe.each(Object.values(CHAT_MODELS))(
               expect(assistantContent.toLowerCase()).toContain('cloud');
             });
 
-            test('with multiple tool calls - comprehensive streaming verification', async () => {
+            test('stream with multiple tool calls comprehensive streaming verification', async () => {
               const chat = new ChatWatsonx({
                 model,
                 version,
@@ -718,7 +718,7 @@ describe.each(Object.values(CHAT_MODELS))(
               expect(assistantContent).toMatch(/Cracow|Kraków|Krakow/);
             });
 
-            test('calling tool with each response - sequential streaming execution', async () => {
+            test('stream calling tool with each response sequential execution', async () => {
               const chat = new ChatWatsonx({
                 model,
                 version,
@@ -859,8 +859,8 @@ describe.each(Object.values(CHAT_MODELS))(
         });
       });
 
-      describe('Agentic usage', () => {
-        test('with single tool invocation', async () => {
+      describe('Agentic', () => {
+        test('agentic with single tool invocation', async () => {
           const chatModel = new ChatWatsonx({
             version,
             projectId,
@@ -888,7 +888,7 @@ describe.each(Object.values(CHAT_MODELS))(
 
           expect(lastMessage.content).toBeDefined();
         });
-        test('with inventory management tools (sequential tool_call invocation)', async () => {
+        test('agentic with inventory management tools sequential invocation', async () => {
           const chatModel = new ChatWatsonx({
             version,
             projectId,
@@ -959,7 +959,7 @@ describe.each(Object.values(CHAT_MODELS))(
           expect(lastMessage.content).toBeDefined();
         });
 
-        test('with user profile and preferences tools (sequential tool_call invocation)', async () => {
+        test('agentic with user profile and preferences tools sequential invocation', async () => {
           const chatModel = new ChatWatsonx({
             version,
             projectId,
@@ -1034,7 +1034,7 @@ describe.each(Object.values(CHAT_MODELS))(
           expect(lastMessage.content).toBeDefined();
         });
 
-        test('with weather and location tools at once (verify usage of tools)', async () => {
+        test('agentic with weather and location tools at once', async () => {
           const chatModel = new ChatWatsonx({
             version,
             projectId,
@@ -1078,8 +1078,8 @@ describe.each(Object.values(CHAT_MODELS))(
           expect(lastMessage.content).toBeDefined();
         });
 
-        describe('with createDeepAgent', () => {
-          test('Create deep agent with StateBackend', () => {
+        describe('Deep Agent', () => {
+          test('create deep agent with state backend', () => {
             const llm = new ChatWatsonx({
               model,
               serviceUrl,
@@ -1097,7 +1097,7 @@ describe.each(Object.values(CHAT_MODELS))(
             expect(typeof agent.stream).toBe('function');
           });
 
-          test('Deep agent can process simple message via subagents', async () => {
+          test('deep agent process simple message via subagents', async () => {
             const llm = new ChatWatsonx({
               model,
               serviceUrl,
@@ -1138,7 +1138,7 @@ describe.each(Object.values(CHAT_MODELS))(
             expect(hasContent).toBe(true);
           }, 30000);
 
-          test('Deep agent streams with tools messages', async () => {
+          test('deep agent streams with tools messages', async () => {
             const llm = new ChatWatsonx({
               model,
               serviceUrl,
@@ -1177,8 +1177,8 @@ describe.each(Object.values(CHAT_MODELS))(
       });
     });
 
-    describe('Negative tests', () => {
-      test('Passing wrong model', async () => {
+    describe('Negative', () => {
+      test('passing wrong model', async () => {
         const chat = new ChatWatsonx({
           version,
           projectId,
@@ -1189,7 +1189,7 @@ describe.each(Object.values(CHAT_MODELS))(
         await expect(chat.invoke('Hello world')).rejects.toThrow();
       });
 
-      test('Passing not existing props', async () => {
+      test('passing not existing props', async () => {
         expect(
           () =>
             new ChatWatsonx({

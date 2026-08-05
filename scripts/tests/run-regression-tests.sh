@@ -48,6 +48,17 @@ fi
 
 echo ""
 echo "=== Stage 3: Running test-regression in test/langchain ==="
+# Stage 1 switched nvm to Node v24 (pinned by langchainjs/.nvmrc since @langchain/ibm@0.2.0).
+# @swc/core in test/langchain has no prebuilt binary for Node 24 and crashes at
+# runtime, so switch back to v20. NPM_CONFIG_PREFIX must be unset first — nvm
+# refuses to switch while that Jenkins variable is set.
+unset NPM_CONFIG_PREFIX npm_config_prefix
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" && nvm use 20
+# Wipe node_modules so npm does a fully clean install and re-downloads the
+# @swc/core optional platform binary for Node 20. Deleting package-lock.json
+# too so npm does not skip optional deps it considers already satisfied.
+rm -rf ./test/langchain/node_modules ./test/langchain/package-lock.json
 ensure_yalc
 cd ./test/langchain && npm run test-regression
 if [ $? -ne 0 ]; then

@@ -21,17 +21,17 @@ const client = new APIBaseService({
   serviceUrl,
 });
 
-describe('Completions', () => {
+describe('Model Gateway', () => {
   jest.setTimeout(timeout);
 
-  describe('Init instances', () => {
-    test('GenerateText init', async () => {
+  describe('Init', () => {
+    test('generate text completions init', async () => {
       const providers = new GenerateTextCompletions(client);
 
       expect(providers).toBeInstanceOf(GenerateTextCompletions);
     });
 
-    test('Chat init', async () => {
+    test('chat init', async () => {
       const chat = new Chat(client);
 
       expect(chat).toBeInstanceOf(Chat);
@@ -39,7 +39,7 @@ describe('Completions', () => {
     });
   });
 
-  describe('Inference', () => {
+  describe('Completions', () => {
     let providerId: string | undefined;
     let modelId: string | undefined;
 
@@ -83,7 +83,7 @@ describe('Completions', () => {
       await providerCleanup(gateway.providers, providerId);
     });
 
-    test('Create chat completions', async () => {
+    test('create chat completions', async () => {
       const chatsMessageModel = {
         content: 'Hello. What is AI?',
         role: 'user',
@@ -101,7 +101,7 @@ describe('Completions', () => {
       expect(res.result).toBeDefined();
     });
 
-    test('Create chat completions with stream object', async () => {
+    test('create chat completions with stream object', async () => {
       const chatsMessageModel = {
         content: 'Hello. What is AI?',
         role: 'user',
@@ -118,7 +118,7 @@ describe('Completions', () => {
       }
     });
 
-    test('Create chat completions with stream string', async () => {
+    test('create chat completions with stream string', async () => {
       const chatsMessageModel = {
         content: 'Hello. What is AI?',
         role: 'user',
@@ -135,7 +135,7 @@ describe('Completions', () => {
       }
     });
 
-    test('Generate text completions', async () => {
+    test('generate text completions', async () => {
       const params = {
         prompt: 'Hello. What is AI?',
         model: modelAlias,
@@ -146,7 +146,7 @@ describe('Completions', () => {
       expect(res.result).toBeDefined();
     });
 
-    test('Generate text completions with stream stirng', async () => {
+    test('generate text completions with stream string', async () => {
       const res = await textCompletions.create({
         prompt: 'Hello. What is AI?',
         model: modelAlias,
@@ -161,7 +161,7 @@ describe('Completions', () => {
       }
     });
 
-    test('Generate text completions with stream object', async () => {
+    test('generate text completions with stream object', async () => {
       const res = await textCompletions.create({
         prompt: 'Hello. What is AI?',
         model: modelAlias,
@@ -177,12 +177,12 @@ describe('Completions', () => {
   });
 });
 
-describe('Embeddings', () => {
+describe('Embeddings Gateway', () => {
   const model = 'ibm/slate-125m-english-rtrvr-v2';
   jest.setTimeout(timeout);
 
-  describe('Init embeddings instances', () => {
-    test('Embeddings init', async () => {
+  describe('Init', () => {
+    test('embeddings init', async () => {
       const embeddings = new Embeddings(client);
 
       expect(embeddings).toBeInstanceOf(Embeddings);
@@ -190,7 +190,7 @@ describe('Embeddings', () => {
     });
   });
 
-  describe('Inference embeddings', () => {
+  describe('Embeddings Completions', () => {
     let providerId: string | undefined;
     let modelId: string | undefined;
     let embeddings: Embeddings;
@@ -233,7 +233,7 @@ describe('Embeddings', () => {
       await providerCleanup(gateway.providers, providerId);
     });
 
-    test('Inference embeddings with simple input', async () => {
+    test('embeddings with simple input', async () => {
       const res = await embeddings.completion.create({
         model,
         input: 'This is text for the embeddings',
@@ -243,7 +243,7 @@ describe('Embeddings', () => {
       expect(res.result.data).toBeInstanceOf(Array);
     });
 
-    test('Inference embeddings with array input', async () => {
+    test('embeddings with array input', async () => {
       const res = await embeddings.completion.create({
         model,
         input: ['This is text for the embeddings', 'This is another text for embeddings'],

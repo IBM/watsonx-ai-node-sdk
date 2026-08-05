@@ -6,7 +6,7 @@ source scripts/utils.sh
 
 # Public GitHub
 GH_USER="$(get_env "public-git-user")"
-GH_TOKEN="$(get_env public-git-token)"
+GH_TOKEN="$(get_secret public-git-token)"
 GH_URL="$(get_env public-git-url | sed 's|https://||g' | sed 's|.git||g')"
 PUBLIC_REPO_DIR="../public-gh"
 

@@ -34,7 +34,7 @@ const version = '2024-03-14';
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 
-describe.skip('Files Integration Tests', () => {
+describe.skip('Batch Inference Files', () => {
   jest.setTimeout(TIMEOUT);
 
   let batchInferenceService: BatchInference;
@@ -51,8 +51,8 @@ describe.skip('Files Integration Tests', () => {
     await removeLocalFile(batchFilePath);
   });
 
-  describe('File Upload via API', () => {
-    test('uploads a file from file path', async () => {
+  describe('File Upload', () => {
+    test('upload file from path', async () => {
       const response = await batchInferenceService.files.upload({
         projectId,
         file: batchFilePath,
@@ -61,7 +61,7 @@ describe.skip('Files Integration Tests', () => {
       expect(response.result.id).toBeDefined();
     });
 
-    test('uploads a file with ReadableStream', async () => {
+    test('upload file with readable stream', async () => {
       const filePath = path.resolve(__dirname, 'batch.jsonl');
       const stream = fs.createReadStream(filePath);
 
@@ -74,8 +74,8 @@ describe.skip('Files Integration Tests', () => {
     });
   });
 
-  describe('File Retrieval via API', () => {
-    test('retrieves a specific file by ID', async () => {
+  describe('File Retrieval', () => {
+    test('retrieve file by id', async () => {
       const fileId = await uploadFile(
         batchInferenceService,
         path.resolve(__dirname, 'batch.jsonl'),
@@ -91,7 +91,7 @@ describe.skip('Files Integration Tests', () => {
       expect((response.result as UploadedFile).id).toBe(fileId);
     });
 
-    test('lists all files', async () => {
+    test('list all files', async () => {
       const response = await batchInferenceService.files.getDetails({
         projectId,
       });
@@ -99,7 +99,7 @@ describe.skip('Files Integration Tests', () => {
       expect((response.result as UploadedFileCollection).data).toBeInstanceOf(Array);
     });
 
-    test('lists files with limit', async () => {
+    test('list files with limit', async () => {
       const limit = 5;
       const response = await batchInferenceService.files.getDetails({
         projectId,
@@ -110,7 +110,7 @@ describe.skip('Files Integration Tests', () => {
       expect(collection.data.length).toBeLessThanOrEqual(limit);
     });
 
-    test('lists files with order parameter', async () => {
+    test('list files with order parameter', async () => {
       const response = await batchInferenceService.files.getDetails({
         projectId,
         order: 'desc',
@@ -127,7 +127,7 @@ describe.skip('Files Integration Tests', () => {
       }
     });
 
-    test('uses list() convenience method', async () => {
+    test('list files convenience method', async () => {
       const files = await batchInferenceService.files.list({
         projectId,
         limit: 10,
@@ -136,7 +136,7 @@ describe.skip('Files Integration Tests', () => {
       expect(files).toBeInstanceOf(Array);
     });
 
-    test('handles pagination with after parameter', async () => {
+    test('list files pagination with after parameter', async () => {
       const firstPage = await batchInferenceService.files.getDetails({
         projectId,
         limit: 2,
@@ -156,7 +156,7 @@ describe.skip('Files Integration Tests', () => {
     });
   });
 
-  describe('File Content Retrieval via API', () => {
+  describe('File Content Retrieval', () => {
     let fileId: string;
     beforeAll(async () => {
       fileId = await uploadFile(
@@ -166,7 +166,7 @@ describe.skip('Files Integration Tests', () => {
       );
     });
 
-    test('retrieves file content', async () => {
+    test('retrieve file content', async () => {
       // Get file content
       const response = await batchInferenceService.files.getContent({
         projectId,
@@ -186,7 +186,7 @@ describe.skip('Files Integration Tests', () => {
       });
     });
 
-    test('retrieves content that matches uploaded file', async () => {
+    test('retrieve content matches uploaded file', async () => {
       const originalContent = fs.readFileSync(path.resolve(__dirname, 'batch.jsonl'), 'utf-8');
 
       const contentResponse = await batchInferenceService.files.getContent({
@@ -202,7 +202,7 @@ describe.skip('Files Integration Tests', () => {
     });
   });
 
-  describe('File Download via API', () => {
+  describe('File Download', () => {
     let fileId: string;
     let downloadedFile: string;
     beforeAll(async () => {
@@ -217,7 +217,7 @@ describe.skip('Files Integration Tests', () => {
       if (downloadedFile) await removeLocalFile(downloadedFile);
     });
 
-    test('downloads file to local filesystem', async () => {
+    test('download file to local filesystem', async () => {
       const downloadFilename = `test-download-${Date.now()}.jsonl`;
       const downloadPath = path.resolve(__dirname, downloadFilename);
 
@@ -236,7 +236,7 @@ describe.skip('Files Integration Tests', () => {
       downloadedFile = downloadPath;
     });
 
-    test('downloads file without path parameter', async () => {
+    test('download file without path parameter', async () => {
       const downloadFilename = `test-download-no-path-${Date.now()}.jsonl`;
 
       // Download to current directory
@@ -252,7 +252,7 @@ describe.skip('Files Integration Tests', () => {
       downloadedFile = downloadFilename;
     });
 
-    test('rejects download if file already exists', async () => {
+    test('reject download if file already exists', async () => {
       const downloadFilename = `test-download-exists-${Date.now()}.jsonl`;
       const downloadPath = path.resolve(__dirname, downloadFilename);
 
@@ -271,7 +271,7 @@ describe.skip('Files Integration Tests', () => {
       downloadedFile = downloadPath;
     });
 
-    test('rejects download if filename does not end with .jsonl', async () => {
+    test('reject download if filename does not end with jsonl', async () => {
       await expect(
         batchInferenceService.files.download({
           projectId,
@@ -283,8 +283,8 @@ describe.skip('Files Integration Tests', () => {
     });
   });
 
-  describe('Error Handling with Real API', () => {
-    test('handles invalid file ID when retrieving details', async () => {
+  describe('Error Handling', () => {
+    test('handle invalid file id when retrieving details', async () => {
       await expect(
         batchInferenceService.files.getDetails({
           projectId,
@@ -293,7 +293,7 @@ describe.skip('Files Integration Tests', () => {
       ).rejects.toThrow();
     });
 
-    test('handles invalid file ID when getting content', async () => {
+    test('handle invalid file id when getting content', async () => {
       await expect(
         batchInferenceService.files.getContent({
           projectId,
@@ -302,7 +302,7 @@ describe.skip('Files Integration Tests', () => {
       ).rejects.toThrow();
     });
 
-    test('handles invalid file ID when downloading', async () => {
+    test('handle invalid file id when downloading', async () => {
       await expect(
         batchInferenceService.files.download({
           projectId,
@@ -312,7 +312,7 @@ describe.skip('Files Integration Tests', () => {
       ).rejects.toThrow();
     });
 
-    test('handles missing file parameter on upload', async () => {
+    test('handle missing file parameter on upload', async () => {
       await expect(
         batchInferenceService.files.upload({
           projectId,
@@ -320,7 +320,7 @@ describe.skip('Files Integration Tests', () => {
       ).rejects.toThrow();
     });
 
-    test('handles non-existent file path on upload', async () => {
+    test('handle non existent file path on upload', async () => {
       await expect(
         batchInferenceService.files.upload({
           projectId,

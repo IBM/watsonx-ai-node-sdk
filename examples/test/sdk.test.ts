@@ -1,29 +1,29 @@
 export const examples: [string, string][] = [
-  ['Text generation', 'example_list_models_and_generate_text.ts'],
-  ['Generate text with prompt', 'example_prompt_generate_text.ts'],
-  ['Stream generated text', 'example_prompt_generate_stream_text.ts'],
-  ['Tokenize input', 'example_tokenize_input.ts'],
-  ['Basic chat generation', 'example_chat.ts'],
-  ['Chat with image', 'example_chat_image.ts'],
-  ['Chat stream', 'example_chat_stream.ts'],
-  ['Chat with tools', 'example_chat_tools.ts'],
-  ['Basic embeddings generation', 'example_generate_embeddings.ts'],
-  ['Basic rerank', 'example_rerank.ts'],
-  ['Timeseries', 'example_time_series.ts'],
-  ['Text extraction', 'example_text_extraction.ts'],
-  ['Tookit', 'example_toolkit.ts'],
+  ['test text generation', 'example_list_models_and_generate_text.ts'],
+  ['test generate text with prompt', 'example_prompt_generate_text.ts'],
+  ['test stream generated text', 'example_prompt_generate_stream_text.ts'],
+  ['test tokenize input', 'example_tokenize_input.ts'],
+  ['test basic chat generation', 'example_chat.ts'],
+  ['test chat with image', 'example_chat_image.ts'],
+  ['test chat stream', 'example_chat_stream.ts'],
+  ['test chat with tools', 'example_chat_tools.ts'],
+  ['test basic embeddings generation', 'example_generate_embeddings.ts'],
+  ['test basic rerank', 'example_rerank.ts'],
+  ['test timeseries', 'example_time_series.ts'],
+  ['test text extraction', 'example_text_extraction.ts'],
+  ['test toolkit', 'example_toolkit.ts'],
 ];
 
 const longRunningExamples: [string, string][] = [
-  ['Prompt and infere', 'example_prompt_tuning.ts'],
-  ['Instruct Lab flow', 'example_instruct_lab.ts'],
+  ['test prompt and infer', 'example_prompt_tuning.ts'],
+  ['test instruct lab flow', 'example_instruct_lab.ts'],
 ];
 
-describe('Test examples', () => {
+describe('SDK Examples', () => {
   test.each(examples)('%s', async (_, file) => {
     await expect(import(`../src/sdk/${file}`)).resolves.not.toThrow();
   });
-  describe.skip('Long running tests', () => {
+  describe.skip('Long Running', () => {
     // These are long running tests. Run only on local machine in specific cases
     test.each(longRunningExamples)(
       '%s',

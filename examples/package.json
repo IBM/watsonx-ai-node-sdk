@@ -40,7 +40,7 @@
     "@ibm-cloud/watsonx-ai": "file:.yalc/@ibm-cloud/watsonx-ai",
     "@langchain/community": "^1.1.29",
     "@langchain/core": "^1.2.2",
-    "@langchain/ibm": "^0.1.1",
+    "@langchain/ibm": "^0.2.0",
     "@langchain/langgraph": "^1.4.7",
     "@zilliz/milvus2-sdk-node": "^2.5.0",
     "axios": "^1.17.0",
@@ -75,6 +75,7 @@
     "typescript": "^5.7.3"
   },
   "overrides": {
-    "langsmith": "^0.8.0"
+    "langsmith": "^0.8.0",
+    "thrift": "file:./stubs/thrift"
   }
 }

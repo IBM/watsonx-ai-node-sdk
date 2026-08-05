@@ -13,7 +13,7 @@ function setup-git() {
 
     GITHUB_USER="$(get_env "${PREFIX}git-user")"
     GITHUB_EMAIL="$(get_env "${PREFIX}git-email")"
-    GITHUB_TOKEN="$(get_env "${PREFIX}git-token")"
+    GITHUB_TOKEN="$(get_secret "${PREFIX}git-token")"
     GITHUB_URL="$(get_env "${PREFIX}git-url" | sed 's|https://||g' | sed 's|.git||g')"
 
     git config --local user.name "${GITHUB_USER}"

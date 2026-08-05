@@ -10,7 +10,7 @@ const model = new ChatWatsonx({
   watsonxAIApikey: process.env.WATSONX_AI_APIKEY,
   watsonxAIAuthType: 'iam',
   version: '2024-05-31',
-  model: 'meta-llama/llama-3-2-11b-vision-instruct',
+  model: 'mistralai/mistral-small-3-1-24b-instruct-2503',
   maxTokens: 250,
 });
 

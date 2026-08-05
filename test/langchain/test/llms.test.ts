@@ -9,11 +9,11 @@ const version = '2024-05-31';
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL as string;
 const model = CHAT_MODELS.IBM;
 
-describe('Regression tests regarding langchain llms', () => {
-  describe('Positive tests', () => {
-    describe('Basic call', () => {
+describe('LangChain LLMs', () => {
+  describe('Positive', () => {
+    describe('Basic', () => {
       describe('with projectId', () => {
-        test('Invoke', async () => {
+        test('invoke with project id', async () => {
           const llms = new WatsonxLLM({
             projectId,
             version,
@@ -25,7 +25,7 @@ describe('Regression tests regarding langchain llms', () => {
           expect(typeof result).toBe('string');
         });
 
-        test('Generate', async () => {
+        test('generate with project id', async () => {
           const llms = new WatsonxLLM({
             projectId,
             version,
@@ -41,7 +41,7 @@ describe('Regression tests regarding langchain llms', () => {
           expect(result.generations.length).toBe(2);
         });
 
-        test('Stream', async () => {
+        test('stream with project id', async () => {
           const llms = new WatsonxLLM({
             projectId,
             version,
@@ -56,7 +56,7 @@ describe('Regression tests regarding langchain llms', () => {
       });
 
       describe('with spaceId', () => {
-        test('Invoke', async () => {
+        test('invoke with space id', async () => {
           const llms = new WatsonxLLM({
             spaceId,
             version,
@@ -68,7 +68,7 @@ describe('Regression tests regarding langchain llms', () => {
           expect(typeof result).toBe('string');
         });
 
-        test('Generate', async () => {
+        test('generate with space id', async () => {
           const llms = new WatsonxLLM({
             spaceId,
             version,
@@ -84,7 +84,7 @@ describe('Regression tests regarding langchain llms', () => {
           expect(result.generations.length).toBe(2);
         });
 
-        test('Stream', async () => {
+        test('stream with space id', async () => {
           const llms = new WatsonxLLM({
             spaceId,
             version,
@@ -99,10 +99,10 @@ describe('Regression tests regarding langchain llms', () => {
       });
     });
 
-    describe('Advanced call', () => {
+    describe('Advanced', () => {
       describe('with projectId', () => {
         describe('Invoke', () => {
-          test('with minNewTokens', async () => {
+          test('invoke with min new tokens', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -115,7 +115,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(result.length).toBeGreaterThan(50);
           });
 
-          test('with maxNewTokens', async () => {
+          test('invoke with max new tokens', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -128,7 +128,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(result.length).toBeLessThan(70);
           });
 
-          test('with stop sequence', async () => {
+          test('invoke with stop sequence', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -143,7 +143,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(result.endsWith('Hello')).toBe(true);
           });
 
-          test('with remaining options', async () => {
+          test('invoke with remaining options', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -163,7 +163,7 @@ describe('Regression tests regarding langchain llms', () => {
         });
 
         describe('Generate', () => {
-          test('with minNewTokens', async () => {
+          test('generate with min new tokens', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -176,7 +176,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(result.generations[0][0].text.length).toBeGreaterThan(50);
           });
 
-          test('with maxNewTokens', async () => {
+          test('generate with max new tokens', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -189,7 +189,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(result.generations[0][0].text.length).toBeLessThan(70);
           });
 
-          test('with stop sequence', async () => {
+          test('generate with stop sequence', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -204,7 +204,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(result.generations[0][0].text.endsWith('hello')).toBe(true);
           });
 
-          test('with remaining options', async () => {
+          test('generate with remaining options', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -224,7 +224,7 @@ describe('Regression tests regarding langchain llms', () => {
         });
 
         describe('Stream', () => {
-          test('with minNewTokens', async () => {
+          test('stream with min new tokens', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -241,7 +241,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(res.length).toBeGreaterThan(50);
           });
 
-          test('with maxNewTokens', async () => {
+          test('stream with max new tokens', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -258,7 +258,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(res.length).toBeLessThan(70);
           });
 
-          test('with stop sequence', async () => {
+          test('stream with stop sequence', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -277,7 +277,7 @@ describe('Regression tests regarding langchain llms', () => {
             expect(res.endsWith('Hello')).toBe(true);
           });
 
-          test('with remaining options', async () => {
+          test('stream with remaining options', async () => {
             const llms = new WatsonxLLM({
               projectId,
               version,
@@ -300,8 +300,8 @@ describe('Regression tests regarding langchain llms', () => {
     });
   });
 
-  describe('Negative tests', () => {
-    test('Passing wrong model', async () => {
+  describe('Negative', () => {
+    test('passing wrong model', async () => {
       const embeddings = new WatsonxLLM({
         version,
         projectId,
@@ -312,7 +312,7 @@ describe('Regression tests regarding langchain llms', () => {
       await expect(embeddings.invoke('Hello world')).rejects.toThrow();
     });
 
-    test('Passing not existing props', async () => {
+    test('passing not existing props', async () => {
       expect(
         () =>
           new WatsonxLLM({

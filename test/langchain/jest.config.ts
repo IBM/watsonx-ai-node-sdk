@@ -12,7 +12,6 @@ const config: Config = {
   collectCoverage: true,
   moduleFileExtensions: ['ts', 'js'],
   testTimeout: 20000,
-  testNamePattern: 'test',
   collectCoverageFrom: ['**/src/**/*.{js,ts}', '!**/.yalc/**', '!**/dist/**', '!**/coverage/**'],
   modulePathIgnorePatterns: ['dist/', 'docs/'],
   moduleNameMapper: {
@@ -46,6 +45,13 @@ const config: Config = {
       {
         resultsDir: '../../allure-results',
         overwrite: false,
+        testCase: {
+          labels: {
+            parentSuite: 'Regression',
+            suite: ({ testCase, filePath }: any) => testCase.ancestorTitles[0] ?? filePath.at(-1),
+            subSuite: ({ testCase }: any) => testCase.ancestorTitles.slice(1).join(' > '),
+          },
+        },
       },
     ],
   ],

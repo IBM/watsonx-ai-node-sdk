@@ -14,10 +14,10 @@
 
 import * as jwt from 'jsonwebtoken';
 
-const SECRET_KEY = 'your-very-secure-secret-key'; //NOSONAR
+const SECRET_KEY = 'your-very-secure-secret-key'; // NOSONAR
 
 const generateJWT = (payload: { userId: number; role: string }, validationTime: string) =>
-  jwt.sign(payload, SECRET_KEY, { expiresIn: validationTime });
+  jwt.sign(payload, SECRET_KEY, { expiresIn: validationTime }); // NOSONAR
 
 const requestAdminToken = async ({ time = '1m', tokenName = 'access_token' } = {}) => ({
   result: {

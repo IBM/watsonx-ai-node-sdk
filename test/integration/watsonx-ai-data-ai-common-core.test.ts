@@ -54,18 +54,18 @@ const deleteSpaceAfterTests = async (spaceId: string) => {
   }
 };
 
-describe('Repository methods tests', () => {
+describe('Foundation Models', () => {
   jest.setTimeout(timeout);
 
-  describe('Space', () => {
-    describe('Creation', () => {
+  describe('Spaces', () => {
+    describe('Space Creation', () => {
       let createdSpaceId: string;
 
       afterAll(async () => {
         if (createdSpaceId) await deleteSpaceAfterTests(createdSpaceId);
       });
 
-      test('createSpace()', async () => {
+      test('create space', async () => {
         const timestamp = Date.now();
         const name = `test-node-js-${timestamp}`;
         const res = await watsonxInstance.createSpace({
@@ -85,7 +85,7 @@ describe('Repository methods tests', () => {
       });
     });
 
-    describe('Operations on existing space', () => {
+    describe('Space Operations', () => {
       let createdSpaceId: string | undefined;
       const timestamp = Date.now();
       let name = `test-node-js-${timestamp}`;
@@ -111,7 +111,7 @@ describe('Repository methods tests', () => {
         if (createdSpaceId) await deleteSpaceAfterTests(createdSpaceId);
       });
 
-      test('getSpace()', async () => {
+      test('get space', async () => {
         const getter = () =>
           watsonxInstance.getSpace({
             spaceId: createdSpaceId as string,
@@ -127,7 +127,7 @@ describe('Repository methods tests', () => {
         expect(res.result.metadata).toBeDefined();
       });
 
-      test('updateSpace()', async () => {
+      test('update space', async () => {
         expect(typeof createdSpaceId).toBe('string');
 
         const updatedName = `${name}-updated`;
@@ -149,7 +149,7 @@ describe('Repository methods tests', () => {
         name = updatedName;
       });
 
-      test('listSpaces()', async () => {
+      test('list spaces', async () => {
         const res = await watsonxInstance.listSpaces({
           name,
         });
@@ -157,7 +157,7 @@ describe('Repository methods tests', () => {
         expect(res.result.resources).toHaveLength(1);
       });
 
-      test('getNext()', async () => {
+      test('list spaces get next page', async () => {
         const params = {
           limit: 1,
         };
@@ -168,7 +168,7 @@ describe('Repository methods tests', () => {
         expect(result).toHaveLength(1);
       });
 
-      test('getAll()', async () => {
+      test('list spaces get all', async () => {
         const params = {
           limit: 50,
         };
@@ -179,7 +179,7 @@ describe('Repository methods tests', () => {
         expect(result.length).toBeGreaterThanOrEqual(1);
       });
 
-      test('deleteSpace()', async () => {
+      test('delete space', async () => {
         expect(typeof createdSpaceId).toBe('string');
 
         const res = await watsonxInstance.deleteSpace({

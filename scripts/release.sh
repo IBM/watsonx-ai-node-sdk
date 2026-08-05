@@ -14,7 +14,7 @@ EOF
 )"
 
 # GitHub Enterprise
-GHE_TOKEN="$(get_env git-token)"
+GHE_TOKEN="$(get_secret git-token)"
 GHE_URL="$(get_env git-url | sed 's|https://||g' | sed 's|.git||g')"
 GHE_REPO="${GHE_URL#*/}"
 
@@ -26,7 +26,7 @@ curl -Ls \
     -d "${RELEASE_PAYLOAD}"
 
 # GitHub
-GH_TOKEN="$(get_env public-git-token)"
+GH_TOKEN="$(get_secret public-git-token)"
 GH_URL="$(get_env public-git-url | sed 's|https://||g' | sed 's|.git||g')"
 GH_REPO="${GH_URL#*/}"
 

@@ -1,0 +1,6 @@
+{
+  "name": "thrift",
+  "version": "0.23.0",
+  "description": "Empty stub — replaces vulnerable thrift package to satisfy the dependency tree without installing the real module",
+  "main": "index.js"
+}

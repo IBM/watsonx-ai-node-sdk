@@ -10,10 +10,10 @@ const version = '2024-05-31';
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL as string;
 const model = EMBEDDING_MODEL_IBM;
 
-describe('Regression tests regarding langchain embeddings', () => {
-  describe('Positive tests', () => {
-    describe('Basic call', () => {
-      test('Single embedding with projectId', async () => {
+describe('LangChain Embeddings', () => {
+  describe('Positive', () => {
+    describe('Basic', () => {
+      test('single embedding with project id', async () => {
         const embeddings = new WatsonxEmbeddings({
           version,
           projectId,
@@ -26,7 +26,7 @@ describe('Regression tests regarding langchain embeddings', () => {
         expect(typeof result[0]).toBe('number');
       });
 
-      test('Multiple embeddings with projectId', async () => {
+      test('multiple embeddings with project id', async () => {
         const embeddings = new WatsonxEmbeddings({
           version,
           projectId,
@@ -39,7 +39,7 @@ describe('Regression tests regarding langchain embeddings', () => {
         expect(typeof result[0][0]).toBe('number');
       });
 
-      test('Single embedding with spaceId', async () => {
+      test('single embedding with space id', async () => {
         const embeddings = new WatsonxEmbeddings({
           version,
           spaceId,
@@ -52,7 +52,7 @@ describe('Regression tests regarding langchain embeddings', () => {
         expect(typeof result[0]).toBe('number');
       });
 
-      test('Multiple embeddings with spaceId', async () => {
+      test('multiple embeddings with space id', async () => {
         const embeddings = new WatsonxEmbeddings({
           version,
           spaceId,
@@ -66,8 +66,8 @@ describe('Regression tests regarding langchain embeddings', () => {
       });
     });
 
-    describe('Advanced call', () => {
-      test('Embedding with all options', async () => {
+    describe('Advanced', () => {
+      test('embedding with all options', async () => {
         const embeddings = new WatsonxEmbeddings({
           version,
           projectId,
@@ -83,8 +83,8 @@ describe('Regression tests regarding langchain embeddings', () => {
     });
   });
 
-  describe('Negative tests', () => {
-    test('Passing wrong model', async () => {
+  describe('Negative', () => {
+    test('passing wrong model', async () => {
       const embeddings = new WatsonxEmbeddings({
         version,
         projectId,
@@ -95,7 +95,7 @@ describe('Regression tests regarding langchain embeddings', () => {
       await expect(embeddings.embedQuery('Hello world')).rejects.toThrow();
     });
 
-    test('Passing not existing props', async () => {
+    test('passing not existing props', async () => {
       expect(
         () =>
           new WatsonxEmbeddings({

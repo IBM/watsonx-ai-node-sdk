@@ -33,11 +33,11 @@ const docs = [
   }),
 ];
 
-describe('Regression tests regarding langchain llms', () => {
-  describe('Positive tests', () => {
-    describe('Basic call', () => {
+describe('LangChain Rerank', () => {
+  describe('Positive', () => {
+    describe('Basic', () => {
       describe('with projectId', () => {
-        test('compressDocuments', async () => {
+        test('compress documents with project id', async () => {
           const watsonxRerank = new WatsonxRerank({
             projectId,
             version,
@@ -52,7 +52,7 @@ describe('Regression tests regarding langchain llms', () => {
           });
         });
 
-        test('rerank', async () => {
+        test('rerank with project id', async () => {
           const watsonxRerank = new WatsonxRerank({
             projectId,
             version,
@@ -69,7 +69,7 @@ describe('Regression tests regarding langchain llms', () => {
       });
 
       describe('with spaceId', () => {
-        test('compressDocuments', async () => {
+        test('compress documents with space id', async () => {
           const watsonxRerank = new WatsonxRerank({
             spaceId,
             version,
@@ -84,7 +84,7 @@ describe('Regression tests regarding langchain llms', () => {
           });
         });
 
-        test('rerank', async () => {
+        test('rerank with space id', async () => {
           const watsonxRerank = new WatsonxRerank({
             spaceId,
             version,
@@ -101,7 +101,7 @@ describe('Regression tests regarding langchain llms', () => {
       });
     });
 
-    describe('Advanced call', () => {
+    describe('Advanced', () => {
       describe('with projectId', () => {
         test('rerank truncated tokens', async () => {
           const watsonxRerank = new WatsonxRerank({
@@ -148,8 +148,8 @@ describe('Regression tests regarding langchain llms', () => {
     });
   });
 
-  describe('Negative tests', () => {
-    test('Input content too long and not truncated with rerank', async () => {
+  describe('Negative', () => {
+    test('input content too long and not truncated with rerank', async () => {
       const watsonxRerank = new WatsonxRerank({
         projectId,
         version,
@@ -164,7 +164,7 @@ describe('Regression tests regarding langchain llms', () => {
       await expect(watsonxRerank.rerank(longerDocs, query)).rejects.toThrow();
     });
 
-    test('Input content too long and not truncated with compressDocuments', async () => {
+    test('input content too long and not truncated with compress documents', async () => {
       const watsonxRerank = new WatsonxRerank({
         projectId,
         version,

@@ -10,7 +10,6 @@ const config: Config = {
   preset: 'ts-jest/presets/default-esm',
   moduleFileExtensions: ['ts', 'js'],
   testTimeout: 60000,
-  testNamePattern: 'test',
   extensionsToTreatAsEsm: ['.ts'],
   collectCoverageFrom: ['**src/**/*.{js,ts}', '!**/.yalc/**', '!**/dist/**', '!**/coverage/**'],
   verbose: true,
@@ -21,6 +20,13 @@ const config: Config = {
       {
         resultsDir: '../allure-results',
         overwrite: false,
+        testCase: {
+          labels: {
+            parentSuite: 'Examples',
+            suite: ({ testCase, filePath }: any) => testCase.ancestorTitles[0] ?? filePath.at(-1),
+            subSuite: ({ testCase }: any) => testCase.ancestorTitles.slice(1).join(' > '),
+          },
+        },
       },
     ],
   ],

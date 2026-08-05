@@ -37,7 +37,7 @@ const BATCH_FILE_NAME = 'batch.jsonl';
 const batchFilePath = path.resolve(__dirname, BATCH_FILE_NAME);
 const TIMEOUT = 60000;
 
-describe.skip('BatchInference Integration Tests', () => {
+describe.skip('Batch Inference', () => {
   jest.setTimeout(TIMEOUT);
 
   let batchInferenceService: BatchInference;
@@ -71,8 +71,8 @@ describe.skip('BatchInference Integration Tests', () => {
     }
   });
 
-  describe('Batch Creation with API', () => {
-    test('create a batch job', async () => {
+  describe('Batch Creation', () => {
+    test('create batch job', async () => {
       const metadata = {
         environment: 'test',
         version: '1.0.0',
@@ -93,8 +93,8 @@ describe.skip('BatchInference Integration Tests', () => {
     });
   });
 
-  describe('Batch Retrieval from API', () => {
-    test('retrieve a specific batch by ID', async () => {
+  describe('Batch Retrieval', () => {
+    test('retrieve batch by id', async () => {
       // Create a batch first
       const batchId = await createTestBatch(batchInferenceService, uploadedFileId);
 
@@ -130,7 +130,7 @@ describe.skip('BatchInference Integration Tests', () => {
       expect(collection.data.length).toBeLessThanOrEqual(limit);
     });
 
-    test('use list() convenience method', async () => {
+    test('list batches convenience method', async () => {
       const batches = await batchInferenceService.list({
         projectId,
         limit: 10,
@@ -140,8 +140,8 @@ describe.skip('BatchInference Integration Tests', () => {
     });
   });
 
-  describe('Batch Cancellation via API', () => {
-    test('cancel a batch job', async () => {
+  describe('Batch Cancellation', () => {
+    test('cancel batch job', async () => {
       const batchIdToCancel = await createTestBatch(batchInferenceService, uploadedFileId);
 
       const cancelResponse = await batchInferenceService.cancel({
@@ -154,8 +154,8 @@ describe.skip('BatchInference Integration Tests', () => {
     });
   });
 
-  describe('Error Handling with Real API', () => {
-    test('handle invalid file ID when creating batch', async () => {
+  describe('Error Handling', () => {
+    test('handle invalid file id when creating batch', async () => {
       await expect(
         batchInferenceService.create({
           projectId,
@@ -166,7 +166,7 @@ describe.skip('BatchInference Integration Tests', () => {
       ).rejects.toThrow();
     });
 
-    test('handle invalid batch ID when retrieving', async () => {
+    test('handle invalid batch id when retrieving', async () => {
       await expect(
         batchInferenceService.getDetails({
           projectId,
@@ -175,7 +175,7 @@ describe.skip('BatchInference Integration Tests', () => {
       ).rejects.toThrow();
     });
 
-    test('handle invalid batch ID when cancelling', async () => {
+    test('handle invalid batch id when cancelling', async () => {
       await expect(
         batchInferenceService.cancel({
           projectId,

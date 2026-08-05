@@ -26,13 +26,13 @@ const describe = authHelper.checkCPD();
 const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 
-describe('WatsonXAI_integration on cpd environment', () => {
+describe('Foundation Models CPD', () => {
   const service = WatsonXAI.newInstance({
     serviceUrl,
     version: '2024-03-14',
   });
 
-  describe('Audio transcription', () => {
+  describe('Audio Model Inference', () => {
     const audioFile = path.resolve(__dirname, '../data/sample_audio_file.mp3');
     const model = 'openai/whisper-tiny';
     const testParams = [
@@ -64,7 +64,7 @@ describe('WatsonXAI_integration on cpd environment', () => {
       },
     ];
 
-    test.each(testParams)(`$name`, async ({ params, isNegative }) => {
+    test.each(testParams)(`test transcribe audio[$name]`, async ({ params, isNegative }) => {
       const res = await service.transcribeAudio(params);
 
       expect(res.status).toBe(200);

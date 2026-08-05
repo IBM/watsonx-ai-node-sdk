@@ -50,7 +50,7 @@ const messages = [
 ];
 
 const chatResponse = await watsonxAIService.textChat({
-  modelId: 'meta-llama/llama-3-2-11b-vision-instruct',
+  modelId: 'mistralai/mistral-small-3-1-24b-instruct-2503',
   projectId,
   spaceId,
   messages,

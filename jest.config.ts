@@ -33,6 +33,13 @@ const config: Config = {
       {
         resultsDir: 'allure-results',
         overwrite: false,
+        testCase: {
+          labels: {
+            parentSuite: 'Integration',
+            suite: ({ testCase, filePath }: any) => testCase.ancestorTitles[0] ?? filePath.at(-1),
+            subSuite: ({ testCase }: any) => testCase.ancestorTitles.slice(1).join(' > '),
+          },
+        },
       },
     ],
   ],
