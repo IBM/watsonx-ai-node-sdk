@@ -97,14 +97,14 @@ tasks:
           COMPLIANCE_EXIT_CODE=0
           "${COMMONS_PATH}/compliance-checks/run.sh" || COMPLIANCE_EXIT_CODE=$?
 
-        
+
           if [[ "$(get_env allow-vulnerabilities "false")" == "true" ]]; then
             echo "WARNING: Compliance issues found but allow-vulnerabilities=true — continuing release."
           else
             echo "ERROR: Compliance issues found. Failing the build."
             exit ${COMPLIANCE_EXIT_CODE}
           fi
-          
+
         abort_on_failure: true
         onError: stopAndFail
 
@@ -233,7 +233,7 @@ tasks:
           - code-checks
         include:
           - docker-socket
-        
+
       - name: dynamic-scan
         include:
           - docker-socket
@@ -268,9 +268,9 @@ tasks:
             fi
 
             scripts/setup-release.sh
-            scripts/release.sh
-
             scripts/sync-public-git.sh
+
+            scripts/release.sh
           fi
 
 finally:

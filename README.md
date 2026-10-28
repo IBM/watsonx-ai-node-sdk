@@ -120,19 +120,24 @@ To learn more about how to use programmatic authentication, see the [Node.js SDK
 The following code examples authenticate with the environment variables.
 Please set environment variables before proceeding with examples:
 It is mandatory to set `projectId` or `spaceId` unless you are working with lightweight engine.
+
+> **Note:** The `version` parameter is optional. When omitted, the SDK uses the latest supported API
+> date automatically. You can also pass `projectId` or `spaceId` directly to the constructor instead
+> of repeating it on every request.
+
 ```ts
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 
-// Service instance
+// Service instance — version defaults to the latest supported API date.
+// Passing projectId here means you do not need to include it on every request.
 const watsonxAIService = new WatsonXAI({
-  version: '2024-05-31',
   serviceUrl: 'https://us-south.ml.cloud.ibm.com',
+  projectId: '<YOUR_PROJECT_ID>',
 });
 
 const params = {
   messages: [{ role: 'user', content: 'Generate a short greeting for project kick-off meeting.' }],
   modelId: 'ibm/granite-4-h-small',
-  projectId: '<YOUR_PROJECT_ID>',
   maxTokens: 200,
 };
 
@@ -158,9 +163,8 @@ For a watsonx.ai lightweight engine, you do not need to provide a `projectId` or
 ```ts
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 
-// Service instance
+// Service instance — version and projectId/spaceId are not required for lightweight engine.
 const watsonxAIService = new WatsonXAI({
-    version: '2024-05-31',
     serviceUrl: process.env.SERVICE_URL,
 });
 

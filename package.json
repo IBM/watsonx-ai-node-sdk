@@ -1,6 +1,6 @@
 {
   "name": "@ibm-cloud/watsonx-ai",
-  "version": "1.7.16",
+  "version": "1.7.17",
   "description": "IBM watsonx.ai Node.js SDK",
   "repository": {
     "type": "git",

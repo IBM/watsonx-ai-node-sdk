@@ -22,13 +22,14 @@ config({ path: credentialsPath });
  */
 // process.env.IBM_CREDENTIALS_FILE = path.join(__dirname, '/../../../credentials/watsonx_ai_ml_vml_v1.env')
 
-const projectId = process.env.WATSONX_AI_PROJECT_ID;
-const _spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 
+// Service instance — version defaults to the latest supported API date.
+// projectId and spaceId are passed here so they do not need to be repeated on every request.
 const watsonxAIService = WatsonXAI.newInstance({
-  version: '2024-05-31',
   serviceUrl,
+  projectId: process.env.WATSONX_AI_PROJECT_ID,
+  spaceId: process.env.WATSONX_AI_PROJECT_ID ? undefined : process.env.WATSONX_AI_SPACE_ID,
 });
 
 // Request models needed by this operation.
@@ -82,7 +83,6 @@ const params = {
   documentReference: textExtractionDataReferenceModel,
   resultsReference: textExtractionResultReferenceModel,
   steps: textExtractionStepsModel,
-  projectId,
   assemblyMd: {},
 };
 
@@ -106,9 +106,8 @@ const checkIfJobFinshed = async <T>(getter: () => Promise<any>, retries = 5, del
   throw new Error('Failed to get a valid response after maximum retries');
 };
 if (!textExtId) throw new Error('No textExtId provided');
-const retrieveTextExtraction = () =>
-  watsonxAIService.getTextExtraction({ projectId, id: textExtId });
+const retrieveTextExtraction = () => watsonxAIService.getTextExtraction({ id: textExtId });
 const result = await checkIfJobFinshed(retrieveTextExtraction);
 console.log(result);
 // cleanup
-await watsonxAIService.deleteTextExtraction({ projectId, id: textExtId });
+await watsonxAIService.deleteTextExtraction({ id: textExtId });

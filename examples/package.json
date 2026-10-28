@@ -76,6 +76,8 @@
   },
   "overrides": {
     "langsmith": "^0.8.0",
-    "thrift": "file:./stubs/thrift"
+    "thrift": "file:./stubs/thrift",
+    "@browserbasehq/stagehand": "file:./stubs/@browserbasehq/stagehand",
+    "openai": ">=5.24.0"
   }
 }

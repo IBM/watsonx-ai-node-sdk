@@ -12,15 +12,14 @@ import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';
 
 const modelName = 'ibm/granite-4-h-small';
-const projectId = process.env.WATSONX_AI_PROJECT_ID;
-const spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
-
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 
-// Service instance
+// Service instance — version defaults to the latest supported API date.
+// projectId and spaceId are passed here so they do not need to be repeated on every request.
 const watsonxAIService = WatsonXAI.newInstance({
-  version: '2024-05-31',
   serviceUrl,
+  projectId: process.env.WATSONX_AI_PROJECT_ID,
+  spaceId: process.env.WATSONX_AI_PROJECT_ID ? undefined : process.env.WATSONX_AI_SPACE_ID,
 });
 
 // Define parameters for text generation
@@ -47,8 +46,6 @@ const promptContentParams = {
 const promptParameters = {
   name: 'WXAI Node.js SDK Example Prompt',
   description: 'Example prompt created from watsonx-ai-node-sdk library',
-  projectId,
-  spaceId,
   prompt: promptContentParams,
   promptVariables: {
     'input': {
@@ -72,8 +69,6 @@ try {
   // Get stored prompt
   const getPrompt = await watsonxAIService.getPrompt({
     promptId: createdPromptId,
-    projectId,
-    spaceId,
   });
   console.log('\n\n***** PROMPT CONTENT *****');
   console.log(JSON.stringify(getPrompt.result, null, 2));
@@ -83,8 +78,6 @@ try {
     name: 'WXAI Node.js SDK Example Prompt Deployment',
     baseModelId: promptContentParams.model_id,
     promptTemplate: { id: createdPromptId },
-    projectId,
-    spaceId,
     online: {},
   });
   console.log(JSON.stringify(createDeploy.result, null, 2));
@@ -117,9 +110,7 @@ try {
   if (createdDeployId)
     await watsonxAIService.deleteDeployment({
       deploymentId: createdDeployId,
-      projectId,
-      spaceId,
     });
   if (createdPromptId)
-    await watsonxAIService.deletePrompt({ promptId: createdPromptId, projectId, spaceId });
+    await watsonxAIService.deletePrompt({ promptId: createdPromptId });
 }

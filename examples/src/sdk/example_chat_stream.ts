@@ -13,15 +13,14 @@ import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';
 
 const modelName = 'ibm/granite-4-h-small';
-const projectId = process.env.WATSONX_AI_PROJECT_ID;
-const spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
-
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 
-// Service instance
+// Service instance — version defaults to the latest supported API date.
+// projectId and spaceId are passed here so they do not need to be repeated on every request.
 const watsonxAIService = WatsonXAI.newInstance({
-  version: '2024-05-31',
   serviceUrl,
+  projectId: process.env.WATSONX_AI_PROJECT_ID,
+  spaceId: process.env.WATSONX_AI_PROJECT_ID ? undefined : process.env.WATSONX_AI_SPACE_ID,
 });
 
 // Define parameters passed to a request
@@ -46,7 +45,6 @@ const messages = [
 ];
 const chatStream = await watsonxAIService.textChatStream({
   modelId: modelName,
-  projectId,
   messages,
   ...modelParameters,
 });
@@ -63,8 +61,6 @@ for await (const chunk of chatStream) {
 
 const chatStreamObjects = await watsonxAIService.textChatStream({
   modelId: modelName,
-  projectId,
-  spaceId,
   messages,
   returnObject: true,
   ...modelParameters,

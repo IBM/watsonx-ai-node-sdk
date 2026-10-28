@@ -9,14 +9,13 @@
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';
 
-const projectId = process.env.WATSONX_AI_PROJECT_ID;
-const spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
-
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
-// Service instance
+// Service instance — version defaults to the latest supported API date.
+// projectId and spaceId are passed here so they do not need to be repeated on every request.
 const watsonxAIService = WatsonXAI.newInstance({
-  version: '2024-05-31',
   serviceUrl,
+  projectId: process.env.WATSONX_AI_PROJECT_ID,
+  spaceId: process.env.WATSONX_AI_PROJECT_ID ? undefined : process.env.WATSONX_AI_SPACE_ID,
 });
 
 // Specify two models
@@ -31,8 +30,6 @@ const input =
 const textTokenzationParameters1 = {
   input,
   modelId: modelName,
-  projectId,
-  spaceId,
   parameters: {
     return_tokens: true,
   },
@@ -48,8 +45,6 @@ console.log(tokens1);
 const textTokenzationParameters2 = {
   input,
   modelId: modelName2,
-  projectId,
-  spaceId,
   parameters: {
     return_tokens: true,
   },

@@ -11,9 +11,6 @@ import type { AxiosResponse } from 'axios';
 import axios from 'axios';
 import '../utils/config.ts';
 
-const projectId = process.env.WATSONX_AI_PROJECT_ID;
-const _spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
-
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 
 console.log('\n\n***** EXAMPLE RERANK 1 - RERANK DOCUMENTS BASED ON A SIMPLE QUERY *****');
@@ -29,17 +26,18 @@ for (let i = 0; i < result.data.length; i += chunkSize - chunkOverlap) {
   const chunk = result.data.slice(i, i + chunkSize);
   data.push({ text: chunk });
 }
-// Service instance
+// Service instance — version defaults to the latest supported API date.
+// projectId and spaceId are passed here so they do not need to be repeated on every request.
 const watsonxAIService = WatsonXAI.newInstance({
-  version: '2024-05-31',
   serviceUrl,
+  projectId: process.env.WATSONX_AI_PROJECT_ID,
+  spaceId: process.env.WATSONX_AI_PROJECT_ID ? undefined : process.env.WATSONX_AI_SPACE_ID,
 });
 
 const rerankedDocs = await watsonxAIService.textRerank({
   modelId: 'cross-encoder/ms-marco-minilm-l-12-v2',
   inputs: data,
   query: 'What did the president say about Ketanji Brown Jackson',
-  projectId: process.env.WATSONX_AI_PROJECT_ID,
   parameters: {
     return_options: {
       top_n: 3,

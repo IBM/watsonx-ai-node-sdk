@@ -1,0 +1,6 @@
+{
+  "name": "@browserbasehq/stagehand",
+  "version": "1.14.0",
+  "description": "Empty stub — replaces @browserbasehq/stagehand to eliminate its vulnerable openai and zod transitive dependencies. This package is never invoked at runtime in this project.",
+  "main": "index.js"
+}

@@ -65,7 +65,11 @@ git add --all
 git commit -m "release: ${TAG}" || echo "There was some issuie when commiting changes. Skipping..."
 git push -u origin gh-pages
 
-# Create git tag in public GitHub repository
+# Create git tag in public GitHub repository (still in ../public-gh)
 git checkout main
 git tag "${TAG}"
 git push origin tag "${TAG}"
+
+# Restore enterprise repo CWD and branch so subsequent scripts (e.g. release.sh) work correctly
+cd -                  # back to enterprise repo
+git checkout main     # enterprise was left on gh-pages

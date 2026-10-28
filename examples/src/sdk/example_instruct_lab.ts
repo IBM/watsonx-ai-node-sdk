@@ -11,8 +11,6 @@ interface IInstructLabJobStatus {
     };
   };
 }
-const projectId = process.env.WATSONX_AI_PROJECT_ID;
-
 const checkIfJobFinshed = async <T>(
   getter: () => Promise<WatsonXAI.Response<IInstructLabJobStatus>> & T,
   retries = 5,
@@ -35,10 +33,14 @@ const checkIfJobFinshed = async <T>(
   throw new Error('Failed to get a valid response after maximum retries');
 };
 
+// Note: version '2023-07-07' is explicitly pinned here — InstructLab endpoints require this
+// specific API version. projectId is passed to the constructor so it does not need to be
+// repeated on every request.
 const watsonxAIService = WatsonXAI.newInstance({
   serviceUrl: process.env.WATSONX_AI_SERVICE_URL,
   platformUrl: process.env.WATSONX_AI_PLATFORM_URL,
   version: '2023-07-07',
+  projectId: process.env.WATSONX_AI_PROJECT_ID,
 });
 
 const dataConnectionReferenceModel = {
@@ -62,7 +64,6 @@ const documentExtractionParams = {
   documentReferences: [dataConnectionReferenceModel],
   resultsReference: objectLocationModel,
   tags: ['t1', 't2'],
-  projectId: process.env.WATSONX_AI_PROJECT_ID,
 };
 
 const documentExtractionRes =
@@ -73,7 +74,6 @@ if (!docExtId) throw new Error('No docExtId provided');
 const docExtGetter = () =>
   watsonxAIService.getDocumentExtraction({
     id: docExtId,
-    projectId,
   });
 
 const documentExtractionResult = await checkIfJobFinshed(docExtGetter, 20);
@@ -82,7 +82,6 @@ console.log(documentExtractionResult);
 const params = {
   name: 'taxonomy-nodejs-sdk',
   description: 'teststring',
-  projectId,
   resultsReference: { location: { path: '.' }, 'type': 'container' },
   dataReference: objectLocationModel,
 };
@@ -94,7 +93,6 @@ if (!taxId) throw new Error('No taxId provided');
 const taxonomyGetter = () =>
   watsonxAIService.getTaxonomy({
     id: taxId,
-    projectId,
   });
 
 const taxonomyResult = await checkIfJobFinshed(taxonomyGetter, 100, 30000);
@@ -106,7 +104,6 @@ const syntheticDataGenerationDataReferenceModel = taxonomyResultReference;
 
 const sdgParams = {
   name: 'sdg-nodejs-sdk',
-  projectId: process.env.WATSONX_AI_PROJECT_ID,
   dataReference: syntheticDataGenerationDataReferenceModel,
   resultsReference: objectLocationModel,
 };
@@ -118,7 +115,6 @@ if (!sdgId) throw new Error('No sdgId provided');
 const sdgGetter = () =>
   watsonxAIService.getSyntheticDataGeneration({
     id: sdgId,
-    projectId,
   });
 
 const sdgResult = await checkIfJobFinshed(sdgGetter, 20);
@@ -137,7 +133,6 @@ const fineTuningParams = {
   resultsReference: fineTuningResultReference,
   description: 'testString',
   tags: ['t1', 't2'],
-  projectId: process.env.WATSONX_AI_PROJECT_ID,
   type: 'ilab',
   custom: { name: 'model', size: 2 },
 };

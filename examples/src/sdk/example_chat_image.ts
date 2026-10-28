@@ -10,14 +10,14 @@ import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import axios from 'axios';
 import '../utils/config.ts';
 
-const projectId = process.env.WATSONX_AI_PROJECT_ID;
-const spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 
-// Service instance
+// Service instance — version defaults to the latest supported API date.
+// projectId and spaceId are passed here so they do not need to be repeated on every request.
 const watsonxAIService = WatsonXAI.newInstance({
-  version: '2024-05-31',
   serviceUrl,
+  projectId: process.env.WATSONX_AI_PROJECT_ID,
+  spaceId: process.env.WATSONX_AI_PROJECT_ID ? undefined : process.env.WATSONX_AI_SPACE_ID,
 });
 const modelParameters = {
   maxTokens: 200,
@@ -51,8 +51,6 @@ const messages = [
 
 const chatResponse = await watsonxAIService.textChat({
   modelId: 'mistralai/mistral-small-3-1-24b-instruct-2503',
-  projectId,
-  spaceId,
   messages,
   ...modelParameters,
 });

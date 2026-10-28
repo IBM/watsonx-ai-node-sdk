@@ -13,16 +13,15 @@
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai';
 import '../utils/config.ts';
 
-const projectId = process.env.WATSONX_AI_PROJECT_ID;
-const spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
-
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 const trainingAssetId = process.env.TRAINING_ASSET_ID;
 
-// Service instance
+// Service instance — version defaults to the latest supported API date.
+// projectId and spaceId are passed here so they do not need to be repeated on every request.
 const watsonxAIService = WatsonXAI.newInstance({
-  version: '2024-05-31',
   serviceUrl,
+  projectId: process.env.WATSONX_AI_PROJECT_ID,
+  spaceId: process.env.WATSONX_AI_PROJECT_ID ? undefined : process.env.WATSONX_AI_SPACE_ID,
 });
 
 const getModelId = async (args: WatsonXAI.TrainingsGetParams, retries = 5, delay = 120000) => {
@@ -65,7 +64,7 @@ const baseModelModel = {
 const dataConnectionReferenceModel = {
   type: 'data_asset',
   location: {
-    href: `/v2/assets/${trainingAssetId}?project_id=${projectId}`,
+    href: `/v2/assets/${trainingAssetId}?project_id=${process.env.WATSONX_AI_PROJECT_ID}`,
   },
 };
 
@@ -88,7 +87,6 @@ const promptTuningModel = {
 const trainingParams = {
   name: 'WXAI Node.js SDK Example Prompt',
   resultsReference: objectLocationModel,
-  projectId,
   description: 'First prompt tuning training',
   tags: ['testString'],
   promptTuning: promptTuningModel,
@@ -156,7 +154,7 @@ try {
 
   // Wait until training has been finished, then save id of the model and use it for deployment
   // This step should take ~3 minutes
-  modelId = await getModelId({ trainingId, projectId });
+  modelId = await getModelId({ trainingId });
 
   // Rel
   const relModel = {
@@ -166,8 +164,6 @@ try {
   const deploymentParams = {
     name: 'text_classification_wx_nodejs_sdk',
     online: onlineDeploymentModel,
-    projectId,
-    spaceId,
     description: 'First deployment',
     tags: ['testString'],
     custom: { anyKey: 'anyValue' },
@@ -181,7 +177,7 @@ try {
 
   // Wait for deployment to be ready inference
   // This step should take ~2-3 minutes
-  await waitForDeployment({ deploymentId, projectId });
+  await waitForDeployment({ deploymentId });
 
   const genParams = {
     idOrName: deploymentId,
@@ -197,7 +193,7 @@ try {
 } finally {
   // All resources will be deleted after this example. If you want to use them afterward, please comment out the lines below.
   if (trainingId)
-    await watsonxAIService.deleteTraining({ projectId, trainingId, hardDelete: true });
-  if (deploymentId) await watsonxAIService.deleteDeployment({ projectId, deploymentId });
-  if (modelId) await watsonxAIService.deleteModel({ projectId, modelId });
+    await watsonxAIService.deleteTraining({ trainingId, hardDelete: true });
+  if (deploymentId) await watsonxAIService.deleteDeployment({ deploymentId });
+  if (modelId) await watsonxAIService.deleteModel({ modelId });
 }

@@ -25,9 +25,6 @@ config({ path: credentialsPath });
  */
 // process.env.IBM_CREDENTIALS_FILE = path.join(__dirname, '/../../../credentials/watsonx_ai_ml_vml_v1.env')
 
-const projectId = process.env.WATSONX_AI_PROJECT_ID;
-const _spaceId = projectId ? undefined : process.env.WATSONX_AI_SPACE_ID;
-
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 
 const response = await fetch(
@@ -65,15 +62,16 @@ const arrayToObject = (array: any[]) => {
 // Skipping last 96 datapoints to have them compared to the forecast
 const jsonData = arrayToObject(jsonArray.slice(-608, -96));
 
-// Service instance
+// Service instance — version defaults to the latest supported API date.
+// projectId and spaceId are passed here so they do not need to be repeated on every request.
 const watsonxAIService = WatsonXAI.newInstance({
-  version: '2024-05-31',
   serviceUrl,
+  projectId: process.env.WATSONX_AI_PROJECT_ID,
+  spaceId: process.env.WATSONX_AI_PROJECT_ID ? undefined : process.env.WATSONX_AI_SPACE_ID,
 });
 
 const res = await watsonxAIService.timeSeriesForecast({
   modelId: 'ibm/granite-ttm-512-96-r2',
-  projectId,
   data: jsonData,
   schema: {
     timestamp_column: 'time',

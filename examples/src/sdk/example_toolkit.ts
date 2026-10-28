@@ -14,14 +14,14 @@ import {
 import '../utils/config.ts';
 
 const modelName = 'openai/gpt-oss-120b';
-const projectId = process.env.WATSONX_AI_PROJECT_ID;
 const serviceUrl = process.env.WATSONX_AI_SERVICE_URL;
 
 const twoToolAgent = async (input: string) => {
-  // Service instance
+  // Service instance — version defaults to the latest supported API date.
+  // projectId is passed here so it does not need to be repeated on every request.
   const watsonxAIService = WatsonXAI.newInstance({
-    version: '2024-05-31',
     serviceUrl,
+    projectId: process.env.WATSONX_AI_PROJECT_ID,
   });
   const googleUtilityTool = await watsonxAIService.getUtilityAgentTool({
     toolId: 'GoogleSearch',
@@ -36,7 +36,6 @@ const twoToolAgent = async (input: string) => {
   const textUtilityChat = await watsonxAIService.textChat({
     messages,
     tools: chatTools,
-    projectId,
     modelId: modelName,
   });
 
@@ -66,7 +65,6 @@ const twoToolAgent = async (input: string) => {
   const textChat = await watsonxAIService.textChat({
     messages,
     tools: chatTools,
-    projectId,
     modelId: modelName,
   });
   console.log(messages);
